@@ -481,13 +481,21 @@ class SteamUpcomingCollector:
 
             in_window = 0
             known_dates = 0
+            fuzzy_skipped = 0
             min_known_start: date | None = None
 
             for game in rows:
                 release = parse_release_window(game.release_raw)
-                if release.start is not None:
-                    known_dates += 1
-                    min_known_start = release.start if min_known_start is None else min(min_known_start, release.start)
+
+                # Only exact release dates are tracked for now.
+                # Month / quarter / year / TBA dates are intentionally skipped.
+                if release.precision != "day":
+                    fuzzy_skipped += 1
+                    continue
+
+                known_dates += 1
+                min_known_start = release.start if min_known_start is None else min(min_known_start, release.start)
+
                 if segment_index is not None and segment_anchor is not None:
                     assigned_segment = assign_release_to_segment(
                         appid=game.appid,
@@ -504,10 +512,12 @@ class SteamUpcomingCollector:
                     in_window += 1
 
             LOGGER.info(
-                "Steam page %d: %d rows, %d dated, %d assigned to current window, %d candidates total",
+                "Steam page %d: %d rows, %d exact dates, %d fuzzy skipped, "
+                "%d assigned to current window, %d candidates total",
                 page + 1,
                 len(rows),
                 known_dates,
+                fuzzy_skipped,
                 in_window,
                 len(seen),
             )

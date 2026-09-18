@@ -173,6 +173,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         search_request_interval=args.search_interval,
         max_pages=args.max_pages,
         follower_cache_path=args.follower_cache,
+        checkpoint_path=args.checkpoint,
+        checkpoint_branch=args.checkpoint_branch,
+        checkpoint_every=args.checkpoint_every,
     )
 
     if not state.get("initial_complete"):
@@ -309,6 +312,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--state", default="data/steam_initial_state.json")
     parser.add_argument("--master", default="data/steam_upcoming_master.json")
     parser.add_argument("--follower-cache", default="data/steam_followers_cache.json")
+    parser.add_argument("--checkpoint", default="data/steam_followers_checkpoint.json")
+    parser.add_argument("--checkpoint-branch", default="steam-state")
+    parser.add_argument("--checkpoint-every", type=int, default=5)
     parser.add_argument("--country", default="TW")
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--min-followers", type=int, default=5000)

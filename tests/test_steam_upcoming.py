@@ -1,6 +1,10 @@
 from datetime import date
 
-from collectors.steam_upcoming import SteamUpcomingCollector, parse_follower_xml, parse_release_window
+from collectors.steam_upcoming import (
+    parse_follower_xml,
+    parse_release_window,
+    parse_search_results_html,
+)
 
 
 def test_parse_exact_day_day_first() -> None:
@@ -49,16 +53,22 @@ def test_parse_follower_xml_group_details() -> None:
     assert parse_follower_xml(xml) == 12345
 
 
-def test_item_mapping() -> None:
-    game = SteamUpcomingCollector._item_to_game(
-        {
-            "id": 123456,
-            "name": "Test Game",
-            "logo": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/123456/capsule.jpg",
-            "release_date": "18 Sep, 2026",
-        }
-    )
-    assert game is not None
+def test_parse_search_results_html() -> None:
+    html = """
+    <a href="https://store.steampowered.com/app/123456/Test_Game/"
+       data-ds-appid="123456"
+       class="search_result_row ds_collapse_flag">
+      <div class="search_capsule">
+        <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/123456/capsule.jpg">
+      </div>
+      <span class="title">Test &amp; Game</span>
+      <div class="search_released">18 Sep, 2026</div>
+    </a>
+    """
+    games = parse_search_results_html(html)
+    assert len(games) == 1
+    game = games[0]
     assert game.appid == 123456
+    assert game.name == "Test & Game"
     assert game.release_start == "2026-09-18"
     assert game.store_url == "https://store.steampowered.com/app/123456/"

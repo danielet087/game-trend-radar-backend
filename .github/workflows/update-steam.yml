@@ -49,7 +49,7 @@ jobs:
           --country TW
           --days 365
           --min-followers 5000
-          --request-interval 12
+          --request-interval 30
           --search-interval 10
           --max-pages 100
           --segment-months 2
@@ -89,6 +89,8 @@ jobs:
               f"- Fresh follower requests: {latest.get('fresh_follower_requests', 0)}\n"
               f"- Reused from private cache: {latest.get('cached_follower_reuses', 0)}\n"
               f"- Follower failures: {latest.get('follower_failures', 0)}\n"
+              f"- Follower 429 events: {latest.get('follower_rate_limit_events', 0)}\n"
+              f"- First follower 429 after fresh requests: {latest.get('first_follower_429_after_requests')}\n"
           )
 
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:

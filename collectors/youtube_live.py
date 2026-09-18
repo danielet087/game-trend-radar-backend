@@ -152,6 +152,7 @@ class YouTubeClient:
         self,
         *,
         tracked_query: str | None = None,
+        fallback_query: str | None = None,
         include_gaming_topic: bool = True,
     ) -> tuple[list[str], int, str]:
         video_ids: list[str] = []
@@ -214,10 +215,12 @@ class YouTubeClient:
             "maxResults": 50,
             "publishedAfter": published_after,
         }
-        if tracked_query:
+        if fallback_query:
+            fallback_params["q"] = fallback_query
+        elif tracked_query:
             fallback_params["q"] = tracked_query
         else:
-            fallback_params["q"] = "gaming|遊戲|ゲーム|게임"
+            fallback_params["q"] = "gaming"
 
         payload = self.get("search", fallback_params)
         search_calls += 1
@@ -356,11 +359,13 @@ def collect_youtube(api_key: str, *, search_calls: int = 2) -> dict[str, Any]:
         search_terms = ["gaming", "遊戲", "ゲーム", "게임"]
 
     tracked_query = "|".join(search_terms[:10]) if search_terms else None
+    fallback_query = search_terms[0] if search_terms else "gaming"
 
-    # Keep a fixed two-search budget:
+    # Primary budget is two live-search calls; one fallback call is used only
     # 1) official Gaming topic, 2) tracked games query.
     discovered_video_ids, actual_search_calls, discovery_mode = client.search_live_games(
         tracked_query=tracked_query,
+        fallback_query=fallback_query,
         include_gaming_topic=True,
     )
 

@@ -139,6 +139,54 @@ def parse_release_window(raw: Any) -> ReleaseWindow:
     return ReleaseWindow(text, None, None, "unknown")
 
 
+def _add_months_clamped(value: date, months: int) -> date:
+    month_index = value.month - 1 + months
+    year = value.year + month_index // 12
+    month = month_index % 12 + 1
+    day = min(value.day, calendar.monthrange(year, month)[1])
+    return date(year, month, day)
+
+
+def assign_release_to_segment(
+    *,
+    appid: int,
+    release: ReleaseWindow,
+    anchor: date,
+    segment_months: int,
+    total_segments: int,
+) -> int | None:
+    if release.start is None or release.end is None:
+        return None
+
+    eligible: list[int] = []
+    windows: list[tuple[date, date]] = []
+    for index in range(total_segments):
+        start = _add_months_clamped(anchor, index * segment_months)
+        end = _add_months_clamped(anchor, (index + 1) * segment_months) - timedelta(days=1)
+        windows.append((start, end))
+        if release.overlaps(start, end):
+            eligible.append(index)
+
+    if not eligible:
+        return None
+
+    # Precise day/month releases should stay with the segment that best
+    # represents their actual release date instead of being load-balanced.
+    if release.precision in {"day", "month"}:
+        span_days = max(0, (release.end - release.start).days)
+        representative = release.start + timedelta(days=span_days // 2)
+        for index in eligible:
+            start, end = windows[index]
+            if start <= representative <= end:
+                return index
+        return eligible[0]
+
+    # Quarter/year release windows are intentionally ambiguous. Assign each
+    # title to exactly one compatible segment using a stable AppID partition,
+    # so the same broad-date title is not checked in every two-month batch.
+    return eligible[appid % len(eligible)]
+
+
 def parse_follower_xml(xml_text: str) -> int:
     root = ET.fromstring(xml_text)
     for path in ("memberCount", "groupDetails/memberCount", ".//memberCount"):
@@ -236,7 +284,7 @@ class SteamUpcomingCollector:
         min_followers: int = 5000,
         page_size: int = 100,
         max_pages: int = 100,
-        follower_request_interval: float = 12.0,
+        follower_request_interval: float = 30.0,
         search_request_interval: float = 10.0,
         timeout_seconds: float = 20.0,
         follower_cache_path: str | Path = "data/steam_followers_cache.json",
@@ -265,6 +313,10 @@ class SteamUpcomingCollector:
         self.cached_follower_reuses = 0
         self.follower_failures = 0
         self.failed_follower_appids: list[int] = []
+        self.rate_limit_events = 0
+        self.follower_rate_limit_events = 0
+        self.search_rate_limit_events = 0
+        self.first_follower_429_after_requests: int | None = None
 
     def _load_follower_cache(self) -> dict[str, dict[str, Any]]:
         if not self.follower_cache_path.exists():
@@ -337,6 +389,15 @@ class SteamUpcomingCollector:
                 response = self.session.get(url, params=params, timeout=self.timeout_seconds)
 
                 if response.status_code == 429:
+                    self.rate_limit_events += 1
+                    endpoint_name = "followers" if "memberslistxml" in url else "search"
+                    if endpoint_name == "followers":
+                        self.follower_rate_limit_events += 1
+                        if self.first_follower_429_after_requests is None:
+                            self.first_follower_429_after_requests = self.fresh_follower_requests
+                    else:
+                        self.search_rate_limit_events += 1
+
                     retry_after = response.headers.get("Retry-After", "").strip()
                     try:
                         delay = float(retry_after)
@@ -383,6 +444,10 @@ class SteamUpcomingCollector:
         today: date | None = None,
         window_start: date | None = None,
         window_end: date | None = None,
+        segment_index: int | None = None,
+        segment_anchor: date | None = None,
+        segment_months: int = 2,
+        total_segments: int = 6,
     ) -> list[UpcomingGame]:
         today = today or _utc_now().date()
         target_start = window_start or today
@@ -423,12 +488,23 @@ class SteamUpcomingCollector:
                 if release.start is not None:
                     known_dates += 1
                     min_known_start = release.start if min_known_start is None else min(min_known_start, release.start)
-                if release.overlaps(target_start, target_end):
+                if segment_index is not None and segment_anchor is not None:
+                    assigned_segment = assign_release_to_segment(
+                        appid=game.appid,
+                        release=release,
+                        anchor=segment_anchor,
+                        segment_months=segment_months,
+                        total_segments=total_segments,
+                    )
+                    if assigned_segment == segment_index:
+                        seen[game.appid] = game
+                        in_window += 1
+                elif release.overlaps(target_start, target_end):
                     seen[game.appid] = game
                     in_window += 1
 
             LOGGER.info(
-                "Steam page %d: %d rows, %d dated, %d within horizon, %d candidates total",
+                "Steam page %d: %d rows, %d dated, %d assigned to current window, %d candidates total",
                 page + 1,
                 len(rows),
                 known_dates,
@@ -436,14 +512,15 @@ class SteamUpcomingCollector:
                 len(seen),
             )
 
-            if known_dates == len(rows) and min_known_start is not None and min_known_start > target_end:
-                pages_past_cutoff += 1
-            else:
-                pages_past_cutoff = 0
+            if segment_index is None:
+                if known_dates == len(rows) and min_known_start is not None and min_known_start > target_end:
+                    pages_past_cutoff += 1
+                else:
+                    pages_past_cutoff = 0
 
-            if pages_past_cutoff >= 2:
-                LOGGER.info("Two consecutive pages are fully beyond %s; stopping early", target_end)
-                break
+                if pages_past_cutoff >= 2:
+                    LOGGER.info("Two consecutive pages are fully beyond %s; stopping early", target_end)
+                    break
 
             start += len(rows)
             total = payload.get("total_count")
@@ -470,6 +547,7 @@ class SteamUpcomingCollector:
         total = len(games)
         qualified: list[QualifiedGame] = []
         cache_now = _utc_now()
+        qualify_started_at = time.monotonic()
 
         for index, game in enumerate(games, start=1):
             cached = self._cached_follower_entry(game.appid, cache_now)
@@ -504,14 +582,19 @@ class SteamUpcomingCollector:
                     )
                 )
 
-            if index % 50 == 0 or index == total:
+            if index % 5 == 0 or index == total:
+                elapsed_seconds = int(time.monotonic() - qualify_started_at)
                 LOGGER.info(
-                    "Follower progress %d/%d; qualified=%d; fresh=%d; cache=%d",
+                    "Follower progress %d/%d; qualified=%d; fresh=%d; cache=%d; "
+                    "429=%d; elapsed=%dm%02ds",
                     index,
                     total,
                     len(qualified),
                     self.fresh_follower_requests,
                     self.cached_follower_reuses,
+                    self.follower_rate_limit_events,
+                    elapsed_seconds // 60,
+                    elapsed_seconds % 60,
                 )
 
         self._save_follower_cache()
@@ -527,6 +610,10 @@ class SteamUpcomingCollector:
         today: date | None = None,
         window_start: date | None = None,
         window_end: date | None = None,
+        segment_index: int | None = None,
+        segment_anchor: date | None = None,
+        segment_months: int = 2,
+        total_segments: int = 6,
     ) -> dict[str, Any]:
         now = _utc_now()
         today = today or now.date()
@@ -536,6 +623,10 @@ class SteamUpcomingCollector:
             today=today,
             window_start=target_start,
             window_end=target_end,
+            segment_index=segment_index,
+            segment_anchor=segment_anchor,
+            segment_months=segment_months,
+            total_segments=total_segments,
         )
         games = self.qualify(candidates)
 
@@ -565,6 +656,10 @@ class SteamUpcomingCollector:
                 "cached_follower_reuses": self.cached_follower_reuses,
                 "follower_failures": self.follower_failures,
                 "failed_follower_appids": self.failed_follower_appids,
+                "rate_limit_events": self.rate_limit_events,
+                "follower_rate_limit_events": self.follower_rate_limit_events,
+                "search_rate_limit_events": self.search_rate_limit_events,
+                "first_follower_429_after_requests": self.first_follower_429_after_requests,
             },
             "candidate_count": len(candidates),
             "count": len(games),

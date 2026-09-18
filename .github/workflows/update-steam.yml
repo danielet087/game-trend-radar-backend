@@ -2,12 +2,6 @@ name: Update Steam upcoming data
 
 on:
   workflow_dispatch:
-  push:
-    # Workflow changes are automatically verified once.
-    branches:
-      - main
-    paths:
-      - ".github/workflows/update-steam.yml"
   schedule:
     # 03:23 UTC = 11:23 Taiwan (UTC+8)
     - cron: "23 3 * * *"
@@ -17,7 +11,7 @@ permissions:
 
 concurrency:
   group: steam-upcoming-daily
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   collect:
@@ -45,6 +39,8 @@ jobs:
 
       # Exact release dates only; month/quarter/year/TBA dates are skipped.
       - name: Collect Steam upcoming games in two-month segments
+        env:
+          STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           python -m scripts.update_steam_daily
           --country TW
@@ -56,6 +52,9 @@ jobs:
           --segment-months 2
           --total-segments 6
           --follower-cache data/steam_followers_cache.json
+          --checkpoint data/steam_followers_checkpoint.json
+          --checkpoint-branch steam-state
+          --checkpoint-every 5
           --state data/steam_initial_state.json
           --master data/steam_upcoming_master.json
           --output output/steam_upcoming.json
@@ -92,6 +91,7 @@ jobs:
               f"- Follower failures: {latest.get('follower_failures', 0)}\n"
               f"- Follower 429 events: {latest.get('follower_rate_limit_events', 0)}\n"
               f"- First follower 429 after fresh requests: {latest.get('first_follower_429_after_requests')}\n"
+              f"- Checkpoint: every {latest.get('checkpoint_every', 5)} fresh lookups -> {latest.get('checkpoint_branch', 'steam-state')}\n"
           )
 
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:

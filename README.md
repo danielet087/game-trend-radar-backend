@@ -80,3 +80,35 @@ Twitch App Access Token 由程式使用 Client Credentials Flow 自動取得，�
 ```
 game-trend-radar/data/twitch_live.json
 ```
+
+
+## Steam 初始建立與後續更新策略
+
+為避免第一次對大量 Steam 遊戲逐筆查 Followers 時觸發 HTTP 429，初始資料分成 6 個區段建立：
+
+- 第 1 次：今天起 0～2 個月
+- 第 2 次：2～4 個月
+- 第 3 次：4～6 個月
+- 第 4 次：6～8 個月
+- 第 5 次：8～10 個月
+- 第 6 次：10～12 個月
+
+每個區段只有在 Followers 查詢完整成功後才會前進到下一段。若有任何 Followers 查詢失敗，隔天會重試同一段；已成功查到的資料保留於 Private cache，不必全部重抓。
+
+一年初始化完成後：
+
+- Followers >= 5,000：每天重新確認
+- Followers 3,000～4,999：每 3 天重新確認
+- Followers < 3,000：每 30 天重新確認
+- 新出現遊戲：第一次看到時立即確認
+- 已正式上市的遊戲：移出 upcoming 公開清單，不再作為未上市遊戲追蹤
+
+## YouTube 每小時資料
+
+`.github/workflows/update-youtube.yml` 每小時第 52 分執行。
+
+- 使用 `YOUTUBE_API_KEY`
+- 以 YouTube Search 做候選直播發現，再用 `videos.list/liveStreamingDetails` 確認是否仍在直播
+- 保存直播主數、同時觀看人數與直播明細
+- 頻道若有設定 `snippet.country`，用該國家作為台灣／亞洲／其他地區的代理分類；不視為實際 GPS 所在地
+- 公開輸出：`game-trend-radar/data/youtube_live.json`

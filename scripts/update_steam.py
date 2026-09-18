@@ -15,8 +15,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--min-followers", type=int, default=5000)
     parser.add_argument("--workers", type=int, default=4)
-    parser.add_argument("--request-interval", type=float, default=0.25)
-    parser.add_argument("--max-pages", type=int, default=200)
+    parser.add_argument("--request-interval", type=float, default=0.35)
+    parser.add_argument("--search-interval", type=float, default=2.0)
+    parser.add_argument("--max-pages", type=int, default=80)
     return parser
 
 
@@ -32,6 +33,7 @@ def main() -> None:
         min_followers=args.min_followers,
         follower_workers=args.workers,
         follower_request_interval=args.request_interval,
+        search_request_interval=args.search_interval,
         max_pages=args.max_pages,
     )
     payload = collector.collect()

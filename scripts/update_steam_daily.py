@@ -201,6 +201,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             today=today,
             window_start=window_start,
             window_end=window_end,
+            segment_index=segment,
+            segment_anchor=anchor,
+            segment_months=segment_months,
+            total_segments=total_segments,
         )
 
         failures = int((latest.get("collection") or {}).get("follower_failures") or 0)
@@ -308,7 +312,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--country", default="TW")
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--min-followers", type=int, default=5000)
-    parser.add_argument("--request-interval", type=float, default=12.0)
+    parser.add_argument("--request-interval", type=float, default=30.0)
     parser.add_argument("--search-interval", type=float, default=10.0)
     parser.add_argument("--max-pages", type=int, default=100)
     parser.add_argument("--segment-months", type=int, default=2)

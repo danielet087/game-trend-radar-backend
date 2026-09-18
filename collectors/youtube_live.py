@@ -76,6 +76,40 @@ def build_known_games(
     return sorted(names.values(), key=lambda name: len(normalize_text(name)), reverse=True)
 
 
+def build_search_terms(
+    twitch_payload: dict[str, Any],
+    steam_payload: dict[str, Any],
+    *,
+    max_terms: int = 20,
+) -> list[str]:
+    ordered: list[str] = []
+    seen: set[str] = set()
+
+    # Upcoming Steam games are the main focus of this site.
+    for row in steam_payload.get("games") or []:
+        if not isinstance(row, dict):
+            continue
+        name = str(row.get("name") or "").strip()
+        key = normalize_text(name)
+        if name and len(key) >= 4 and key not in seen:
+            ordered.append(name)
+            seen.add(key)
+
+    # Fill remaining slots with current Twitch game leaders.
+    for row in twitch_payload.get("top_games") or []:
+        if not isinstance(row, dict):
+            continue
+        name = str(row.get("game_name") or "").strip()
+        key = normalize_text(name)
+        if name and len(key) >= 4 and key not in seen:
+            ordered.append(name)
+            seen.add(key)
+        if len(ordered) >= max_terms:
+            break
+
+    return ordered[:max_terms]
+
+
 def infer_game_name(title: str, known_games: Iterable[str]) -> str | None:
     normalized_title = f" {normalize_text(title)} "
     ordered_games = sorted(
@@ -110,23 +144,21 @@ class YouTubeClient:
         payload = response.json()
         return payload if isinstance(payload, dict) else {}
 
-    def search_live_gaming(self, *, pages: int = 2) -> list[str]:
+    def search_live_games(self, queries: Iterable[str]) -> list[str]:
         video_ids: list[str] = []
-        page_token: str | None = None
 
-        for page in range(max(1, pages)):
-            params: dict[str, Any] = {
-                "part": "snippet",
-                "eventType": "live",
-                "type": "video",
-                "videoCategoryId": "20",
-                "order": "viewCount",
-                "maxResults": 50,
-            }
-            if page_token:
-                params["pageToken"] = page_token
-
-            payload = self.get("search", params)
+        for index, query in enumerate(queries, start=1):
+            payload = self.get(
+                "search",
+                {
+                    "part": "snippet",
+                    "eventType": "live",
+                    "type": "video",
+                    "order": "viewCount",
+                    "maxResults": 50,
+                    "q": query,
+                },
+            )
             rows = payload.get("items") or []
             for row in rows:
                 if not isinstance(row, dict):
@@ -135,10 +167,11 @@ class YouTubeClient:
                 if video_id:
                     video_ids.append(str(video_id))
 
-            LOGGER.info("YouTube live gaming search page %d: %d videos", page + 1, len(rows))
-            page_token = payload.get("nextPageToken")
-            if not page_token:
-                break
+            LOGGER.info(
+                "YouTube live game search %d: %d videos",
+                index,
+                len(rows),
+            )
 
         return list(dict.fromkeys(video_ids))
 
@@ -238,14 +271,28 @@ def aggregate_games(streams: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
     return result
 
 
-def collect_youtube(api_key: str, *, search_pages: int = 2) -> dict[str, Any]:
+def collect_youtube(api_key: str, *, search_calls: int = 2) -> dict[str, Any]:
     client = YouTubeClient(api_key)
 
     twitch_payload = fetch_public_json(TWITCH_JSON_URL)
     steam_payload = fetch_public_json(STEAM_JSON_URL)
     known_games = build_known_games(twitch_payload, steam_payload)
+    search_terms = build_search_terms(
+        twitch_payload,
+        steam_payload,
+        max_terms=max(1, search_calls) * 10,
+    )
 
-    video_ids = client.search_live_gaming(pages=search_pages)
+    if not search_terms:
+        search_terms = ["gaming", "遊戲", "ゲーム", "게임"]
+
+    group_size = max(1, (len(search_terms) + max(1, search_calls) - 1) // max(1, search_calls))
+    queries = [
+        "|".join(search_terms[start:start + group_size])
+        for start in range(0, len(search_terms), group_size)
+    ][:max(1, search_calls)]
+
+    video_ids = client.search_live_games(queries)
     videos = client.get_videos(video_ids)
 
     channel_ids = [
@@ -307,9 +354,9 @@ def collect_youtube(api_key: str, *, search_pages: int = 2) -> dict[str, Any]:
         "generated_at": generated_at,
         "source": "YouTube Data API v3",
         "coverage": {
-            "search_pages": search_pages,
-            "search_calls_per_run": search_pages,
-            "estimated_daily_search_calls_at_hourly_schedule": search_pages * 24,
+            "search_calls_per_run": len(queries),
+            "estimated_daily_search_calls_at_hourly_schedule": len(queries) * 24,
+            "search_term_count": len(search_terms),
             "live_gaming_stream_sample_size": len(streams),
             "known_game_dictionary_size": len(known_games),
             "matched_stream_count": len(matched),

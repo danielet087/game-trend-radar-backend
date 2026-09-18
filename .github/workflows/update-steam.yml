@@ -43,6 +43,7 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
 
+      # Exact release dates only; month/quarter/year/TBA dates are skipped.
       - name: Collect Steam upcoming games in two-month segments
         run: >
           python -m scripts.update_steam_daily

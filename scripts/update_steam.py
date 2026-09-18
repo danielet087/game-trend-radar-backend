@@ -14,10 +14,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--country", default="TW")
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--min-followers", type=int, default=5000)
-    parser.add_argument("--workers", type=int, default=4)
-    parser.add_argument("--request-interval", type=float, default=0.35)
-    parser.add_argument("--search-interval", type=float, default=2.0)
-    parser.add_argument("--max-pages", type=int, default=80)
+    parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--request-interval", type=float, default=2.0)
+    parser.add_argument("--search-interval", type=float, default=10.0)
+    parser.add_argument("--max-pages", type=int, default=100)
     return parser
 
 

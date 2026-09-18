@@ -54,3 +54,29 @@ python -m pytest -q
 - 先跑測試，再產生 `output/steam_upcoming.json`。
 - JSON 目前只保存為 Private Repository 的 Artifact，保留 7 天。
 - 下一步才會設定跨 Repository 發佈，只把整理後的 JSON 寫入公開前端 `game-trend-radar`。
+
+
+## Twitch 每小時資料
+
+`.github/workflows/update-twitch.yml` 每小時第 37 分執行一次。
+
+目前收集：
+
+- Twitch 高觀看直播樣本，彙整成遊戲層級的直播主數與觀看人數。
+- Steam 關注清單中的遊戲，對應 Twitch 遊戲分類後另外追蹤。
+- 語言分布會保存；Twitch Helix API 不提供直播主實體所在地，因此不把語言直接當成台灣／亞洲所在地。
+
+需要在 Private Repository 的 GitHub Actions Secrets 設定：
+
+- `TWITCH_CLIENT_ID`
+- `TWITCH_CLIENT_SECRET`
+
+Twitch App Access Token 由程式使用 Client Credentials Flow 自動取得，不需要把 Access Token 手動存進 GitHub Secrets。
+
+如果上述兩個 Secret 尚未設定，Twitch workflow 會安全跳過，不會讓排程顯示失敗。
+
+公開輸出預計為：
+
+```
+game-trend-radar/data/twitch_live.json
+```

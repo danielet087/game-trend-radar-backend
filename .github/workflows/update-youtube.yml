@@ -1,0 +1,111 @@
+name: Update YouTube live data
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "collectors/youtube_live.py"
+      - "scripts/update_youtube.py"
+      - "tests/test_youtube_live.py"
+      - ".github/workflows/update-youtube.yml"
+  schedule:
+    # Twitch runs at :37; YouTube runs at :52.
+    - cron: "52 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: youtube-live-hourly
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+
+      - name: Check YouTube API key
+        id: credentials
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          if [ -n "$YOUTUBE_API_KEY" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "YOUTUBE_API_KEY is not configured; skipping this hourly run."
+          fi
+
+      - name: Set up Python
+        if: steps.credentials.outputs.configured == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        if: steps.credentials.outputs.configured == 'true'
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Run tests
+        if: steps.credentials.outputs.configured == 'true'
+        run: python -m pytest -q
+
+      - name: Collect YouTube live data
+        if: steps.credentials.outputs.configured == 'true'
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: >
+          python -m scripts.update_youtube
+          --search-pages 2
+          --output output/youtube_live.json
+
+      - name: Validate YouTube JSON
+        if: steps.credentials.outputs.configured == 'true'
+        run: python -m json.tool output/youtube_live.json > /dev/null
+
+      - name: Upload private YouTube artifact
+        if: steps.credentials.outputs.configured == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-live-json
+          path: output/youtube_live.json
+          if-no-files-found: error
+          retention-days: 2
+
+      - name: Publish YouTube JSON to public frontend repository
+        if: steps.credentials.outputs.configured == 'true'
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          if [ -z "$FRONTEND_REPO_TOKEN" ]; then
+            echo "FRONTEND_REPO_TOKEN is not configured; skipping public publish."
+            exit 0
+          fi
+
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+          mkdir -p frontend/data
+          cp output/youtube_live.json frontend/data/youtube_live.json
+
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/youtube_live.json
+
+          if git diff --cached --quiet; then
+            echo "Public YouTube JSON is already up to date."
+            exit 0
+          fi
+
+          git commit -m "data: update YouTube live metrics"
+          git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
+          git push origin main

@@ -14,10 +14,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--country", default="TW")
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--min-followers", type=int, default=5000)
-    parser.add_argument("--workers", type=int, default=1)
-    parser.add_argument("--request-interval", type=float, default=2.0)
+    parser.add_argument("--request-interval", type=float, default=5.0)
     parser.add_argument("--search-interval", type=float, default=10.0)
     parser.add_argument("--max-pages", type=int, default=100)
+    parser.add_argument("--follower-cache", default="data/steam_followers_cache.json")
     return parser
 
 
@@ -31,10 +31,10 @@ def main() -> None:
         country=args.country,
         horizon_days=args.days,
         min_followers=args.min_followers,
-        follower_workers=args.workers,
         follower_request_interval=args.request_interval,
         search_request_interval=args.search_interval,
         max_pages=args.max_pages,
+        follower_cache_path=args.follower_cache,
     )
     payload = collector.collect()
     path = write_json(payload, args.output)

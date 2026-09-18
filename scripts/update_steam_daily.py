@@ -129,6 +129,7 @@ def build_public_payload(
             "total_segments": state.get("total_segments"),
             "next_segment": state.get("next_segment"),
             "completed_segments": state.get("completed_segments", []),
+            "last_attempt": state.get("last_attempt"),
         },
         "latest_collection": latest_run.get("collection", {}),
         "count": len(games),
@@ -202,31 +203,64 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             window_end=window_end,
         )
 
-        combined_games = merge_segment(
-            existing_games,
-            latest.get("games", []),
-            window_start=window_start,
-            window_end=window_end,
-            today=today,
-        )
+        failures = int((latest.get("collection") or {}).get("follower_failures") or 0)
 
-        completed = list(state.get("completed_segments") or [])
-        completed = [item for item in completed if int(item.get("segment", -1)) != segment]
-        completed.append(
-            {
+        if failures > 0:
+            LOGGER.warning(
+                "Initial segment %d/%d is incomplete: %d follower lookups failed. "
+                "The segment will be retried on the next scheduled run.",
+                segment + 1,
+                total_segments,
+                failures,
+            )
+            combined_games = prune_released(existing_games, today)
+            state["last_attempt"] = {
                 "segment": segment,
                 "window_start": window_start.isoformat(),
                 "window_end": window_end.isoformat(),
-                "completed_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                "attempted_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                "status": "incomplete",
+                "candidate_count": int(latest.get("candidate_count") or 0),
+                "qualified_count_partial": int(latest.get("count") or 0),
+                "follower_failures": failures,
+            }
+        else:
+            combined_games = merge_segment(
+                existing_games,
+                latest.get("games", []),
+                window_start=window_start,
+                window_end=window_end,
+                today=today,
+            )
+
+            completed = list(state.get("completed_segments") or [])
+            completed = [item for item in completed if int(item.get("segment", -1)) != segment]
+            completed.append(
+                {
+                    "segment": segment,
+                    "window_start": window_start.isoformat(),
+                    "window_end": window_end.isoformat(),
+                    "completed_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                    "candidate_count": int(latest.get("candidate_count") or 0),
+                    "qualified_count": int(latest.get("count") or 0),
+                }
+            )
+            completed.sort(key=lambda item: int(item["segment"]))
+
+            state["completed_segments"] = completed
+            state["next_segment"] = segment + 1
+            state["initial_complete"] = state["next_segment"] >= total_segments
+            state["last_attempt"] = {
+                "segment": segment,
+                "window_start": window_start.isoformat(),
+                "window_end": window_end.isoformat(),
+                "attempted_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                "status": "complete",
                 "candidate_count": int(latest.get("candidate_count") or 0),
                 "qualified_count": int(latest.get("count") or 0),
+                "follower_failures": 0,
             }
-        )
-        completed.sort(key=lambda item: int(item["segment"]))
 
-        state["completed_segments"] = completed
-        state["next_segment"] = segment + 1
-        state["initial_complete"] = state["next_segment"] >= total_segments
         mode = "initializing"
 
     else:

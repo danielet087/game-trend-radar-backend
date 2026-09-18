@@ -144,22 +144,46 @@ class YouTubeClient:
         payload = response.json()
         return payload if isinstance(payload, dict) else {}
 
-    def search_live_games(self, queries: Iterable[str]) -> list[str]:
+    def search_live_games(
+        self,
+        *,
+        tracked_query: str | None = None,
+        include_gaming_topic: bool = True,
+    ) -> tuple[list[str], int]:
         video_ids: list[str] = []
+        search_calls = 0
 
-        for index, query in enumerate(queries, start=1):
-            payload = self.get(
-                "search",
+        requests_to_make: list[dict[str, Any]] = []
+
+        if include_gaming_topic:
+            requests_to_make.append(
                 {
                     "part": "snippet",
                     "eventType": "live",
                     "type": "video",
+                    "topicId": "/m/0bzvm2",
                     "order": "viewCount",
                     "maxResults": 50,
-                    "q": query,
-                },
+                }
             )
+
+        if tracked_query:
+            requests_to_make.append(
+                {
+                    "part": "snippet",
+                    "eventType": "live",
+                    "type": "video",
+                    "q": tracked_query,
+                    "order": "viewCount",
+                    "maxResults": 50,
+                }
+            )
+
+        for index, params in enumerate(requests_to_make, start=1):
+            payload = self.get("search", params)
+            search_calls += 1
             rows = payload.get("items") or []
+
             for row in rows:
                 if not isinstance(row, dict):
                     continue
@@ -168,12 +192,12 @@ class YouTubeClient:
                     video_ids.append(str(video_id))
 
             LOGGER.info(
-                "YouTube live game search %d: %d videos",
+                "YouTube live search %d: %d videos",
                 index,
                 len(rows),
             )
 
-        return list(dict.fromkeys(video_ids))
+        return list(dict.fromkeys(video_ids)), search_calls
 
     def get_videos(self, video_ids: Iterable[str]) -> list[dict[str, Any]]:
         ids = list(dict.fromkeys(str(video_id) for video_id in video_ids if str(video_id)))
@@ -286,13 +310,14 @@ def collect_youtube(api_key: str, *, search_calls: int = 2) -> dict[str, Any]:
     if not search_terms:
         search_terms = ["gaming", "遊戲", "ゲーム", "게임"]
 
-    group_size = max(1, (len(search_terms) + max(1, search_calls) - 1) // max(1, search_calls))
-    queries = [
-        "|".join(search_terms[start:start + group_size])
-        for start in range(0, len(search_terms), group_size)
-    ][:max(1, search_calls)]
+    tracked_query = "|".join(search_terms[:10]) if search_terms else None
 
-    video_ids = client.search_live_games(queries)
+    # Keep a fixed two-search budget:
+    # 1) official Gaming topic, 2) tracked games query.
+    video_ids, actual_search_calls = client.search_live_games(
+        tracked_query=tracked_query,
+        include_gaming_topic=True,
+    )
     videos = client.get_videos(video_ids)
 
     channel_ids = [
@@ -354,8 +379,8 @@ def collect_youtube(api_key: str, *, search_calls: int = 2) -> dict[str, Any]:
         "generated_at": generated_at,
         "source": "YouTube Data API v3",
         "coverage": {
-            "search_calls_per_run": len(queries),
-            "estimated_daily_search_calls_at_hourly_schedule": len(queries) * 24,
+            "search_calls_per_run": actual_search_calls,
+            "estimated_daily_search_calls_at_hourly_schedule": actual_search_calls * 24,
             "search_term_count": len(search_terms),
             "live_gaming_stream_sample_size": len(streams),
             "known_game_dictionary_size": len(known_games),

@@ -219,10 +219,10 @@ class SteamUpcomingCollector:
         horizon_days: int = 365,
         min_followers: int = 5000,
         page_size: int = 100,
-        max_pages: int = 80,
-        follower_workers: int = 4,
-        follower_request_interval: float = 0.35,
-        search_request_interval: float = 2.0,
+        max_pages: int = 100,
+        follower_workers: int = 1,
+        follower_request_interval: float = 2.0,
+        search_request_interval: float = 10.0,
         timeout_seconds: float = 20.0,
     ) -> None:
         self.country = country.upper()
@@ -250,7 +250,7 @@ class SteamUpcomingCollector:
     ) -> requests.Response:
         last_error: Exception | str | None = None
 
-        for attempt in range(5):
+        for attempt in range(10):
             if limiter is not None:
                 limiter.wait()
             try:
@@ -260,14 +260,17 @@ class SteamUpcomingCollector:
                     try:
                         delay = float(retry_after)
                     except ValueError:
-                        delay = 30.0 * (attempt + 1)
-                    delay = min(120.0, max(5.0, delay))
+                        delay = 120.0 + (attempt * 60.0)
+                    delay = min(600.0, max(120.0, delay))
                     last_error = f"HTTP {response.status_code}"
-                    LOGGER.warning("HTTP %s from Steam; cooling down %.1fs", response.status_code, delay)
+                    LOGGER.warning(
+                        "HTTP %s from Steam; cooling down %.0fs before retry %d/10",
+                        response.status_code, delay, attempt + 1,
+                    )
                     time.sleep(delay)
                     continue
                 if response.status_code in {500, 502, 504}:
-                    delay = min(2 ** attempt, 30)
+                    delay = min(5 * (attempt + 1), 60)
                     last_error = f"HTTP {response.status_code}"
                     LOGGER.warning("HTTP %s from Steam; retrying in %.1fs", response.status_code, delay)
                     time.sleep(delay)
@@ -276,9 +279,9 @@ class SteamUpcomingCollector:
                 return response
             except (requests.Timeout, requests.ConnectionError, requests.HTTPError) as exc:
                 last_error = exc
-                if attempt == 4:
+                if attempt == 9:
                     break
-                time.sleep(min(2 ** attempt, 30))
+                time.sleep(min(5 * (attempt + 1), 60))
 
         raise RuntimeError(f"Steam request failed after retries: {last_error}")
 
@@ -388,7 +391,7 @@ class SteamUpcomingCollector:
                 result = future.result()
                 if result:
                     qualified.append(result)
-                if completed % 100 == 0 or completed == total:
+                if completed % 25 == 0 or completed == total:
                     LOGGER.info(
                         "Follower progress %d/%d; %d >= %d",
                         completed, total, len(qualified), self.min_followers,
@@ -415,6 +418,14 @@ class SteamUpcomingCollector:
                 "release_horizon_days": self.horizon_days,
                 "min_followers": self.min_followers,
                 "unknown_release_dates_included": False,
+            },
+            "request_policy": {
+                "search_interval_seconds": self.search_rate_limiter.interval,
+                "follower_interval_seconds": self.follower_rate_limiter.interval,
+                "follower_workers": self.follower_workers,
+                "max_pages": self.max_pages,
+                "rate_limit_retry_attempts": 10,
+                "rate_limit_cooldown_seconds": "120-600",
             },
             "candidate_count": len(candidates),
             "count": len(games),

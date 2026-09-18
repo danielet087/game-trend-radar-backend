@@ -288,11 +288,11 @@ class SteamUpcomingCollector:
         temp.replace(self.follower_cache_path)
 
     def _cache_ttl(self, followers: int) -> timedelta:
-        if followers >= int(self.min_followers * 0.8):
-            return timedelta(hours=24)
-        if followers >= int(self.min_followers * 0.5):
+        if followers >= 5000:
+            return timedelta(days=1)
+        if followers >= 3000:
             return timedelta(days=3)
-        return timedelta(days=7)
+        return timedelta(days=30)
 
     def _cached_follower_entry(self, appid: int, now: datetime) -> tuple[int, str] | None:
         entry = self.follower_cache.get(str(appid))
@@ -375,9 +375,16 @@ class SteamUpcomingCollector:
 
         raise RuntimeError(f"Steam request failed after retries: {last_error}")
 
-    def fetch_candidates(self, *, today: date | None = None) -> list[UpcomingGame]:
+    def fetch_candidates(
+        self,
+        *,
+        today: date | None = None,
+        window_start: date | None = None,
+        window_end: date | None = None,
+    ) -> list[UpcomingGame]:
         today = today or _utc_now().date()
-        cutoff = today + timedelta(days=self.horizon_days)
+        target_start = window_start or today
+        target_end = window_end or (today + timedelta(days=self.horizon_days))
         seen: dict[int, UpcomingGame] = {}
         start = 0
         pages_past_cutoff = 0
@@ -414,7 +421,7 @@ class SteamUpcomingCollector:
                 if release.start is not None:
                     known_dates += 1
                     min_known_start = release.start if min_known_start is None else min(min_known_start, release.start)
-                if release.overlaps(today, cutoff):
+                if release.overlaps(target_start, target_end):
                     seen[game.appid] = game
                     in_window += 1
 
@@ -427,13 +434,13 @@ class SteamUpcomingCollector:
                 len(seen),
             )
 
-            if known_dates == len(rows) and min_known_start is not None and min_known_start > cutoff:
+            if known_dates == len(rows) and min_known_start is not None and min_known_start > target_end:
                 pages_past_cutoff += 1
             else:
                 pages_past_cutoff = 0
 
             if pages_past_cutoff >= 2:
-                LOGGER.info("Two consecutive pages are fully beyond %s; stopping early", cutoff)
+                LOGGER.info("Two consecutive pages are fully beyond %s; stopping early", target_end)
                 break
 
             start += len(rows)
@@ -510,10 +517,22 @@ class SteamUpcomingCollector:
             key=lambda g: (-g.followers, g.release_start or "9999-12-31", g.name.casefold()),
         )
 
-    def collect(self, *, today: date | None = None) -> dict[str, Any]:
+    def collect(
+        self,
+        *,
+        today: date | None = None,
+        window_start: date | None = None,
+        window_end: date | None = None,
+    ) -> dict[str, Any]:
         now = _utc_now()
         today = today or now.date()
-        candidates = self.fetch_candidates(today=today)
+        target_start = window_start or today
+        target_end = window_end or (today + timedelta(days=self.horizon_days))
+        candidates = self.fetch_candidates(
+            today=today,
+            window_start=target_start,
+            window_end=target_end,
+        )
         games = self.qualify(candidates)
 
         return {
@@ -525,6 +544,8 @@ class SteamUpcomingCollector:
             "filter": {
                 "country": self.country,
                 "release_horizon_days": self.horizon_days,
+                "release_window_start": target_start.isoformat(),
+                "release_window_end": target_end.isoformat(),
                 "min_followers": self.min_followers,
                 "unknown_release_dates_included": False,
             },

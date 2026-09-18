@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import base64
 import calendar
 import json
 import logging
+import os
 import re
 import threading
 import time
@@ -275,6 +277,33 @@ def _parse_iso_datetime(value: str | None) -> datetime | None:
         return None
 
 
+def merge_follower_records(
+    *sources: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+
+    for source in sources:
+        for appid, entry in source.items():
+            if not isinstance(entry, dict):
+                continue
+
+            key = str(appid)
+            current = merged.get(key)
+            if current is None:
+                merged[key] = dict(entry)
+                continue
+
+            incoming_time = _parse_iso_datetime(str(entry.get("checked_at") or ""))
+            current_time = _parse_iso_datetime(str(current.get("checked_at") or ""))
+
+            if incoming_time is not None and (
+                current_time is None or incoming_time > current_time
+            ):
+                merged[key] = dict(entry)
+
+    return merged
+
+
 class SteamUpcomingCollector:
     def __init__(
         self,
@@ -288,6 +317,9 @@ class SteamUpcomingCollector:
         search_request_interval: float = 10.0,
         timeout_seconds: float = 20.0,
         follower_cache_path: str | Path = "data/steam_followers_cache.json",
+        checkpoint_path: str | Path = "data/steam_followers_checkpoint.json",
+        checkpoint_branch: str = "steam-state",
+        checkpoint_every: int = 5,
         cache_flush_every: int = 20,
     ) -> None:
         self.country = country.upper()
@@ -299,7 +331,13 @@ class SteamUpcomingCollector:
         self.follower_rate_limiter = _RateLimiter(follower_request_interval)
         self.search_rate_limiter = _RateLimiter(search_request_interval)
         self.follower_cache_path = Path(follower_cache_path)
+        self.checkpoint_path = Path(checkpoint_path)
+        self.checkpoint_branch = checkpoint_branch
+        self.checkpoint_every = max(1, checkpoint_every)
         self.cache_flush_every = max(1, cache_flush_every)
+        self.github_repository = os.environ.get("GITHUB_REPOSITORY", "").strip()
+        self.checkpoint_token = os.environ.get("STEAM_CHECKPOINT_TOKEN", "").strip()
+        self._checkpoint_dirty_count = 0
 
         self.session = requests.Session()
         self.session.headers.update({
@@ -308,7 +346,21 @@ class SteamUpcomingCollector:
             "Accept-Language": "en-US,en;q=0.8",
         })
 
-        self.follower_cache = self._load_follower_cache()
+        main_cache = self._load_follower_cache()
+        local_checkpoint = self._load_checkpoint_file()
+        remote_checkpoint = self._load_remote_checkpoint()
+        self.follower_cache = merge_follower_records(
+            main_cache,
+            local_checkpoint,
+            remote_checkpoint,
+        )
+        if remote_checkpoint:
+            LOGGER.info(
+                "Loaded %d follower records from persistent checkpoint branch %s",
+                len(remote_checkpoint),
+                self.checkpoint_branch,
+            )
+
         self.fresh_follower_requests = 0
         self.cached_follower_reuses = 0
         self.follower_failures = 0
@@ -329,6 +381,133 @@ class SteamUpcomingCollector:
         except (OSError, ValueError, TypeError):
             LOGGER.warning("Could not read follower cache; starting with an empty cache")
         return {}
+
+    def _load_checkpoint_file(self) -> dict[str, dict[str, Any]]:
+        if not self.checkpoint_path.exists():
+            return {}
+        try:
+            payload = json.loads(self.checkpoint_path.read_text(encoding="utf-8"))
+            games = payload.get("games", payload)
+            if isinstance(games, dict):
+                return {str(k): v for k, v in games.items() if isinstance(v, dict)}
+        except (OSError, ValueError, TypeError):
+            LOGGER.warning("Could not read local follower checkpoint")
+        return {}
+
+    def _checkpoint_api_url(self) -> str | None:
+        if not self.github_repository:
+            return None
+        return (
+            f"https://api.github.com/repos/{self.github_repository}/contents/"
+            f"{self.checkpoint_path.as_posix()}"
+        )
+
+    def _checkpoint_headers(self) -> dict[str, str]:
+        return {
+            "Authorization": f"Bearer {self.checkpoint_token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+    def _load_remote_checkpoint(self) -> dict[str, dict[str, Any]]:
+        url = self._checkpoint_api_url()
+        if not url or not self.checkpoint_token:
+            return {}
+
+        try:
+            response = requests.get(
+                url,
+                headers=self._checkpoint_headers(),
+                params={"ref": self.checkpoint_branch},
+                timeout=self.timeout_seconds,
+            )
+            if response.status_code == 404:
+                return {}
+            response.raise_for_status()
+            payload = response.json()
+            encoded = str(payload.get("content") or "").replace("\n", "")
+            if not encoded:
+                return {}
+            decoded = base64.b64decode(encoded).decode("utf-8")
+            data = json.loads(decoded)
+            games = data.get("games", data)
+            if isinstance(games, dict):
+                return {str(k): v for k, v in games.items() if isinstance(v, dict)}
+        except Exception as exc:
+            LOGGER.warning("Could not load remote Steam checkpoint: %s", exc)
+
+        return {}
+
+    def _checkpoint_payload(self) -> dict[str, Any]:
+        return {
+            "version": 1,
+            "updated_at": _utc_now().replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "games": self.follower_cache,
+        }
+
+    def _save_checkpoint_local(self) -> None:
+        self.checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        temp = self.checkpoint_path.with_suffix(".tmp")
+        temp.write_text(
+            json.dumps(self._checkpoint_payload(), ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        temp.replace(self.checkpoint_path)
+
+    def _persist_checkpoint_remote(self, *, reason: str, force: bool = False) -> None:
+        self._save_checkpoint_local()
+
+        if not self.checkpoint_token or not self.github_repository:
+            return
+        if not force and self._checkpoint_dirty_count < self.checkpoint_every:
+            return
+        if self._checkpoint_dirty_count <= 0 and not force:
+            return
+
+        url = self._checkpoint_api_url()
+        if not url:
+            return
+
+        try:
+            existing_sha: str | None = None
+            current = requests.get(
+                url,
+                headers=self._checkpoint_headers(),
+                params={"ref": self.checkpoint_branch},
+                timeout=self.timeout_seconds,
+            )
+            if current.status_code == 200:
+                existing_sha = str(current.json().get("sha") or "") or None
+            elif current.status_code != 404:
+                current.raise_for_status()
+
+            raw = (
+                json.dumps(self._checkpoint_payload(), ensure_ascii=False, indent=2) + "\n"
+            ).encode("utf-8")
+            body: dict[str, Any] = {
+                "message": f"checkpoint: save Steam follower progress ({reason})",
+                "content": base64.b64encode(raw).decode("ascii"),
+                "branch": self.checkpoint_branch,
+            }
+            if existing_sha:
+                body["sha"] = existing_sha
+
+            response = requests.put(
+                url,
+                headers=self._checkpoint_headers(),
+                json=body,
+                timeout=self.timeout_seconds,
+            )
+            response.raise_for_status()
+            LOGGER.info(
+                "Persisted Steam checkpoint to %s after %d new follower lookups (%s)",
+                self.checkpoint_branch,
+                self._checkpoint_dirty_count,
+                reason,
+            )
+            self._checkpoint_dirty_count = 0
+        except Exception as exc:
+            LOGGER.warning("Could not persist remote Steam checkpoint: %s", exc)
 
     def _save_follower_cache(self) -> None:
         self.follower_cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -410,6 +589,8 @@ class SteamUpcomingCollector:
                         delay,
                         attempt + 1,
                     )
+                    if endpoint_name == "followers":
+                        self._persist_checkpoint_remote(reason="steam-429", force=True)
                     time.sleep(delay)
                     continue
 
@@ -578,6 +759,11 @@ class SteamUpcomingCollector:
                 checked_at = checked_at_dt.replace(microsecond=0).isoformat().replace("+00:00", "Z")
                 self._update_follower_cache(game.appid, followers, checked_at_dt)
                 self.fresh_follower_requests += 1
+                self._checkpoint_dirty_count += 1
+                self._save_checkpoint_local()
+
+                if self._checkpoint_dirty_count >= self.checkpoint_every:
+                    self._persist_checkpoint_remote(reason="periodic")
 
                 if self.fresh_follower_requests % self.cache_flush_every == 0:
                     self._save_follower_cache()
@@ -608,6 +794,7 @@ class SteamUpcomingCollector:
                 )
 
         self._save_follower_cache()
+        self._persist_checkpoint_remote(reason="segment-end", force=True)
 
         return sorted(
             qualified,
@@ -670,6 +857,8 @@ class SteamUpcomingCollector:
                 "follower_rate_limit_events": self.follower_rate_limit_events,
                 "search_rate_limit_events": self.search_rate_limit_events,
                 "first_follower_429_after_requests": self.first_follower_429_after_requests,
+                "checkpoint_branch": self.checkpoint_branch,
+                "checkpoint_every": self.checkpoint_every,
             },
             "candidate_count": len(candidates),
             "count": len(games),

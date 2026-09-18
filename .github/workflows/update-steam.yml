@@ -5,6 +5,13 @@ on:
   schedule:
     # 03:23 UTC = 11:23 Taiwan (UTC+8)
     - cron: "23 3 * * *"
+  push:
+    # Allow a guarded recovery commit to resume initialization after the
+    # GitHub-hosted runner's 6-hour job limit. Ordinary code pushes do not run it.
+    branches:
+      - main
+    paths:
+      - ".github/workflows/update-steam.yml"
 
 permissions:
   contents: write

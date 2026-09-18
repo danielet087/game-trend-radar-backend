@@ -3,7 +3,7 @@ name: Update Steam upcoming data
 on:
   workflow_dispatch:
   push:
-    # Temporary verification trigger; remove after the first successful run.
+    # Temporary verification trigger; retry after Steam parser/rate-limit fix.
     branches:
       - main
     paths:

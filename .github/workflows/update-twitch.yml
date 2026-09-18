@@ -2,6 +2,12 @@ name: Update Twitch live data
 
 on:
   workflow_dispatch:
+  push:
+    # Temporary one-time verification trigger. Remove after first successful run.
+    branches:
+      - main
+    paths:
+      - ".github/workflows/update-twitch.yml"
   schedule:
     # 每小時第 37 分執行，避開整點常見的排程尖峰
     - cron: "37 * * * *"

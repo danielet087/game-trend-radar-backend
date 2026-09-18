@@ -14,7 +14,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--country", default="TW")
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--min-followers", type=int, default=5000)
-    parser.add_argument("--request-interval", type=float, default=5.0)
+    parser.add_argument("--request-interval", type=float, default=12.0)
     parser.add_argument("--search-interval", type=float, default=10.0)
     parser.add_argument("--max-pages", type=int, default=100)
     parser.add_argument("--follower-cache", default="data/steam_followers_cache.json")

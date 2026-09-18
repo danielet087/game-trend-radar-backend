@@ -43,3 +43,14 @@ python -m pytest -q
 3. 加入 Twitch 每小時資料。
 4. 加入 YouTube Live 每小時資料。
 5. 計算台灣／亞洲／全球與新上榜遊戲趨勢。
+
+
+## GitHub Actions 自動更新
+
+`.github/workflows/update-steam.yml` 會：
+
+- 每天 11:23（台灣時間）自動執行一次。
+- 也可以從 GitHub Actions 頁面手動按 `Run workflow`。
+- 先跑測試，再產生 `output/steam_upcoming.json`。
+- JSON 目前只保存為 Private Repository 的 Artifact，保留 7 天。
+- 下一步才會設定跨 Repository 發佈，只把整理後的 JSON 寫入公開前端 `game-trend-radar`。

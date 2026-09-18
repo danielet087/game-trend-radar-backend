@@ -43,30 +43,28 @@ jobs:
       - name: Run tests
         run: python -m pytest -q
 
-      - name: Collect Steam upcoming games slowly
+      - name: Collect Steam upcoming games in two-month segments
         run: >
-          python -m scripts.update_steam
+          python -m scripts.update_steam_daily
           --country TW
           --days 365
           --min-followers 5000
           --request-interval 12
           --search-interval 10
           --max-pages 100
+          --segment-months 2
+          --total-segments 6
           --follower-cache data/steam_followers_cache.json
+          --state data/steam_initial_state.json
+          --master data/steam_upcoming_master.json
           --output output/steam_upcoming.json
 
       - name: Validate JSON
         run: |
           python -m json.tool output/steam_upcoming.json > /dev/null
-          python - <<'PY'
-          import json
-
-          with open("output/steam_upcoming.json", "r", encoding="utf-8") as f:
-              data = json.load(f)
-
-          if data.get("candidate_count", 0) <= 0:
-              raise SystemExit("Steam candidate_count is 0; refusing to publish an empty dataset.")
-          PY
+          python -m json.tool data/steam_initial_state.json > /dev/null
+          python -m json.tool data/steam_upcoming_master.json > /dev/null
+          python -m json.tool data/steam_followers_cache.json > /dev/null
 
       - name: Show collection summary
         run: |
@@ -77,14 +75,20 @@ jobs:
           with open("output/steam_upcoming.json", "r", encoding="utf-8") as f:
               data = json.load(f)
 
-          collection = data.get("collection", {})
+          init = data.get("initialization", {})
+          latest = data.get("latest_collection", {})
+          last_attempt = init.get("last_attempt") or {}
           summary = (
               f"## Steam update\n\n"
               f"- Generated: {data.get('generated_at')}\n"
-              f"- Candidates: {data.get('candidate_count')}\n"
-              f"- Followers >= {data.get('filter', {}).get('min_followers')}: {data.get('count')}\n"
-              f"- Fresh follower requests: {collection.get('fresh_follower_requests', 0)}\n"
-              f"- Reused from private cache: {collection.get('cached_follower_reuses', 0)}\n"
+              f"- Mode: {init.get('mode')}\n"
+              f"- Initial complete: {init.get('complete')}\n"
+              f"- Next segment: {init.get('next_segment')} / {init.get('total_segments')}\n"
+              f"- Last segment status: {last_attempt.get('status')}\n"
+              f"- Public games >= 5000 followers: {data.get('count')}\n"
+              f"- Fresh follower requests: {latest.get('fresh_follower_requests', 0)}\n"
+              f"- Reused from private cache: {latest.get('cached_follower_reuses', 0)}\n"
+              f"- Follower failures: {latest.get('follower_failures', 0)}\n"
           )
 
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
@@ -99,21 +103,24 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Persist private follower cache
+      - name: Persist private Steam state and cache
         run: |
-          if [ ! -f data/steam_followers_cache.json ]; then
-            echo "Follower cache was not created."
-            exit 1
-          fi
+          for file in             data/steam_followers_cache.json             data/steam_initial_state.json             data/steam_upcoming_master.json
+          do
+            if [ ! -f "$file" ]; then
+              echo "Missing private Steam state file: $file"
+              exit 1
+            fi
+          done
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/steam_followers_cache.json
+          git add             data/steam_followers_cache.json             data/steam_initial_state.json             data/steam_upcoming_master.json
 
           if git diff --cached --quiet; then
-            echo "Private follower cache is already up to date."
+            echo "Private Steam state is already up to date."
           else
-            git commit -m "data: update private Steam follower cache"
+            git commit -m "data: update private Steam initialization state"
             git pull --rebase origin main
             git push origin HEAD:main
           fi

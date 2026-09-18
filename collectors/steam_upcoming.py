@@ -14,12 +14,13 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import requests
+from bs4 import BeautifulSoup
 
 LOGGER = logging.getLogger(__name__)
 
 STEAM_SEARCH_URL = "https://store.steampowered.com/search/results/"
 STEAM_FOLLOWERS_URL = "https://steamcommunity.com/games/{appid}/memberslistxml/"
-USER_AGENT = "GameTrendRadar/0.1 (+GitHub Actions; Steam public data collector)"
+USER_AGENT = "Mozilla/5.0 (compatible; GameTrendRadar/0.2; +https://github.com/danielet087/game-trend-radar)"
 
 
 @dataclass(frozen=True)
@@ -77,11 +78,15 @@ def parse_release_window(raw: Any) -> ReleaseWindow:
         except (OverflowError, OSError, ValueError):
             return ReleaseWindow(str(raw), None, None, "unknown")
 
-    text = str(raw).strip()
+    text = " ".join(str(raw).split())
     if not text:
         return ReleaseWindow(text, None, None, "unknown")
 
-    if text.lower().replace(".", "") in {"coming soon", "soon", "tba", "tbd", "to be announced"}:
+    normalized = text.lower().replace(".", "")
+    if normalized in {
+        "coming soon", "soon", "tba", "tbd", "to be announced",
+        "date to be announced", "announced later",
+    }:
         return ReleaseWindow(text, None, None, "unknown")
 
     try:
@@ -145,6 +150,50 @@ def parse_follower_xml(xml_text: str) -> int:
     raise ValueError("Steam follower XML did not contain memberCount")
 
 
+def parse_search_results_html(results_html: str) -> list[UpcomingGame]:
+    if not results_html:
+        return []
+
+    soup = BeautifulSoup(results_html, "html.parser")
+    games: list[UpcomingGame] = []
+
+    for row in soup.select("a.search_result_row"):
+        appid_raw = row.get("data-ds-appid") or ""
+        if not str(appid_raw).isdigit():
+            href = row.get("href") or ""
+            match = re.search(r"/app/(\d+)/", href)
+            appid_raw = match.group(1) if match else ""
+        if not str(appid_raw).isdigit():
+            continue
+
+        appid = int(appid_raw)
+        name_node = row.select_one("span.title")
+        release_node = row.select_one("div.search_released")
+        image_node = row.select_one(".search_capsule img")
+
+        name = " ".join(name_node.get_text(" ", strip=True).split()) if name_node else f"App {appid}"
+        release_raw = " ".join(release_node.get_text(" ", strip=True).split()) if release_node else ""
+        release = parse_release_window(release_raw)
+        image = None
+        if image_node:
+            image = image_node.get("src") or image_node.get("data-src")
+
+        games.append(
+            UpcomingGame(
+                appid=appid,
+                name=name,
+                release_raw=release.raw,
+                release_start=release.start.isoformat() if release.start else None,
+                release_end=release.end.isoformat() if release.end else None,
+                release_precision=release.precision,
+                capsule_image=str(image) if image else None,
+                store_url=f"https://store.steampowered.com/app/{appid}/",
+            )
+        )
+
+    return games
+
+
 class _RateLimiter:
     def __init__(self, interval: float) -> None:
         self.interval = max(0.0, interval)
@@ -170,30 +219,56 @@ class SteamUpcomingCollector:
         horizon_days: int = 365,
         min_followers: int = 5000,
         page_size: int = 100,
-        max_pages: int = 200,
+        max_pages: int = 80,
         follower_workers: int = 4,
-        follower_request_interval: float = 0.25,
+        follower_request_interval: float = 0.35,
+        search_request_interval: float = 2.0,
         timeout_seconds: float = 20.0,
     ) -> None:
         self.country = country.upper()
         self.horizon_days = horizon_days
         self.min_followers = min_followers
-        self.page_size = page_size
-        self.max_pages = max_pages
+        self.page_size = max(1, min(page_size, 100))
+        self.max_pages = max(1, max_pages)
         self.follower_workers = max(1, follower_workers)
         self.timeout_seconds = timeout_seconds
-        self.rate_limiter = _RateLimiter(follower_request_interval)
+        self.follower_rate_limiter = _RateLimiter(follower_request_interval)
+        self.search_rate_limiter = _RateLimiter(search_request_interval)
         self.session = requests.Session()
-        self.session.headers.update({"User-Agent": USER_AGENT, "Accept-Language": "en-US,en;q=0.8"})
+        self.session.headers.update({
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.8",
+        })
 
-    def _request(self, url: str, *, params: dict[str, Any] | None = None) -> requests.Response:
-        last_error: Exception | None = None
+    def _request(
+        self,
+        url: str,
+        *,
+        params: dict[str, Any] | None = None,
+        limiter: _RateLimiter | None = None,
+    ) -> requests.Response:
+        last_error: Exception | str | None = None
+
         for attempt in range(5):
+            if limiter is not None:
+                limiter.wait()
             try:
                 response = self.session.get(url, params=params, timeout=self.timeout_seconds)
-                if response.status_code in {429, 500, 502, 503, 504}:
-                    retry_after = response.headers.get("Retry-After")
-                    delay = min(float(retry_after), 60.0) if retry_after and retry_after.isdigit() else min(2 ** attempt, 30)
+                if response.status_code in {429, 503}:
+                    retry_after = response.headers.get("Retry-After", "").strip()
+                    try:
+                        delay = float(retry_after)
+                    except ValueError:
+                        delay = 30.0 * (attempt + 1)
+                    delay = min(120.0, max(5.0, delay))
+                    last_error = f"HTTP {response.status_code}"
+                    LOGGER.warning("HTTP %s from Steam; cooling down %.1fs", response.status_code, delay)
+                    time.sleep(delay)
+                    continue
+                if response.status_code in {500, 502, 504}:
+                    delay = min(2 ** attempt, 30)
+                    last_error = f"HTTP {response.status_code}"
                     LOGGER.warning("HTTP %s from Steam; retrying in %.1fs", response.status_code, delay)
                     time.sleep(delay)
                     continue
@@ -204,81 +279,84 @@ class SteamUpcomingCollector:
                 if attempt == 4:
                     break
                 time.sleep(min(2 ** attempt, 30))
+
         raise RuntimeError(f"Steam request failed after retries: {last_error}")
-
-    @staticmethod
-    def _item_to_game(item: dict[str, Any]) -> UpcomingGame | None:
-        appid = item.get("id")
-        if not appid:
-            match = re.search(r"/apps/(\d+)/", str(item.get("logo") or ""))
-            appid = match.group(1) if match else None
-        try:
-            appid_int = int(appid)
-        except (TypeError, ValueError):
-            return None
-
-        raw_date = item.get("release_date") or item.get("releasedate") or item.get("date") or ""
-        window = parse_release_window(raw_date)
-        image = item.get("logo") or item.get("small_capsule") or item.get("tiny_image")
-        name = str(item.get("name") or "Unknown").strip() or "Unknown"
-
-        return UpcomingGame(
-            appid=appid_int,
-            name=name,
-            release_raw=window.raw,
-            release_start=window.start.isoformat() if window.start else None,
-            release_end=window.end.isoformat() if window.end else None,
-            release_precision=window.precision,
-            capsule_image=str(image) if image else None,
-            store_url=f"https://store.steampowered.com/app/{appid_int}/",
-        )
 
     def fetch_candidates(self, *, today: date | None = None) -> list[UpcomingGame]:
         today = today or datetime.now(timezone.utc).date()
         cutoff = today + timedelta(days=self.horizon_days)
         seen: dict[int, UpcomingGame] = {}
         start = 0
+        pages_past_cutoff = 0
 
         for page in range(self.max_pages):
             response = self._request(
                 STEAM_SEARCH_URL,
                 params={
                     "filter": "comingsoon",
-                    "json": 1,
+                    "sort_by": "Released_ASC",
+                    "start": start,
+                    "count": self.page_size,
+                    "infinite": 1,
+                    "force_infinite": 1,
+                    "category1": 998,
                     "cc": self.country,
                     "l": "english",
-                    "count": self.page_size,
-                    "start": start,
-                    "sort_by": "Released_ASC",
                 },
+                limiter=self.search_rate_limiter,
             )
             payload = response.json()
-            items = payload.get("items") or []
-            if not items:
+            rows = parse_search_results_html(payload.get("results_html") or "")
+
+            if not rows:
+                LOGGER.info("Steam page %d returned no searchable app rows; stopping", page + 1)
                 break
 
-            for item in items:
-                if not isinstance(item, dict):
-                    continue
-                game = self._item_to_game(item)
-                if game is None:
-                    continue
-                if parse_release_window(game.release_raw).overlaps(today, cutoff):
-                    seen[game.appid] = game
+            in_window = 0
+            known_dates = 0
+            min_known_start: date | None = None
 
-            start += len(items)
+            for game in rows:
+                release = parse_release_window(game.release_raw)
+                if release.start is not None:
+                    known_dates += 1
+                    min_known_start = release.start if min_known_start is None else min(min_known_start, release.start)
+                if release.overlaps(today, cutoff):
+                    seen[game.appid] = game
+                    in_window += 1
+
+            LOGGER.info(
+                "Steam page %d: %d rows, %d dated, %d within horizon, %d candidates total",
+                page + 1, len(rows), known_dates, in_window, len(seen),
+            )
+
+            if known_dates == len(rows) and min_known_start is not None and min_known_start > cutoff:
+                pages_past_cutoff += 1
+            else:
+                pages_past_cutoff = 0
+
+            if pages_past_cutoff >= 2:
+                LOGGER.info("Two consecutive pages are fully beyond %s; stopping early", cutoff)
+                break
+
+            start += len(rows)
             total = payload.get("total_count")
-            LOGGER.info("Steam page %d: %d items, %d candidates kept", page + 1, len(items), len(seen))
             if isinstance(total, int) and start >= total:
                 break
-            if len(items) < self.page_size:
+            if len(rows) < self.page_size:
                 break
 
-        return sorted(seen.values(), key=lambda g: (g.release_start or "9999-12-31", g.name.casefold(), g.appid))
+        return sorted(
+            seen.values(),
+            key=lambda g: (g.release_start or "9999-12-31", g.name.casefold(), g.appid),
+        )
 
     def fetch_followers(self, appid: int) -> int:
-        self.rate_limiter.wait()
-        response = self._request(STEAM_FOLLOWERS_URL.format(appid=appid), params={"xml": 1})
+        response = self._request(
+            STEAM_FOLLOWERS_URL.format(appid=appid),
+            params={"xml": 1},
+            limiter=self.follower_rate_limiter,
+        )
         return parse_follower_xml(response.text)
 
     def _qualify_one(self, game: UpcomingGame) -> QualifiedGame | None:
@@ -311,9 +389,15 @@ class SteamUpcomingCollector:
                 if result:
                     qualified.append(result)
                 if completed % 100 == 0 or completed == total:
-                    LOGGER.info("Follower progress %d/%d; %d >= %d", completed, total, len(qualified), self.min_followers)
+                    LOGGER.info(
+                        "Follower progress %d/%d; %d >= %d",
+                        completed, total, len(qualified), self.min_followers,
+                    )
 
-        return sorted(qualified, key=lambda g: (-g.followers, g.release_start or "9999-12-31", g.name.casefold()))
+        return sorted(
+            qualified,
+            key=lambda g: (-g.followers, g.release_start or "9999-12-31", g.name.casefold()),
+        )
 
     def collect(self, *, today: date | None = None) -> dict[str, Any]:
         now = datetime.now(timezone.utc)
@@ -323,7 +407,7 @@ class SteamUpcomingCollector:
         return {
             "generated_at": now.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
             "source": {
-                "catalog": "Steam Store coming-soon search",
+                "catalog": "Steam Store coming-soon search results_html",
                 "followers": "Steam Community game-group memberCount",
             },
             "filter": {

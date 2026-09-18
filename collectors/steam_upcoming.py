@@ -263,6 +263,8 @@ class SteamUpcomingCollector:
         self.follower_cache = self._load_follower_cache()
         self.fresh_follower_requests = 0
         self.cached_follower_reuses = 0
+        self.follower_failures = 0
+        self.failed_follower_appids: list[int] = []
 
     def _load_follower_cache(self) -> dict[str, dict[str, Any]]:
         if not self.follower_cache_path.exists():
@@ -479,6 +481,8 @@ class SteamUpcomingCollector:
                 try:
                     followers = self.fetch_followers(game.appid)
                 except Exception as exc:
+                    self.follower_failures += 1
+                    self.failed_follower_appids.append(game.appid)
                     LOGGER.warning("Followers failed for %s (%s): %s", game.appid, game.name, exc)
                     continue
 
@@ -559,6 +563,8 @@ class SteamUpcomingCollector:
                 "candidate_count": len(candidates),
                 "fresh_follower_requests": self.fresh_follower_requests,
                 "cached_follower_reuses": self.cached_follower_reuses,
+                "follower_failures": self.follower_failures,
+                "failed_follower_appids": self.failed_follower_appids,
             },
             "candidate_count": len(candidates),
             "count": len(games),

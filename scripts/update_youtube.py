@@ -10,7 +10,7 @@ from collectors.youtube_live import collect_youtube, write_json
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Collect hourly YouTube gaming live metrics.")
     parser.add_argument("--output", default="output/youtube_live.json")
-    parser.add_argument("--search-pages", type=int, default=2)
+    parser.add_argument("--search-calls", type=int, default=2)
     return parser
 
 
@@ -25,7 +25,7 @@ def main() -> None:
     if not api_key:
         raise SystemExit("YOUTUBE_API_KEY is required")
 
-    payload = collect_youtube(api_key, search_pages=args.search_pages)
+    payload = collect_youtube(api_key, search_calls=args.search_calls)
     path = write_json(payload, args.output)
     print(
         "YouTube collection complete: "

@@ -4,12 +4,11 @@ import json
 import logging
 import os
 import time
-from collections import Counter, defaultdict
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
-from urllib.parse import urlencode
 
 import requests
 
@@ -200,6 +199,29 @@ class TwitchClient:
 
         return found
 
+    def get_games_by_ids(self, game_ids: Iterable[str]) -> dict[str, TwitchGame]:
+        game_ids = list(dict.fromkeys(str(game_id).strip() for game_id in game_ids if str(game_id).strip()))
+        found: dict[str, TwitchGame] = {}
+
+        for start in range(0, len(game_ids), 100):
+            batch = game_ids[start:start + 100]
+            params: list[tuple[str, str]] = [("id", game_id) for game_id in batch]
+            payload = self.get("games", params=params)
+
+            for row in payload.get("data") or []:
+                if not isinstance(row, dict):
+                    continue
+                game = TwitchGame(
+                    id=str(row.get("id") or ""),
+                    name=str(row.get("name") or ""),
+                    box_art_url=str(row.get("box_art_url") or "") or None,
+                    igdb_id=str(row.get("igdb_id") or "") or None,
+                )
+                if game.id:
+                    found[game.id] = game
+
+        return found
+
 
 def load_steam_games(url: str = DEFAULT_STEAM_JSON_URL, *, timeout_seconds: float = 15.0) -> list[dict[str, Any]]:
     try:
@@ -323,7 +345,20 @@ def collect_twitch(
     # Global discovery is intentionally a stable sample of Twitch's most-viewed streams,
     # not a claim that every live channel on Twitch was enumerated.
     global_streams = client.get_stream_pages(max_pages=global_pages)
-    top_games = aggregate_streams(global_streams)[:top_games_limit]
+    global_aggregates = aggregate_streams(global_streams)
+    global_game_meta = client.get_games_by_ids(row["game_id"] for row in global_aggregates)
+
+    top_games: list[dict[str, Any]] = []
+    for row in global_aggregates:
+        meta = global_game_meta.get(row["game_id"])
+        if not meta or not meta.igdb_id:
+            continue
+        enriched = dict(row)
+        enriched["box_art_url"] = meta.box_art_url
+        enriched["igdb_id"] = meta.igdb_id
+        top_games.append(enriched)
+        if len(top_games) >= top_games_limit:
+            break
 
     steam_games = load_steam_games(steam_json_url)
     names = [str(game.get("name") or "") for game in steam_games]
@@ -350,6 +385,7 @@ def collect_twitch(
             "global_stream_sample_size": len(global_streams),
             "global_stream_pages": global_pages,
             "global_metrics_are_sampled": True,
+            "global_game_filter": "Twitch categories with a non-empty IGDB game ID",
             "tracked_game_stream_pages": tracked_pages,
             "tracked_game_count": len(steam_games),
             "tracked_game_matches": sum(1 for row in tracked_games if row["matched"]),

@@ -32,7 +32,8 @@ ASIA_COUNTRIES = {
 
 
 def normalize_text(value: str) -> str:
-    value = unicodedata.normalize("NFKC", value or "").casefold()
+    value = (value or "").replace("™", " ").replace("®", " ").replace("©", " ")
+    value = unicodedata.normalize("NFKC", value).casefold()
     value = re.sub(r"[^\w]+", " ", value, flags=re.UNICODE)
     return " ".join(value.split())
 
@@ -77,7 +78,12 @@ def build_known_games(
 
 def infer_game_name(title: str, known_games: Iterable[str]) -> str | None:
     normalized_title = f" {normalize_text(title)} "
-    for game in known_games:
+    ordered_games = sorted(
+        known_games,
+        key=lambda game: len(normalize_text(str(game))),
+        reverse=True,
+    )
+    for game in ordered_games:
         normalized_game = normalize_text(game)
         if not normalized_game:
             continue

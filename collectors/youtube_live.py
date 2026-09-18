@@ -5,7 +5,7 @@ import logging
 import re
 import unicodedata
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -21,6 +21,10 @@ TWITCH_JSON_URL = (
 STEAM_JSON_URL = (
     "https://raw.githubusercontent.com/danielet087/game-trend-radar/"
     "main/data/steam_upcoming.json"
+)
+YOUTUBE_JSON_URL = (
+    "https://raw.githubusercontent.com/danielet087/game-trend-radar/"
+    "main/data/youtube_live.json"
 )
 
 ASIA_COUNTRIES = {
@@ -149,14 +153,14 @@ class YouTubeClient:
         *,
         tracked_query: str | None = None,
         include_gaming_topic: bool = True,
-    ) -> tuple[list[str], int]:
+    ) -> tuple[list[str], int, str]:
         video_ids: list[str] = []
         search_calls = 0
 
-        requests_to_make: list[dict[str, Any]] = []
+        primary_requests: list[dict[str, Any]] = []
 
         if include_gaming_topic:
-            requests_to_make.append(
+            primary_requests.append(
                 {
                     "part": "snippet",
                     "eventType": "live",
@@ -168,7 +172,7 @@ class YouTubeClient:
             )
 
         if tracked_query:
-            requests_to_make.append(
+            primary_requests.append(
                 {
                     "part": "snippet",
                     "eventType": "live",
@@ -179,7 +183,7 @@ class YouTubeClient:
                 }
             )
 
-        for index, params in enumerate(requests_to_make, start=1):
+        for index, params in enumerate(primary_requests, start=1):
             payload = self.get("search", params)
             search_calls += 1
             rows = payload.get("items") or []
@@ -191,13 +195,43 @@ class YouTubeClient:
                 if video_id:
                     video_ids.append(str(video_id))
 
-            LOGGER.info(
-                "YouTube live search %d: %d videos",
-                index,
-                len(rows),
-            )
+            LOGGER.info("YouTube live search %d: %d videos", index, len(rows))
 
-        return list(dict.fromkeys(video_ids)), search_calls
+        if video_ids:
+            return list(dict.fromkeys(video_ids)), search_calls, "event_type_live"
+
+        # search.list(eventType=live) can intermittently return an empty result set.
+        # Use one bounded fallback discovery request, then verify actual live status
+        # with videos.list/liveStreamingDetails.
+        published_after = (
+            datetime.now(timezone.utc) - timedelta(days=2)
+        ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+        fallback_params: dict[str, Any] = {
+            "part": "snippet",
+            "type": "video",
+            "order": "date",
+            "maxResults": 50,
+            "publishedAfter": published_after,
+        }
+        if tracked_query:
+            fallback_params["q"] = tracked_query
+        else:
+            fallback_params["q"] = "gaming|遊戲|ゲーム|게임"
+
+        payload = self.get("search", fallback_params)
+        search_calls += 1
+        rows = payload.get("items") or []
+
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            video_id = ((row.get("id") or {}).get("videoId"))
+            if video_id:
+                video_ids.append(str(video_id))
+
+        LOGGER.info("YouTube fallback candidate search: %d videos", len(rows))
+        return list(dict.fromkeys(video_ids)), search_calls, "recent_candidates_fallback"
 
     def get_videos(self, video_ids: Iterable[str]) -> list[dict[str, Any]]:
         ids = list(dict.fromkeys(str(video_id) for video_id in video_ids if str(video_id)))
@@ -295,11 +329,22 @@ def aggregate_games(streams: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
     return result
 
 
+def is_active_live_video(video: dict[str, Any]) -> bool:
+    snippet = video.get("snippet") or {}
+    live = video.get("liveStreamingDetails") or {}
+
+    if snippet.get("liveBroadcastContent") == "live":
+        return True
+
+    return bool(live.get("actualStartTime")) and not bool(live.get("actualEndTime"))
+
+
 def collect_youtube(api_key: str, *, search_calls: int = 2) -> dict[str, Any]:
     client = YouTubeClient(api_key)
 
     twitch_payload = fetch_public_json(TWITCH_JSON_URL)
     steam_payload = fetch_public_json(STEAM_JSON_URL)
+    previous_youtube_payload = fetch_public_json(YOUTUBE_JSON_URL)
     known_games = build_known_games(twitch_payload, steam_payload)
     search_terms = build_search_terms(
         twitch_payload,
@@ -314,11 +359,22 @@ def collect_youtube(api_key: str, *, search_calls: int = 2) -> dict[str, Any]:
 
     # Keep a fixed two-search budget:
     # 1) official Gaming topic, 2) tracked games query.
-    video_ids, actual_search_calls = client.search_live_games(
+    discovered_video_ids, actual_search_calls, discovery_mode = client.search_live_games(
         tracked_query=tracked_query,
         include_gaming_topic=True,
     )
-    videos = client.get_videos(video_ids)
+
+    previous_live_ids = [
+        str(row.get("video_id") or "")
+        for row in previous_youtube_payload.get("streams") or []
+        if isinstance(row, dict) and row.get("video_id")
+    ]
+    video_ids = list(dict.fromkeys(discovered_video_ids + previous_live_ids))
+    videos = [
+        video
+        for video in client.get_videos(video_ids)
+        if is_active_live_video(video)
+    ]
 
     channel_ids = [
         str((row.get("snippet") or {}).get("channelId") or "")
@@ -382,6 +438,8 @@ def collect_youtube(api_key: str, *, search_calls: int = 2) -> dict[str, Any]:
             "search_calls_per_run": actual_search_calls,
             "estimated_daily_search_calls_at_hourly_schedule": actual_search_calls * 24,
             "search_term_count": len(search_terms),
+            "discovery_mode": discovery_mode,
+            "candidate_video_count": len(video_ids),
             "live_gaming_stream_sample_size": len(streams),
             "known_game_dictionary_size": len(known_games),
             "matched_stream_count": len(matched),

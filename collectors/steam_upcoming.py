@@ -236,7 +236,7 @@ class SteamUpcomingCollector:
         min_followers: int = 5000,
         page_size: int = 100,
         max_pages: int = 100,
-        follower_request_interval: float = 5.0,
+        follower_request_interval: float = 12.0,
         search_request_interval: float = 10.0,
         timeout_seconds: float = 20.0,
         follower_cache_path: str | Path = "data/steam_followers_cache.json",

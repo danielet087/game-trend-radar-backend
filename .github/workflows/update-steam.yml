@@ -3,19 +3,10 @@ name: Update Steam upcoming data
 on:
   workflow_dispatch:
   schedule:
-    # 03:23 UTC = 11:23 Taiwan (UTC+8)
+    # 03:23 UTC = 11:23 Taiwan (UTC+8); daily maintenance and recovery
     - cron: "23 3 * * *"
-  push:
-    # Editing this workflow triggers the first 50-record batch. Subsequent
-    # batches are triggered by workflow_dispatch, not by data commits.
-    branches:
-      - main
-    paths:
-      - ".github/workflows/update-steam.yml"
-
 permissions:
   contents: write
-  actions: write
 
 concurrency:
   group: steam-upcoming-daily
@@ -164,45 +155,3 @@ jobs:
           git commit -m "data: update Steam upcoming games"
           git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
           git push origin main
-
-      # GitHub Actions workflow_dispatch is allowed with GITHUB_TOKEN.
-      # The shared concurrency group permits one running + one pending run,
-      # so the next batch starts after this run exits; no hourly ChatGPT
-      # guard or user action is required.
-      - name: Queue the next 50-record batch until the full year is scanned
-        if: ${{ success() }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          import subprocess
-          from pathlib import Path
-
-          payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
-          init = payload.get("initialization") or {}
-          attempt = init.get("last_attempt") or {}
-          collection = payload.get("latest_collection") or {}
-          fresh = int(collection.get("fresh_follower_requests") or 0)
-          errors = int(collection.get("follower_failures") or 0)
-          rate_limit = int(collection.get("follower_rate_limit_events") or 0)
-
-          if init.get("complete") or init.get("mode") != "initializing":
-              print("Full-year initialization is complete; no chained run.")
-          elif rate_limit >= 5:
-              print(f"Steam rate-limited {rate_limit} times; defer until the daily schedule.")
-          elif fresh == 0 and attempt.get("status") != "complete":
-              print(f"No forward progress (failures={errors}); defer until the daily schedule.")
-          else:
-              repo = os.environ["GITHUB_REPOSITORY"]
-              workflow = f"repos/{repo}/actions/workflows/update-steam.yml/dispatches"
-              print(
-                  f"Queueing next 50-lookups batch; fresh={fresh}, errors={errors}, "
-                  f"segment={init.get('next_segment')}/{init.get('total_segments')}."
-              )
-              subprocess.run(
-                  ["gh", "api", "-X", "POST", workflow, "-f", "ref=main"],
-                  check=True,
-              )
-          PY

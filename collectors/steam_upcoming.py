@@ -81,7 +81,10 @@ def parse_release_window(raw: Any) -> ReleaseWindow:
 
     if isinstance(raw, (int, float)) and not isinstance(raw, bool):
         try:
-            d = datetime.fromtimestamp(float(raw), tz=TAIWAN_TZ).date()
+            stamp = float(raw)
+            if abs(stamp) >= 100_000_000_000:  # Unix milliseconds, if supplied.
+                stamp /= 1000
+            d = datetime.fromtimestamp(stamp, tz=TAIWAN_TZ).date()
             return ReleaseWindow(str(raw), d, d, "day")
         except (OverflowError, OSError, ValueError):
             return ReleaseWindow(str(raw), None, None, "unknown")
@@ -89,6 +92,21 @@ def parse_release_window(raw: Any) -> ReleaseWindow:
     text = " ".join(str(raw).split())
     if not text:
         return ReleaseWindow(text, None, None, "unknown")
+
+    # Actual release times can cross midnight in Taiwan. Convert only when
+    # an offset-aware time is supplied; an announced date alone has no hour
+    # and must not be shifted by an assumed Steam/Pacific unlock time.
+    if re.fullmatch(r"\\d{10}|\\d{13}", text):
+        release = parse_release_window(int(text))
+        return ReleaseWindow(text, release.start, release.end, release.precision)
+    if re.fullmatch(r"\\d{4}-\\d{2}-\\d{2}T.+(?:Z|[+-]\\d{2}:?\\d{2})", text):
+        try:
+            instant = datetime.fromisoformat(text.replace("Z", "+00:00"))
+            if instant.tzinfo is not None:
+                d = instant.astimezone(TAIWAN_TZ).date()
+                return ReleaseWindow(text, d, d, "day")
+        except ValueError:
+            pass
 
     normalized = text.lower().replace(".", "")
     if normalized in {

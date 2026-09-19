@@ -33,7 +33,7 @@ jobs:
         run: |
           python -m py_compile scripts/run_steam_official_shortlist.py
           python -m pytest -q
-      - name: Verify ONLY third-party >=4000 candidates from official Steam XML
+      - name: Resume official Steam verification from saved 66 of 247 and publish each batch
         env:
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}

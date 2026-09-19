@@ -1,0 +1,72 @@
+name: Diagnose Phantom Blade Zero discovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/diagnose-steam-app-4115450.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Compare Store search discovery with exact AppID
+        run: |
+          python - <<'PY'
+          import json, re, time, urllib.parse, urllib.request
+          appid=4115450
+          def get(url,params):
+              query=urllib.parse.urlencode(params)
+              req=urllib.request.Request(url+"?"+query,headers={"User-Agent":"Mozilla/5.0","Accept-Language":"en-US,en;q=0.8"})
+              with urllib.request.urlopen(req,timeout=25) as response:
+                  return response.read().decode("utf-8","replace")
+          for name,changes in [
+              ("released_asc_page1",{"sort_by":"Released_ASC","start":0}),
+              ("released_asc_page2",{"sort_by":"Released_ASC","start":100}),
+              ("released_asc_page6",{"sort_by":"Released_ASC","start":500}),
+              ("released_asc_no_category",{"sort_by":"Released_ASC","start":0,"category1":None}),
+              ("released_asc_term",{"sort_by":"Released_ASC","start":0,"term":"Phantom Blade Zero"}),
+              ("price_desc_page1",{"sort_by":"Price_DESC","start":0}),
+              ("name_desc_page1",{"sort_by":"Name_DESC","start":0}),
+              ("name_asc_page1",{"sort_by":"Name_ASC","start":0}),
+          ]:
+              params={"filter":"comingsoon","sort_by":"Released_ASC","start":0,"count":100,
+                      "infinite":1,"force_infinite":1,"category1":998,"cc":"TW","l":"english"}
+              params.update(changes)
+              params={k:v for k,v in params.items() if v is not None}
+              try:
+                  raw=get("https://store.steampowered.com/search/results/",params)
+                  body=json.loads(raw)
+                  html=body.get("results_html","")
+                  ids=re.findall(r'data-ds-appid=["\\\'](\\d+)["\\\']',html)
+                  print(json.dumps({"case":name,"contains_4115450":str(appid) in ids,
+                      "ids_count":len(ids),"total_count":body.get("total_count"),
+                      "raw_html_has_appid":str(appid) in html,"first_ids":ids[:5]},
+                      ensure_ascii=False))
+              except Exception as exc:
+                  print(json.dumps({"case":name,"error":f"{type(exc).__name__}: {exc}"}))
+              time.sleep(1)
+          for language in ("english","tchinese"):
+              try:
+                  data=json.loads(get("https://store.steampowered.com/api/appdetails",
+                      {"appids":appid,"cc":"TW","l":language}))
+                  item=data.get(str(appid),{})
+                  d=item.get("data") or {}
+                  print(json.dumps({"case":"appdetails_"+language,"success":item.get("success"),
+                      "type":d.get("type"),"name":d.get("name"),"release_date":d.get("release_date")},
+                      ensure_ascii=False))
+              except Exception as exc:
+                  print(json.dumps({"case":"appdetails_"+language,"error":str(exc)}))
+          try:
+              xml=get(f"https://steamcommunity.com/games/{appid}/memberslistxml/",{"xml":1})
+              m=re.search(r"<memberCount>([\\d,]+)</memberCount>",xml)
+              print(json.dumps({"case":"followers","memberCount":m.group(1) if m else None,
+                  "snippet":xml[:240] if not m else None}))
+          except Exception as exc:
+              print(json.dumps({"case":"followers","error":str(exc)}))
+          PY

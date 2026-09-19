@@ -2,7 +2,7 @@
 
 Phase 1 visits 365 Taiwan calendar-day intervals through the authenticated Steam
 IStoreQueryService (release_date_type=1), saves a private candidate catalog and
-resume cursor. Phase 2 queries up to 50 NEW Followers per independent GH run.
+resume cursor. Phase 2 screens ALL candidates via third-party bulk. Phase 3 verifies ONLY\ntitles measured >=4,000 via Steam XML; official >=5,000 qualifies.
 Neither phase overwrites the legacy initialization state or Steam checkpoint.
 """
 from __future__ import annotations
@@ -23,7 +23,7 @@ from collectors.steam_upcoming import (
 )
 from scripts.update_steam_daily import load_json, merge_partial_segment, save_json
 from scripts.steam_follower_prefilter import (
-    PRIORITY_THRESHOLD, pending_priorities, scan_batch,
+    PRIORITY_THRESHOLD, scan_batch,
 )
 
 LOG = logging.getLogger(__name__)
@@ -209,29 +209,139 @@ def run_discovery(args: argparse.Namespace, state: dict[str, Any], catalog: dict
             "candidate_count": catalog["count"], "followers_queried": 0}
 
 
+def as_upcoming_game(raw: dict[str, Any]) -> UpcomingGame:
+    return UpcomingGame(
+        appid=raw["appid"], name=raw["name"], release_raw=raw["release_raw"],
+        release_start=raw["release_start"], release_end=raw["release_end"],
+        release_precision="day", capsule_image=raw.get("capsule_image"),
+        store_url=raw["store_url"],
+    )
+
+
+def prefilter_complete(prefilter: dict[str, Any], catalog: list[dict[str, Any]]) -> bool:
+    """Third-party step cannot be skipped, including the first 685 cached games."""
+    items = prefilter.get("games") or {}
+    return (
+        bool(prefilter.get("complete"))
+        and int(prefilter.get("next_index", -1)) >= len(catalog)
+        and all(str(row["appid"]) in items for row in catalog)
+    )
+
+
+def run_prefilter_phase(
+    args: argparse.Namespace, state: dict[str, Any], catalog: dict[str, Any],
+) -> dict[str, Any]:
+    """Phase 2: scan ONLY the third-party source, never instantiate XML collector."""
+    rows = catalog.get("games", [])
+    path = Path(args.prefilter_state)
+    pre = load_json(path, {"version": 1, "next_index": 0,
+                           "complete": False, "games": {}})
+    if not isinstance(pre.get("games"), dict):
+        raise RuntimeError("Invalid third-party prefilter games")
+    key = os.environ.get("STEAM_WEB_API_KEY", "").strip()
+    if not key:
+        raise RuntimeError("STEAM_WEB_API_KEY required for third-party prefilter")
+    # Resume the 685 titles that were officially checked before step 2 was
+    # introduced. Already prescreened titles remain untouched.
+    head = int(pre.get("head_next_index", 0))
+    head_limit = min(int(state.get("next_follower_index", 0)), len(rows))
+    if head < head_limit:
+        subset = rows[:head_limit]
+        temporary = {"version": 1, "next_index": head,
+                     "complete": False, "games": {}}
+        info = scan_batch(
+            subset, temporary, steam_api_key=key, initial_index=0,
+            limit=args.prefilter_batch_size,
+            request_interval=args.prefilter_request_interval,
+        )
+        pre["games"].update(temporary["games"])
+        pre["head_next_index"] = int(info["next_index"])
+    elif int(pre.get("next_index", 0)) < len(rows):
+        info = scan_batch(
+            rows, pre, steam_api_key=key, initial_index=0,
+            limit=args.prefilter_batch_size,
+            request_interval=args.prefilter_request_interval,
+        )
+    else:
+        info = {"start_index": len(rows), "next_index": len(rows),
+                "screened": 0, "priority": 0, "missing": 0}
+    # Missing third-party entries are a NON-MEASURED, below-3000 scheduling
+    # bucket; only measured >=4000 enter the Steam verification list.
+    for entry in pre["games"].values():
+        members = entry.get("third_party_followers")
+        if members is None:
+            entry["priority"] = False
+            entry["scheduling_band"] = "missing_assumed_under_3000"
+        elif isinstance(members, int):
+            entry["priority"] = members >= PRIORITY_THRESHOLD
+            entry["scheduling_band"] = "measured"
+    complete = (
+        int(pre.get("head_next_index", 0)) >= head_limit
+        and int(pre.get("next_index", 0)) >= len(rows)
+        and all(str(row["appid"]) in pre["games"] for row in rows)
+    )
+    pre["complete"] = complete
+    pre["threshold"] = PRIORITY_THRESHOLD
+    pre["updated_at"] = datetime.now(timezone.utc).isoformat()
+    save_json(path, pre)
+    state["prefilter_next_index"] = int(pre.get("next_index", 0))
+    state["prefilter_head_next_index"] = int(pre.get("head_next_index", 0))
+    state["prefilter_complete"] = complete
+    state["prefilter_threshold"] = PRIORITY_THRESHOLD
+    state["phase"] = "followers" if complete else "prefilter"
+    state["last_attempt"] = {
+        "phase": "prefilter", "candidate_count": len(rows),
+        "prefilter_start_index": info["start_index"],
+        "prefilter_next_index": info["next_index"],
+        "prefilter_screened": info["screened"],
+        "prefilter_priority": info["priority"],
+        "prefilter_missing": info["missing"],
+        "prefilter_head_next_index": pre["head_next_index"],
+        "prefilter_complete": complete,
+        "priority_total": sum(bool(x.get("priority")) for x in pre["games"].values()),
+        "missing_total": sum(x.get("third_party_followers") is None
+                             for x in pre["games"].values()),
+        "fresh_follower_requests": 0,
+    }
+    return dict(state["last_attempt"])
+
+
 def run_follower_batch(
     args: argparse.Namespace,
     state: dict[str, Any],
     catalog: dict[str, Any],
     master: dict[str, Any],
 ) -> dict[str, Any]:
-    """Steam discovery -> third-party >=4000 screen -> Steam XML >=5000.
-
-    Unknown third-party counts remain explicitly unverified. The production
-    prefilter path NEVER runs a full XML backfill for <4000 or missing groups.
-    """
+    """Phase 3: ONLY official XML for titles measured >=4000 in phase 2."""
     rows = catalog.get("games", [])
-    cursor = int(state.get("next_follower_index") or 0)
-    budget = int(getattr(args, "max_fresh_requests_per_run", 50))
-    if not 1 <= budget <= 50:
-        raise ValueError("Official XML requests per batch must be within 1..50")
-    prefilter_enabled = int(getattr(args, "prefilter_batch_size", 0) or 0) > 0
-    if not prefilter_enabled and cursor >= len(rows):
+    pre = load_json(Path(args.prefilter_state), {"games": []})
+    if not prefilter_complete(pre, rows):
+        raise RuntimeError("Step 2 has not screened every candidate; no official XML allowed")
+    cache_data = load_json(Path(args.follower_cache), {"games": {}})
+    cache = cache_data.get("games") or {}
+    priority_rows = [
+        row for row in rows
+        if (pre["games"][str(row["appid"])].get("priority")
+            and isinstance(pre["games"][str(row["appid"])].get("third_party_followers"), int)
+            and pre["games"][str(row["appid"])]["third_party_followers"] >= PRIORITY_THRESHOLD)
+    ]
+    remaining = [row for row in priority_rows if str(row["appid"]) not in cache]
+    start_verified = int(state.get("verified_priority_count", 0))
+    if not remaining:
         state["phase"] = "complete"
         state["initial_complete"] = True
-        state["last_attempt"] = {"phase": "complete", "candidate_count": len(rows)}
-        return {"phase": "complete", "followers_queried": 0}
-
+        state["coverage_exhaustive"] = False  # only prefiltered games validated
+        state["last_attempt"] = {
+            "phase": "complete", "candidate_count": len(rows),
+            "priority_total": len(priority_rows),
+            "verified_priority_count": len(priority_rows),
+            "fresh_follower_requests": 0,
+        }
+        return dict(state["last_attempt"])
+    today = taiwan_today()
+    budget = int(getattr(args, "max_fresh_requests_per_run", 50))
+    if not 1 <= budget <= 50:
+        raise ValueError("Official XML budget must be within 1..50")
     collector = SteamUpcomingCollector(
         country="TW", horizon_days=365, min_followers=5000,
         follower_request_interval=args.request_interval,
@@ -241,155 +351,39 @@ def run_follower_batch(
         reuse_all_cached_during_initialization=True,
         max_fresh_requests_per_run=budget,
     )
-
-    def as_game(raw: dict[str, Any]) -> UpcomingGame:
-        return UpcomingGame(
-            appid=raw["appid"], name=raw["name"], release_raw=raw["release_raw"],
-            release_start=raw["release_start"], release_end=raw["release_end"],
-            release_precision="day", capsule_image=raw.get("capsule_image"),
-            store_url=raw["store_url"],
-        )
-
-    screened = {"start_index": cursor, "next_index": cursor,
-                "screened": 0, "priority": 0, "missing": 0,
-                "complete": not prefilter_enabled}
-    prefilter: dict[str, Any] = {}
-    verified = []
-    priority_remaining = 0
-    priority_fresh_requests = 0
-    prefilter_count = 0
-    prefilter_unknown_count = 0
-    prefilter_matched_count = 0
-    official_verified_count = 0
-    sequential_processed = 0
-
-    if prefilter_enabled:
-        prefilter = load_json(
-            Path(args.prefilter_state),
-            {"version": 1, "next_index": cursor, "complete": False, "games": {}},
-        )
-        # Stage 2: finish the third-party screen of the entire future-year
-        # catalog before beginning NEW official XML verification (stage 3).
-        if int(prefilter.get("next_index", cursor)) < len(rows):
-            screened = scan_batch(
-                rows, prefilter,
-                steam_api_key=os.environ.get("STEAM_WEB_API_KEY", "").strip(),
-                initial_index=cursor, limit=args.prefilter_batch_size,
-                request_interval=getattr(args, "prefilter_request_interval", 0.5),
-            )
-        else:
-            prefilter["complete"] = True
-            screened["start_index"] = int(prefilter.get("next_index", cursor))
-            screened["next_index"] = screened["start_index"]
-            screened["complete"] = True
-
-        save_json(Path(args.prefilter_state), prefilter)
-        pref_games = prefilter.get("games") or {}
-        prefilter_count = len(pref_games)
-        prefilter_unknown_count = sum(
-            entry.get("third_party_followers") is None
-            for entry in pref_games.values()
-        )
-        prefilter_matched_count = sum(
-            entry.get("priority") is True
-            for entry in pref_games.values()
-        )
-        official_verified_count = sum(
-            str(row["appid"]) in collector.follower_cache for row in rows
-        )
-        if prefilter.get("complete", False):
-            priority_rows = pending_priorities(
-                rows, prefilter, collector.follower_cache,
-                min_start_index=cursor, max_candidates=budget,
-            )
-            if priority_rows:
-                verified = collector.qualify(map(as_game, priority_rows))
-                priority_fresh_requests = collector.fresh_follower_requests
-            priority_remaining = len(pending_priorities(
-                rows, prefilter, collector.follower_cache,
-                min_start_index=cursor, max_candidates=len(rows),
-            ))
-            official_verified_count = sum(
-                str(row["appid"]) in collector.follower_cache for row in rows
-            )
-
-        state["prefilter_next_index"] = int(prefilter.get("next_index", cursor))
-        state["prefilter_complete"] = bool(prefilter.get("complete", False))
-        state["prefilter_threshold"] = PRIORITY_THRESHOLD
-        state["prefilter_screened_count"] = prefilter_count
-        state["prefilter_missing_count"] = prefilter_unknown_count
-        state["prefilter_matched_count"] = prefilter_matched_count
-        state["official_verified_count"] = official_verified_count
-    else:
-        # Legacy/manual collector invocation without fast screening.
-        verified = collector.qualify(map(as_game, rows[cursor:]))
-        sequential_processed = collector.processed_candidate_count
-
-    catalog_by_id = {row["appid"]: row for row in rows}
+    qualified = collector.qualify(map(as_upcoming_game, remaining))
+    source_by_id = {x["appid"]: x for x in rows}
     enriched = []
-    for row in verified:
-        record = vars(row).copy()
-        source = catalog_by_id.get(row.appid, {})
+    for row in qualified:
+        item = vars(row).copy()
+        source = source_by_id.get(row.appid, {})
         for field in ("name_en", "name_zh_tw", "release_date_timezone",
                       "release_date_basis", "release_time_utc",
                       "release_time_source", "discovered_by"):
-            record[field] = source.get(field)
-        enriched.append(record)
-    master["games"] = merge_partial_segment(
-        master.get("games", []), enriched, today=taiwan_today(),
-    )
+            item[field] = source.get(field)
+        enriched.append(item)
+    master["games"] = merge_partial_segment(master.get("games", []), enriched, today=today)
     master["updated_at"] = datetime.now(timezone.utc).isoformat()
-
-    failed = collector.failed_follower_appids
-    if not prefilter_enabled:
-        if failed:
-            failed_index = next(
-                (i for i, row in enumerate(rows[cursor:], start=cursor)
-                 if row["appid"] in failed), cursor
-            )
-            state["next_follower_index"] = min(
-                cursor + sequential_processed, failed_index,
-            )
-        else:
-            state["next_follower_index"] = cursor + sequential_processed
-        if state["next_follower_index"] >= len(rows) and not failed:
-            state["phase"] = "complete"
-            state["initial_complete"] = True
-    else:
-        # This is the old pre-screen historical Steam cursor, NOT the new
-        # screen progress. Preserve it; never imply 11,467 XML checks ran.
-        state["next_follower_index"] = cursor
-        if prefilter.get("complete") and priority_remaining == 0 and not failed:
-            state["phase"] = "complete"
-            state["initial_complete"] = True
-            # Third-party missing and <4000 are deliberately unverified.
-            state["coverage_exhaustive"] = False
-
-    next_cursor = int(state["next_follower_index"])
+    after_cache = load_json(Path(args.follower_cache), {"games": {}}).get("games") or {}
+    verified = sum(str(x["appid"]) in after_cache for x in priority_rows)
+    state["verified_priority_count"] = verified
+    state["priority_total"] = len(priority_rows)
+    state["next_follower_index"] = int(state.get("next_follower_index", 0))
+    if verified == len(priority_rows) and not collector.failed_follower_appids:
+        state["phase"] = "complete"
+        state["initial_complete"] = True
     state["last_attempt"] = {
         "phase": "followers", "candidate_count": len(rows),
-        "start_index": cursor, "next_index": next_cursor,
+        "start_index": start_verified, "next_index": verified,
+        "priority_total": len(priority_rows),
+        "verified_priority_count": verified,
         "fresh_follower_requests": collector.fresh_follower_requests,
-        "priority_fresh_requests": priority_fresh_requests,
         "cached_reuses": collector.cached_follower_reuses,
         "failures": collector.follower_failures,
         "rate_limit_events": collector.follower_rate_limit_events,
         "qualified_this_batch": len(enriched),
         "published_games_total": len(master["games"]),
-        "prefilter_start_index": screened["start_index"],
-        "prefilter_next_index": int(prefilter.get("next_index", cursor))
-            if prefilter_enabled else cursor,
-        "prefilter_screened": screened["screened"],
-        "prefilter_priority": screened["priority"],
-        "prefilter_missing": screened["missing"],
-        "prefilter_complete": bool(prefilter.get("complete", False))
-            if prefilter_enabled else False,
-        "prefilter_matched_total": prefilter_matched_count,
-        "prefilter_missing_total": prefilter_unknown_count,
-        "official_verified_total": official_verified_count,
-        "priority_remaining": priority_remaining,
-        "screen_first_then_verify": prefilter_enabled,
-        "backfill_started": not prefilter_enabled,
+        "prefilter_complete": True,
     }
     return {"phase": state["phase"], **state["last_attempt"]}
 
@@ -406,6 +400,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     phase = state.get("phase")
     if phase == "discovery":
         result = run_discovery(args, state, catalog)
+    elif phase == "prefilter" or (
+        phase == "followers"
+        and int(getattr(args, "prefilter_batch_size", 0) or 0) > 0
+        and not prefilter_complete(
+            load_json(Path(args.prefilter_state), {"games": []}),
+            catalog.get("games", []),
+        )
+    ):
+        result = run_prefilter_phase(args, state, catalog)
     elif phase == "followers":
         result = run_follower_batch(args, state, catalog, master)
     elif phase == "complete":
@@ -435,7 +438,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "coverage_exhaustive": False,
                 "prefilter_threshold": state.get("prefilter_threshold"),
                 "prefilter_next_index": state.get("prefilter_next_index"),
+                "prefilter_head_next_index": state.get("prefilter_head_next_index"),
                 "prefilter_complete": state.get("prefilter_complete", False),
+                "priority_total": state.get("priority_total"),
+                "verified_priority_count": state.get("verified_priority_count"),
                 "prefilter_screened_count": state.get("prefilter_screened_count", 0),
                 "prefilter_missing_count": state.get("prefilter_missing_count", 0),
                 "prefilter_matched_count": state.get("prefilter_matched_count", 0),

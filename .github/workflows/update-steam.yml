@@ -62,6 +62,7 @@ jobs:
           --checkpoint data/steam_followers_checkpoint.json
           --checkpoint-branch steam-state
           --checkpoint-every 5
+          --max-fresh-requests 600
           --state data/steam_initial_state.json
           --master data/steam_upcoming_master.json
           --output output/steam_upcoming.json

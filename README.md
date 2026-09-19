@@ -2,6 +2,15 @@
 
 遊戲熱度追蹤與分析的私人資料蒐集端。此 Repository 保持 **Private**；公開網站放在 `game-trend-radar`。
 
+## Steam 批次群組查詢：2026-09-19 實測紀錄
+
+以下是獨立、只讀的探針結果，**不代表已替換正式 Followers 收集器**。使用者的 Steam Web API 金鑰僅由 GitHub Actions secrets 注入；測試不輸出金鑰。
+
+- [群組批次探針](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35451413393)：既有快取的 12 個 AppID，Steam XML `groupID64` 和 `memberCount` 都成功（12/12）；對其中 6 個執行 `ISteamUser/ResolveVanityURL`、`url_type=3`，6/6 成功且回傳 GroupID64 與 XML 完全相同。
+- 同一次探針：匿名 Steam CM 登入成功（eresult=1），送出含 10 個群組的 `CMsgClientGetClanActivityCounts`，但未收到 `ClientGetClanActivityCountsResponse` 或任何對應的 `ClientClanState.user_counts.members`（0/10）。所以**尚未證明能透過匿名 CM 批次查總會員數**；Steam Web API Key 不是 Steam 使用者登入憑證。
+- [XML 間隔探針](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35451566114)：每秒開始一個舊 AppID 的 XML 查詢，前 6 個 HTTP 200，第 7 個 HTTP 429 後立即停止。6 筆成功請求平均回應 0.371 秒；第一次群組探針的 12 筆 XML 約每 2 秒間隔全部成功。但兩輪請求相近，不能據此推論 2 秒間隔可長期安全運行。
+- 暫不降低正式的 30 秒 Followers 查詢間隔，也不修改 `data/steam_candidate_state.json`、cache 或公開前端。若持續追查 CM，必須先解決會員總數回傳及 XML 比對；不要將線上／遊戲中／聊天中人數誤當 Followers。
+
 ## 目前正式 Steam 初始化流程（2026-09-19）
 
 以下為現行流程；下方的「6 個兩月區段」及 `update-steam.yml` 是舊版手動復原流程，不可用於接續目前的 Followers 游標。

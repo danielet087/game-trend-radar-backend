@@ -22,6 +22,9 @@ from collectors.steam_upcoming import (
     SteamUpcomingCollector, UpcomingGame, TAIWAN_TZ, taiwan_today, write_json,
 )
 from scripts.update_steam_daily import load_json, merge_partial_segment, save_json
+from scripts.steam_follower_prefilter import (
+    PRIORITY_THRESHOLD, pending_priorities, scan_batch,
+)
 
 LOG = logging.getLogger(__name__)
 QUERY_URL = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -229,21 +232,71 @@ def run_follower_batch(
         reuse_all_cached_during_initialization=True,
         max_fresh_requests_per_run=50,
     )
-    selected = []
-    for raw in rows[cursor:]:
-        selected.append(UpcomingGame(
+
+    def as_game(raw: dict[str, Any]) -> UpcomingGame:
+        return UpcomingGame(
             appid=raw["appid"], name=raw["name"], release_raw=raw["release_raw"],
             release_start=raw["release_start"], release_end=raw["release_end"],
             release_precision="day", capsule_image=raw.get("capsule_image"),
             store_url=raw["store_url"],
+        )
+
+    prefilter_enabled = int(getattr(args, "prefilter_batch_size", 0) or 0) > 0
+    prefilter: dict[str, Any] = {}
+    screen = {"start_index": cursor, "next_index": cursor,
+              "screened": 0, "priority": 0, "missing": 0, "complete": True}
+    qualified = []
+    priority_fresh_requests = 0
+    priority_remaining = 0
+    sequential_processed = 0
+    if prefilter_enabled:
+        prefilter = load_json(
+            Path(args.prefilter_state),
+            {"version": 1, "next_index": cursor, "complete": False, "games": {}},
+        )
+        if int(prefilter.get("next_index", cursor)) < len(rows):
+            screen = scan_batch(
+                rows, prefilter, steam_api_key=os.environ.get("STEAM_WEB_API_KEY", "").strip(),
+                initial_index=cursor, limit=args.prefilter_batch_size,
+                request_interval=getattr(args, "prefilter_request_interval", 0.5),
+            )
+        else:
+            prefilter["complete"] = True
+            screen["start_index"] = int(prefilter.get("next_index", cursor))
+            screen["next_index"] = screen["start_index"]
+        # A separate resumable JSON: never mix third-party counts into the
+        # official XML cache, and do not mark a low-score game as verified.
+        save_json(Path(args.prefilter_state), prefilter)
+        priority_rows = pending_priorities(
+            rows, prefilter, collector.follower_cache,
+            min_start_index=cursor, max_candidates=50,
+        )
+        if priority_rows:
+            qualified.extend(collector.qualify(map(as_game, priority_rows)))
+            priority_fresh_requests = collector.fresh_follower_requests
+        priority_remaining = len(pending_priorities(
+            rows, prefilter, collector.follower_cache,
+            min_start_index=cursor, max_candidates=len(rows),
         ))
-    qualified = collector.qualify(selected)
-    # The Followership dataclass holds the Steam card fields, while the
-    # catalog holds the exact Taiwan timestamp and source. Preserve both:
-    # reparsing a date-only release_raw would lose the verified UTC time.
+        state["prefilter_next_index"] = int(prefilter.get("next_index", cursor))
+        state["prefilter_complete"] = bool(prefilter.get("complete", False))
+        state["prefilter_threshold"] = PRIORITY_THRESHOLD
+
+    # When the entire fast screen and priority queue are finished, return to
+    # the original complete XML pass starting at the unchanged official cursor.
+    # This prevents third-party undercounts from permanently losing real hits.
+    backfill = not prefilter_enabled or (
+        prefilter.get("complete", False)
+        and priority_remaining == 0 and not collector.failed_follower_appids
+    )
+    if backfill and collector.fresh_follower_requests < 50:
+        selection = list(map(as_game, rows[cursor:]))
+        qualified.extend(collector.qualify(selection))
+        sequential_processed = collector.processed_candidate_count
+
     catalog_by_id = {row["appid"]: row for row in rows}
     enriched = []
-    for row in qualified:
+    for row in {row.appid: row for row in qualified}.values():
         record = vars(row).copy()
         source = catalog_by_id.get(row.appid, {})
         for field in ("name_en", "name_zh_tw", "release_date_timezone",
@@ -255,27 +308,40 @@ def run_follower_batch(
     master["games"] = combined
     master["updated_at"] = datetime.now(timezone.utc).isoformat()
     failed = collector.failed_follower_appids
-    if failed:
+    if failed and backfill:
         failed_index = next(
             (i for i, row in enumerate(rows[cursor:], start=cursor)
              if row["appid"] in failed), cursor
         )
-        next_cursor = failed_index
+        next_cursor = min(cursor + sequential_processed, failed_index)
+    elif backfill:
+        next_cursor = cursor + sequential_processed
     else:
-        next_cursor = cursor + collector.processed_candidate_count
+        next_cursor = cursor
     state["next_follower_index"] = next_cursor
-    if next_cursor >= len(rows) and not failed:
+    if next_cursor >= len(rows) and not failed and (
+        not prefilter_enabled or prefilter.get("complete", False)
+    ):
         state["phase"] = "complete"
         state["initial_complete"] = True
     state["last_attempt"] = {
         "phase": "followers", "candidate_count": len(rows),
         "start_index": cursor, "next_index": next_cursor,
         "fresh_follower_requests": collector.fresh_follower_requests,
+        "priority_fresh_requests": priority_fresh_requests,
         "cached_reuses": collector.cached_follower_reuses,
         "failures": collector.follower_failures,
         "rate_limit_events": collector.follower_rate_limit_events,
-        "qualified_this_batch": len(qualified),
+        "qualified_this_batch": len(enriched),
         "published_games_total": len(master["games"]),
+        "prefilter_start_index": screen["start_index"],
+        "prefilter_next_index": int(prefilter.get("next_index", cursor)) if prefilter_enabled else cursor,
+        "prefilter_screened": screen["screened"],
+        "prefilter_priority": screen["priority"],
+        "prefilter_missing": screen["missing"],
+        "prefilter_complete": bool(prefilter.get("complete", False)) if prefilter_enabled else False,
+        "priority_remaining": priority_remaining,
+        "backfill_started": backfill,
     }
     return {"phase": state["phase"], **state["last_attempt"]}
 
@@ -319,6 +385,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "candidate_count": catalog.get("count", 0),
                 "next_follower_index": state.get("next_follower_index", 0),
                 "coverage_exhaustive": False,
+                "prefilter_threshold": state.get("prefilter_threshold"),
+                "prefilter_next_index": state.get("prefilter_next_index"),
+                "prefilter_complete": state.get("prefilter_complete", False),
                 "last_attempt": state.get("last_attempt"),
             },
             "count": len(master.get("games", [])),
@@ -340,6 +409,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--follower-cache", default="data/steam_followers_cache.json")
     parser.add_argument("--checkpoint", default="data/steam_followers_checkpoint.json")
     parser.add_argument("--checkpoint-branch", default="steam-state")
+    parser.add_argument("--prefilter-state", default="data/steam_prefilter_state.json")
+    parser.add_argument("--prefilter-batch-size", type=int, default=0)
+    parser.add_argument("--prefilter-request-interval", type=float, default=0.5)
     parser.add_argument("--request-interval", type=float, default=30.0)
     parser.add_argument("--search-interval", type=float, default=1.5)
     return parser

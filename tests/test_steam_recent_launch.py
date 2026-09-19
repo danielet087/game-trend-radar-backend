@@ -5,6 +5,8 @@ from unittest.mock import patch
 from scripts.publish_steam_preview import (
     checked_followers,
     fetch_new_release_appids,
+    first_week_release,
+    release_from_store,
     recent_release,
     run,
 )
@@ -104,3 +106,80 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
             today=date(2026, 9, 20), delay_seconds=0, follower_interval=0,
         )
     assert {game["appid"] for game in followup["recent_games"]} == {101, 202}
+
+
+def test_first_week_includes_release_day_and_day_seven_but_not_day_eight():
+    released = date(2026, 9, 12)
+    assert first_week_release(released, date(2026, 9, 12))
+    assert first_week_release(released, date(2026, 9, 19))
+    assert not first_week_release(released, date(2026, 9, 20))
+    assert not first_week_release(released, date(2026, 9, 11))
+
+
+def test_recent_dark_horse_must_have_first_week_follower_evidence():
+    today = date(2026, 9, 29)
+    base = {
+        "appid": 987,
+        "release_start": "2026-09-19",
+        "followers": 3001,
+        "recent_source": "direct_release",
+    }
+    assert recent_release({
+        **base, "first_week_qualified_at": "2026-09-26T06:00:00Z",
+    }, today)
+    assert not recent_release({
+        **base, "first_week_qualified_at": "2026-09-27T06:00:00Z",
+    }, today)
+    assert not recent_release({
+        **base, "first_week_qualified_at": "2026-09-18T06:00:00Z",
+    }, today)
+    assert recent_release({
+        **base, "recent_source": "tracked_release",
+    }, today)
+
+
+def test_direct_first_week_store_confirmation_and_badge_evidence():
+    details = {
+        "type": "game", "name": "New Launch",
+        "release_date": {"date": "12 Sep, 2026", "coming_soon": False},
+    }
+    with (
+        patch("scripts.publish_steam_preview.app_details", return_value=details),
+        patch("scripts.publish_steam_preview.add_traditional_name"),
+    ):
+        eligible = release_from_store(
+            None, 555, 3500, "2026-09-19T00:00:00Z",
+            today=date(2026, 9, 19), delay_seconds=0,
+            recent_source="direct_release",
+        )
+        late = release_from_store(
+            None, 555, 3500, "2026-09-20T00:00:00Z",
+            today=date(2026, 9, 20), delay_seconds=0,
+            recent_source="direct_release",
+        )
+    assert eligible["first_week_qualified_at"] == "2026-09-19T00:00:00Z"
+    assert eligible["recent_source"] == "direct_release"
+    assert late is None
+
+
+def test_under_3000_gets_rechecked_next_day():
+    now = datetime(2026, 9, 20, tzinfo=timezone.utc)
+    checkpoint = {"123": {"followers": 2999, "checked_at": "2026-09-19T00:00:00Z"}}
+    assert checked_followers(123, checkpoint, {}, now) is None
+    checkpoint["123"]["checked_at"] = "2026-09-19T20:00:00Z"
+    assert checked_followers(123, checkpoint, {}, now) == (
+        2999, "2026-09-19T20:00:00Z"
+    )
+
+
+def test_search_excludes_launches_older_than_first_week():
+    html = (
+        '<a class="search_result_row" data-ds-appid="101"><span class="title">Old</span>'
+        '<div class="search_released">11 Sep, 2026</div></a>'
+        '<a class="search_result_row" data-ds-appid="202"><span class="title">Week</span>'
+        '<div class="search_released">12 Sep, 2026</div></a>'
+        '<a class="search_result_row" data-ds-appid="303"><span class="title">Today</span>'
+        '<div class="search_released">19 Sep, 2026</div></a>'
+    )
+    with patch("scripts.publish_steam_preview.steam_get", return_value={"results_html": html}):
+        assert fetch_new_release_appids(None, date(2026, 9, 19)) == [202, 303]

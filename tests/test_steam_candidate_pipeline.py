@@ -108,7 +108,7 @@ def test_stage_one_advances_calendar_days_without_followers(monkeypatch):
         assert first["followers_queried"] == 0
         assert state["days_scanned"] == 1
         second = run_discovery(args, state, catalog)
-    assert second["phase"] == "followers"
+    assert second["phase"] == "prefilter"
     assert second["followers_queried"] == 0
     assert state["days_scanned"] == 2
 

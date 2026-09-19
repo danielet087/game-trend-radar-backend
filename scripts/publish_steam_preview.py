@@ -277,6 +277,9 @@ def run(
         key: value for key, value in prior_released.items()
         if isinstance(value, dict) and recent_release(value, today)
     }
+    for game in recently_released.values():
+        if game.get("recent_source") == "direct_release":
+            game.setdefault("first_week_qualified_at", game.get("follower_checked_at"))
     session = requests.Session()
     session.headers.update({"User-Agent": UA, "Accept-Language": "en-US,en;q=0.8"})
 

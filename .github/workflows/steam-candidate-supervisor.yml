@@ -5,6 +5,8 @@ name: Steam candidate supervisor
 # yielding roughly 2–3 minute checks, subject to GitHub scheduling delays.
 # Collector now completes all remaining dates (up to 365 total) in ONE run.
 # Once discovery is complete, dispatch one fresh-50-Followers batch and publish its results.
+# Manual continuity wake after first successful Followers publication (cursor 569/11467).
+
 on:
   workflow_dispatch:
   schedule:

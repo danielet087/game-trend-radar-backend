@@ -1,11 +1,9 @@
 name: Steam candidates then Followers
 
 on:
+  # Controlled by Steam candidate supervisor via workflow_dispatch.
+  # GitHub cron and the old GPT push-marker are no longer dispatch sources.
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/steam-gpt-trigger.txt"
 permissions:
   contents: write
 concurrency:

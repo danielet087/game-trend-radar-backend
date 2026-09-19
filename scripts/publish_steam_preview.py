@@ -292,7 +292,7 @@ def run(
             ).isoformat().replace("+00:00", "Z")
             recently_released[str(appid)] = game
             processed_tracked.add(appid)
-        elif day > today and day <= today + timedelta(days=365) and coming_soon is True:
+        elif day >= today and day <= today + timedelta(days=365) and coming_soon is True:
             add_traditional_name(session, appid, game, details, delay_seconds=delay_seconds)
             games.append(game)
             processed_tracked.add(appid)

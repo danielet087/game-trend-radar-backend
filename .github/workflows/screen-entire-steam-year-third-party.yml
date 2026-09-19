@@ -16,12 +16,12 @@ concurrency:
 
 jobs:
   entire-year:
-    # One bounded GitHub-hosted screening run. Consumes private Actions minutes;
+    # Resumes saved 6085+ cursor; per-request/batch retries handle transient Steam faults.\n    # One bounded GitHub-hosted screening run. Consumes private Actions minutes;
     # deliberately DOES NOT issue any Steam Community followers XML queries.
     runs-on: ubuntu-latest
     timeout-minutes: 175
     steps:
-      - name: Checkout private year catalog and existing 1085-title checkpoint
+      - name: Checkout private full-year catalog and latest persisted prescreen cursor
         uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -33,7 +33,7 @@ jobs:
         run: |
           python -m py_compile scripts/run_full_steam_prefilter.py
           python -m pytest -q
-      - name: Screen entire candidate catalog through existing saved checkpoint
+      - name: Resume all remaining third-party screening with bounded retries
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
         run: |
@@ -58,7 +58,7 @@ jobs:
               and v["third_party_followers"] >= 4000 for v in rows.values())
           print("THIRD_PARTY_SCREENED", len(rows), "OF", 11467)
           print("GROUPS_WITH_THIRD_PARTY_COUNT", measured)
-          print("GROUPS_UNRESOLVED_LOW_PRIORITY", missing)
+          print("GROUPS_WITHOUT_THIRD_PARTY_COUNT", missing)
           print("THIRD_PARTY_4000_CANDIDATES", qualified)
           print("THIRD_PARTY_STAGE_COMPLETE", bool(state.get("prefilter_complete")))
           print("STEAM_OFFICIAL_CURSOR_PRESERVED", state.get("next_follower_index"))

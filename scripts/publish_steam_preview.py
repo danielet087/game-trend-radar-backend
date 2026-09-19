@@ -106,12 +106,12 @@ def run(*, checkpoint_path: Path, output_path: Path, min_followers: int = 5000, 
             games.append(game)
         LOGGER.info("Metadata %d/%d: AppID=%d followers=%d", index, len(qualified), appid, followers)
 
-    # Steam Store's top_sellers list, restricted to titles released in the last 30 days.
+    # Only Steam Store top_sellers released in the past 30 days qualify as recent popular titles.
     # Do not label these records as having follower data: this is a different metric.
     featured = steam_get(session, FEATURED, {"cc": "TW", "l": "english"}) or {}
     recent: list[dict[str, Any]] = []
     seen: set[int] = set()
-    for source in ("top_sellers", "new_releases"):
+    for source in ("top_sellers",):
         group = featured.get(source) or {}
         for item in (group.get("items") or [])[:15]:
             try:
@@ -123,7 +123,7 @@ def run(*, checkpoint_path: Path, output_path: Path, min_followers: int = 5000, 
             seen.add(appid)
             time.sleep(delay_seconds)
             details = app_details(session, appid)
-            if not details:
+            if not details or details.get("type") != "game":
                 continue
             game = normalized_metadata(appid, details, None, None)
             if not game:
@@ -139,7 +139,7 @@ def run(*, checkpoint_path: Path, output_path: Path, min_followers: int = 5000, 
 
     output = {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        "source": "Steam Store appdetails + private follower checkpoint; recent releases: Steam Store top_sellers/new_releases",
+        "source": "Steam Store appdetails + private follower checkpoint; recent popular releases: Steam Store top_sellers",
         "is_partial_preview": True,
         "checkpoint_count": len(cached),
         "checkpoint_updated_at": checkpoint.get("updated_at"),

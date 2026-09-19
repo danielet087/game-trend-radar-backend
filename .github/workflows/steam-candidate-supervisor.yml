@@ -1,0 +1,37 @@
+name: Steam candidate supervisor
+
+# GitHub schedule minimum is five minutes.
+# Check at cron minute 02/07/12...57 AND again 180 seconds later,
+# yielding roughly 2–3 minute checks, subject to GitHub scheduling delays.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "2-59/5 * * * *"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/steam-candidate-supervisor.yml"
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: steam-candidate-supervisor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout latest private backend
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check latest Steam progress, dispatch safely, repeat after 3 minutes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python -m scripts.steam_candidate_supervisor

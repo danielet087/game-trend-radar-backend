@@ -106,6 +106,35 @@ def merge_segment(
     )
 
 
+def merge_partial_segment(
+    existing_games: list[dict[str, Any]],
+    newly_qualified: list[dict[str, Any]],
+    *,
+    today: date,
+) -> list[dict[str, Any]]:
+    """Persist each 50-lookup batch without discarding older segment progress.
+
+    An incomplete run cannot replace the entire two-month window: later
+    candidates have not yet been checked. Only update an AppID when the run
+    actually returned that game's Followers.
+    """
+    by_appid: dict[int, dict[str, Any]] = {}
+    for game in prune_released(existing_games, today) + newly_qualified:
+        try:
+            appid = int(game["appid"])
+        except (KeyError, ValueError, TypeError):
+            continue
+        by_appid[appid] = game
+    return sorted(
+        by_appid.values(),
+        key=lambda game: (
+            -int(game.get("followers") or 0),
+            str(game.get("release_start") or "9999-12-31"),
+            int(game["appid"]),
+        ),
+    )
+
+
 def build_public_payload(
     *,
     games: list[dict[str, Any]],
@@ -180,7 +209,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         checkpoint_branch=args.checkpoint_branch,
         checkpoint_every=args.checkpoint_every,
         reuse_all_cached_during_initialization=not bool(state.get("initial_complete")),
-        max_fresh_requests_per_run=args.max_fresh_requests,
+        max_fresh_requests_per_run=(
+            args.max_fresh_requests if not state.get("initial_complete") else 600
+        ),
     )
 
     if not state.get("initial_complete"):
@@ -237,7 +268,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     total_segments,
                     failures,
                 )
-            combined_games = prune_released(existing_games, today)
+            combined_games = merge_partial_segment(
+                existing_games, latest.get("games", []), today=today,
+            )
             state["last_attempt"] = {
                 "segment": segment,
                 "window_start": window_start.isoformat(),
@@ -246,6 +279,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "status": "paused_budget" if paused_for_budget else "incomplete",
                 "candidate_count": int(latest.get("candidate_count") or 0),
                 "qualified_count_partial": int(latest.get("count") or 0),
+                "published_games_total": len(combined_games),
+                "fresh_requests_this_batch": int(
+                    collection.get("fresh_follower_requests") or 0
+                ),
                 "processed_candidate_count": int(collection.get("processed_candidate_count") or 0),
                 "remaining_unchecked_candidates": remaining_unchecked,
                 "follower_failures": failures,
@@ -287,6 +324,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "follower_failures": 0,
             }
 
+        state["initial_batch_count"] = int(state.get("initial_batch_count") or 0) + 1
+        state["last_attempt"]["initial_batch_count"] = state["initial_batch_count"]
         mode = "initializing"
 
     else:
@@ -304,7 +343,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             window_start=window_start,
             window_end=window_end,
         )
-        combined_games = list(latest.get("games", []))
+        combined_games = merge_partial_segment(
+            existing_games, latest.get("games", []), today=today,
+        ) if latest.get("collection", {}).get("paused_due_to_fresh_request_budget") else list(
+            latest.get("games", [])
+        )
         mode = "maintenance"
 
     # Look up public Store Browse timestamps only for qualified games.
@@ -353,7 +396,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-fresh-requests",
         type=int,
         default=600,
-        help="During one run, stop cleanly after this many new follower requests; <=0 disables the cap.",
+        help="During initialization, save and publish after this many fresh follower lookups; <=0 disables the cap.",
     )
     parser.add_argument("--country", default="TW")
     parser.add_argument("--days", type=int, default=365)

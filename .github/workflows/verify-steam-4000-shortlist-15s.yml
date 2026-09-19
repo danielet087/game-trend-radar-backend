@@ -1,0 +1,74 @@
+name: Stage 3 - verify 4000 shortlist using Steam official XML
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/verify-steam-4000-shortlist-15s.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: steam-two-phase-initialization
+  cancel-in-progress: false
+
+jobs:
+  verify-official:
+    # Shortlist is only 247 titles. GitHub-hosted is deliberately bounded.
+    # This consumes private Actions minutes, unlike a self-hosted runner.
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - name: Checkout finished third-party shortlist and existing official cache
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend and tests
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Check exact three-stage logic and official runner syntax
+        run: |
+          python -m py_compile scripts/run_steam_official_shortlist.py
+          python -m pytest -q
+      - name: Verify ONLY third-party >=4000 candidates from official Steam XML
+        env:
+          STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -m scripts.run_steam_official_shortlist \
+            --interval 15 \
+            --batch-size 25 \
+            --max-minutes 100
+      - name: Final strict verification summary
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
+          pre=json.loads(Path("data/steam_prefilter_state.json").read_text(encoding="utf-8"))
+          cache=json.loads(Path("data/steam_followers_cache.json").read_text(encoding="utf-8"))["games"]
+          shortlisted=[
+              appid for appid,item in pre["games"].items()
+              if isinstance(item.get("third_party_followers"),int)
+              and item["third_party_followers"]>=4000
+          ]
+          verified=sum(appid in cache for appid in shortlisted)
+          print("THIRD_PARTY_SHORTLIST",len(shortlisted))
+          print("OFFICIAL_XML_VERIFIED",verified)
+          print("REMAINING_OFFICIAL",len(shortlisted)-verified)
+          print("VERIFICATION_COMPLETE",state.get("initial_complete"))
+          print("PREFILTER_COMPLETE",state.get("prefilter_complete"))
+          print("HISTORIC_CURSOR_PRESERVED",state.get("next_follower_index"))
+          assert state.get("prefilter_complete")
+          assert state.get("next_follower_index")==685
+          if Path("output/steam_upcoming.json").exists():
+              pub=json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
+              assert pub["filter"]["min_followers"]==5000
+              assert all(int(g["followers"])>=5000 for g in pub["games"])
+          PY

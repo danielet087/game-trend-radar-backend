@@ -230,7 +230,7 @@ def run_follower_batch(
         follower_cache_path=args.follower_cache, checkpoint_path=args.checkpoint,
         checkpoint_branch=args.checkpoint_branch, checkpoint_every=5,
         reuse_all_cached_during_initialization=True,
-        max_fresh_requests_per_run=50,
+        max_fresh_requests_per_run=int(getattr(args, "max_fresh_requests_per_run", 50)),
     )
 
     def as_game(raw: dict[str, Any]) -> UpcomingGame:
@@ -246,6 +246,9 @@ def run_follower_batch(
     screen = {"start_index": cursor, "next_index": cursor,
               "screened": 0, "priority": 0, "missing": 0, "complete": True}
     qualified = []
+    budget = int(getattr(args, "max_fresh_requests_per_run", 50))
+    if not 1 <= budget <= 50:
+        raise ValueError("Official XML requests per batch must be within 1..50")
     priority_fresh_requests = 0
     priority_remaining = 0
     sequential_processed = 0
@@ -269,7 +272,7 @@ def run_follower_batch(
         save_json(Path(args.prefilter_state), prefilter)
         priority_rows = pending_priorities(
             rows, prefilter, collector.follower_cache,
-            min_start_index=cursor, max_candidates=50,
+            min_start_index=cursor, max_candidates=budget,
         )
         if priority_rows:
             qualified.extend(collector.qualify(map(as_game, priority_rows)))
@@ -289,7 +292,7 @@ def run_follower_batch(
         prefilter.get("complete", False)
         and priority_remaining == 0 and not collector.failed_follower_appids
     )
-    if backfill and collector.fresh_follower_requests < 50:
+    if backfill and collector.fresh_follower_requests < budget:
         selection = list(map(as_game, rows[cursor:]))
         qualified.extend(collector.qualify(selection))
         sequential_processed = collector.processed_candidate_count
@@ -412,6 +415,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--prefilter-state", default="data/steam_prefilter_state.json")
     parser.add_argument("--prefilter-batch-size", type=int, default=0)
     parser.add_argument("--prefilter-request-interval", type=float, default=0.5)
+    parser.add_argument("--max-fresh-requests-per-run", type=int, default=50)
     parser.add_argument("--request-interval", type=float, default=30.0)
     parser.add_argument("--search-interval", type=float, default=1.5)
     return parser

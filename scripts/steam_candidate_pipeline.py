@@ -336,7 +336,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--master", default="data/steam_upcoming_master.json")
     parser.add_argument("--output", default="output/steam_upcoming.json")
     parser.add_argument("--days", type=int, default=365)
-    parser.add_argument("--batch-days", type=int, default=30)
+    parser.add_argument("--batch-days", type=int, default=365)
     parser.add_argument("--follower-cache", default="data/steam_followers_cache.json")
     parser.add_argument("--checkpoint", default="data/steam_followers_checkpoint.json")
     parser.add_argument("--checkpoint-branch", default="steam-state")

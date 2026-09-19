@@ -2,6 +2,24 @@
 
 遊戲熱度追蹤與分析的私人資料蒐集端。此 Repository 保持 **Private**；公開網站放在 `game-trend-radar`。
 
+## 目前正式 Steam 初始化流程（2026-09-19）
+
+以下為現行流程；下方的「6 個兩月區段」及 `update-steam.yml` 是舊版手動復原流程，不可用於接續目前的 Followers 游標。
+
+1. `steam-two-phase.yml` 已掃描完台灣日期未來 365 天，接續按候選順序每批最多發送 50 次新的 Followers 查詢；已查詢的資料沿用私人 cache 與 checkpoint。
+2. `steam-candidate-supervisor.yml` 可手動啟動，且會在每次 `Steam candidates then Followers` 工作完成後由 `workflow_run` 自動接力；工作執行中或上批失敗時不會重複派送。**目前沒有 cron 自動開機首次派送**。
+3. `publish-steam-preview.yml` 的近期上市 Followers 查詢也已改到同一個專用 runner，避免額外消耗私人專案的 GitHub-hosted 分鐘。
+4. 三個工作流程都要求 `runs-on: [self-hosted, linux, steam-followers]`。這是執行機器的要求，單純修改 YAML **不會提供一台免費主機**。自架 runner 不計入 GitHub-hosted Actions 分鐘，但機器與網路須自行提供。
+
+### 一次性啟動專用 runner
+
+- 在本私人 Repository 的 `Settings → Actions → Runners → New self-hosted runner` 選擇 Linux，於自己管理、可信任的常駐 Linux 主機按畫面中的即時指令下載與註冊（註冊 token 有時效，不要存進原始碼）。
+- 註冊時設定自訂標籤 `steam-followers`；GitHub 自動的 `self-hosted` 與 `linux` 標籤也必須存在。確認 runner 在 GitHub 頁面顯示 **Online**。
+- 確認主機有 Git、Python 3.12 的安裝能力、可連 GitHub/Steam 的網路，以及供資料和 pip 使用的空間。於 Linux 可依 GitHub 提示用 `sudo ./svc.sh install`、`sudo ./svc.sh start` 安裝常駐服務。
+- Runner Online 後，到 `Actions → Steam candidate supervisor → Run workflow` 手動啟動一次；之後 Followers 批次完成會觸發下一次 supervisor。若先前已有排隊中的 workflow，先檢查狀態，避免重複手動派送。
+- 追蹤進度看 `data/steam_candidate_state.json` 的 `next_follower_index` 和公開站 `data/steam_upcoming.json` 的 `initialization`。**不要重設游標或清空 cache**。
+
+
 ## 第一階段：Steam 未上市遊戲
 
 目標：每天整理 Steam 未上市遊戲，保留「未來一年內可能上市」且 Followers >= 5,000 的項目。

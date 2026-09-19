@@ -92,7 +92,9 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
         101: "tracked_release", 202: "direct_release"
     }
     assert all(game["followers"] > 3000 for game in first["recent_games"])
-    assert fetch_follows.call_count == 3
+    # Only the two truly released candidates need Followers queries.
+    # Coming-soon app 505 is rejected before spending a Community request.
+    assert fetch_follows.call_count == 2
     private = json.loads(state.read_text(encoding="utf-8"))
     assert private["checked"]["303"]["followers"] == 3000
 

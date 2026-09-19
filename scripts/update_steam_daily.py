@@ -251,7 +251,33 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         paused_for_budget = bool(collection.get("paused_due_to_fresh_request_budget"))
         remaining_unchecked = int(collection.get("remaining_unchecked_candidates") or 0)
 
-        if failures > 0 or paused_for_budget:
+        # An empty Steam search result for a distant period does NOT prove
+        # that period was exhaustively scanned. Steam's Released_ASC returns
+        # TBA records while named future launches exist under other sorts.
+        # Never advance next_segment or mark all-year completion on a
+        # zero-candidate, unverified discovery.
+        if int(latest.get("candidate_count") or 0) == 0:
+            LOGGER.warning(
+                "Segment %d/%d has zero exact-date candidates; keeping it "
+                "unverified and preserving all existing games and Followers.",
+                segment + 1, total_segments,
+            )
+            combined_games = prune_released(existing_games, today)
+            state["last_attempt"] = {
+                "segment": segment,
+                "window_start": window_start.isoformat(),
+                "window_end": window_end.isoformat(),
+                "attempted_at": datetime.now(timezone.utc).replace(
+                    microsecond=0
+                ).isoformat().replace("+00:00", "Z"),
+                "status": "discovery_incomplete",
+                "candidate_count": 0,
+                "qualified_count_partial": 0,
+                "published_games_total": len(combined_games),
+                "follower_failures": failures,
+                "note": "Search results do not establish complete coverage of this period.",
+            }
+        elif failures > 0 or paused_for_budget:
             if paused_for_budget:
                 LOGGER.info(
                     "Initial segment %d/%d paused cleanly with %d candidates remaining. "

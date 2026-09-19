@@ -220,3 +220,37 @@ def test_after_priority_complete_original_xml_cursor_resumes(tmp_path):
     assert result["next_index"] == 3
     assert state["phase"] == "complete"
     assert state["initial_complete"] is True
+
+
+def test_string_ids_are_parsed_and_previous_false_missing_window_repaired():
+    class StringIdSession(FakeSession):
+        def post(self, url, *, json, timeout):
+            response = super().post(url, json=json, timeout=timeout)
+            payload = response.json()
+            for item in payload["data"]:
+                item["id"] = str(item["id"])
+            return FakeResponse(200, payload)
+
+    saved = {
+        "version": 1, "next_index": 2, "games": {
+            "101": {"third_party_followers": None,
+                    "group_short_id": 101, "priority": True},
+            "102": {"third_party_followers": None,
+                    "group_short_id": 102, "priority": True},
+        },
+    }
+    client = StringIdSession({101: 3999, 102: 8000, 103: 4000})
+    summary = priority.scan_batch(
+        games(101, 102, 103), saved, steam_api_key="test-key",
+        initial_index=0, limit=1, request_interval=0, session=client,
+    )
+    assert summary["start_index"] == 2
+    assert summary["next_index"] == 3
+    assert saved["bulk_parser_version"] == 2
+    assert saved["games"]["101"]["third_party_followers"] == 3999
+    assert saved["games"]["101"]["priority"] is False
+    assert saved["games"]["102"]["third_party_followers"] == 8000
+    assert saved["games"]["102"]["priority"] is True
+    assert saved["games"]["103"]["third_party_followers"] == 4000
+    assert saved["games"]["103"]["priority"] is True
+    assert client.called == [103]

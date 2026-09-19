@@ -28,7 +28,8 @@ concurrency:
 
 jobs:
   check:
-    runs-on: ubuntu-latest
+    # Dedicated trusted Linux runner; no GitHub-hosted Actions minutes.
+    runs-on: [self-hosted, linux, steam-followers]
     timeout-minutes: 8
     steps:
       - name: Checkout latest private backend

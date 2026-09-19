@@ -8,7 +8,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_window, write_json
+from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_window, taiwan_today, write_json
 
 LOGGER = logging.getLogger(__name__)
 
@@ -118,6 +118,7 @@ def build_public_payload(
         "filter": {
             "country": "TW",
             "release_horizon_days": 365,
+            "release_date_timezone": "Asia/Taipei",
             "min_followers": 5000,
             "unknown_release_dates_included": False,
         },
@@ -138,7 +139,7 @@ def build_public_payload(
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
-    today = date.today()
+    today = taiwan_today()
     state_path = Path(args.state)
     master_path = Path(args.master)
 

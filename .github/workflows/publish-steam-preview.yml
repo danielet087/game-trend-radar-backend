@@ -20,7 +20,8 @@ concurrency:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    # Preview can also fetch up to 45 Followers; keep it off hosted minutes.
+    runs-on: [self-hosted, linux, steam-followers]
     timeout-minutes: 45
     steps:
       - name: Checkout private backend

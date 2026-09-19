@@ -24,16 +24,57 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _group_id(session: requests.Session, key: str, appid: int) -> int | None:
-    try:
-        response = session.get(
-            VANITY_URL, params={"key": key, "vanityurl": str(appid), "url_type": 3},
-            timeout=15,
+RETRYABLE_HTTP = {408, 425, 429, 500, 502, 503, 504}
+RETRY_DELAYS = (4, 12, 30, 60)
+RATE_LIMIT_DELAYS = (15, 30, 60, 120)
+
+
+def _request_with_retries(
+    session: requests.Session, method: str, url: str, **kwargs: Any,
+) -> requests.Response:
+    """Bounded retry for temporary network/Steam/provider failures only.
+
+    Never log request URLs, params, headers, response body, or the API key.
+    A permanent 400/401/403 is returned to the caller immediately.
+    """
+    last_error = "temporary network failure"
+    for attempt in range(len(RETRY_DELAYS) + 1):
+        try:
+            response = session.request(method, url, **kwargs)
+        except requests.RequestException:
+            response = None
+        if response is not None:
+            code = response.status_code
+            if code not in RETRYABLE_HTTP:
+                return response
+            last_error = f"HTTP {code}"
+        if attempt >= len(RETRY_DELAYS):
+            break
+        delay = (
+            RATE_LIMIT_DELAYS[attempt]
+            if response is not None and response.status_code == 429
+            else RETRY_DELAYS[attempt]
         )
-    except requests.RequestException as exc:
-        raise RuntimeError(
-            "Steam vanity lookup temporarily unavailable; priority cursor unchanged"
-        ) from None
+        if response is not None and response.status_code in (429, 503):
+            # Respect a numeric Retry-After, capped so the job can checkpoint.
+            value = getattr(response, "headers", {}).get("Retry-After", "")
+            try:
+                delay = max(delay, min(120, int(value)))
+            except (TypeError, ValueError):
+                pass
+        time.sleep(delay)
+    raise RuntimeError(
+        f"Temporary lookup exhausted retries ({last_error}); "
+        "priority cursor unchanged"
+    )
+
+
+def _group_id(session: requests.Session, key: str, appid: int) -> int | None:
+    response = _request_with_retries(
+        session, "GET", VANITY_URL,
+        params={"key": key, "vanityurl": str(appid), "url_type": 3},
+        timeout=15,
+    )
     if response.status_code != 200:
         raise RuntimeError(
             f"Steam vanity returned HTTP {response.status_code}; priority cursor unchanged"
@@ -53,14 +94,11 @@ def _bulk_counts(
 ) -> dict[int, int]:
     if not group_ids:
         return {}
-    try:
-        response = session.post(
-            BULK_URL,
-            json={"ids": group_ids, "limit": len(group_ids)},
-            timeout=30,
-        )
-    except requests.RequestException:
-        raise RuntimeError("Third-party bulk lookup unavailable; priority cursor unchanged") from None
+    response = _request_with_retries(
+        session, "POST", BULK_URL,
+        json={"ids": group_ids, "limit": len(group_ids)},
+        timeout=30,
+    )
     if response.status_code != 200:
         raise RuntimeError(
             f"Third-party bulk returned HTTP {response.status_code}; priority cursor unchanged"
@@ -194,7 +232,7 @@ def scan_batch(
     for previous in saved.values():
         if previous.get("third_party_followers") is None:
             previous["priority"] = False
-            previous["scheduling_band"] = "missing_assumed_under_3000"
+            previous["scheduling_band"] = "unresolved"
     saved.update(repaired)
     saved.update(staged)
     prefilter["bulk_parser_version"] = 2

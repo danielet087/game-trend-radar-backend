@@ -1,0 +1,98 @@
+name: Steam candidates then Followers
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/steam-gpt-trigger.txt"
+permissions:
+  contents: write
+concurrency:
+  group: steam-two-phase-initialization
+  cancel-in-progress: false
+jobs:
+  batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout private backend
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Run tests
+        run: python -m pytest -q
+      - name: Find 30 Taiwan dates OR check 50 Followers
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+          STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          python -m scripts.steam_candidate_pipeline
+          --days 365
+          --batch-days 30
+          --request-interval 30
+          --search-interval 1.5
+          --state data/steam_candidate_state.json
+          --catalog data/steam_candidates.json
+          --master data/steam_upcoming_master.json
+          --follower-cache data/steam_followers_cache.json
+          --checkpoint data/steam_followers_checkpoint.json
+          --checkpoint-branch steam-state
+          --output output/steam_upcoming.json
+      - name: Validate persistent candidate and state JSON
+        run: |
+          python -m json.tool data/steam_candidate_state.json > /dev/null
+          python -m json.tool data/steam_candidates.json > /dev/null
+          if [ -f output/steam_upcoming.json ]; then
+            python -m json.tool output/steam_upcoming.json > /dev/null
+          fi
+      - name: Save private candidate catalog and checkpoint metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_candidate_state.json data/steam_candidates.json
+          if [ -f output/steam_upcoming.json ]; then
+            git add data/steam_followers_cache.json data/steam_upcoming_master.json
+          fi
+          if git diff --cached --quiet; then
+            echo "No new candidate or follower progress."
+          else
+            git commit -m "data: advance private Steam two-stage initialization"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Publish qualified games only after candidate discovery
+        if: ${{ success() }}
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          if [ ! -f output/steam_upcoming.json ]; then
+            echo "Discovery only: no Followers queried and no public games overwritten."
+            exit 0
+          fi
+          if [ -z "$FRONTEND_REPO_TOKEN" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN is required for public publish."
+            exit 1
+          fi
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+          cp output/steam_upcoming.json frontend/data/steam_upcoming.json
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_upcoming.json
+          if git diff --cached --quiet; then
+            echo "Public JSON already matches."
+            exit 0
+          fi
+          git commit -m "data: publish qualified Steam candidates after follower batch"
+          git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
+          git pull --rebase origin main
+          git push origin HEAD:main

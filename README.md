@@ -6,16 +6,20 @@
 
 - [首次 200 款限量試跑](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454533202)：原始 Steam 官方完整複查游標 685 保留，第三方初篩 685→885，官方 XML 新查 5 款、0 款新增達 5,000；沒有 HTTP 429。曾錯把 200 款都當成第三方缺資料，**這是程式解析 Bug，不能當覆蓋率**。
 - [驗證第三方實際回應格式](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454944698)：已存的 200 個群組短 ID，第三方 HTTP 200，實際回傳 176 筆、找不到 24 筆；回傳 `id` 是 **JSON 字串**、`members` 是整數。先前程式錯誤限制 `id` 必須是整數。現已修改 `scripts/steam_follower_prefilter.py` 接受可解析的字串 ID，且會在往前掃描時**用一次 bulk 呼叫重新修復先前錯誤歸類的視窗**。
-- [修復後再跑 200 款](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454982484)：初篩游標 885→1085，先前 200 款已修復；累計 400 款第三方初篩，有會員數 276 款、缺資料 124 款。這批 400 款中第三方會員數 >= 4,000 為 0 款，缺資料者依規則優先查 Steam XML；官方累計多查 10 款，其中 0 款新增達 5,000，所以公開合格清單維持 48 款。官方**完整順序複查**游標仍在 685，因為優先驗證與初篩尚在前期。
+- [修復後再跑 200 款](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454982484)：初篩游標 885→1085，先前 200 款已修復；累計 400 款第三方初篩，有會員數 276 款、缺資料 124 款。這批 400 款中第三方會員數 >= 4,000 為 0 款；**當時的舊流程**曾錯誤地優先查缺資料者，後來已依使用者三階段規則取消；官方累計多查 10 款，其中 0 款新增達 5,000，所以公開合格清單維持 48 款。舊版官方順序掃描游標仍在 685，新流程第三步有自己的驗證計數。
 - [71 項回歸測試通過](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454904769)。獨立的 `pilot-steam-prefilter-4000.yml` 是**手動**限量工作（每次最多 200 初篩＋5 次官方 XML，預設每次 XML 30 秒間隔），使用 GitHub-hosted Runner **會消耗私人專案 Actions 分鐘**，不可當作大批次的長期免費執行環境。正式 `steam-two-phase.yml` 仍要求 `self-hosted, linux, steam-followers` Runner；尚未見新的正式大批次成功執行。
 
-## 已部署：第三方 4,000 優先初篩＋Steam XML 5,000 正式驗證
+## 正式流程：Steam 官方候選 → 第三方 >= 4,000 → Steam 官方 >= 5,000
 
-- 4,000 是第三方資料的**優先安排官方驗證**門檻，**不是**公開網站的上榜門檻。第三方回傳 >= 4,000 或沒有任何人數／沒有群組 ID 的遊戲，優先用 Steam Community XML 的 `memberCount` 確認；正式輸出仍只保留官方確認 >= 5,000 的遊戲。第三方數字寫在獨立私人 `data/steam_prefilter_state.json`，不污染 `data/steam_followers_cache.json` 或公開站的 `followers`。
-- `steam-two-phase.yml` 每批先使用現有 `STEAM_WEB_API_KEY` 對最多 **200 款未經初篩候選**解析 Steam 群組，再向 `api.steam-groups.com/api/groups/bulk` 一次取得其第三方暫定人數。每一批必須所有解析和 bulk 回應完整成功才保存該批初篩游標；遇到 HTTP 429／授權／第三方錯誤時不把失敗遊戲分類為低關注。
-- 各批隨即用原本 XML 收集器，優先查第三方 >=4,000 和第三方缺資料的遊戲，每次最多 **50 次新的官方 XML**，保留現有 30 秒節流、官方 cache 與 checkpoint。初篩整份候選表且優先佇列清空後，原本從 **685** 開始的 `next_follower_index` 繼續循序複查**所有低於 4,000 的剩餘遊戲**；僅官方逐一驗證完成後才標記整年初始化完成。
-- 進度有兩個不同意義的游標：`prefilter_next_index` 是第三方初篩到哪一款；`next_follower_index` 是原有**完整官方 XML**順序複查游標。前者快速前進時，後者可以維持在 685，並不代表初篩停擺。公開 JSON `initialization` 會附上初篩進度欄位，但不公開第三方人數。既有 11,467 款候選、官方 cache、已公開的 48 款、舊版游標都不重設。
-- 新增 `scripts/steam_follower_prefilter.py`、`tests/test_steam_follower_prefilter.py`；[完整測試 70 passed](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454016394)。目前 GitHub 正式工作仍指定 `runs-on: [self-hosted, linux, steam-followers]`，**程式部署與單元測試通過不代表已開始實際批次收集**。Runner 上線後先確認舊工作是否 Queued，再按原本 supervisor 啟動方式接續，不要同時發多個 collector。
+**本段優先於下方任何 2026-09-19 舊實驗描述；早期「缺資料優先查官方」和「所有低關注遊戲最後補查」已撤銷。**
+
+1. 第一步：以 Steam 官方 `IStoreQueryService/Query` 掃描台灣時間未來 365 天，產出 **11,467 款**即將上市候選；不重掃既有清單。
+2. 第二步：對完整 11,467 款進行第三方 Steam Groups 批次初篩，透過原有 `STEAM_WEB_API_KEY` 解析群組 ID，再用 `api.steam-groups.com/api/groups/bulk` 查暫定人數。**只有第三方實際測得 >= 4,000** 才列入第三步。第三方 < 4,000 直接不進入官方 XML；查不到人數標記為 `unresolved`，不臆測成低關注、也不拿去驗證與發布。先前從索引 685 開始的 400 款已初篩會保留，先補做先前已查的 0–684 款群組對照，再從 1085 繼續；流程保留斷點。
+3. 第三步：**第二步全部完成後**，對符合初篩 >= 4,000 的遊戲以 Steam Community XML `memberCount` 查真正 Followers；**只有官方 >= 5,000** 才公開到網站。每次至多 50 次新的 XML，維持 30 秒節流與既有官方 cache / checkpoint。不重新查第三方低於 4,000 或未取得第三方人數的遊戲，也不進行「全清單官方補查」。
+
+數據意義：`prefilter_next_index` 加上 `prefilter_head_next_index` 是第三方初篩斷點；`next_follower_index=685` 為切換前的**歷史官方順序掃描游標**，不是新的階段三進度。第三步用 `priority_total` 與 `verified_priority_count` 表示真正候選的官方驗證進度。 `initial_complete` 表示完成本三階段流程；`coverage_exhaustive=false`，因為第三方低估與缺資料可能導致漏掉實際官方 >=5,000 的遊戲。
+
+GitHub 正式工作仍需 `[self-hosted, linux, steam-followers]` Runner；手動 pilot 會消耗 GitHub-hosted 分鐘，不會自動大量開跑。已存在的 **48 款 Steam 官方驗證上榜資料**保留，其中部分是在採用這個新門檻之前驗證的。
 
 ## Steam 批次群組查詢：2026-09-19 實測紀錄
 
@@ -44,14 +48,11 @@
 
 [SteamDB FAQ](https://steamdb.info/faq/) 明確禁止自動抓取／爬取其網站，也未提供一般公開 API；本專案不能改成 SteamDB 自動爬取來規避官方查詢成本。
 
-## 目前正式 Steam 初始化流程（2026-09-19）
+## Runner 與執行說明
 
-以下為現行流程；下方的「6 個兩月區段」及 `update-steam.yml` 是舊版手動復原流程，不可用於接續目前的 Followers 游標。
+現行三階段順序請以上方「正式流程」為準。舊版「6 個兩月區段」和 `update-steam.yml` 只作歷史說明，不可用於接續這批 11,467 款候選。
 
-1. `steam-two-phase.yml` 已掃描完台灣日期未來 365 天，先以第三方 >=4,000 人初篩每批最多 200 款、優先官方 XML 確認每批最多 50 次新的 Followers 查詢；初篩完會回到原本完整順序補查。已查詢的資料沿用私人 cache 與 checkpoint。
-2. `steam-candidate-supervisor.yml` 可手動啟動，且會在每次 `Steam candidates then Followers` 工作完成後由 `workflow_run` 自動接力；工作執行中或上批失敗時不會重複派送。**目前沒有 cron 自動開機首次派送**。
-3. `publish-steam-preview.yml` 的近期上市 Followers 查詢也已改到同一個專用 runner，避免額外消耗私人專案的 GitHub-hosted 分鐘。
-4. 三個工作流程都要求 `runs-on: [self-hosted, linux, steam-followers]`。這是執行機器的要求，單純修改 YAML **不會提供一台免費主機**。自架 runner 不計入 GitHub-hosted Actions 分鐘，但機器與網路須自行提供。
+`steam-two-phase.yml` 從保存的階段與游標接續；`steam-candidate-supervisor.yml` 可手動啟動，並在 collector 完成後接力。正式 collector 和 preview 都需要 `runs-on: [self-hosted, linux, steam-followers]`，只是 GitHub 的執行標籤，不會憑空提供執行機器。
 
 ### 一次性啟動專用 runner
 
@@ -59,7 +60,7 @@
 - 註冊時設定自訂標籤 `steam-followers`；GitHub 自動的 `self-hosted` 與 `linux` 標籤也必須存在。確認 runner 在 GitHub 頁面顯示 **Online**。
 - 確認主機有 Git、Python 3.12 的安裝能力、可連 GitHub/Steam 的網路，以及供資料和 pip 使用的空間。於 Linux 可依 GitHub 提示用 `sudo ./svc.sh install`、`sudo ./svc.sh start` 安裝常駐服務。
 - Runner Online 後，到 `Actions → Steam candidate supervisor → Run workflow` 手動啟動一次；之後 Followers 批次完成會觸發下一次 supervisor。若先前已有排隊中的 workflow，先檢查狀態，避免重複手動派送。
-- 追蹤進度看 `data/steam_candidate_state.json` 的 `prefilter_next_index`（第三方初篩）和 `next_follower_index`（官方完整複查），以及公開站 `data/steam_upcoming.json` 的 `initialization`。**不要重設游標或清空 cache**。
+- 追蹤進度看 `data/steam_candidate_state.json` 的第三方 `prefilter_next_index` / `prefilter_head_next_index` 和候選驗證 `verified_priority_count` / `priority_total`，以及公開站 `data/steam_upcoming.json` 的 `initialization`。**不要重設游標或清空 cache**。
 
 
 ## 第一階段：Steam 未上市遊戲

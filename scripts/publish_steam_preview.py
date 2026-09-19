@@ -12,7 +12,7 @@ import requests
 
 from collectors.steam_upcoming import (
     STEAM_FOLLOWERS_URL, STEAM_SEARCH_URL, parse_follower_xml,
-    parse_release_window, parse_search_results_html, write_json,
+    parse_release_window, parse_search_results_html, taiwan_today, write_json,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -266,7 +266,7 @@ def run(
     cached = checkpoint.get("games", {})
     if not isinstance(cached, dict):
         raise ValueError("Checkpoint games must be an object")
-    today = today or datetime.now(timezone(timedelta(hours=8))).date()
+    today = today or taiwan_today()
     now = datetime.now(timezone.utc)
     state: dict[str, Any] = {}
     if recent_state_path.exists():
@@ -439,6 +439,8 @@ def run(
     output = {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "source": "Steam Store metadata + private Followers checkpoint + Steam new-releases scan",
+        "release_date_timezone": "Asia/Taipei",
+        "release_date_basis": "Steam Store TW date; no unlock time inferred",
         "is_partial_preview": True,
         "checkpoint_count": len(cached),
         "checkpoint_updated_at": checkpoint.get("updated_at"),

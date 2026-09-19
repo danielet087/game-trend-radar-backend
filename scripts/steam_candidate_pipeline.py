@@ -197,7 +197,7 @@ def run_discovery(args: argparse.Namespace, state: dict[str, Any], catalog: dict
         "new_catalog_total": len(games_by_id), "followers_queried": 0,
     }
     if start > end:
-        state["phase"] = "followers"
+        state["phase"] = "prefilter"
         state["discovery_finished_at"] = datetime.now(timezone.utc).isoformat()
     catalog["games"] = sorted(
         games_by_id.values(), key=lambda x: (x["release_start"], x["appid"])
@@ -236,6 +236,7 @@ def run_prefilter_phase(
     path = Path(args.prefilter_state)
     pre = load_json(path, {"version": 1, "next_index": 0,
                            "complete": False, "games": {}})
+    pre.setdefault("head_next_index", 0)
     if not isinstance(pre.get("games"), dict):
         raise RuntimeError("Invalid third-party prefilter games")
     key = os.environ.get("STEAM_WEB_API_KEY", "").strip()

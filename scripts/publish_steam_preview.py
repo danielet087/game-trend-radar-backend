@@ -95,9 +95,15 @@ def normalized_metadata(appid: int, details: dict[str, Any], followers: int | No
 
 
 RECENT_DAYS = 30
+FIRST_WEEK_DAYS = 7  # Release day through seven calendar days afterward.
 DIRECT_FOLLOWERS_MIN = 3001  # "Over 3,000" is strictly greater than 3,000.
 MAX_NEW_RELEASE_REQUESTS = 45
 MAX_SCAN_SECONDS = 1800  # Finish and persist private state before the 45-minute CI timeout.
+
+
+def first_week_release(release_day: date, observed_day: date) -> bool:
+    """A direct-launch title may qualify from release day through day seven."""
+    return release_day <= observed_day <= release_day + timedelta(days=FIRST_WEEK_DAYS)
 
 
 def recent_release(game: dict[str, Any], today: date) -> bool:
@@ -106,11 +112,22 @@ def recent_release(game: dict[str, Any], today: date) -> bool:
         followers = int(game["followers"])
     except (KeyError, ValueError, TypeError):
         return False
-    return (
-        today - timedelta(days=RECENT_DAYS) <= day <= today
-        and followers >= DIRECT_FOLLOWERS_MIN
-        and game.get("recent_source") in {"tracked_release", "direct_release"}
-    )
+    source = game.get("recent_source")
+    if not (today - timedelta(days=RECENT_DAYS) <= day <= today and followers >= DIRECT_FOLLOWERS_MIN):
+        return False
+    if source == "tracked_release":
+        return True
+    if source != "direct_release":
+        return False
+    # Existing older state without the new field must also prove qualification
+    # occurred during the first week; do not retroactively call a month-old hit a dark horse.
+    first_observed = game.get("first_week_qualified_at") or game.get("follower_checked_at")
+    try:
+        checked = datetime.fromisoformat(str(first_observed).replace("Z", "+00:00"))
+        observed_day = checked.astimezone(timezone(timedelta(hours=8))).date()
+    except (ValueError, TypeError):
+        return False
+    return first_week_release(day, observed_day)
 
 
 def checked_followers(
@@ -139,7 +156,9 @@ def checked_followers(
         return count, checked_at
     # A fresh discovery may reuse recent checkpoint measurements, but not old
     # low-follower measurements which could hide a sudden release crossing 3000.
-    ttl = 1 if count >= 5000 else 3 if count >= 2000 else 7
+    # Under-threshold new releases must be checked again on following days:
+    # keeping a 3/7-day low-follower TTL would miss first-week growth.
+    ttl = 1
     if now - last <= timedelta(days=ttl):
         return count, checked_at
     return None
@@ -150,7 +169,7 @@ def fetch_new_release_appids(
 ) -> list[int]:
     """Browse new Steam Store releases, including apps never in comingsoon."""
     seen: set[int] = set()
-    result: list[int] = []
+    dated: list[tuple[date, int]] = []
     for page in range(max_pages):
         response = steam_get(session, STEAM_SEARCH_URL, {
             "filter": "newreleases",
@@ -173,16 +192,19 @@ def fetch_new_release_appids(
                 continue
             try:
                 search_date = date.fromisoformat(row.release_start or "")
-                if search_date > today or search_date < today - timedelta(days=RECENT_DAYS):
+                if not first_week_release(search_date, today):
                     continue
             except ValueError:
-                # Store search sometimes omits the day; appdetails is authoritative.
-                pass
+                # Unknown search date: leave eligibility to Store appdetails,
+                # checked before making a Community Followers request.
+                search_date = today
             seen.add(row.appid)
-            result.append(row.appid)
+            dated.append((search_date, row.appid))
         if len(rows) < 100:
             break
-    return result
+    # An about-to-expire first-week candidate must be considered before today's
+    # brand-new releases when the bounded daily Followers budget is tight.
+    return [appid for _, appid in sorted(dated, key=lambda row: (row[0], row[1]))]
 
 
 def fetch_new_release_followers(session: requests.Session, appid: int) -> int | None:
@@ -221,8 +243,12 @@ def release_from_store(
     day = date.fromisoformat(game["release_start"])
     if not (today - timedelta(days=RECENT_DAYS) <= day <= today):
         return None
+    if recent_source == "direct_release" and not first_week_release(day, today):
+        return None
     add_traditional_name(session, appid, game, details, delay_seconds=delay_seconds)
     game["recent_source"] = recent_source
+    if recent_source == "direct_release":
+        game["first_week_qualified_at"] = checked_at
     game["confirmed_released_at"] = datetime.now(timezone.utc).replace(
         microsecond=0
     ).isoformat().replace("+00:00", "Z")
@@ -307,12 +333,31 @@ def run(
     direct_requests = 0
     candidate_checked = 0
     follower_clock: float | None = None
+    # Do not spend today's 45 Community calls repeatedly on old low-follower
+    # entries while new, never-scanned first-week launches wait behind them.
+    candidate_ids.sort(key=lambda appid: (
+        appid in processed_tracked or str(appid) in recently_released,
+        str(appid) in checks or str(appid) in cached,
+    ))
     for appid in candidate_ids:
         if appid in processed_tracked:
             continue
         if time.monotonic() - started >= MAX_SCAN_SECONDS:
             LOGGER.info("Released-game scan reached time budget; remaining IDs deferred")
             break
+        # Validate actual Store launch and the seven-day window BEFORE spending
+        # a Community request. Store search dates may be imprecise or changed.
+        if str(appid) not in recently_released:
+            details = app_details(session, appid)
+            if not details or details.get("type") != "game":
+                continue
+            if (details.get("release_date") or {}).get("coming_soon") is not False:
+                continue
+            exact = normalized_metadata(appid, details, None, None)
+            if exact is None or not first_week_release(
+                date.fromisoformat(exact["release_start"]), today
+            ):
+                continue
         # Newly published release candidates can be rechecked on subsequent days.
         previous = checked_followers(appid, cached, checks, now)
         if previous is None:
@@ -391,6 +436,8 @@ def run(
         "missing_or_ambiguous_release_date": skipped_missing_date,
         "min_followers": min_followers,
         "recent_min_followers_exclusive": 3000,
+        "direct_release_qualification_window_days": FIRST_WEEK_DAYS,
+        "recent_dark_horse_label": "近期黑馬",
         "recent_new_candidates_seen": len(candidate_ids),
         "recent_new_follower_requests": direct_requests,
         "recent_candidates_checked": candidate_checked,

@@ -94,3 +94,54 @@ def test_offset_timestamp_converts_to_taiwan_without_guessing_hour() -> None:
     announced = parse_release_window("18 Sep, 2026")
     assert announced.start == date(2026, 9, 18)
     assert parse_release_window("2026-09-18").start == date(2026, 9, 18)
+
+
+def test_first_segment_finds_games_missing_from_released_asc(tmp_path) -> None:
+    """Steam Price_DESC page 1 may contain first-segment titles absent in Released_ASC."""
+    from collectors.steam_upcoming import SteamUpcomingCollector
+
+    def row(appid: int, name: str, released: str) -> str:
+        return (
+            f'<a class="search_result_row" data-ds-appid="{appid}" '
+            f'href="https://store.steampowered.com/app/{appid}/">'
+            f'<span class="title">{name}</span>'
+            f'<div class="search_released">{released}</div></a>'
+        )
+
+    calls: list[str] = []
+
+    class Response:
+        def __init__(self, html: str) -> None:
+            self.html = html
+
+        def json(self) -> dict:
+            return {"results_html": self.html, "total_count": 1}
+
+    def request(url, *, params, limiter):
+        sort = params["sort_by"]
+        calls.append(sort)
+        if sort == "Released_ASC":
+            return Response(row(123456, "Another Game", "20 Sep, 2026"))
+        if sort == "Price_DESC":
+            return Response(row(4115450, "Phantom Blade Zero", "28 Oct, 2026"))
+        return Response("")
+
+    collector = SteamUpcomingCollector(
+        max_pages=1,
+        search_request_interval=0,
+        follower_request_interval=0,
+        follower_cache_path=tmp_path / "followers.json",
+        checkpoint_path=tmp_path / "checkpoint.json",
+    )
+    collector._request = request
+    games = collector.fetch_candidates(
+        today=date(2026, 9, 19),
+        window_start=date(2026, 9, 19),
+        window_end=date(2026, 11, 18),
+        segment_index=0,
+        segment_anchor=date(2026, 9, 19),
+        segment_months=2,
+        total_segments=6,
+    )
+    assert "Price_DESC" in calls
+    assert {game.appid for game in games} == {123456, 4115450}

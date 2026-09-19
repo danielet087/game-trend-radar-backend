@@ -37,12 +37,36 @@ def steam_get(session: requests.Session, url: str, params: dict[str, Any]) -> di
     return None
 
 
-def app_details(session: requests.Session, appid: int) -> dict[str, Any] | None:
-    data = steam_get(session, APP_DETAILS, {"appids": appid, "cc": "TW", "l": "english"})
+def app_details(
+    session: requests.Session, appid: int, *, language: str = "english"
+) -> dict[str, Any] | None:
+    data = steam_get(session, APP_DETAILS, {"appids": appid, "cc": "TW", "l": language})
     item = (data or {}).get(str(appid), {})
     if isinstance(item, dict) and item.get("success") and isinstance(item.get("data"), dict):
         return item["data"]
     return None
+
+
+def localized_names(
+    english_details: dict[str, Any], traditional_details: dict[str, Any] | None
+) -> tuple[str, str | None]:
+    english_name = str(english_details.get("name") or "").strip()
+    traditional_name = str((traditional_details or {}).get("name") or "").strip()
+    return english_name, traditional_name if traditional_name and traditional_name != english_name else None
+
+
+def add_traditional_name(
+    session: requests.Session, appid: int, game: dict[str, Any], english_details: dict[str, Any],
+    *, delay_seconds: float,
+) -> None:
+    # Request names in tchinese, but keep the English locale for parsing release dates.
+    # Some games have no localized Store title; never invent a translation.
+    time.sleep(delay_seconds)
+    traditional_details = app_details(session, appid, language="tchinese")
+    name_en, name_zh_tw = localized_names(english_details, traditional_details)
+    game["name"] = name_en or game["name"]
+    game["name_en"] = name_en or game["name"]
+    game["name_zh_tw"] = name_zh_tw
 
 
 def normalized_metadata(appid: int, details: dict[str, Any], followers: int | None, checked_at: str | None) -> dict[str, Any] | None:
@@ -53,6 +77,8 @@ def normalized_metadata(appid: int, details: dict[str, Any], followers: int | No
     return {
         "appid": appid,
         "name": str(details.get("name") or f"Steam App {appid}"),
+        "name_en": str(details.get("name") or f"Steam App {appid}"),
+        "name_zh_tw": None,
         "release_raw": release.raw,
         "release_start": release.start.isoformat(),
         "release_end": release.end.isoformat() if release.end else None,
@@ -103,6 +129,7 @@ def run(*, checkpoint_path: Path, output_path: Path, min_followers: int = 5000, 
             continue
         day = date.fromisoformat(game["release_start"])
         if today - timedelta(days=30) <= day <= today + timedelta(days=365):
+            add_traditional_name(session, appid, game, details, delay_seconds=delay_seconds)
             games.append(game)
         LOGGER.info("Metadata %d/%d: AppID=%d followers=%d", index, len(qualified), appid, followers)
 
@@ -130,6 +157,7 @@ def run(*, checkpoint_path: Path, output_path: Path, min_followers: int = 5000, 
                 continue
             day = date.fromisoformat(game["release_start"])
             if today - timedelta(days=30) <= day <= today and not (details.get("release_date") or {}).get("coming_soon", False):
+                add_traditional_name(session, appid, game, details, delay_seconds=delay_seconds)
                 game["recent_source"] = source
                 recent.append(game)
             if len(recent) >= 8:

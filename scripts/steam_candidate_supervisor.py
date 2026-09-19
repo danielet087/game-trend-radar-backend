@@ -1,9 +1,8 @@
-"""GitHub Actions Steam collector supervisor (checks at cron + 180 seconds).
+"""GitHub Actions Steam supervisor for an eligible trusted self-hosted runner.
 
-GitHub cron cannot run more frequently than five minutes. One supervisor job
-checks on its five-minute start AND after a three-minute wait, giving an
-approximately 2–3 minute checking gap while allowing GitHub scheduling delays.
-The supervisor never scrapes Steam or reads API keys for Steam.
+A workflow-completion event or manual dispatch starts the supervisor. It checks
+once immediately and again after 180 seconds when needed. Followers resume
+from the persisted candidate cursor; the supervisor does not query Steam.
 """
 from __future__ import annotations
 
@@ -112,11 +111,6 @@ def check_once() -> str:
     state = fetch_state()
     validate_state(state)
     phase = state["phase"]
-    # Stop hosted-runner Followers dispatch while moving the collector to a
-    # non-metered external or self-hosted execution environment. Preserve state.
-    if phase == "followers":
-        LOG.info("Followers hosted-runner dispatch paused for executor migration; no job dispatched.")
-        return "done"
     days = int(state["days_scanned"])
     if phase == "complete" and state.get("initial_complete"):
         LOG.info("Steam two-stage initialization fully complete; no new dispatch.")

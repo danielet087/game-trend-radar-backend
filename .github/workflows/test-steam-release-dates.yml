@@ -10,6 +10,8 @@ on:
       - "scripts/steam_release_dates.py"
       - "tests/test_steam_release_dates.py"
       - "collectors/steam_upcoming.py"
+      - "tests/test_steam_future_discovery.py"
+      - "scripts/update_steam_daily.py"
 
 permissions:
   contents: read
@@ -28,4 +30,4 @@ jobs:
       - name: Install test dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Verify Taiwan dates, Store Browse timestamps and recent launches
-        run: python -m pytest -q tests/test_steam_release_dates.py tests/test_steam_upcoming.py tests/test_steam_preview_locale.py tests/test_steam_recent_launch.py tests/test_steam_daily.py
+        run: python -m pytest -q tests/test_steam_release_dates.py tests/test_steam_upcoming.py tests/test_steam_preview_locale.py tests/test_steam_recent_launch.py tests/test_steam_daily.py tests/test_steam_future_discovery.py

@@ -1,15 +1,10 @@
 name: Update Steam upcoming data
 
+# Legacy two-month initializer is retained for manual recovery only.
+# ChatGPT marker and daily cron now belong to the two-stage workflow.
 on:
   workflow_dispatch:
-  schedule:
-    # 03:23 UTC = 11:23 Taiwan (UTC+8); daily maintenance and recovery
-    - cron: "23 3 * * *"
-  push:
-    # Only the ChatGPT automation edits this marker after checking the status.
-    branches: [main]
-    paths:
-      - ".github/steam-gpt-trigger.txt"
+
 permissions:
   contents: write
 

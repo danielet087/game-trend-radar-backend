@@ -112,6 +112,11 @@ def check_once() -> str:
     state = fetch_state()
     validate_state(state)
     phase = state["phase"]
+    # Stop hosted-runner Followers dispatch while moving the collector to a
+    # non-metered external or self-hosted execution environment. Preserve state.
+    if phase == "followers":
+        LOG.info("Followers hosted-runner dispatch paused for executor migration; no job dispatched.")
+        return "done"
     days = int(state["days_scanned"])
     if phase == "complete" and state.get("initial_complete"):
         LOG.info("Steam two-stage initialization fully complete; no new dispatch.")

@@ -10,6 +10,7 @@ from typing import Any
 
 import requests
 
+from scripts.steam_release_dates import resolve_release_date
 from collectors.steam_upcoming import (
     STEAM_FOLLOWERS_URL, STEAM_SEARCH_URL, parse_follower_xml,
     parse_release_window, parse_search_results_html, taiwan_today, write_json,
@@ -73,19 +74,16 @@ def add_traditional_name(
 
 
 def normalized_metadata(appid: int, details: dict[str, Any], followers: int | None, checked_at: str | None) -> dict[str, Any] | None:
-    raw = str((details.get("release_date") or {}).get("date") or "").strip()
-    release = parse_release_window(raw)
-    if release.precision != "day" or not release.start:
+    release_details = details.get("release_date") or {}
+    release = resolve_release_date(appid, release_details.get("date"), detail=release_details)
+    if release["release_precision"] != "day" or not release["release_start"]:
         return None
     return {
         "appid": appid,
         "name": str(details.get("name") or f"Steam App {appid}"),
         "name_en": str(details.get("name") or f"Steam App {appid}"),
         "name_zh_tw": None,
-        "release_raw": release.raw,
-        "release_start": release.start.isoformat(),
-        "release_end": release.end.isoformat() if release.end else None,
-        "release_precision": "day",
+        **release,
         "followers": followers,
         "follower_checked_at": checked_at,
         "capsule_image": details.get("capsule_image") or details.get("header_image"),

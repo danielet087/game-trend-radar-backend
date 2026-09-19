@@ -1,0 +1,39 @@
+name: Probe Steam future-date discovery
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/probe-steam-future-dates.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install -q -r requirements.txt
+      - name: Compare Steam sort modes and dates
+        run: |
+          python - <<'PY'
+          from datetime import date
+          import requests
+          from collectors.steam_upcoming import parse_search_results_html
+          url = "https://store.steampowered.com/search/results/"
+          session = requests.Session()
+          session.headers.update({"User-Agent": "GameTrendRadar/0.5"})
+          for sort in ("Released_ASC", "Released_DESC", "Price_DESC", "Price_ASC", "Name_ASC"):
+            for page in (0, 3, 6, 10):
+              try:
+                response=session.get(url,params={"filter":"comingsoon","sort_by":sort,"start":page*100,"count":100,"infinite":1,"force_infinite":1,"category1":998,"cc":"TW","l":"english"},timeout=25)
+                response.raise_for_status()
+                body=response.json()
+                games=parse_search_results_html(body.get("results_html") or "")
+                exact=[g for g in games if g.release_precision=="day"]
+                future=[g for g in exact if g.release_start >= "2026-11-19"]
+                in_27=[g for g in future if "2027-01-01"<=g.release_start<="2027-09-19"]
+                print(f"SORT={sort} PAGE={page} ROWS={len(games)} EXACT={len(exact)} NOV_PLUS={len(future)} IN_2027={len(in_27)} FIRST={[ (g.name,g.release_start) for g in future[:4]]} TOTAL={body.get('total_count')}",flush=True)
+              except Exception as e: print(f"SORT={sort} PAGE={page} ERROR={e}",flush=True)
+          PY

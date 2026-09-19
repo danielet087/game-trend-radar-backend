@@ -53,6 +53,8 @@ def publish_official() -> None:
     if not PUBLIC.parent.exists():
         cmd("git", "clone", "--depth", "1",
             "https://github.com/danielet087/game-trend-radar.git", "frontend")
+    cmd("git", "-C", "frontend", "config", "user.name", "github-actions[bot]")
+    cmd("git", "-C", "frontend", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com")
     body = json.loads(OUTPUT.read_text(encoding="utf-8"))
     assert body["filter"]["min_followers"] == 5000
     assert all(int(game["followers"]) >= 5000 for game in body["games"])

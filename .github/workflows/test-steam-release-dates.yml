@@ -1,0 +1,31 @@
+name: Verify Steam Taiwan release dates
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/test-steam-release-dates.yml"
+      - "scripts/steam_release_dates.py"
+      - "tests/test_steam_release_dates.py"
+      - "collectors/steam_upcoming.py"
+
+permissions:
+  contents: read
+
+jobs:
+  release-date-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Verify Taiwan date conversion and Store fallback
+        run: python -m pytest -q tests/test_steam_release_dates.py tests/test_steam_upcoming.py tests/test_steam_preview_locale.py

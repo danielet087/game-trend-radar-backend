@@ -1,0 +1,115 @@
+name: Stage 2 - screen all upcoming Steam games via third party
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/screen-entire-steam-year-third-party.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: steam-two-phase-initialization
+  cancel-in-progress: false
+
+jobs:
+  entire-year:
+    # One bounded GitHub-hosted screening run. Consumes private Actions minutes;
+    # deliberately DOES NOT issue any Steam Community followers XML queries.
+    runs-on: ubuntu-latest
+    timeout-minutes: 175
+    steps:
+      - name: Checkout private year catalog and existing 1085-title checkpoint
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pipeline and test dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Verify three-stage routing and third-party-only checkpoint script
+        run: |
+          python -m py_compile scripts/run_full_steam_prefilter.py
+          python -m pytest -q
+      - name: Screen entire candidate catalog through existing saved checkpoint
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -m scripts.run_full_steam_prefilter \
+            --batch-size 200 \
+            --request-interval 0.5 \
+            --max-minutes 162
+      - name: Report precise prescreen and official verification stages
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state = json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
+          pre = json.loads(Path("data/steam_prefilter_state.json").read_text(encoding="utf-8"))
+          rows = pre["games"]
+          measured = sum(isinstance(v.get("third_party_followers"), int) for v in rows.values())
+          missing = sum(v.get("third_party_followers") is None for v in rows.values())
+          qualified = sum(
+              isinstance(v.get("third_party_followers"), int)
+              and v["third_party_followers"] >= 4000 for v in rows.values())
+          print("THIRD_PARTY_SCREENED", len(rows), "OF", 11467)
+          print("GROUPS_WITH_THIRD_PARTY_COUNT", measured)
+          print("GROUPS_UNRESOLVED_LOW_PRIORITY", missing)
+          print("THIRD_PARTY_4000_CANDIDATES", qualified)
+          print("THIRD_PARTY_STAGE_COMPLETE", bool(state.get("prefilter_complete")))
+          print("STEAM_OFFICIAL_CURSOR_PRESERVED", state.get("next_follower_index"))
+          assert state.get("next_follower_index") == 685
+          assert state.get("phase") in ("prefilter", "followers")
+          assert measured + missing == len(rows)
+          assert not state.get("prefilter_complete") or len(rows) == 11467
+          PY
+      - name: Publish progress counters only; preserve 5000-official games
+        if: success()
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          if [ -z "$FRONTEND_REPO_TOKEN" ]; then
+            echo "::warning::No frontend token; private screening state remains saved."
+            exit 0
+          fi
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+          python - <<'PY'
+          import json
+          from datetime import datetime,timezone
+          from pathlib import Path
+          state=json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
+          front=Path("frontend/data/steam_upcoming.json")
+          payload=json.loads(front.read_text(encoding="utf-8"))
+          init=payload.setdefault("initialization", {})
+          init["prefilter_threshold"]=4000
+          init["prefilter_next_index"]=state.get("prefilter_next_index")
+          init["prefilter_head_next_index"]=state.get("prefilter_head_next_index")
+          init["prefilter_screened_count"]=state.get("prefilter_screened_count")
+          init["prefilter_missing_count"]=state.get("prefilter_missing_count")
+          init["prefilter_matched_count"]=state.get("prefilter_matched_count")
+          init["prefilter_complete"]=state.get("prefilter_complete",False)
+          init["phase"]=state.get("phase")
+          init["last_attempt"]=state.get("last_attempt")
+          payload["generated_at"]=datetime.now(timezone.utc).isoformat()
+          # Never publish provisional third-party followers; existing official
+          # game cards, >=5000 rule and official cursor stay unchanged.
+          assert payload["filter"]["min_followers"]==5000
+          assert all(int(g["followers"])>=5000 for g in payload["games"])
+          front.write_text(json.dumps(payload,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+          PY
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_upcoming.json
+          if git diff --cached --quiet; then
+            echo "Public data already matches screening progress."
+          else
+            git commit -m "data: publish completed third-party prescreen progress, preserve verified games"
+            git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

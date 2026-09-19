@@ -762,9 +762,12 @@ class SteamUpcomingCollector:
         # catalog for the full year: beyond the near-term result window it
         # returns TBA/month/year records while exact 2027 releases remain
         # discoverable under other sort orders (verified on Steam TW).
-        # Supplement with alternate public storefront slices. Preserve the
-        # exact-day rule and do not spend Community Followers calls here.
-        if segment_index is not None and segment_index > 0:
+        # Supplement every segment (including the first) with alternate
+        # public storefront slices. Steam Released_ASC is not a complete
+        # release-date index: e.g. Phantom Blade Zero (4115450, Oct 2026)
+        # appears in Price_DESC page 1 but not the sampled Released_ASC pages.
+        # Preserve the exact-day rule and do not spend Followers calls here.
+        if segment_index is not None:
             for sort_mode, pages in (
                 ("Price_DESC", 5),
                 ("Name_ASC", 10),

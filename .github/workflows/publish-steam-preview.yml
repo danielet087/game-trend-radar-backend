@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: steam-calendar-preview
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   publish:
@@ -25,6 +25,9 @@ jobs:
     steps:
       - name: Checkout private backend
         uses: actions/checkout@v4
+
+      - name: Use latest committed private launch history
+        run: git pull --ff-only origin main
 
       - name: Set up Python
         uses: actions/setup-python@v5

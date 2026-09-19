@@ -2,6 +2,13 @@
 
 遊戲熱度追蹤與分析的私人資料蒐集端。此 Repository 保持 **Private**；公開網站放在 `game-trend-radar`。
 
+## 實際續跑紀錄：2026-09-20（台灣時間）
+
+- [首次 200 款限量試跑](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454533202)：原始 Steam 官方完整複查游標 685 保留，第三方初篩 685→885，官方 XML 新查 5 款、0 款新增達 5,000；沒有 HTTP 429。曾錯把 200 款都當成第三方缺資料，**這是程式解析 Bug，不能當覆蓋率**。
+- [驗證第三方實際回應格式](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454944698)：已存的 200 個群組短 ID，第三方 HTTP 200，實際回傳 176 筆、找不到 24 筆；回傳 `id` 是 **JSON 字串**、`members` 是整數。先前程式錯誤限制 `id` 必須是整數。現已修改 `scripts/steam_follower_prefilter.py` 接受可解析的字串 ID，且會在往前掃描時**用一次 bulk 呼叫重新修復先前錯誤歸類的視窗**。
+- [修復後再跑 200 款](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454982484)：初篩游標 885→1085，先前 200 款已修復；累計 400 款第三方初篩，有會員數 276 款、缺資料 124 款。這批 400 款中第三方會員數 >= 4,000 為 0 款，缺資料者依規則優先查 Steam XML；官方累計多查 10 款，其中 0 款新增達 5,000，所以公開合格清單維持 48 款。官方**完整順序複查**游標仍在 685，因為優先驗證與初篩尚在前期。
+- [71 項回歸測試通過](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454904769)。獨立的 `pilot-steam-prefilter-4000.yml` 是**手動**限量工作（每次最多 200 初篩＋5 次官方 XML，預設每次 XML 30 秒間隔），使用 GitHub-hosted Runner **會消耗私人專案 Actions 分鐘**，不可當作大批次的長期免費執行環境。正式 `steam-two-phase.yml` 仍要求 `self-hosted, linux, steam-followers` Runner；尚未見新的正式大批次成功執行。
+
 ## 已部署：第三方 4,000 優先初篩＋Steam XML 5,000 正式驗證
 
 - 4,000 是第三方資料的**優先安排官方驗證**門檻，**不是**公開網站的上榜門檻。第三方回傳 >= 4,000 或沒有任何人數／沒有群組 ID 的遊戲，優先用 Steam Community XML 的 `memberCount` 確認；正式輸出仍只保留官方確認 >= 5,000 的遊戲。第三方數字寫在獨立私人 `data/steam_prefilter_state.json`，不污染 `data/steam_followers_cache.json` 或公開站的 `followers`。

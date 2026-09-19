@@ -41,6 +41,38 @@ def push_private_checkpoint(state: dict, next_index: int) -> None:
     subprocess.run(["git", "push", "origin", "HEAD:main"], check=True)
 
 
+BATCH_RETRY_DELAYS = (20, 60, 150, 240, 300)
+
+
+def is_retryable_batch_failure(error: RuntimeError) -> bool:
+    """Only retry temporary provider/network faults, not missing credentials."""
+    message = str(error)
+    if "Temporary lookup exhausted retries" in message:
+        return True
+    for code in (408, 425, 429, 500, 502, 503, 504):
+        if f"HTTP {code}" in message:
+            return True
+    return False
+
+
+def scan_with_recovery(args: argparse.Namespace, state: dict, catalog: dict) -> dict:
+    """Never advance persisted cursor for a partially fetched 200-title batch."""
+    for attempt in range(len(BATCH_RETRY_DELAYS) + 1):
+        try:
+            return run_prefilter_phase(args, state, catalog)
+        except RuntimeError as error:
+            if not is_retryable_batch_failure(error) or attempt >= len(BATCH_RETRY_DELAYS):
+                raise
+            cooldown = BATCH_RETRY_DELAYS[attempt]
+            LOG.warning(
+                "Temporary prescreen lookup error; saved cursor intact. "
+                "Retry current batch in %s seconds (attempt %s/%s).",
+                cooldown, attempt + 1, len(BATCH_RETRY_DELAYS),
+            )
+            time.sleep(cooldown)
+    raise AssertionError("unreachable")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch-size", type=int, default=200)
@@ -82,7 +114,7 @@ def main() -> None:
         if (time.monotonic() - started) >= options.max_minutes * 60:
             LOG.warning("Hosted time budget reached; checkpoint saved, can resume.")
             break
-        info = run_prefilter_phase(args, state, catalog)
+        info = scan_with_recovery(args, state, catalog)
         count += 1
         LOG.info(
             "PREFILTER BATCH %s head=%s tail=%s/%s records=%s priority=%s "

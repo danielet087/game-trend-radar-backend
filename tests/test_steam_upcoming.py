@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 
 from collectors.steam_upcoming import (
     parse_follower_xml,
@@ -72,3 +72,25 @@ def test_parse_search_results_html() -> None:
     assert game.name == "Test & Game"
     assert game.release_start == "2026-09-18"
     assert game.store_url == "https://store.steampowered.com/app/123456/"
+
+
+def test_epoch_release_time_uses_taiwan_calendar_day() -> None:
+    # Sep 18 at 17:00 UTC is Sep 19 at 01:00 in Taiwan.
+    instant = datetime(2026, 9, 18, 17, tzinfo=timezone.utc)
+    seconds = int(instant.timestamp())
+    for raw in (seconds, seconds * 1000, str(seconds), str(seconds * 1000)):
+        parsed = parse_release_window(raw)
+        assert parsed.precision == "day"
+        assert parsed.start == date(2026, 9, 19)
+
+
+def test_offset_timestamp_converts_to_taiwan_without_guessing_hour() -> None:
+    instant = parse_release_window("2026-09-18T17:00:00Z")
+    assert instant.start == date(2026, 9, 19)
+    utc_offset = parse_release_window("2026-09-18T09:00:00-08:00")
+    assert utc_offset.start == date(2026, 9, 19)
+    # A date-only Steam Store listing does not reveal when the game unlocks.
+    # Never automatically add one calendar day to it.
+    announced = parse_release_window("18 Sep, 2026")
+    assert announced.start == date(2026, 9, 18)
+    assert parse_release_window("2026-09-18").start == date(2026, 9, 18)

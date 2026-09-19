@@ -1,10 +1,7 @@
 name: Pilot 4000 prescreen plus up to 5 Steam XML checks
 
+# Manual, explicitly bounded pilot. Do not auto-charge hosted minutes on edits.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/pilot-steam-prefilter-4000.yml"
   workflow_dispatch:
 
 permissions:

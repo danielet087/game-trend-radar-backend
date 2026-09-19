@@ -2,6 +2,14 @@
 
 遊戲熱度追蹤與分析的私人資料蒐集端。此 Repository 保持 **Private**；公開網站放在 `game-trend-radar`。
 
+## 正在執行：完整第三方初篩（獨立第二階段）
+
+[GitHub Actions：11,467 款完整第三方初篩](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35455744790) 已啟動。此工作只使用 Valve `ResolveVanityURL` 解析官方群組 ID 與第三方 `api.steam-groups.com/api/groups/bulk` 取得初步會員數，**完全不呼叫 Steam Community XML**；每 200 款提交私人 `steam_prefilter_state.json` 與候選狀態，沿用原本從索引 685～1084 的 400 筆第三方結果，另補前 685 款，接著掃描至 11,467。
+
+第三方實測 >=4,000 方進入下一階段，查不到資料則保留 `null/unresolved` 並視為低優先、不進入第三步，但不寫成虛構的實際 Followers。等第二階段 **11,467/11,467** 全部結束，第三步才用官方 XML 核實 >=5,000，既有官方 685 游標和公開 48 款不重設。
+
+這個一次性初篩跑在 GitHub-hosted Runner，會消耗私人專案每月免費 Actions 分鐘，設有 175 分鐘的工作上限及 162 分鐘的內部停止點；遇到限流或到達停止點，已提交的每批 200 款會保留，必要時可由 workflow_dispatch 從斷點續跑。**建立 GitHub Actions 不代表可以保證已在本次對話結束前全部完成**；要以該 run 的結果及 `prefilter_complete` 為準。
+
 ## 實際續跑紀錄：2026-09-20（台灣時間）
 
 - [首次 200 款限量試跑](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454533202)：原始 Steam 官方完整複查游標 685 保留，第三方初篩 685→885，官方 XML 新查 5 款、0 款新增達 5,000；沒有 HTTP 429。曾錯把 200 款都當成第三方缺資料，**這是程式解析 Bug，不能當覆蓋率**。

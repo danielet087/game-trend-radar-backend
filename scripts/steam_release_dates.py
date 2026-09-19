@@ -89,3 +89,20 @@ def resolve_release_date(
     )
     result["release_time_utc"] = utc.isoformat().replace("+00:00", "Z")
     return result
+
+
+def corrected_games(games: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Correct verified release times in both cached and freshly fetched games."""
+    result: list[dict[str, Any]] = []
+    for record in games:
+        game = dict(record)
+        release = resolve_release_date(
+            int(game["appid"]), game.get("release_raw"),
+            detail={"release_time_utc": game["release_time_utc"]}
+            if game.get("release_time_utc") and game.get("release_date_basis") == "steam_structured_release_time"
+            else None,
+        )
+        if release.get("release_date_basis") != "steam_store_announced_date":
+            game.update(release)
+        result.append(game)
+    return result

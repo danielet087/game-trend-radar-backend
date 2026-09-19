@@ -22,6 +22,12 @@ LOGGER = logging.getLogger(__name__)
 STEAM_SEARCH_URL = "https://store.steampowered.com/search/results/"
 STEAM_FOLLOWERS_URL = "https://steamcommunity.com/games/{appid}/memberslistxml/"
 USER_AGENT = "Mozilla/5.0 (compatible; GameTrendRadar/0.3; +https://github.com/danielet087/game-trend-radar)"
+TAIWAN_TZ = timezone(timedelta(hours=8))
+
+
+def taiwan_today() -> date:
+    """Use the same calendar day for scans, release windows and the frontend."""
+    return datetime.now(TAIWAN_TZ).date()
 
 
 @dataclass(frozen=True)
@@ -75,7 +81,7 @@ def parse_release_window(raw: Any) -> ReleaseWindow:
 
     if isinstance(raw, (int, float)) and not isinstance(raw, bool):
         try:
-            d = datetime.fromtimestamp(float(raw), tz=timezone.utc).date()
+            d = datetime.fromtimestamp(float(raw), tz=TAIWAN_TZ).date()
             return ReleaseWindow(str(raw), d, d, "day")
         except (OverflowError, OSError, ValueError):
             return ReleaseWindow(str(raw), None, None, "unknown")
@@ -644,7 +650,7 @@ class SteamUpcomingCollector:
         segment_months: int = 2,
         total_segments: int = 6,
     ) -> list[UpcomingGame]:
-        today = today or _utc_now().date()
+        today = today or taiwan_today()
         target_start = window_start or today
         target_end = window_end or (today + timedelta(days=self.horizon_days))
         seen: dict[int, UpcomingGame] = {}
@@ -848,7 +854,7 @@ class SteamUpcomingCollector:
         total_segments: int = 6,
     ) -> dict[str, Any]:
         now = _utc_now()
-        today = today or now.date()
+        today = today or now.astimezone(TAIWAN_TZ).date()
         target_start = window_start or today
         target_end = window_end or (today + timedelta(days=self.horizon_days))
         candidates = self.fetch_candidates(
@@ -870,6 +876,7 @@ class SteamUpcomingCollector:
             },
             "filter": {
                 "country": self.country,
+                "release_date_timezone": "Asia/Taipei",
                 "release_horizon_days": self.horizon_days,
                 "release_window_start": target_start.isoformat(),
                 "release_window_end": target_end.isoformat(),

@@ -64,6 +64,11 @@ jobs:
           assert int(attempt["fresh_follower_requests"]) <= 5
           assert int(provisional["next_index"]) >= 685
           assert provisional["threshold"] == 4000
+          assert provisional["bulk_parser_version"] == 2
+          parsed=sum(isinstance(x.get("third_party_followers"),int)
+                     for x in provisional["games"].values())
+          assert parsed > 0, "Third-party returned groups must not all be treated as absent"
+          print("Recovered provisional third-party group counts:",parsed)
           assert official["filter"]["min_followers"] == 5000
           assert official["count"] == len(official["games"])
           assert all(int(g["followers"]) >= 5000 for g in official["games"])

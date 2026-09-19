@@ -9,6 +9,12 @@ name: Steam candidate supervisor
 
 on:
   workflow_dispatch:
+  # Automatically resume as soon as a 50-Followers collector run completes.
+  # Cron remains a fallback if workflow_run delivery is delayed.
+  workflow_run:
+    workflows: ["Steam candidates then Followers"]
+    types: [completed]
+    branches: [main]
   schedule:
     - cron: "2-59/5 * * * *"
   push:

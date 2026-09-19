@@ -11,7 +11,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   batch:
-    runs-on: ubuntu-latest
+    # Dedicated trusted Linux runner; no GitHub-hosted Actions minutes.
+    runs-on: [self-hosted, linux, steam-followers]
     timeout-minutes: 180
     steps:
       - name: Checkout private backend

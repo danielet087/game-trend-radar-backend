@@ -113,39 +113,53 @@ def test_stage_one_advances_calendar_days_without_followers(monkeypatch):
     assert state["days_scanned"] == 2
 
 
-def test_follower_stage_reuses_cache_and_50_request_limit(tmp_path):
+def test_stage_three_refuses_xml_until_third_party_entire_catalog_complete(tmp_path):
     from scripts import steam_candidate_pipeline as pipeline
     state = fresh_state(date(2026, 9, 19), 1)
     state["phase"] = "followers"
-    state["days_scanned"] = 1
     catalog = {"games": [
-        {"appid": appid, "name": f"Game {appid}", "release_raw": "2026-10-01",
+        {"appid": 101, "name": "Game 101", "release_raw": "2026-10-01",
          "release_start": "2026-10-01", "release_end": "2026-10-01",
-         "capsule_image": None, "store_url": f"https://store.steampowered.com/app/{appid}/"}
-        for appid in (101, 102, 103)]}
-    master = {"games": []}
+         "capsule_image": None, "store_url": "https://store.steampowered.com/app/101/"}
+    ]}
     args = argparse.Namespace(
-        follower_cache=str(tmp_path / "cache.json"),
-        checkpoint=str(tmp_path / "checkpoint.json"),
-        checkpoint_branch="steam-state", request_interval=0,
-        search_interval=0,
+        prefilter_state=str(tmp_path / "pre.json"),
+        follower_cache=str(tmp_path / "official.json"),
     )
-    class Collector:
-        fresh_follower_requests = 2
-        cached_follower_reuses = 0
-        failed_follower_appids = []
-        processed_candidate_count = 2
-        follower_failures = 0
-        follower_rate_limit_events = 0
-        def qualify(self, items):
-            assert len(items) == 3
-            return []
+    with pytest.raises(RuntimeError, match="Step 2 has not screened"):
+        pipeline.run_follower_batch(args, state, catalog, {"games": []})
+
+
+def test_new_prefilter_is_separate_phase_before_official_queries(tmp_path, monkeypatch):
+    from scripts import steam_candidate_pipeline as pipeline
+    monkeypatch.setenv("STEAM_WEB_API_KEY", "test-key")
+    catalog = {"games": [
+        {"appid": 101, "name": "Game 101", "release_raw": "2026-10-01",
+         "release_start": "2026-10-01", "release_end": "2026-10-01",
+         "capsule_image": None, "store_url": "https://store.steampowered.com/app/101/"}
+    ]}
+    state = fresh_state(date(2026, 9, 19), 1)
+    state["phase"] = "followers"
+    state["days_scanned"] = 1
+    pre_file = tmp_path / "pre.json"
+    args = argparse.Namespace(
+        prefilter_state=str(pre_file), prefilter_batch_size=200,
+        prefilter_request_interval=0, follower_cache=str(tmp_path/"cache.json"),
+    )
+    def fake_scan(rows, stored, **kwargs):
+        stored["next_index"] = 1
+        stored["games"]["101"] = {
+            "third_party_followers": 4200, "priority": True}
+        return {"start_index": 0, "next_index": 1,
+                "screened": 1, "priority": 1, "missing": 0}
     with (
-        patch.object(pipeline, "SteamUpcomingCollector", return_value=Collector()) as ctor,
+        patch.object(pipeline, "scan_batch", side_effect=fake_scan),
+        patch.object(pipeline, "SteamUpcomingCollector") as official,
     ):
-        result = run_follower_batch(args, state, catalog, master)
-    assert ctor.call_args.kwargs["max_fresh_requests_per_run"] == 50
-    assert ctor.call_args.kwargs["reuse_all_cached_during_initialization"] is True
-    assert result["fresh_follower_requests"] == 2
-    assert state["next_follower_index"] == 2
+        result = pipeline.run_prefilter_phase(args, state, catalog)
+    official.assert_not_called()
+    assert result["phase"] == "prefilter"
+    assert result["fresh_follower_requests"] == 0
     assert state["phase"] == "followers"
+    assert state["prefilter_complete"] is True
+    assert __import__("json").loads(pre_file.read_text())["games"]["101"]["priority"]

@@ -12,16 +12,16 @@ from collectors.steam_upcoming import parse_release_window
 
 TAIWAN_TZ = timezone(timedelta(hours=8))
 
-# Publicly verified SteamDB Store Release Date. Keep the expected Store day
-# so a later publisher date change does not silently preserve a stale override.
-VERIFIED_RELEASE_TIMES: dict[int, dict[str, str]] = {
+# User-reported TW Steam storefront calendar dates. These are date-only
+# corrections, NOT verified UTC unlock timestamps. Reconfirm if Steam's
+# underlying Store API date changes.
+TAIWAN_STOREFRONT_DATES: dict[int, dict[str, str]] = {
     4019220: {
         "store_date": "2026-09-21",
-        "release_time_utc": "2026-09-21T16:00:00Z",
-        "source": "https://steamdb.info/app/4019220/",
+        "taiwan_date": "2026-09-22",
+        "basis": "steam_tw_storefront_date_user_reported",
     },
 }
-
 
 def resolve_release_date(
     appid: int, announced: Any, *, detail: dict[str, Any] | None = None,
@@ -47,12 +47,12 @@ def resolve_release_date(
             candidate = value
             break
 
-    verified = VERIFIED_RELEASE_TIMES.get(int(appid))
-    if candidate is None and verified and result["release_start"] == verified["store_date"]:
-        candidate = verified["release_time_utc"]
-        result["release_time_source"] = verified["source"]
-
     if candidate is None:
+        tw_display = TAIWAN_STOREFRONT_DATES.get(int(appid))
+        if tw_display and result["release_start"] == tw_display["store_date"]:
+            result["release_start"] = tw_display["taiwan_date"]
+            result["release_end"] = tw_display["taiwan_date"]
+            result["release_date_basis"] = tw_display["basis"]
         return result
 
     precise = parse_release_window(candidate)
@@ -82,11 +82,7 @@ def resolve_release_date(
     result["release_start"] = precise.start.isoformat()
     result["release_end"] = precise.end.isoformat() if precise.end else None
     result["release_precision"] = precise.precision
-    result["release_date_basis"] = (
-        "steam_structured_release_time"
-        if result["release_time_source"] is None
-        else "verified_store_release_time"
-    )
+    result["release_date_basis"] = "steam_structured_release_time"
     result["release_time_utc"] = utc.isoformat().replace("+00:00", "Z")
     return result
 

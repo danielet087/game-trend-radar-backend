@@ -40,7 +40,10 @@ def _request_with_retries(
     last_error = "temporary network failure"
     for attempt in range(len(RETRY_DELAYS) + 1):
         try:
-            response = session.request(method, url, **kwargs)
+            response = (
+                session.get(url, **kwargs)
+                if method == "GET" else session.post(url, **kwargs)
+            )
         except requests.RequestException:
             response = None
         if response is not None:

@@ -135,6 +135,39 @@ def merge_partial_segment(
     )
 
 
+def reopen_first_segment_missing_alternative_search(state: dict[str, Any]) -> bool:
+    """Backfill first window once; preserve previously collected Followers and games."""
+    if state.get("first_segment_alt_sort_recheck_started"):
+        return False
+    completed = list(state.get("completed_segments") or [])
+    outdated = any(
+        int(entry.get("segment", -1)) == 0
+        and not entry.get("alternative_search_checked")
+        for entry in completed
+    )
+    if not outdated:
+        return False
+    state["completed_segments"] = [
+        entry for entry in completed if int(entry.get("segment", -1)) != 0
+    ]
+    state["first_segment_alt_sort_recheck_started"] = True
+    state["initial_complete"] = False
+    state["next_segment"] = 0
+    state["last_attempt"] = {
+        "segment": 0,
+        "status": "reopened_missing_alternate_search",
+        "reason": "Initial Released_ASC-only scan missed Phantom Blade Zero in Price_DESC",
+    }
+    return True
+
+
+def next_unfinished_segment(completed: list[dict[str, Any]], total_segments: int) -> int:
+    """Resume remaining windows without repeating separately completed segments."""
+    done = {int(entry["segment"]) for entry in completed}
+    return next((index for index in range(total_segments) if index not in done),
+                total_segments)
+
+
 def build_public_payload(
     *,
     games: list[dict[str, Any]],
@@ -188,6 +221,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             today,
             segment_months=args.segment_months,
             total_segments=args.total_segments,
+        )
+
+    if reopen_first_segment_missing_alternative_search(state):
+        LOGGER.warning(
+            "Reopened initial Steam segment for alternate search sorts; "
+            "keeping existing Followers cache, checkpoint and master games."
         )
 
     anchor = date.fromisoformat(str(state["anchor_date"]))
@@ -332,12 +371,13 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                     "completed_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
                     "candidate_count": int(latest.get("candidate_count") or 0),
                     "qualified_count": int(latest.get("count") or 0),
+                    "alternative_search_checked": True,
                 }
             )
             completed.sort(key=lambda item: int(item["segment"]))
 
             state["completed_segments"] = completed
-            state["next_segment"] = segment + 1
+            state["next_segment"] = next_unfinished_segment(completed, total_segments)
             state["initial_complete"] = state["next_segment"] >= total_segments
             state["last_attempt"] = {
                 "segment": segment,

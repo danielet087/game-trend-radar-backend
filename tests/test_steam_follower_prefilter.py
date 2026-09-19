@@ -331,3 +331,40 @@ def test_permanent_api_403_not_retried_and_cursor_preserved(monkeypatch):
     assert session.attempts == 1
     assert delays == []
     assert saved == {"version": 1, "next_index": 0, "games": {}}
+
+
+def test_full_year_runner_retries_transient_batch_without_losing_checkpoint(monkeypatch):
+    from scripts import run_full_steam_prefilter as runner
+
+    attempts = []
+    delays = []
+    def fake_phase(args, state, catalog):
+        attempts.append(state["prefilter_next_index"])
+        if len(attempts) <= 2:
+            raise RuntimeError("Temporary lookup exhausted retries (temporary network failure); priority cursor unchanged")
+        state["prefilter_next_index"] = 6285
+        return {"screened": 200}
+
+    monkeypatch.setattr(runner, "run_prefilter_phase", fake_phase)
+    monkeypatch.setattr(runner.time, "sleep", delays.append)
+    state = {"prefilter_next_index": 6085}
+    assert runner.scan_with_recovery(argparse.Namespace(), state, {}) == {"screened": 200}
+    assert attempts == [6085, 6085, 6085]
+    assert delays == list(runner.BATCH_RETRY_DELAYS[:2])
+    assert state["prefilter_next_index"] == 6285
+
+
+def test_full_year_runner_does_not_retry_permanent_authorization_error(monkeypatch):
+    from scripts import run_full_steam_prefilter as runner
+
+    delays = []
+    monkeypatch.setattr(runner.time, "sleep", delays.append)
+    with patch.object(runner, "run_prefilter_phase", side_effect=RuntimeError(
+        "Steam vanity returned HTTP 403; priority cursor unchanged"
+    )) as query:
+        with pytest.raises(RuntimeError, match="HTTP 403"):
+            runner.scan_with_recovery(
+                argparse.Namespace(), {"prefilter_next_index": 6085}, {},
+            )
+    query.assert_called_once()
+    assert delays == []

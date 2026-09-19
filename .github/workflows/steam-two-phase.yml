@@ -28,14 +28,14 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Run tests
         run: python -m pytest -q
-      - name: Find 30 Taiwan dates OR check 50 Followers
+      - name: Finish all remaining Taiwan release dates OR check 50 Followers
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           python -m scripts.steam_candidate_pipeline
           --days 365
-          --batch-days 30
+          --batch-days 365
           --request-interval 30
           --search-interval 1.5
           --state data/steam_candidate_state.json

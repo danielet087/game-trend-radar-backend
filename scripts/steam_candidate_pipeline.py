@@ -265,13 +265,13 @@ def run_prefilter_phase(
     else:
         info = {"start_index": len(rows), "next_index": len(rows),
                 "screened": 0, "priority": 0, "missing": 0}
-    # Missing third-party entries are a NON-MEASURED, below-3000 scheduling
-    # bucket; only measured >=4000 enter the Steam verification list.
+    # Missing third-party entries are explicitly UNRESOLVED; only measured
+    # >=4000 enter the Steam verification list. Never invent a low score.
     for entry in pre["games"].values():
         members = entry.get("third_party_followers")
         if members is None:
             entry["priority"] = False
-            entry["scheduling_band"] = "missing_assumed_under_3000"
+            entry["scheduling_band"] = "unresolved"
         elif isinstance(members, int):
             entry["priority"] = members >= PRIORITY_THRESHOLD
             entry["scheduling_band"] = "measured"
@@ -288,6 +288,13 @@ def run_prefilter_phase(
     state["prefilter_head_next_index"] = int(pre.get("head_next_index", 0))
     state["prefilter_complete"] = complete
     state["prefilter_threshold"] = PRIORITY_THRESHOLD
+    state["prefilter_screened_count"] = len(pre["games"])
+    state["prefilter_missing_count"] = sum(
+        entry.get("third_party_followers") is None for entry in pre["games"].values()
+    )
+    state["prefilter_matched_count"] = sum(
+        entry.get("priority") is True for entry in pre["games"].values()
+    )
     state["phase"] = "followers" if complete else "prefilter"
     state["last_attempt"] = {
         "phase": "prefilter", "candidate_count": len(rows),
@@ -314,7 +321,7 @@ def run_follower_batch(
 ) -> dict[str, Any]:
     """Phase 3: ONLY official XML for titles measured >=4000 in phase 2."""
     rows = catalog.get("games", [])
-    pre = load_json(Path(args.prefilter_state), {"games": []})
+    pre = load_json(Path(args.prefilter_state), {"games": {}})
     if not prefilter_complete(pre, rows):
         raise RuntimeError("Step 2 has not screened every candidate; no official XML allowed")
     cache_data = load_json(Path(args.follower_cache), {"games": {}})
@@ -351,7 +358,7 @@ def run_follower_batch(
         reuse_all_cached_during_initialization=True,
         max_fresh_requests_per_run=budget,
     )
-    qualified = collector.qualify(map(as_upcoming_game, remaining))
+    qualified = collector.qualify(list(map(as_upcoming_game, remaining)))
     source_by_id = {x["appid"]: x for x in rows}
     enriched = []
     for row in qualified:
@@ -368,6 +375,7 @@ def run_follower_batch(
     verified = sum(str(x["appid"]) in after_cache for x in priority_rows)
     state["verified_priority_count"] = verified
     state["priority_total"] = len(priority_rows)
+    state["official_verified_count"] = len(after_cache)
     state["next_follower_index"] = int(state.get("next_follower_index", 0))
     if verified == len(priority_rows) and not collector.failed_follower_appids:
         state["phase"] = "complete"
@@ -419,8 +427,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     state["updated_at"] = stamp
     save_json(catalog_file, catalog)
     save_json(state_file, state)
-    if phase == "followers":
-        save_json(master_file, master)
+    if phase in {"followers", "prefilter"}:
+        if phase == "followers":
+            save_json(master_file, master)
         output = {
             "generated_at": stamp, "source": {
                 "catalog": "Steam IStoreQueryService/Query day-filter, TW",

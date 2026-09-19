@@ -3,7 +3,7 @@
   "anchor_date": "2026-09-19",
   "segment_months": 2,
   "total_segments": 6,
-  "next_segment": 4,
+  "next_segment": 1,
   "completed_segments": [
     {
       "segment": 0,
@@ -12,43 +12,40 @@
       "completed_at": "2026-09-19T06:17:06Z",
       "candidate_count": 892,
       "qualified_count": 39
-    },
+    }
+  ],
+  "initial_complete": false,
+  "last_attempt": {
+    "segment": 1,
+    "window_start": "2026-11-19",
+    "window_end": "2027-01-18",
+    "status": "discovery_reopened",
+    "reason": "0 candidates did not establish full coverage",
+    "candidate_count": 0,
+    "initial_batch_count": 3
+  },
+  "initial_batch_count": 3,
+  "reopened_empty_segments": [
     {
       "segment": 1,
       "window_start": "2026-11-19",
       "window_end": "2027-01-18",
-      "completed_at": "2026-09-19T06:54:26Z",
-      "candidate_count": 0,
-      "qualified_count": 0
+      "previously_mislabeled_complete_at": "2026-09-19T06:54:26Z",
+      "reason": "Steam Released_ASC returned no candidates; alternative search required"
     },
     {
       "segment": 2,
       "window_start": "2027-01-19",
       "window_end": "2027-03-18",
-      "completed_at": "2026-09-19T06:57:17Z",
-      "candidate_count": 0,
-      "qualified_count": 0
+      "previously_mislabeled_complete_at": "2026-09-19T06:57:17Z",
+      "reason": "Steam Released_ASC returned no candidates; alternative search required"
     },
     {
       "segment": 3,
       "window_start": "2027-03-19",
       "window_end": "2027-05-18",
-      "completed_at": "2026-09-19T07:00:04Z",
-      "candidate_count": 0,
-      "qualified_count": 0
+      "previously_mislabeled_complete_at": "2026-09-19T07:00:04Z",
+      "reason": "Steam Released_ASC returned no candidates; alternative search required"
     }
-  ],
-  "initial_complete": false,
-  "last_attempt": {
-    "segment": 3,
-    "window_start": "2027-03-19",
-    "window_end": "2027-05-18",
-    "attempted_at": "2026-09-19T07:00:04Z",
-    "status": "complete",
-    "candidate_count": 0,
-    "qualified_count": 0,
-    "follower_failures": 0,
-    "initial_batch_count": 3
-  },
-  "initial_batch_count": 3
+  ]
 }

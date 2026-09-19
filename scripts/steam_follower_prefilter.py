@@ -73,12 +73,21 @@ def _bulk_counts(
             if not isinstance(item, dict):
                 continue
             gid, members = item.get("id"), item.get("members")
+            # This third-party API can represent its numeric group ID as a
+            # JSON string. Do not classify these *returned* groups as missing.
+            if isinstance(gid, bool) or not isinstance(gid, (int, str)):
+                continue
+            try:
+                parsed_gid = int(gid)
+            except ValueError:
+                continue
             if (
-                isinstance(gid, int) and not isinstance(gid, bool)
-                and isinstance(members, int) and not isinstance(members, bool)
-                and members >= 0 and gid in group_ids
+                isinstance(members, int) and not isinstance(members, bool)
+                and members >= 0 and parsed_gid in group_ids
             ):
-                counts[gid] = members
+                counts[parsed_gid] = members
+        if data["data"] and not counts:
+            raise ValueError("bulk data returned, but none of the IDs/member counts parsed")
         return counts
     except (ValueError, TypeError):
         raise RuntimeError(
@@ -120,6 +129,35 @@ def scan_batch(
 
     client = session or requests.Session()
     client.headers.setdefault("User-Agent", "GameTrendRadarThirdPartyPriority/1.0")
+    # Repair a prior parser-version-1 window that mistakenly classified
+    # returned JSON-string group IDs as unknown. The original GroupID mapping
+    # is already private and cached: repair with ONE bulk call, no 200 new
+    # Steam ResolveVanityURL requests. Stage until the new window succeeds.
+    repaired = {}
+    if int(prefilter.get("bulk_parser_version", 1)) < 2:
+        old = prefilter.get("games") or {}
+        unknown = {
+            str(appid): record for appid, record in old.items()
+            if record.get("third_party_followers") is None
+            and isinstance(record.get("group_short_id"), int)
+        }
+        if unknown:
+            lookup = list(dict.fromkeys(
+                record["group_short_id"] for record in unknown.values()
+            ))
+            if len(lookup) > 2000:
+                raise RuntimeError("Unexpected old prescreen size; manual repair required")
+            for offset in range(0, len(lookup), 200):
+                chunk = _bulk_counts(client, lookup[offset:offset + 200])
+                for appid, record in unknown.items():
+                    member_count = chunk.get(record["group_short_id"])
+                    if member_count is not None:
+                        repaired[appid] = {
+                            **record,
+                            "third_party_followers": member_count,
+                            "priority": member_count >= PRIORITY_THRESHOLD,
+                            "checked_at": _now(),
+                        }
     groups: dict[int, int | None] = {}
     for idx, row in enumerate(window):
         if idx:
@@ -144,7 +182,9 @@ def scan_batch(
             "checked_at": stamp,
         }
     # Commit the window atomically in the in-memory JSON object.
-    prefilter.setdefault("games", {}).update(staged)
+    prefilter.setdefault("games", {}).update(repaired)
+    prefilter["games"].update(staged)
+    prefilter["bulk_parser_version"] = 2
     prefilter["version"] = 1
     prefilter["threshold"] = PRIORITY_THRESHOLD
     prefilter["next_index"] = stop

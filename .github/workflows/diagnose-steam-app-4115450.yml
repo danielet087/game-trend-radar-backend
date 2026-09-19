@@ -43,10 +43,13 @@ jobs:
                   raw=get("https://store.steampowered.com/search/results/",params)
                   body=json.loads(raw)
                   html=body.get("results_html","")
-                  ids=re.findall(r'data-ds-appid=["\\\'](\\d+)["\\\']',html)
+                  ids=re.findall("data-ds-appid=.",html)
                   print(json.dumps({"case":name,"contains_4115450":str(appid) in ids,
                       "ids_count":len(ids),"total_count":body.get("total_count"),
-                      "raw_html_has_appid":str(appid) in html,"first_ids":ids[:5]},
+                      "raw_html_has_appid":str(appid) in html,
+                      "html_near_appid":html[max(0,html.find(str(appid))-160):html.find(str(appid))+280] if str(appid) in html else None,
+                      "release_labels":re.findall("search_released[^>]*>([^<]+)",html)[:4],
+                      "first_ids":ids[:5]},
                       ensure_ascii=False))
               except Exception as exc:
                   print(json.dumps({"case":name,"error":f"{type(exc).__name__}: {exc}"}))
@@ -64,7 +67,7 @@ jobs:
                   print(json.dumps({"case":"appdetails_"+language,"error":str(exc)}))
           try:
               xml=get(f"https://steamcommunity.com/games/{appid}/memberslistxml/",{"xml":1})
-              m=re.search(r"<memberCount>([\\d,]+)</memberCount>",xml)
+              m=re.search("<memberCount>([0-9,]+)</memberCount>",xml)
               print(json.dumps({"case":"followers","memberCount":m.group(1) if m else None,
                   "snippet":xml[:240] if not m else None}))
           except Exception as exc:

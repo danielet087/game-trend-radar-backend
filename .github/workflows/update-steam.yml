@@ -5,6 +5,11 @@ on:
   schedule:
     # 03:23 UTC = 11:23 Taiwan (UTC+8); daily maintenance and recovery
     - cron: "23 3 * * *"
+  push:
+    # Only the ChatGPT automation edits this marker after checking the status.
+    branches: [main]
+    paths:
+      - ".github/steam-gpt-trigger.txt"
 permissions:
   contents: write
 

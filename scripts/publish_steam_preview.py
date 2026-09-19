@@ -10,7 +10,7 @@ from typing import Any
 
 import requests
 
-from scripts.steam_release_dates import resolve_release_date
+from scripts.steam_release_dates import fetch_store_browse_releases, resolved_store_date
 from collectors.steam_upcoming import (
     STEAM_FOLLOWERS_URL, STEAM_SEARCH_URL, parse_follower_xml,
     parse_release_window, parse_search_results_html, taiwan_today, write_json,
@@ -73,9 +73,12 @@ def add_traditional_name(
     game["name_zh_tw"] = name_zh_tw
 
 
-def normalized_metadata(appid: int, details: dict[str, Any], followers: int | None, checked_at: str | None) -> dict[str, Any] | None:
+def normalized_metadata(
+    appid: int, details: dict[str, Any], followers: int | None, checked_at: str | None,
+    *, browse_release: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
     release_details = details.get("release_date") or {}
-    release = resolve_release_date(appid, release_details.get("date"), detail=release_details)
+    release = resolved_store_date(appid, release_details.get("date"), browse_release, fallback_detail=release_details)
     if release["release_precision"] != "day" or not release["release_start"]:
         return None
     return {
@@ -228,6 +231,7 @@ def fetch_new_release_followers(session: requests.Session, appid: int) -> int | 
 def release_from_store(
     session: requests.Session, appid: int, followers: int, checked_at: str,
     *, today: date, delay_seconds: float, recent_source: str,
+    browse_release: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     details = app_details(session, appid)
     if not details or details.get("type") != "game":
@@ -235,7 +239,9 @@ def release_from_store(
     # The scheduled date alone is not proof of an actual launch.
     if (details.get("release_date") or {}).get("coming_soon") is not False:
         return None
-    game = normalized_metadata(appid, details, followers, checked_at)
+    game = normalized_metadata(
+        appid, details, followers, checked_at, browse_release=browse_release,
+    )
     if game is None:
         return None
     day = date.fromisoformat(game["release_start"])
@@ -292,6 +298,12 @@ def run(
         if followers >= min_followers:
             qualified.append((appid, followers, str(entry.get("checked_at") or "")))
     qualified.sort(key=lambda row: (-row[1], row[0]))
+    # One public, batched Store Browse request per ~35 qualified games.
+    # This never requests Followers and runs only for already qualified apps.
+    browse_releases = fetch_store_browse_releases(
+        session, [appid for appid, _, _ in qualified],
+        request_interval=delay_seconds,
+    )
 
     games: list[dict[str, Any]] = []
     skipped_missing_date = 0
@@ -304,7 +316,10 @@ def run(
         if not details or details.get("type") != "game":
             LOGGER.warning("No Steam game metadata for tracked app %d", appid)
             continue
-        game = normalized_metadata(appid, details, followers, checked_at)
+        game = normalized_metadata(
+            appid, details, followers, checked_at,
+            browse_release=browse_releases.get(appid),
+        )
         if game is None:
             skipped_missing_date += 1
             LOGGER.info("Skipping %d: Store has no exact release day", appid)
@@ -331,6 +346,9 @@ def run(
 
     # New launches never included in Upcoming: independently scan Store releases.
     candidate_ids = fetch_new_release_appids(session, today)
+    new_release_times = fetch_store_browse_releases(
+        session, candidate_ids, request_interval=delay_seconds,
+    )
     direct_requests = 0
     candidate_checked = 0
     follower_clock: float | None = None
@@ -354,7 +372,10 @@ def run(
                 continue
             if (details.get("release_date") or {}).get("coming_soon") is not False:
                 continue
-            exact = normalized_metadata(appid, details, None, None)
+            exact = normalized_metadata(
+                appid, details, None, None,
+                browse_release=new_release_times.get(appid),
+            )
             if exact is None or not first_week_release(
                 date.fromisoformat(exact["release_start"]), today
             ):
@@ -401,6 +422,7 @@ def run(
         game = release_from_store(
             session, appid, count, checked_at, today=today,
             delay_seconds=delay_seconds, recent_source="direct_release",
+            browse_release=new_release_times.get(appid),
         )
         if game:
             recently_released[str(appid)] = game
@@ -436,9 +458,10 @@ def run(
 
     output = {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        "source": "Steam Store metadata + private Followers checkpoint + Steam new-releases scan",
+        "source": "Steam Store TW appdetails + public IStoreBrowseService/GetItems release timestamps + private Followers checkpoint",
         "release_date_timezone": "Asia/Taipei",
-        "release_date_basis": "Steam Store TW date; no unlock time inferred",
+        "release_date_basis": "Steam Store TW announced date; Steam Store Browse timestamp when available",
+        "precise_release_timestamps_found": len(browse_releases),
         "is_partial_preview": True,
         "checkpoint_count": len(cached),
         "checkpoint_updated_at": checkpoint.get("updated_at"),

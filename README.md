@@ -13,6 +13,22 @@
 - [第三輪 CM 診斷與 Metadata 探針](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35452231242)：使用既有 API Key，3/3 遊戲 GroupID64 解析成功；`ICommunityService/GetClanMetadata` 回傳 HTTP 401（因此未取得會員總數）；匿名 CM 登入結果 1，3 群組查詢後觀察約 34 秒，沒有 `ClientGetClanActivityCountsResponse`、`ClientClanState` 或偵測到連線中斷。不能推論帳號登入一定會改善，也不能以 Web API Key 當成 Steam 帳號憑證。若要測登入帳號，應使用使用者自行管理的專用測試帳號於受信任的本機互動登入，**不要**將密碼、Steam Guard 碼、登入金鑰或 Cookie 提交 GitHub、Actions 日誌或交給聊天助手。
 
 
+## Steam Groups 第三方批次 API：第四至第六輪實測（2026-09-19）
+
+來源：[steam-groups.com API 文件](https://steam-groups.com/docs)，為**非 Valve** 的第三方公開資料庫。其 `POST /api/groups/bulk` 文件列出最多 10,000 個短群組 ID；實測只測到最多 205 個。傳入 Steam 群組的完整 SteamID64 會回 HTTP 500，使用 `group_id64 - 103582791429521408` 得到的短 ID 才有成功回應。
+
+| 實驗 | 群組 ID 解析 | 第三方人數有資料 | 耗時 | 準確性風險 |
+|---|---:|---:|---|---|
+| [12 款已知群組](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35452722689) | 已知 ID 12/12 | 9/12；單次 bulk 約 0.679 秒 | 整次測試約數秒 | 9/9 比先前 XML 少 |
+| [60 款分層快取樣本](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35452832692) | 60/60 | 56/60；單次 bulk 約 0.461 秒 | 30.44 秒 | XML ≥5,000 的 20 款中 2 款低於第三方門檻 |
+| [205 款分層快取樣本](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35452968478) | 205/205 | 188/205；單次 bulk 約 0.943 秒 | 100.81 秒 | XML ≥5,000 的 45 款中，第三方低估至 <5,000 有 7 款、找不到 1 款 |
+
+205 款成功回傳的第三方計數**全部低於**既有 Steam XML 計數；這不證明計數來自同一時間／同一定義。API 未提供可供校驗的會員計數更新時間，`isLastSeen=false` 也不等於人數剛更新。這些是**分層抽樣**，不是全部 11,467 款的真實覆蓋率預測。現有私人 cache 的 1,063 筆中，Steam XML ≥5,000 有 48 筆；樣本取了較多高關注遊戲以檢查漏判。
+
+**研發方向（尚未部署為正式任務）：** 先用既有 Steam Web API Key 的 `ISteamUser/ResolveVanityURL`、`url_type=3` 取得 GroupID64，再轉短 ID 批次查第三方。結果只能標記成 `provisional/third_party` 供優先排序；正式前端的 `followers` 與 ≥5,000 篩選仍須使用近期的 Steam 官方 XML 已驗證計數。第三方找不到、接近門檻或與既有官方 cache 衝突者優先以 XML 補查；低關注者繼續背景驗證，不能直接視為已完整掃描。未經長時間測試不可把 205 款吞吐率外推成 Steam Web API 的保證速率。任何 429 都停止並退避。
+
+[SteamDB FAQ](https://steamdb.info/faq/) 明確禁止自動抓取／爬取其網站，也未提供一般公開 API；本專案不能改成 SteamDB 自動爬取來規避官方查詢成本。
+
 ## 目前正式 Steam 初始化流程（2026-09-19）
 
 以下為現行流程；下方的「6 個兩月區段」及 `update-steam.yml` 是舊版手動復原流程，不可用於接續目前的 Followers 游標。

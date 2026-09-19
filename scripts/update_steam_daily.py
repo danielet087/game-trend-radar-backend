@@ -176,6 +176,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         checkpoint_path=args.checkpoint,
         checkpoint_branch=args.checkpoint_branch,
         checkpoint_every=args.checkpoint_every,
+        reuse_all_cached_during_initialization=not bool(state.get("initial_complete")),
+        max_fresh_requests_per_run=args.max_fresh_requests,
     )
 
     if not state.get("initial_complete"):
@@ -210,25 +212,39 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             total_segments=total_segments,
         )
 
-        failures = int((latest.get("collection") or {}).get("follower_failures") or 0)
+        collection = latest.get("collection") or {}
+        failures = int(collection.get("follower_failures") or 0)
+        paused_for_budget = bool(collection.get("paused_due_to_fresh_request_budget"))
+        remaining_unchecked = int(collection.get("remaining_unchecked_candidates") or 0)
 
-        if failures > 0:
-            LOGGER.warning(
-                "Initial segment %d/%d is incomplete: %d follower lookups failed. "
-                "The segment will be retried on the next scheduled run.",
-                segment + 1,
-                total_segments,
-                failures,
-            )
+        if failures > 0 or paused_for_budget:
+            if paused_for_budget:
+                LOGGER.info(
+                    "Initial segment %d/%d paused cleanly with %d candidates remaining. "
+                    "Saved follower checkpoints will be reused on the next run.",
+                    segment + 1,
+                    total_segments,
+                    remaining_unchecked,
+                )
+            else:
+                LOGGER.warning(
+                    "Initial segment %d/%d is incomplete: %d follower lookups failed. "
+                    "The segment will be retried on the next scheduled run.",
+                    segment + 1,
+                    total_segments,
+                    failures,
+                )
             combined_games = prune_released(existing_games, today)
             state["last_attempt"] = {
                 "segment": segment,
                 "window_start": window_start.isoformat(),
                 "window_end": window_end.isoformat(),
                 "attempted_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-                "status": "incomplete",
+                "status": "paused_budget" if paused_for_budget else "incomplete",
                 "candidate_count": int(latest.get("candidate_count") or 0),
                 "qualified_count_partial": int(latest.get("count") or 0),
+                "processed_candidate_count": int(collection.get("processed_candidate_count") or 0),
+                "remaining_unchecked_candidates": remaining_unchecked,
                 "follower_failures": failures,
             }
         else:
@@ -315,6 +331,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint", default="data/steam_followers_checkpoint.json")
     parser.add_argument("--checkpoint-branch", default="steam-state")
     parser.add_argument("--checkpoint-every", type=int, default=5)
+    parser.add_argument(
+        "--max-fresh-requests",
+        type=int,
+        default=600,
+        help="During one run, stop cleanly after this many new follower requests; <=0 disables the cap.",
+    )
     parser.add_argument("--country", default="TW")
     parser.add_argument("--days", type=int, default=365)
     parser.add_argument("--min-followers", type=int, default=5000)

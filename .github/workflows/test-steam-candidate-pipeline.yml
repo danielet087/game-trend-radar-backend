@@ -1,0 +1,25 @@
+name: Verify Steam two-phase candidate pipeline
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/test-steam-candidate-pipeline.yml"
+      - "scripts/steam_candidate_pipeline.py"
+      - "tests/test_steam_candidate_pipeline.py"
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Run complete Steam test suite
+        run: python -m pytest -q

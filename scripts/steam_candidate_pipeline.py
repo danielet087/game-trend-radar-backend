@@ -21,7 +21,6 @@ import requests
 from collectors.steam_upcoming import (
     SteamUpcomingCollector, UpcomingGame, TAIWAN_TZ, taiwan_today, write_json,
 )
-from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
 from scripts.update_steam_daily import load_json, merge_partial_segment, save_json
 
 LOG = logging.getLogger(__name__)
@@ -239,12 +238,21 @@ def run_follower_batch(
             store_url=raw["store_url"],
         ))
     qualified = collector.qualify(selected)
-    combined = merge_partial_segment(
-        master.get("games", []), [vars(x) for x in qualified], today=today,
-    )
-    # Avoid a second Store Browse fetch for the already timestamped catalog
-    # unless needed by a separate maintenance workflow.
-    master["games"] = corrected_games(combined)
+    # The Followership dataclass holds the Steam card fields, while the
+    # catalog holds the exact Taiwan timestamp and source. Preserve both:
+    # reparsing a date-only release_raw would lose the verified UTC time.
+    catalog_by_id = {row["appid"]: row for row in rows}
+    enriched = []
+    for row in qualified:
+        record = vars(row).copy()
+        source = catalog_by_id.get(row.appid, {})
+        for field in ("name_en", "name_zh_tw", "release_date_timezone",
+                      "release_date_basis", "release_time_utc",
+                      "release_time_source", "discovered_by"):
+            record[field] = source.get(field)
+        enriched.append(record)
+    combined = merge_partial_segment(master.get("games", []), enriched, today=today)
+    master["games"] = combined
     master["updated_at"] = datetime.now(timezone.utc).isoformat()
     failed = collector.failed_follower_appids
     if failed:

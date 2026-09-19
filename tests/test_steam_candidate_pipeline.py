@@ -142,7 +142,6 @@ def test_follower_stage_reuses_cache_and_50_request_limit(tmp_path):
             return []
     with (
         patch.object(pipeline, "SteamUpcomingCollector", return_value=Collector()) as ctor,
-        patch.object(pipeline, "corrected_games", side_effect=lambda games: games),
     ):
         result = run_follower_batch(args, state, catalog, master)
     assert ctor.call_args.kwargs["max_fresh_requests_per_run"] == 50

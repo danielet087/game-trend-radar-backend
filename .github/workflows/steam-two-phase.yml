@@ -28,7 +28,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Run tests
         run: python -m pytest -q
-      - name: Finish all remaining Taiwan release dates OR check 50 Followers
+      - name: Finish discovery OR fetch up to 50 new Followers per run
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,6 +52,30 @@ jobs:
           if [ -f output/steam_upcoming.json ]; then
             python -m json.tool output/steam_upcoming.json > /dev/null
           fi
+      - name: Verify each 50-Followers batch is ready for public update
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
+          attempt = state.get("last_attempt") or {}
+          if attempt.get("phase") != "followers":
+              print("No Followers batch; candidate discovery or completion only.")
+          else:
+              n = int(attempt.get("fresh_follower_requests", -1))
+              assert 0 <= n <= 50, f"Unexpected fresh Followers requests: {n}"
+              start = int(attempt["start_index"])
+              end = int(attempt["next_index"])
+              assert end > start, "No candidate progress after Followers batch"
+              payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
+              assert payload["initialization"]["next_follower_index"] == end
+              assert payload["initialization"]["days_scanned"] == 365
+              assert payload["count"] == len(payload["games"])
+              assert all(int(g["followers"]) >= 5000 for g in payload["games"])
+              print(f"Followers batch: {n} new Steam queries; candidates {start}->{end}; "
+                    f"qualified games for public JSON: {payload['count']}")
+          PY
       - name: Save private candidate catalog and checkpoint metadata
         run: |
           git config user.name "github-actions[bot]"
@@ -67,7 +91,7 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
-      - name: Publish qualified games only after candidate discovery
+      - name: Publish updated site JSON after EVERY Followers batch
         if: ${{ success() }}
         env:
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
@@ -90,7 +114,7 @@ jobs:
             echo "Public JSON already matches."
             exit 0
           fi
-          git commit -m "data: publish qualified Steam candidates after follower batch"
+          git commit -m "data: publish Steam games after each 50-Followers batch"
           git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
           git pull --rebase origin main
           git push origin HEAD:main

@@ -3,14 +3,14 @@ from datetime import date
 from scripts.steam_release_dates import corrected_games, resolve_release_date
 
 
-def test_dressmaker_real_unlock_is_taiwan_sep_22():
+def test_dressmaker_reported_taiwan_store_date_without_fake_unlock_time():
     result = resolve_release_date(4019220, "21 Sep, 2026")
     assert result["release_start"] == "2026-09-22"
     assert result["release_end"] == "2026-09-22"
     assert result["release_raw"] == "21 Sep, 2026"
-    assert result["release_time_utc"] == "2026-09-21T16:00:00Z"
+    assert result["release_time_utc"] is None
     assert result["release_date_timezone"] == "Asia/Taipei"
-    assert result["release_date_basis"] == "verified_store_release_time"
+    assert result["release_date_basis"] == "steam_tw_storefront_date_user_reported"
 
 
 def test_unverified_release_dates_do_not_shift():
@@ -19,7 +19,7 @@ def test_unverified_release_dates_do_not_shift():
     assert other["release_time_utc"] is None
 
 
-def test_changed_store_date_disables_stale_verified_timestamp():
+def test_changed_store_date_disables_stale_reported_date():
     updated = resolve_release_date(4019220, "25 Sep, 2026")
     assert updated["release_start"] == "2026-09-25"
     assert updated["release_date_basis"] == "steam_store_announced_date"

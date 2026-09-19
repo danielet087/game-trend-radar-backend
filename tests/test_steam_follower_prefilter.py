@@ -90,15 +90,15 @@ def test_priority_threshold_and_unknown_fallback_are_not_official_counts():
 
 
 def test_failed_mapping_must_not_advance_or_write_partial_window():
-    saved = {"version": 1, "next_index": 685, "games": {}}
+    saved = {"version": 1, "next_index": 0, "games": {}}
     with pytest.raises(RuntimeError, match="HTTP 429"):
         priority.scan_batch(
             games(1, 2), saved,
-            steam_api_key="test-key", initial_index=685, limit=2,
+            steam_api_key="test-key", initial_index=0, limit=2,
             request_interval=0,
             session=FakeSession({1: 9000, 2: 8000}, bad_appid=2),
         )
-    assert saved == {"version": 1, "next_index": 685, "games": {}}
+    assert saved == {"version": 1, "next_index": 0, "games": {}}
 
 
 def test_batch_first_verifies_hot_and_missing_without_moving_official_cursor(tmp_path, monkeypatch):

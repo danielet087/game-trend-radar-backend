@@ -336,6 +336,11 @@ def run_follower_batch(
     remaining = [row for row in priority_rows if str(row["appid"]) not in cache]
     start_verified = int(state.get("verified_priority_count", 0))
     if not remaining:
+        state["priority_total"] = len(priority_rows)
+        state["verified_priority_count"] = len(priority_rows)
+        state["official_verified_count"] = sum(
+            str(item["appid"]) in cache for item in rows
+        )
         state["phase"] = "complete"
         state["initial_complete"] = True
         state["coverage_exhaustive"] = False  # only prefiltered games validated

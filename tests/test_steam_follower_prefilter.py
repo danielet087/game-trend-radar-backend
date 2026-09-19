@@ -75,18 +75,20 @@ def test_priority_threshold_and_unknown_fallback_are_not_official_counts():
     )
     assert report == {
         "start_index": 0, "next_index": 4, "screened": 4,
-        "priority": 3, "missing": 1, "complete": True,
+        "priority": 2, "missing": 1, "complete": True,
     }
     assert state["games"]["101"]["priority"] is False
     assert state["games"]["102"]["priority"] is True
     assert state["games"]["103"]["third_party_followers"] == 9300
     assert state["games"]["104"]["third_party_followers"] is None
+    assert state["games"]["104"]["priority"] is False
+    assert state["games"]["104"]["scheduling_band"] == "missing_assumed_under_3000"
     assert [g["appid"] for g in priority.pending_priorities(
         catalog, state, {}, min_start_index=0,
-    )] == [102, 103, 104]
+    )] == [102, 103]
     assert [g["appid"] for g in priority.pending_priorities(
         catalog, state, {"102": {"followers": 4300}}, min_start_index=0,
-    )] == [103, 104]
+    )] == [103]
 
 
 def test_failed_mapping_must_not_advance_or_write_partial_window():
@@ -253,4 +255,7 @@ def test_string_ids_are_parsed_and_previous_false_missing_window_repaired():
     assert saved["games"]["102"]["priority"] is True
     assert saved["games"]["103"]["third_party_followers"] == 4000
     assert saved["games"]["103"]["priority"] is True
+    # An older unknown entry must be demoted, not kept in the priority queue.
+    assert saved["games"]["101"]["scheduling_band"] == "measured"
+
     assert client.called == [103]

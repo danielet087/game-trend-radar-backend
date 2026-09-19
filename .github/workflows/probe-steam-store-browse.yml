@@ -1,0 +1,53 @@
+name: Probe Steam Store Browse release timestamp
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-steam-store-browse.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect public release fields for two app IDs
+        run: |
+          python - <<'PY'
+          import json
+          import urllib.parse
+          import urllib.request
+          from datetime import datetime, timedelta, timezone
+
+          ids = [4019220, 1488490, 4358690]
+          payload = {
+              "ids": [{"appid": i} for i in ids],
+              "context": {"country_code": "TW", "language": "english", "steam_realm": 1},
+              "data_request": {"include_release": True},
+          }
+          url = ("https://api.steampowered.com/IStoreBrowseService/GetItems/v1/?"
+                 + urllib.parse.urlencode({"input_json": json.dumps(payload, separators=(",", ":"))}))
+          request = urllib.request.Request(url, headers={"User-Agent": "GameTrendRadar/0.5"})
+          try:
+              with urllib.request.urlopen(request, timeout=25) as response:
+                  data = json.load(response)
+              items = data.get("response", {}).get("store_items", [])
+              for item in items:
+                  rel = item.get("release") or {}
+                  ts = rel.get("steam_release_date")
+                  local = datetime.fromtimestamp(int(ts), tz=timezone(timedelta(hours=8))).isoformat() if ts else None
+                  print(json.dumps({
+                      "appid": item.get("appid"),
+                      "has_release": bool(rel),
+                      "steam_release_date": ts,
+                      "taipei": local,
+                      "is_coming_soon": rel.get("is_coming_soon"),
+                      "custom_release_date_message": rel.get("custom_release_date_message"),
+                  }, ensure_ascii=False))
+          except Exception as exc:
+              print(f"Probe unavailable; code will use Store API fallback: {type(exc).__name__}: {exc}")
+          PY

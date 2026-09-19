@@ -14,7 +14,8 @@ from scripts.publish_steam_preview import (
 
 def test_recent_release_requires_real_follower_count_and_verified_source():
     day = date(2026, 9, 19)
-    base = {"release_start": "2026-09-19", "recent_source": "direct_release"}
+    base = {"release_start": "2026-09-19", "recent_source": "direct_release",
+            "first_week_qualified_at": "2026-09-19T00:00:00Z"}
     assert recent_release({**base, "followers": 3001}, day)
     assert not recent_release({**base, "followers": 3000}, day)
     assert not recent_release({**base, "followers": None}, day)
@@ -75,6 +76,7 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
         patch("scripts.publish_steam_preview.app_details", side_effect=details),
         patch("scripts.publish_steam_preview.add_traditional_name"),
         patch("scripts.publish_steam_preview.fetch_new_release_appids", return_value=[101, 202, 303, 505]),
+        patch("scripts.publish_steam_preview.fetch_store_browse_releases", return_value={}),
         patch("scripts.publish_steam_preview.fetch_new_release_followers", side_effect=lambda session, appid: {
             202: 3001, 303: 3000, 505: 4000,
         }[appid]) as fetch_follows,
@@ -99,6 +101,7 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
     with (
         patch("scripts.publish_steam_preview.app_details", side_effect=details),
         patch("scripts.publish_steam_preview.add_traditional_name"),
+        patch("scripts.publish_steam_preview.fetch_store_browse_releases", return_value={}),
         patch("scripts.publish_steam_preview.fetch_new_release_appids", return_value=[]),
     ):
         followup = run(

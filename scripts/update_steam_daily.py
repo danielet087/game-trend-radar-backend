@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_window, taiwan_today, write_json
+from scripts.steam_release_dates import corrected_games
 
 LOGGER = logging.getLogger(__name__)
 
@@ -164,7 +165,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     state["total_segments"] = int(state.get("total_segments") or args.total_segments)
 
     master = load_json(master_path, {"games": []})
-    existing_games = master.get("games") if isinstance(master.get("games"), list) else []
+    existing_games = corrected_games(master.get("games") if isinstance(master.get("games"), list) else [])
 
     collector = SteamUpcomingCollector(
         country=args.country,
@@ -304,6 +305,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         )
         combined_games = list(latest.get("games", []))
         mode = "maintenance"
+
+    combined_games = corrected_games(combined_games)
 
     master_payload = {
         "version": 1,

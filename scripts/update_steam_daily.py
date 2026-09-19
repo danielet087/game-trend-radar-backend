@@ -4,12 +4,13 @@ import argparse
 import calendar
 import json
 import logging
+import requests
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_window, taiwan_today, write_json
-from scripts.steam_release_dates import corrected_games
+from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
 
 LOGGER = logging.getLogger(__name__)
 
@@ -306,7 +307,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         combined_games = list(latest.get("games", []))
         mode = "maintenance"
 
-    combined_games = corrected_games(combined_games)
+    # Look up public Store Browse timestamps only for qualified games.
+    # The six-hour initialization and private Follower checkpoint are untouched.
+    browse_releases = fetch_store_browse_releases(
+        requests.Session(),
+        [int(game["appid"]) for game in combined_games],
+        country=args.country,
+    )
+    combined_games = corrected_games(combined_games, browse_releases)
 
     master_payload = {
         "version": 1,
@@ -322,6 +330,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         state=state,
         latest_run=latest,
     )
+    public_payload["release_time_lookup"] = {
+        "provider": "Steam IStoreBrowseService/GetItems",
+        "country": args.country,
+        "timestamps_found": len(browse_releases),
+        "timezone": "Asia/Taipei",
+    }
     write_json(public_payload, args.output)
     return public_payload
 

@@ -1,0 +1,66 @@
+name: Probe Steam clan batch (read-only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-steam-clan-batch.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-clan-batch-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    # Small one-off investigation, independent of the missing self-hosted runner.
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout read-only source
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install isolated probe dependencies
+        run: python -m pip install --disable-pip-version-check requests "steam[client]==1.4.4"
+      - name: Check group IDs, optional VanityURL and anonymous clan batch
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+        run: python -m scripts.probe_steam_clan_batch
+      - name: Show result summary
+        if: always()
+        run: |
+          if [ -f output/steam_clan_batch_probe.json ]; then
+            python -m json.tool output/steam_clan_batch_probe.json > /dev/null
+            python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          report = json.loads(Path("output/steam_clan_batch_probe.json").read_text(encoding="utf-8"))
+          text = (
+              "## Steam clan batch probe\n\n"
+              f"- Samples: {report['statistics']['sampled']}\n"
+              f"- XML group IDs: {report['statistics']['xml_with_group_id64']}\n"
+              f"- VanityURL successes: {report['statistics']['vanity_successes']}\n"
+              f"- CM status: {report['cm']['status']}\n"
+              f"- CM members: {report['statistics']['cm_with_member_count']}\n"
+              f"- Exact XML matches: {report['statistics']['cm_xml_exact_matches']}\n"
+              f"- Total seconds: {report['total_seconds']}\n"
+          )
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as output:
+              output.write(text)
+          PY
+          fi
+      - name: Save private report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-clan-batch-probe
+          path: output/steam_clan_batch_probe.json
+          if-no-files-found: ignore
+          retention-days: 1

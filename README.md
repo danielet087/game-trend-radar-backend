@@ -10,6 +10,8 @@
 - 同一次探針：匿名 Steam CM 登入成功（eresult=1），送出含 10 個群組的 `CMsgClientGetClanActivityCounts`，但未收到 `ClientGetClanActivityCountsResponse` 或任何對應的 `ClientClanState.user_counts.members`（0/10）。所以**尚未證明能透過匿名 CM 批次查總會員數**；Steam Web API Key 不是 Steam 使用者登入憑證。
 - [XML 間隔探針](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35451566114)：每秒開始一個舊 AppID 的 XML 查詢，前 6 個 HTTP 200，第 7 個 HTTP 429 後立即停止。6 筆成功請求平均回應 0.371 秒；第一次群組探針的 12 筆 XML 約每 2 秒間隔全部成功。但兩輪請求相近，不能據此推論 2 秒間隔可長期安全運行。
 - 暫不降低正式的 30 秒 Followers 查詢間隔，也不修改 `data/steam_candidate_state.json`、cache 或公開前端。若持續追查 CM，必須先解決會員總數回傳及 XML 比對；不要將線上／遊戲中／聊天中人數誤當 Followers。
+- [第三輪 CM 診斷與 Metadata 探針](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35452231242)：使用既有 API Key，3/3 遊戲 GroupID64 解析成功；`ICommunityService/GetClanMetadata` 回傳 HTTP 401（因此未取得會員總數）；匿名 CM 登入結果 1，3 群組查詢後觀察約 34 秒，沒有 `ClientGetClanActivityCountsResponse`、`ClientClanState` 或偵測到連線中斷。不能推論帳號登入一定會改善，也不能以 Web API Key 當成 Steam 帳號憑證。若要測登入帳號，應使用使用者自行管理的專用測試帳號於受信任的本機互動登入，**不要**將密碼、Steam Guard 碼、登入金鑰或 Cookie 提交 GitHub、Actions 日誌或交給聊天助手。
+
 
 ## 目前正式 Steam 初始化流程（2026-09-19）
 

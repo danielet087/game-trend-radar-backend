@@ -1,6 +1,9 @@
 from datetime import date
 
-from scripts.update_steam_daily import add_months, merge_segment
+from scripts.update_steam_daily import (
+    add_months, merge_segment, reopen_first_segment_missing_alternative_search,
+    next_unfinished_segment,
+)
 
 
 def test_add_months_clamps_end_of_month() -> None:
@@ -47,3 +50,31 @@ def test_merge_segment_replaces_current_window() -> None:
     )
 
     assert [row["appid"] for row in result] == [2, 3]
+
+
+def test_reopen_missing_first_segment_once_without_deleting_other_progress() -> None:
+    state = {
+        "next_segment": 3,
+        "initial_complete": False,
+        "completed_segments": [
+            {"segment": 0, "candidate_count": 892, "qualified_count": 39},
+            {"segment": 1, "candidate_count": 12, "qualified_count": 3},
+            {"segment": 2, "candidate_count": 5, "qualified_count": 2},
+        ],
+    }
+    assert reopen_first_segment_missing_alternative_search(state)
+    assert state["next_segment"] == 0
+    assert [row["segment"] for row in state["completed_segments"]] == [1, 2]
+    assert state["first_segment_alt_sort_recheck_started"]
+    assert not reopen_first_segment_missing_alternative_search(state)
+    assert next_unfinished_segment(state["completed_segments"], 6) == 0
+
+
+def test_next_segment_skips_already_completed_windows_after_backfill() -> None:
+    completed = [
+        {"segment": 0, "alternative_search_checked": True},
+        {"segment": 1},
+        {"segment": 2},
+    ]
+    assert next_unfinished_segment(completed, 6) == 3
+    assert next_unfinished_segment([{"segment": i} for i in range(6)], 6) == 6

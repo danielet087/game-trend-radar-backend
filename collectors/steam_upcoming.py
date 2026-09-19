@@ -762,12 +762,12 @@ class SteamUpcomingCollector:
         # catalog for the full year: beyond the near-term result window it
         # returns TBA/month/year records while exact 2027 releases remain
         # discoverable under other sort orders (verified on Steam TW).
-        # Supplement every segment (including the first) with alternate
-        # public storefront slices. Steam Released_ASC is not a complete
-        # release-date index: e.g. Phantom Blade Zero (4115450, Oct 2026)
-        # appears in Price_DESC page 1 but not the sampled Released_ASC pages.
-        # Preserve the exact-day rule and do not spend Followers calls here.
-        if segment_index is not None:
+        # Supplement every segment AND one-calendar-day lookups. Steam
+        # Released_ASC is not a complete date index: Phantom Blade Zero
+        # (4115450) appeared in Price_DESC but not the sampled release pages.
+        # This is still discovery, not a guarantee of exhaustive coverage.
+        day_lookup = target_start == target_end
+        if segment_index is not None or day_lookup:
             for sort_mode, pages in (
                 ("Price_DESC", 5),
                 ("Name_ASC", 10),
@@ -813,7 +813,11 @@ class SteamUpcomingCollector:
                             segment_months=segment_months,
                             total_segments=total_segments,
                         ) if segment_anchor is not None else None
-                        if assigned == segment_index:
+                        if (
+                            assigned == segment_index
+                            if segment_index is not None
+                            else release.overlaps(target_start, target_end)
+                        ):
                             seen[game.appid] = game
                 LOGGER.info(
                     "Alternative Steam search sort=%s rows=%d exact=%d "

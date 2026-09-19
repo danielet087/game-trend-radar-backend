@@ -15,12 +15,8 @@ on:
     workflows: ["Steam candidates then Followers"]
     types: [completed]
     branches: [main]
-  schedule:
-    - cron: "2-59/5 * * * *"
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/steam-candidate-supervisor.yml"
+  # Hosted-runner cron and push wakeups paused to conserve Actions minutes
+  # while Followers collection is migrated to a non-metered executor.
 
 permissions:
   actions: write

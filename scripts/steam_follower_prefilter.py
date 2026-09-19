@@ -16,6 +16,7 @@ BULK_URL = "https://api.steam-groups.com/api/groups/bulk"
 GROUP_BASE = 103582791429521408
 PRIORITY_THRESHOLD = 4000
 STEAM_PUBLIC_THRESHOLD = 5000
+MISSING_ASSUMED_BELOW = 3000  # scheduling label, never a fabricated follower number
 DEFAULT_BATCH_SIZE = 200
 
 
@@ -156,6 +157,7 @@ def scan_batch(
                             **record,
                             "third_party_followers": member_count,
                             "priority": member_count >= PRIORITY_THRESHOLD,
+                            "scheduling_band": "measured",
                             "checked_at": _now(),
                         }
     groups: dict[int, int | None] = {}
@@ -172,18 +174,30 @@ def scan_batch(
     for appid, group in groups.items():
         members = counts.get(group) if group is not None else None
         unknown = members is None
-        priority = unknown or members >= PRIORITY_THRESHOLD
+        # A missing third-party record is scheduled in the below-3000
+        # BACKGROUND band, per product policy. This is NOT an observed
+        # member count and can never be used for official publication.
+        priority = members is not None and members >= PRIORITY_THRESHOLD
         priority_count += priority
         missing_count += unknown
         staged[str(appid)] = {
             "third_party_followers": members,
             "group_short_id": group,
             "priority": priority,
+            "scheduling_band": (
+                "missing_assumed_under_3000" if unknown else "measured"
+            ),
             "checked_at": stamp,
         }
-    # Commit the window atomically in the in-memory JSON object.
-    prefilter.setdefault("games", {}).update(repaired)
-    prefilter["games"].update(staged)
+    # Commit the window atomically in memory. Reclassify all historical
+    # null entries, including older data that falsely marked them priority.
+    saved = prefilter.setdefault("games", {})
+    for previous in saved.values():
+        if previous.get("third_party_followers") is None:
+            previous["priority"] = False
+            previous["scheduling_band"] = "missing_assumed_under_3000"
+    saved.update(repaired)
+    saved.update(staged)
     prefilter["bulk_parser_version"] = 2
     prefilter["version"] = 1
     prefilter["threshold"] = PRIORITY_THRESHOLD

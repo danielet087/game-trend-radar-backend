@@ -45,6 +45,9 @@ jobs:
           --follower-cache data/steam_followers_cache.json
           --checkpoint data/steam_followers_checkpoint.json
           --checkpoint-branch steam-state
+          --prefilter-state data/steam_prefilter_state.json
+          --prefilter-batch-size 200
+          --prefilter-request-interval 0.5
           --output output/steam_upcoming.json
       - name: Validate persistent candidate and state JSON
         run: |
@@ -68,7 +71,12 @@ jobs:
               assert 0 <= n <= 50, f"Unexpected fresh Followers requests: {n}"
               start = int(attempt["start_index"])
               end = int(attempt["next_index"])
-              assert end > start, "No candidate progress after Followers batch"
+              pre_start = int(attempt.get("prefilter_start_index", start))
+              pre_end = int(attempt.get("prefilter_next_index", pre_start))
+              priority_fresh = int(attempt.get("priority_fresh_requests", 0))
+              assert (
+                  end > start or pre_end > pre_start or priority_fresh > 0
+              ), "No candidate, prefilter or priority-verification progress"
               payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
               assert payload["initialization"]["next_follower_index"] == end
               assert payload["initialization"]["days_scanned"] == 365
@@ -82,6 +90,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/steam_candidate_state.json data/steam_candidates.json
+          if [ -f data/steam_prefilter_state.json ]; then
+            git add data/steam_prefilter_state.json
+          fi
           if [ -f output/steam_upcoming.json ]; then
             git add data/steam_followers_cache.json data/steam_upcoming_master.json
           fi

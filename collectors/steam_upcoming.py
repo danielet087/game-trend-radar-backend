@@ -758,6 +758,75 @@ class SteamUpcomingCollector:
             if len(rows) < self.page_size:
                 break
 
+        # Steam's Released_ASC coming-soon search is NOT a chronological
+        # catalog for the full year: beyond the near-term result window it
+        # returns TBA/month/year records while exact 2027 releases remain
+        # discoverable under other sort orders (verified on Steam TW).
+        # Supplement with alternate public storefront slices. Preserve the
+        # exact-day rule and do not spend Community Followers calls here.
+        if segment_index is not None and segment_index > 0:
+            for sort_mode, pages in (
+                ("Price_DESC", 5),
+                ("Name_ASC", 10),
+                ("Name_DESC", 10),
+                ("Released_DESC", 3),
+            ):
+                before = len(seen)
+                exact_count = 0
+                fuzzy_count = 0
+                total_rows = 0
+                for page in range(min(pages, self.max_pages)):
+                    response = self._request(
+                        STEAM_SEARCH_URL,
+                        params={
+                            "filter": "comingsoon",
+                            "sort_by": sort_mode,
+                            "start": page * self.page_size,
+                            "count": self.page_size,
+                            "infinite": 1,
+                            "force_infinite": 1,
+                            "category1": 998,
+                            "cc": self.country,
+                            "l": "english",
+                        },
+                        limiter=self.search_rate_limiter,
+                    )
+                    rows = parse_search_results_html(
+                        response.json().get("results_html") or ""
+                    )
+                    if not rows:
+                        break
+                    total_rows += len(rows)
+                    for game in rows:
+                        release = parse_release_window(game.release_raw)
+                        if release.precision != "day":
+                            fuzzy_count += 1
+                            continue
+                        exact_count += 1
+                        assigned = assign_release_to_segment(
+                            appid=game.appid,
+                            release=release,
+                            anchor=segment_anchor,
+                            segment_months=segment_months,
+                            total_segments=total_segments,
+                        ) if segment_anchor is not None else None
+                        if assigned == segment_index:
+                            seen[game.appid] = game
+                LOGGER.info(
+                    "Alternative Steam search sort=%s rows=%d exact=%d "
+                    "fuzzy=%d newly discovered segment=%d; total=%d",
+                    sort_mode, total_rows, exact_count, fuzzy_count,
+                    len(seen) - before, len(seen),
+                )
+
+        if segment_index is not None and not seen:
+            LOGGER.warning(
+                "NO VERIFIED COVERAGE for Steam initial segment %d (%s "
+                "through %s). Search has no exact-day candidate here; "
+                "this cannot prove the two-month interval is empty.",
+                segment_index + 1, target_start, target_end,
+            )
+
         return sorted(
             seen.values(),
             key=lambda g: (g.release_start or "9999-12-31", g.name.casefold(), g.appid),

@@ -74,7 +74,8 @@ def test_empty_distant_segment_is_not_declared_completed(tmp_path):
         "segment_months": 2,
         "total_segments": 6,
         "next_segment": 1,
-        "completed_segments": [{"segment": 0, "candidate_count": 892}],
+        "completed_segments": [{"segment": 0, "candidate_count": 892,
+                                "alternative_search_checked": True}],
         "initial_complete": False,
     }), encoding="utf-8")
     master.write_text(json.dumps({"games": [cached]}), encoding="utf-8")

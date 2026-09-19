@@ -103,83 +103,30 @@ def test_failed_mapping_must_not_advance_or_write_partial_window():
     assert saved == {"version": 1, "next_index": 0, "games": {}}
 
 
-def test_screen_first_does_not_call_steam_xml_before_catalog_screen_complete(tmp_path, monkeypatch):
-    catalog = games(101, 102, 103, 104)
-    # Existing private cursor has already officially checked app 101.
-    official = {
-        "101": {"followers": 40, "checked_at": "2026-09-19T00:00:00Z"},
-    }
+def test_incomplete_screen_cannot_run_steam_xml(tmp_path):
+    catalog = games(101, 102, 103)
+    pre_file = tmp_path / "pre.json"
+    pre_file.write_text(json.dumps({
+        "version": 1, "next_index": 2, "complete": False,
+        "games": {
+            "101": {"third_party_followers": 9000, "priority": True},
+            "102": {"third_party_followers": 10, "priority": False},
+        },
+    }), encoding="utf-8")
     state = pipeline.fresh_state(date(2026, 9, 19), 1)
     state["phase"] = "followers"
-    state["next_follower_index"] = 1
-    prefilter_path = tmp_path / "pre.json"
-    arguments = argparse.Namespace(
-        follower_cache=str(tmp_path / "official.json"),
-        checkpoint=str(tmp_path / "checkpoint.json"),
-        checkpoint_branch="steam-state", request_interval=0, search_interval=0,
-        prefilter_state=str(prefilter_path), prefilter_batch_size=2,
-        prefilter_request_interval=0,
-    )
-    results = []
-
-    class Collector:
-        fresh_follower_requests = 0
-        cached_follower_reuses = 0
-        failed_follower_appids = []
-        follower_failures = 0
-        follower_rate_limit_events = 0
-        processed_candidate_count = 0
-        follower_cache = dict(official)
-
-        def qualify(self, selection):
-            selection = list(selection)
-            results.append([g.appid for g in selection])
-            self.fresh_follower_requests += len(selection)
-            self.follower_cache.update({
-                str(g.appid): {"followers": 5100, "checked_at": "2026-09-19T00:00:00Z"}
-                for g in selection
-            })
-            return [
-                SimpleNamespace(**vars(g), followers=5100,
-                                follower_checked_at="2026-09-19T00:00:00Z",
-                                community_url=f"https://steamcommunity.com/app/{g.appid}/")
-                for g in selection
-            ]
-
-    def fake_scan(rows, saved, **kwargs):
-        assert kwargs["initial_index"] == 1
-        saved.update({
-            "next_index": 3, "complete": False,
-            "games": {
-                "102": {"priority": False, "third_party_followers": 3999},
-                "103": {"priority": True, "third_party_followers": 4000},
-            },
-        })
-        return {"start_index": 1, "next_index": 3, "screened": 2,
-                "priority": 1, "missing": 0, "complete": False}
-
-    monkeypatch.setenv("STEAM_WEB_API_KEY", "test-only")
-    with (
-        patch.object(pipeline, "SteamUpcomingCollector", return_value=Collector()),
-        patch.object(pipeline, "scan_batch", side_effect=fake_scan),
-    ):
-        outcome = pipeline.run_follower_batch(
-            arguments, state, {"games": catalog}, {"games": []},
-        )
-    assert results == []
-    assert outcome["priority_fresh_requests"] == 0
-    assert outcome["next_index"] == 1
-    assert state["prefilter_next_index"] == 3
-    assert state["phase"] == "followers"
-    assert state["prefilter_matched_count"] == 1
-    assert prefilter_path.exists()
-    assert json.loads(prefilter_path.read_text())["games"]["102"]["priority"] is False
+    args = argparse.Namespace(prefilter_state=str(pre_file),
+                              follower_cache=str(tmp_path / "cache.json"))
+    with patch.object(pipeline, "SteamUpcomingCollector") as collector:
+        with pytest.raises(RuntimeError, match="Step 2 has not screened"):
+            pipeline.run_follower_batch(args, state, {"games": catalog}, {"games": []})
+    collector.assert_not_called()
 
 
-def test_after_screen_complete_only_hot_games_get_xml_not_full_backfill(tmp_path):
+def test_completed_screen_checks_only_measured_4000_or_more(tmp_path):
     catalog = games(101, 102, 103, 104)
-    prefilter_path = tmp_path / "pre.json"
-    prefilter_path.write_text(json.dumps({
+    pre_file = tmp_path / "pre.json"
+    pre_file.write_text(json.dumps({
         "version": 1, "next_index": 4, "complete": True,
         "games": {
             "101": {"priority": True, "third_party_followers": 4000},
@@ -188,16 +135,19 @@ def test_after_screen_complete_only_hot_games_get_xml_not_full_backfill(tmp_path
             "104": {"priority": True, "third_party_followers": 8000},
         },
     }), encoding="utf-8")
+    cache_file = tmp_path / "official.json"
+    cache_file.write_text(json.dumps({
+        "games": {"101": {"followers": 5100, "checked_at": "2026-09-19T00:00:00Z"}}
+    }), encoding="utf-8")
     state = pipeline.fresh_state(date(2026, 9, 19), 1)
     state["phase"] = "followers"
-    arguments = argparse.Namespace(
-        follower_cache=str(tmp_path / "official.json"),
+    args = argparse.Namespace(
+        follower_cache=str(cache_file),
         checkpoint=str(tmp_path / "checkpoint.json"),
         checkpoint_branch="steam-state", request_interval=0, search_interval=0,
-        prefilter_state=str(prefilter_path), prefilter_batch_size=200,
-        prefilter_request_interval=0,
+        prefilter_state=str(pre_file), max_fresh_requests_per_run=5,
     )
-    calls = []
+    xml_calls = []
 
     class Collector:
         fresh_follower_requests = 0
@@ -206,73 +156,74 @@ def test_after_screen_complete_only_hot_games_get_xml_not_full_backfill(tmp_path
         follower_failures = 0
         follower_rate_limit_events = 0
         processed_candidate_count = 0
-        follower_cache = {"101": {"followers": 5100}}
 
         def qualify(self, selection):
-            selection = list(selection)
-            calls.append([g.appid for g in selection])
-            self.fresh_follower_requests += len(selection)
-            for g in selection:
-                self.follower_cache[str(g.appid)] = {"followers": 5100}
-            self.processed_candidate_count = len(selection)
+            selected = list(selection)
+            xml_calls.append([game.appid for game in selected])
+            self.fresh_follower_requests += len(selected)
+            rows = json.loads(cache_file.read_text(encoding="utf-8"))
+            for game in selected:
+                rows["games"][str(game.appid)] = {
+                    "followers": 5100, "checked_at": "2026-09-19T00:00:00Z",
+                }
+            cache_file.write_text(json.dumps(rows), encoding="utf-8")
             return []
 
     with patch.object(pipeline, "SteamUpcomingCollector", return_value=Collector()):
         result = pipeline.run_follower_batch(
-            arguments, state, {"games": catalog}, {"games": []},
+            args, state, {"games": catalog}, {"games": []},
         )
-    assert calls == [[104]]
-    assert result["backfill_started"] is False
-    assert result["next_index"] == 0
-    assert result["official_verified_total"] == 2
+    assert xml_calls == [[104]]
+    assert result["fresh_follower_requests"] == 1
+    assert result["verified_priority_count"] == 2
+    assert result["priority_total"] == 2
     assert state["phase"] == "complete"
     assert state["initial_complete"] is True
     assert state["coverage_exhaustive"] is False
-    assert state["prefilter_missing_count"] == 1
+    assert state["next_follower_index"] == 0
+    # 3,999 and missing are NOT sent for official verification.
+    assert "102" not in json.loads(cache_file.read_text())["games"]
+    assert "103" not in json.loads(cache_file.read_text())["games"]
 
 
-def test_last_screen_window_defers_steam_until_screen_ends(tmp_path, monkeypatch):
+def test_screen_two_batches_before_any_steam_xml(tmp_path, monkeypatch):
     catalog = games(101, 102, 103)
     state = pipeline.fresh_state(date(2026, 9, 19), 1)
-    state["phase"] = "followers"
+    state["phase"] = "prefilter"
+    state["days_scanned"] = 1
     args = argparse.Namespace(
+        prefilter_state=str(tmp_path / "pre.json"),
         follower_cache=str(tmp_path / "official.json"),
-        checkpoint=str(tmp_path / "checkpoint.json"),
-        checkpoint_branch="steam-state", request_interval=0, search_interval=0,
-        prefilter_state=str(tmp_path / "pre.json"), prefilter_batch_size=2,
-        prefilter_request_interval=0, max_fresh_requests_per_run=5,
+        prefilter_batch_size=2, prefilter_request_interval=0,
     )
-    counts = {101: 9000, 102: 3999, 103: 4000}
     monkeypatch.setenv("STEAM_WEB_API_KEY", "test-only")
-    with patch.object(pipeline, "scan_batch", wraps=lambda rows, saved, **kw: priority.scan_batch(
-            rows, saved, session=FakeSession(counts),
-            request_interval=0,
-            **{k:v for k,v in kw.items() if k!="request_interval"},
-        )):
-        class Collector:
-            fresh_follower_requests = 0
-            cached_follower_reuses = 0
-            failed_follower_appids = []
-            follower_failures = 0
-            follower_rate_limit_events = 0
-            processed_candidate_count = 0
-            follower_cache = {}
-            def qualify(self, selection):
-                selected = list(selection)
-                self.fresh_follower_requests += len(selected)
-                self.follower_cache.update({
-                    str(x.appid): {"followers": 5100} for x in selected
-                })
-                return []
-        with patch.object(pipeline, "SteamUpcomingCollector", side_effect=Collector):
-            first = pipeline.run_follower_batch(args, state, {"games": catalog}, {"games": []})
-            assert first["fresh_follower_requests"] == 0
-            assert state["prefilter_next_index"] == 2
-            assert state["phase"] == "followers"
-            second = pipeline.run_follower_batch(args, state, {"games": catalog}, {"games": []})
+    counts = {101: 9000, 102: 3999, 103: 4000}
+
+    def fake_scan(rows, saved, **kwargs):
+        return priority.scan_batch(
+            rows, saved, session=FakeSession(counts), request_interval=0,
+            **{k: v for k, v in kwargs.items() if k != "request_interval"},
+        )
+
+    with (
+        patch.object(pipeline, "scan_batch", side_effect=fake_scan),
+        patch.object(pipeline, "SteamUpcomingCollector") as collector,
+    ):
+        first = pipeline.run_prefilter_phase(args, state, {"games": catalog})
+        assert first["fresh_follower_requests"] == 0
+        assert state["phase"] == "prefilter"
+        assert state["prefilter_next_index"] == 2
+        second = pipeline.run_prefilter_phase(args, state, {"games": catalog})
+    collector.assert_not_called()
+    assert second["fresh_follower_requests"] == 0
+    assert state["phase"] == "followers"
+    assert state["prefilter_complete"] is True
     assert state["prefilter_next_index"] == 3
-    assert second["fresh_follower_requests"] == 2
-    assert state["phase"] == "complete"
+    stored = json.loads((tmp_path / "pre.json").read_text(encoding="utf-8"))
+    assert len(stored["games"]) == 3
+    assert {appid for appid, data in stored["games"].items()
+            if data["priority"]} == {"101", "103"}
+
 
 
 def test_string_ids_are_parsed_and_previous_false_missing_window_repaired():

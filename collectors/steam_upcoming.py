@@ -320,6 +320,8 @@ class SteamUpcomingCollector:
         checkpoint_path: str | Path = "data/steam_followers_checkpoint.json",
         checkpoint_branch: str = "steam-state",
         checkpoint_every: int = 5,
+        reuse_all_cached_during_initialization: bool = False,
+        max_fresh_requests_per_run: int | None = 600,
         cache_flush_every: int = 20,
     ) -> None:
         self.country = country.upper()
@@ -334,6 +336,12 @@ class SteamUpcomingCollector:
         self.checkpoint_path = Path(checkpoint_path)
         self.checkpoint_branch = checkpoint_branch
         self.checkpoint_every = max(1, checkpoint_every)
+        self.reuse_all_cached_during_initialization = bool(reuse_all_cached_during_initialization)
+        self.max_fresh_requests_per_run = (
+            None
+            if max_fresh_requests_per_run is None or max_fresh_requests_per_run <= 0
+            else int(max_fresh_requests_per_run)
+        )
         self.cache_flush_every = max(1, cache_flush_every)
         self.github_repository = os.environ.get("GITHUB_REPOSITORY", "").strip()
         self.checkpoint_token = os.environ.get("STEAM_CHECKPOINT_TOKEN", "").strip()
@@ -369,6 +377,9 @@ class SteamUpcomingCollector:
         self.follower_rate_limit_events = 0
         self.search_rate_limit_events = 0
         self.first_follower_429_after_requests: int | None = None
+        self.collection_paused_due_to_budget = False
+        self.remaining_unchecked_candidates = 0
+        self.processed_candidate_count = 0
 
     def _load_follower_cache(self) -> dict[str, dict[str, Any]]:
         if not self.follower_cache_path.exists():
@@ -541,6 +552,9 @@ class SteamUpcomingCollector:
         checked_at = _parse_iso_datetime(checked_at_raw)
         if checked_at is None:
             return None
+
+        if self.reuse_all_cached_during_initialization:
+            return followers, str(checked_at_raw)
 
         if now - checked_at <= self._cache_ttl(followers):
             return followers, str(checked_at_raw)
@@ -747,6 +761,25 @@ class SteamUpcomingCollector:
                 followers, checked_at = cached
                 self.cached_follower_reuses += 1
             else:
+                if (
+                    self.max_fresh_requests_per_run is not None
+                    and self.fresh_follower_requests >= self.max_fresh_requests_per_run
+                ):
+                    self.collection_paused_due_to_budget = True
+                    self.remaining_unchecked_candidates = total - index + 1
+                    self.processed_candidate_count = index - 1
+                    LOGGER.info(
+                        "Fresh follower request budget reached at %d/%d; "
+                        "fresh=%d; cache=%d; remaining=%d. "
+                        "Ending this run cleanly so checkpoint/state can be persisted.",
+                        index - 1,
+                        total,
+                        self.fresh_follower_requests,
+                        self.cached_follower_reuses,
+                        self.remaining_unchecked_candidates,
+                    )
+                    break
+
                 try:
                     followers = self.fetch_followers(game.appid)
                 except Exception as exc:
@@ -777,6 +810,8 @@ class SteamUpcomingCollector:
                         community_url=f"https://steamcommunity.com/app/{game.appid}/",
                     )
                 )
+
+            self.processed_candidate_count = index
 
             if index % 5 == 0 or index == total:
                 elapsed_seconds = int(time.monotonic() - qualify_started_at)
@@ -859,6 +894,11 @@ class SteamUpcomingCollector:
                 "first_follower_429_after_requests": self.first_follower_429_after_requests,
                 "checkpoint_branch": self.checkpoint_branch,
                 "checkpoint_every": self.checkpoint_every,
+                "initialization_cache_reuse": self.reuse_all_cached_during_initialization,
+                "max_fresh_requests_per_run": self.max_fresh_requests_per_run,
+                "processed_candidate_count": self.processed_candidate_count,
+                "paused_due_to_fresh_request_budget": self.collection_paused_due_to_budget,
+                "remaining_unchecked_candidates": self.remaining_unchecked_candidates,
             },
             "candidate_count": len(candidates),
             "count": len(games),

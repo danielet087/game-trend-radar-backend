@@ -158,8 +158,8 @@ def checked_followers(
     # low-follower measurements which could hide a sudden release crossing 3000.
     # Under-threshold new releases must be checked again on following days:
     # keeping a 3/7-day low-follower TTL would miss first-week growth.
-    ttl = 1
-    if now - last <= timedelta(days=ttl):
+    freshness = timedelta(hours=20 if count < DIRECT_FOLLOWERS_MIN else 24)
+    if now - last < freshness:
         return count, checked_at
     return None
 
@@ -360,6 +360,14 @@ def run(
                 continue
         # Newly published release candidates can be rechecked on subsequent days.
         previous = checked_followers(appid, cached, checks, now)
+        if previous is not None and str(appid) not in recently_released:
+            # A pre-release measurement cannot prove post-launch followers;
+            # check it again so the first-week badge has valid evidence.
+            checked_date = datetime.fromisoformat(
+                previous[1].replace("Z", "+00:00")
+            ).astimezone(timezone(timedelta(hours=8))).date()
+            if checked_date < date.fromisoformat(exact["release_start"]):
+                previous = None
         if previous is None:
             if direct_requests >= max_new_followers:
                 LOGGER.info("Released-game follower budget reached: %d", direct_requests)

@@ -75,7 +75,7 @@ def main():
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "test": "one_time_read_only_60_cache_appids",
         "key_present": bool(key),
-        "selection": "20 >=5000, 20 100..4999, 20 <100 (per bucket availability)",
+        "selection": os.environ.get("PROBE_SELECTION", "20 >=5000, 20 100..4999, 20 <100 (per bucket availability)"),
         "requested_count": len(selected),
         "mapping": [], "bulk": {}, "summary": {},
     }

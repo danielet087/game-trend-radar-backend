@@ -6,6 +6,8 @@ on:
       - ".github/workflows/test-steam-candidate-pipeline.yml"
       - "scripts/steam_candidate_pipeline.py"
       - "tests/test_steam_candidate_pipeline.py"
+      - "scripts/steam_candidate_supervisor.py"
+      - "tests/test_steam_candidate_supervisor.py"
 permissions:
   contents: read
 jobs:

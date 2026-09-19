@@ -1,0 +1,67 @@
+name: Probe precise Steam date-filter coverage
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/probe-steam-day-filter-coverage.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Compare day-specific results with known app release
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request, urllib.parse
+          from datetime import datetime, timedelta, timezone
+          key = os.environ.get("STEAM_WEB_API_KEY", "").strip()
+          if not key:
+              raise SystemExit("Steam API key is not configured")
+          endpoint = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
+          cases = [
+              ("oct28_utc", "2026-10-28T00:00:00+00:00", "2026-10-29T00:00:00+00:00"),
+              ("oct28_tw", "2026-10-27T16:00:00+00:00", "2026-10-28T16:00:00+00:00"),
+              ("oct29_utc", "2026-10-29T00:00:00+00:00", "2026-10-30T00:00:00+00:00"),
+              ("sep22_tw", "2026-09-21T16:00:00+00:00", "2026-09-22T16:00:00+00:00"),
+              ("far_future", "2030-01-01T00:00:00+00:00", "2030-01-02T00:00:00+00:00"),
+          ]
+          for name, begin, end in cases:
+              for release_type in (0,1):
+                  query={
+                      "query":{"start":0,"count":1000,
+                          "filters":{"coming_soon_only":True,
+                              "type_filters":{"include_games":True},
+                              "release_date_filter":{
+                                  "release_date_type":release_type,
+                                  "start_date":int(datetime.fromisoformat(begin).timestamp()),
+                                  "end_date":int(datetime.fromisoformat(end).timestamp())}}},
+                      "context":{"country_code":"TW","language":"english"},
+                      "data_request":{"include_release":True,"include_basic_info":True}
+                  }
+                  url=endpoint+"?"+urllib.parse.urlencode(
+                      {"key":key,"input_json":json.dumps(query,separators=(",",":"))}
+                  )
+                  try:
+                      with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"GameTrendRadar/0.8"}),timeout=35) as reply:
+                          result=json.load(reply).get("response") or {}
+                      rows=result.get("store_items") or []
+                      ids=result.get("ids") or []
+                      metadata=result.get("metadata") or {}
+                      sample=[{"appid":g.get("appid"),"name":g.get("name"),
+                               "release":g.get("release")}
+                              for g in rows[:2]]
+                      target=[{"appid":g.get("appid"),"release":g.get("release")}
+                              for g in rows if g.get("appid")==4115450]
+                      print(json.dumps({
+                          "case":name,"type":release_type,"count":len(rows),
+                          "id_count":len(ids),"metadata":metadata,
+                          "target":target,"sample":sample
+                      },ensure_ascii=False,default=str),flush=True)
+                  except Exception as e:
+                      print(json.dumps({"case":name,"type":release_type,
+                                        "error":type(e).__name__}),flush=True)
+          PY

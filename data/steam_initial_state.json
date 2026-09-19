@@ -3,7 +3,7 @@
   "anchor_date": "2026-09-19",
   "segment_months": 2,
   "total_segments": 6,
-  "next_segment": 1,
+  "next_segment": 2,
   "completed_segments": [
     {
       "segment": 0,
@@ -12,6 +12,14 @@
       "completed_at": "2026-09-19T06:17:06Z",
       "candidate_count": 892,
       "qualified_count": 39
+    },
+    {
+      "segment": 1,
+      "window_start": "2026-11-19",
+      "window_end": "2027-01-18",
+      "completed_at": "2026-09-19T07:25:09Z",
+      "candidate_count": 16,
+      "qualified_count": 4
     }
   ],
   "initial_complete": false,
@@ -19,12 +27,14 @@
     "segment": 1,
     "window_start": "2026-11-19",
     "window_end": "2027-01-18",
-    "status": "discovery_reopened",
-    "reason": "0 candidates did not establish full coverage",
-    "candidate_count": 0,
-    "initial_batch_count": 3
+    "attempted_at": "2026-09-19T07:25:09Z",
+    "status": "complete",
+    "candidate_count": 16,
+    "qualified_count": 4,
+    "follower_failures": 0,
+    "initial_batch_count": 4
   },
-  "initial_batch_count": 3,
+  "initial_batch_count": 4,
   "reopened_empty_segments": [
     {
       "segment": 1,

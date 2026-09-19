@@ -3,7 +3,7 @@
   "anchor_date": "2026-09-19",
   "segment_months": 2,
   "total_segments": 6,
-  "next_segment": 1,
+  "next_segment": 2,
   "completed_segments": [
     {
       "segment": 0,
@@ -12,17 +12,27 @@
       "completed_at": "2026-09-19T06:17:06Z",
       "candidate_count": 892,
       "qualified_count": 39
+    },
+    {
+      "segment": 1,
+      "window_start": "2026-11-19",
+      "window_end": "2027-01-18",
+      "completed_at": "2026-09-19T06:54:26Z",
+      "candidate_count": 0,
+      "qualified_count": 0
     }
   ],
   "initial_complete": false,
   "last_attempt": {
-    "segment": 0,
-    "window_start": "2026-09-19",
-    "window_end": "2026-11-18",
-    "attempted_at": "2026-09-19T06:17:06Z",
+    "segment": 1,
+    "window_start": "2026-11-19",
+    "window_end": "2027-01-18",
+    "attempted_at": "2026-09-19T06:54:26Z",
     "status": "complete",
-    "candidate_count": 892,
-    "qualified_count": 39,
-    "follower_failures": 0
-  }
+    "candidate_count": 0,
+    "qualified_count": 0,
+    "follower_failures": 0,
+    "initial_batch_count": 1
+  },
+  "initial_batch_count": 1
 }

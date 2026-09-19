@@ -65,7 +65,7 @@ class FakeSession:
         })
 
 
-def test_priority_threshold_and_unknown_fallback_are_not_official_counts():
+def test_priority_threshold_and_unknown_do_not_enter_steam_xml():
     catalog = games(101, 102, 103, 104)
     state = {"version": 1, "next_index": 0, "games": {}}
     fake = FakeSession({101: 3999, 102: 4000, 103: 9300, 104: None})
@@ -82,7 +82,7 @@ def test_priority_threshold_and_unknown_fallback_are_not_official_counts():
     assert state["games"]["103"]["third_party_followers"] == 9300
     assert state["games"]["104"]["third_party_followers"] is None
     assert state["games"]["104"]["priority"] is False
-    assert state["games"]["104"]["scheduling_band"] == "missing_assumed_under_3000"
+    assert state["games"]["104"]["scheduling_band"] == "unresolved"
     assert [g["appid"] for g in priority.pending_priorities(
         catalog, state, {}, min_start_index=0,
     )] == [102, 103]
@@ -103,7 +103,7 @@ def test_failed_mapping_must_not_advance_or_write_partial_window():
     assert saved == {"version": 1, "next_index": 0, "games": {}}
 
 
-def test_batch_first_verifies_hot_and_missing_without_moving_official_cursor(tmp_path, monkeypatch):
+def test_screen_first_does_not_call_steam_xml_before_catalog_screen_complete(tmp_path, monkeypatch):
     catalog = games(101, 102, 103, 104)
     # Existing private cursor has already officially checked app 101.
     official = {
@@ -166,23 +166,26 @@ def test_batch_first_verifies_hot_and_missing_without_moving_official_cursor(tmp
         outcome = pipeline.run_follower_batch(
             arguments, state, {"games": catalog}, {"games": []},
         )
-    assert results == [[103]]
-    assert outcome["priority_fresh_requests"] == 1
+    assert results == []
+    assert outcome["priority_fresh_requests"] == 0
     assert outcome["next_index"] == 1
     assert state["prefilter_next_index"] == 3
+    assert state["phase"] == "followers"
+    assert state["prefilter_matched_count"] == 1
     assert prefilter_path.exists()
     assert json.loads(prefilter_path.read_text())["games"]["102"]["priority"] is False
 
 
-def test_after_priority_complete_original_xml_cursor_resumes(tmp_path):
-    catalog = games(101, 102, 103)
+def test_after_screen_complete_only_hot_games_get_xml_not_full_backfill(tmp_path):
+    catalog = games(101, 102, 103, 104)
     prefilter_path = tmp_path / "pre.json"
     prefilter_path.write_text(json.dumps({
-        "version": 1, "next_index": 3, "complete": True,
+        "version": 1, "next_index": 4, "complete": True,
         "games": {
             "101": {"priority": True, "third_party_followers": 4000},
-            "102": {"priority": False, "third_party_followers": 500},
-            "103": {"priority": False, "third_party_followers": 1},
+            "102": {"priority": False, "third_party_followers": 3999},
+            "103": {"priority": False, "third_party_followers": None},
+            "104": {"priority": True, "third_party_followers": 8000},
         },
     }), encoding="utf-8")
     state = pipeline.fresh_state(date(2026, 9, 19), 1)
@@ -208,8 +211,9 @@ def test_after_priority_complete_original_xml_cursor_resumes(tmp_path):
         def qualify(self, selection):
             selection = list(selection)
             calls.append([g.appid for g in selection])
-            self.fresh_follower_requests += 2
-            self.cached_follower_reuses += 1
+            self.fresh_follower_requests += len(selection)
+            for g in selection:
+                self.follower_cache[str(g.appid)] = {"followers": 5100}
             self.processed_candidate_count = len(selection)
             return []
 
@@ -217,11 +221,58 @@ def test_after_priority_complete_original_xml_cursor_resumes(tmp_path):
         result = pipeline.run_follower_batch(
             arguments, state, {"games": catalog}, {"games": []},
         )
-    assert calls == [[101, 102, 103]]
-    assert result["backfill_started"] is True
-    assert result["next_index"] == 3
+    assert calls == [[104]]
+    assert result["backfill_started"] is False
+    assert result["next_index"] == 0
+    assert result["official_verified_total"] == 2
     assert state["phase"] == "complete"
     assert state["initial_complete"] is True
+    assert state["coverage_exhaustive"] is False
+    assert state["prefilter_missing_count"] == 1
+
+
+def test_last_screen_window_defers_steam_until_screen_ends(tmp_path, monkeypatch):
+    catalog = games(101, 102, 103)
+    state = pipeline.fresh_state(date(2026, 9, 19), 1)
+    state["phase"] = "followers"
+    args = argparse.Namespace(
+        follower_cache=str(tmp_path / "official.json"),
+        checkpoint=str(tmp_path / "checkpoint.json"),
+        checkpoint_branch="steam-state", request_interval=0, search_interval=0,
+        prefilter_state=str(tmp_path / "pre.json"), prefilter_batch_size=2,
+        prefilter_request_interval=0, max_fresh_requests_per_run=5,
+    )
+    counts = {101: 9000, 102: 3999, 103: 4000}
+    monkeypatch.setenv("STEAM_WEB_API_KEY", "test-only")
+    with patch.object(pipeline, "scan_batch", wraps=lambda rows, saved, **kw: priority.scan_batch(
+            rows, saved, session=FakeSession(counts),
+            request_interval=0,
+            **{k:v for k,v in kw.items() if k!="request_interval"},
+        )):
+        class Collector:
+            fresh_follower_requests = 0
+            cached_follower_reuses = 0
+            failed_follower_appids = []
+            follower_failures = 0
+            follower_rate_limit_events = 0
+            processed_candidate_count = 0
+            follower_cache = {}
+            def qualify(self, selection):
+                selected = list(selection)
+                self.fresh_follower_requests += len(selected)
+                self.follower_cache.update({
+                    str(x.appid): {"followers": 5100} for x in selected
+                })
+                return []
+        with patch.object(pipeline, "SteamUpcomingCollector", side_effect=Collector):
+            first = pipeline.run_follower_batch(args, state, {"games": catalog}, {"games": []})
+            assert first["fresh_follower_requests"] == 0
+            assert state["prefilter_next_index"] == 2
+            assert state["phase"] == "followers"
+            second = pipeline.run_follower_batch(args, state, {"games": catalog}, {"games": []})
+    assert state["prefilter_next_index"] == 3
+    assert second["fresh_follower_requests"] == 2
+    assert state["phase"] == "complete"
 
 
 def test_string_ids_are_parsed_and_previous_false_missing_window_repaired():

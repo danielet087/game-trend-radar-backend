@@ -1,0 +1,63 @@
+name: Probe Steam day-range query
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/probe-steam-day-range.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect key availability and day filter without disclosing key
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json, os, urllib.parse, urllib.request, urllib.error
+          key=os.environ.get("STEAM_WEB_API_KEY","").strip()
+          print("STEAM_WEB_API_KEY_CONFIGURED="+str(bool(key)))
+          if not key:
+              print("Date-specific Query API requires Steam Web API key; no request sent.")
+              raise SystemExit(0)
+          start=dt.datetime(2026,10,28,tzinfo=dt.timezone.utc)
+          end=start+dt.timedelta(days=1)
+          for release_date_type in (0,1,2):
+              query={
+                "query":{
+                  "start":0,"count":100,
+                  "filters":{
+                    "coming_soon_only":True,
+                    "type_filters":{"include_games":True},
+                    "release_date_filter":{
+                      "release_date_type":release_date_type,
+                      "start_date":int(start.timestamp()),
+                      "end_date":int(end.timestamp())}
+                  }},
+                "context":{"country_code":"TW","language":"english"},
+                "data_request":{"include_release":True}
+              }
+              url="https://api.steampowered.com/IStoreQueryService/Query/v1/?"+urllib.parse.urlencode(
+                {"key":key,"input_json":json.dumps(query,separators=(",",":"))})
+              try:
+                  with urllib.request.urlopen(
+                      urllib.request.Request(url,headers={"User-Agent":"GameTrendRadar/0.7"}),timeout=25
+                  ) as response: data=json.load(response)
+                  # Never print response URLs, headers or credentials.
+                  result=data.get("response") or {}
+                  candidates=result.get("store_items") or result.get("items") or []
+                  ids=[item.get("appid") for item in candidates if isinstance(item,dict)]
+                  print(json.dumps({"release_date_type":release_date_type,"response_keys":list(result)[:12],
+                    "count":len(ids),"phantom_blade_zero_present":4115450 in ids,
+                    "total_count":result.get("total_count"),"has_more":result.get("has_more")},ensure_ascii=False))
+              except urllib.error.HTTPError as e:
+                  print(json.dumps({"release_date_type":release_date_type,"http_status":e.code}))
+              except Exception as e:
+                  print(json.dumps({"release_date_type":release_date_type,"error_type":type(e).__name__}))
+          PY

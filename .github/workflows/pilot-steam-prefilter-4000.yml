@@ -1,0 +1,111 @@
+name: Pilot 4000 prescreen plus up to 5 Steam XML checks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pilot-steam-prefilter-4000.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  # Mutual exclusion with the full self-hosted follower collector.
+  group: steam-two-phase-initialization
+  cancel-in-progress: false
+
+jobs:
+  pilot:
+    # Explicitly bounded hosted pilot; NOT the main 50-request worker.
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Checkout private backend
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Run full regression tests first
+        run: python -m pytest -q
+      - name: Fast screen 200 and verify up to 5 via Steam XML
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+          STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          python -m scripts.steam_candidate_pipeline
+          --days 365
+          --batch-days 365
+          --request-interval 30
+          --search-interval 1.5
+          --state data/steam_candidate_state.json
+          --catalog data/steam_candidates.json
+          --master data/steam_upcoming_master.json
+          --follower-cache data/steam_followers_cache.json
+          --checkpoint data/steam_followers_checkpoint.json
+          --checkpoint-branch steam-state
+          --prefilter-state data/steam_prefilter_state.json
+          --prefilter-batch-size 200
+          --prefilter-request-interval 0.5
+          --max-fresh-requests-per-run 5
+          --output output/steam_upcoming.json
+      - name: Validate no provisional follower counts were published
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
+          provisional=json.loads(Path("data/steam_prefilter_state.json").read_text(encoding="utf-8"))
+          official=json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
+          attempt=state["last_attempt"]
+          assert int(attempt["fresh_follower_requests"]) <= 5
+          assert int(provisional["next_index"]) >= 685
+          assert provisional["threshold"] == 4000
+          assert official["filter"]["min_followers"] == 5000
+          assert official["count"] == len(official["games"])
+          assert all(int(g["followers"]) >= 5000 for g in official["games"])
+          assert official["initialization"]["prefilter_next_index"] == provisional["next_index"]
+          print("PILOT RESULT:", "prescreen", provisional["next_index"],
+                "official cursor", state["next_follower_index"],
+                "new official XML", attempt["fresh_follower_requests"],
+                "officially qualified", official["count"])
+          PY
+      - name: Commit private resume checkpoint and official cache
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_candidate_state.json data/steam_candidates.json
+          git add data/steam_prefilter_state.json data/steam_followers_cache.json
+          git add data/steam_upcoming_master.json
+          if git diff --cached --quiet; then
+            echo "No new data changes."
+          else
+            git commit -m "data: pilot third-party 4000 prescreen and five official XML verifications"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+      - name: Publish ONLY Steam-verified Followers and public progress metadata
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          if [ -z "$FRONTEND_REPO_TOKEN" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN required to publish"
+            exit 1
+          fi
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+          cp output/steam_upcoming.json frontend/data/steam_upcoming.json
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_upcoming.json
+          if git diff --cached --quiet; then
+            echo "Public JSON already matches official result."
+          else
+            git commit -m "data: publish verified Steam games and 4000 prefilter progress"
+            git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

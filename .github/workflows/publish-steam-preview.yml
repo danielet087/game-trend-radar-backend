@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
 
-      - name: Verify localized Store title fallback
+      - name: Verify localized titles and recent-launch follower thresholds
         run: python -m pytest -q tests/test_steam_preview_locale.py tests/test_steam_recent_launch.py
 
       - name: Read persisted checkpoint (no Followers queries)

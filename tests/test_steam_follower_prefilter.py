@@ -91,7 +91,8 @@ def test_priority_threshold_and_unknown_do_not_enter_steam_xml():
     )] == [103]
 
 
-def test_failed_mapping_must_not_advance_or_write_partial_window():
+def test_failed_mapping_must_not_advance_or_write_partial_window(monkeypatch):
+    monkeypatch.setattr(priority.time, "sleep", lambda _: None)
     saved = {"version": 1, "next_index": 0, "games": {}}
     with pytest.raises(RuntimeError, match="HTTP 429"):
         priority.scan_batch(
@@ -261,3 +262,72 @@ def test_string_ids_are_parsed_and_previous_false_missing_window_repaired():
     assert saved["games"]["101"]["scheduling_band"] == "measured"
 
     assert client.called == [103]
+
+
+def test_transient_steam_connection_error_is_retried_and_window_committed(monkeypatch):
+    import requests
+
+    class FlakySession(FakeSession):
+        attempts = 0
+        def get(self, url, *, params, timeout):
+            self.attempts += 1
+            if self.attempts == 1:
+                raise requests.ConnectionError("transient network error")
+            return super().get(url, params=params, timeout=timeout)
+
+    intervals = []
+    monkeypatch.setattr(priority.time, "sleep", intervals.append)
+    saved = {"version": 1, "next_index": 0, "games": {}}
+    fake = FlakySession({101: 4200})
+    result = priority.scan_batch(
+        games(101), saved, steam_api_key="private-test-only",
+        initial_index=0, limit=1, request_interval=0, session=fake,
+    )
+    assert fake.attempts == 2
+    assert intervals == [priority.RETRY_DELAYS[0]]
+    assert result["next_index"] == 1
+    assert saved["games"]["101"]["third_party_followers"] == 4200
+
+
+def test_temporary_429_uses_backoff_then_recovers(monkeypatch):
+    class ThrottledSession(FakeSession):
+        attempts = 0
+        def get(self, url, *, params, timeout):
+            self.attempts += 1
+            if self.attempts <= 2:
+                return FakeResponse(429, {})
+            return super().get(url, params=params, timeout=timeout)
+
+    delays = []
+    monkeypatch.setattr(priority.time, "sleep", delays.append)
+    saved = {"version": 1, "next_index": 0, "games": {}}
+    session = ThrottledSession({101: 4000})
+    result = priority.scan_batch(
+        games(101), saved, steam_api_key="private-test-only",
+        initial_index=0, limit=1, request_interval=0, session=session,
+    )
+    assert session.attempts == 3
+    assert delays == list(priority.RATE_LIMIT_DELAYS[:2])
+    assert result["priority"] == 1
+    assert saved["games"]["101"]["priority"]
+
+
+def test_permanent_api_403_not_retried_and_cursor_preserved(monkeypatch):
+    class Forbidden(FakeSession):
+        attempts = 0
+        def get(self, url, *, params, timeout):
+            self.attempts += 1
+            return FakeResponse(403, {})
+
+    delays = []
+    monkeypatch.setattr(priority.time, "sleep", delays.append)
+    saved = {"version": 1, "next_index": 0, "games": {}}
+    session = Forbidden({})
+    with pytest.raises(RuntimeError, match="HTTP 403"):
+        priority.scan_batch(
+            games(101), saved, steam_api_key="private-test-only",
+            initial_index=0, limit=1, request_interval=0, session=session,
+        )
+    assert session.attempts == 1
+    assert delays == []
+    assert saved == {"version": 1, "next_index": 0, "games": {}}

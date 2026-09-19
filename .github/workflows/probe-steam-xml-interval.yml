@@ -1,0 +1,39 @@
+name: Probe Steam XML 1-second interval (read-only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-steam-xml-interval.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install lightweight dependency
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Query 50 existing Steam games with interval 1s
+        run: python -m scripts.probe_steam_xml_interval
+      - name: Validate report JSON
+        if: always()
+        run: |
+          if [ -f output/steam_xml_interval_probe.json ]; then
+            python -m json.tool output/steam_xml_interval_probe.json > /dev/null
+          fi
+      - name: Save read-only private benchmark
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-xml-interval-probe
+          path: output/steam_xml_interval_probe.json
+          if-no-files-found: ignore
+          retention-days: 1

@@ -130,7 +130,7 @@ def check_once() -> str:
     if phase == "discovery":
         LOG.info(
             "Steam candidate discovery %s/365 days; next=%s; candidates=%s. "
-            "Dispatching one 30-day batch (no Followers).",
+            "Dispatching all remaining release dates up to day 365 (no Followers).",
             days, state.get("next_date"),
             last_attempt.get("new_catalog_total", "unknown"),
         )

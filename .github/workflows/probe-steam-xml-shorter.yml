@@ -1,0 +1,45 @@
+name: Probe shorter Steam XML interval safely (read-only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-steam-xml-shorter.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-xml-shorter-pilot
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Checkout only read-only probe
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install minimal dependency
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Query existing cached Steam app IDs at 10s then 6s interval
+        run: python -m scripts.probe_steam_xml_shorter
+      - name: Validate private report
+        if: always()
+        run: |
+          if [ -f output/steam_xml_shorter_pilot.json ]; then
+            python -m json.tool output/steam_xml_shorter_pilot.json > /dev/null
+          fi
+      - name: Save rate-limit pilot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-xml-shorter-pilot
+          path: output/steam_xml_shorter_pilot.json
+          if-no-files-found: ignore
+          retention-days: 1

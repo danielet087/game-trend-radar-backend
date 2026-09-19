@@ -29,7 +29,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Run tests
         run: python -m pytest -q
-      - name: Finish discovery OR fetch up to 50 new Followers per run
+      - name: Steam one-year discovery, full third-party 4000 screen, THEN shortlisted XML
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,7 +56,7 @@ jobs:
           if [ -f output/steam_upcoming.json ]; then
             python -m json.tool output/steam_upcoming.json > /dev/null
           fi
-      - name: Verify each 50-Followers batch is ready for public update
+      - name: Validate strict three-stage results before public update
         run: |
           python - <<'PY'
           import json
@@ -64,26 +64,34 @@ jobs:
 
           state = json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
           attempt = state.get("last_attempt") or {}
-          if attempt.get("phase") != "followers":
-              print("No Followers batch; candidate discovery or completion only.")
-          else:
+          if attempt.get("phase") == "prefilter":
+              assert int(attempt.get("fresh_follower_requests", -1)) == 0, (
+                  "Stage 2 must NEVER query Steam XML"
+              )
+              assert 0 <= int(state["prefilter_next_index"]) <= int(attempt["candidate_count"])
+              payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
+              assert payload["initialization"]["prefilter_next_index"] == state["prefilter_next_index"]
+              assert all(int(g["followers"]) >= 5000 for g in payload["games"])
+              print(f"Third-party >=4000 prescreen: {state['prefilter_screened_count']} "
+                    f"/{attempt['candidate_count']}; Steam XML queries: 0")
+          elif attempt.get("phase") == "followers":
               n = int(attempt.get("fresh_follower_requests", -1))
               assert 0 <= n <= 50, f"Unexpected fresh Followers requests: {n}"
-              start = int(attempt["start_index"])
-              end = int(attempt["next_index"])
-              pre_start = int(attempt.get("prefilter_start_index", start))
-              pre_end = int(attempt.get("prefilter_next_index", pre_start))
-              priority_fresh = int(attempt.get("priority_fresh_requests", 0))
-              assert (
-                  end > start or pre_end > pre_start or priority_fresh > 0
-              ), "No candidate, prefilter or priority-verification progress"
+              start, end = int(attempt["start_index"]), int(attempt["next_index"])
+              assert end > start or state.get("initial_complete"), (
+                  "No new verified priority games or completion"
+              )
               payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
-              assert payload["initialization"]["next_follower_index"] == end
+              assert payload["initialization"]["prefilter_complete"] is True
+              assert payload["initialization"]["verified_priority_count"] == end
               assert payload["initialization"]["days_scanned"] == 365
               assert payload["count"] == len(payload["games"])
               assert all(int(g["followers"]) >= 5000 for g in payload["games"])
-              print(f"Followers batch: {n} new Steam queries; candidates {start}->{end}; "
-                    f"qualified games for public JSON: {payload['count']}")
+              print(f"Steam XML verification: {n} new, shortlisted {start}->{end}; "
+                    f"officially qualified {payload['count']}")
+          else:
+              print("Steam discovery/initialization completion; no new XML batch.")
+
           PY
       - name: Save private candidate catalog and checkpoint metadata
         run: |

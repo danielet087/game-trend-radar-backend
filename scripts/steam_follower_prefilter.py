@@ -1,7 +1,8 @@
-"""Resume-safe third-party *priority* screen for exact Steam Followers verification.
+"""Resume-safe third-party >=4000 shortlist for Steam XML >=5000 verification.
 
-Third-party numbers are NEVER eligible for publication or persisted to the
-official Steam XML follower cache. This screen only changes verification order.
+Only measured third-party >=4000 games proceed to new Steam XML queries.
+Missing groups stay unresolved, not assigned invented follower numbers, and
+below-threshold games do not enter the official XML verification stage.
 """
 from __future__ import annotations
 
@@ -16,7 +17,6 @@ BULK_URL = "https://api.steam-groups.com/api/groups/bulk"
 GROUP_BASE = 103582791429521408
 PRIORITY_THRESHOLD = 4000
 STEAM_PUBLIC_THRESHOLD = 5000
-MISSING_ASSUMED_BELOW = 3000  # scheduling label, never a fabricated follower number
 DEFAULT_BATCH_SIZE = 200
 
 
@@ -174,9 +174,8 @@ def scan_batch(
     for appid, group in groups.items():
         members = counts.get(group) if group is not None else None
         unknown = members is None
-        # A missing third-party record is scheduled in the below-3000
-        # BACKGROUND band, per product policy. This is NOT an observed
-        # member count and can never be used for official publication.
+        # A missing third-party record remains unresolved, not a fabricated
+        # follower count and not eligible for new Steam XML verification.
         priority = members is not None and members >= PRIORITY_THRESHOLD
         priority_count += priority
         missing_count += unknown
@@ -185,7 +184,7 @@ def scan_batch(
             "group_short_id": group,
             "priority": priority,
             "scheduling_band": (
-                "missing_assumed_under_3000" if unknown else "measured"
+                "unresolved" if unknown else "measured"
             ),
             "checked_at": stamp,
         }

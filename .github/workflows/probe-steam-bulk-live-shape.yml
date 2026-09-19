@@ -1,0 +1,49 @@
+name: Probe current 200 group bulk response shape
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-steam-bulk-live-shape.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Inspect one read-only bulk response for the persisted 200 IDs
+        run: |
+          python - <<'PY'
+          import collections
+          import json
+          import requests
+          from pathlib import Path
+          from scripts.steam_follower_prefilter import _bulk_counts
+
+          saved=json.loads(Path("data/steam_prefilter_state.json").read_text(encoding="utf-8"))
+          groups=list(dict.fromkeys(
+              row["group_short_id"]
+              for row in saved["games"].values()
+              if isinstance(row.get("group_short_id"),int)))
+          response=requests.post("https://api.steam-groups.com/api/groups/bulk",
+              json={"ids":groups,"limit":len(groups)},timeout=18)
+          print("REQUESTED",len(groups),"HTTP",response.status_code)
+          response.raise_for_status()
+          body=response.json()
+          rows=body.get("data",[])
+          print("RAW_COUNT",len(rows),"NOT_FOUND",len(body.get("notFound",[])))
+          print("ID_TYPES",dict(collections.Counter(type(x.get("id")).__name__ for x in rows if isinstance(x,dict))))
+          print("MEMBERS_TYPES",dict(collections.Counter(type(x.get("members")).__name__ for x in rows if isinstance(x,dict))))
+          print("GROUP_ID_SAMPLE",[(x.get("id"),x.get("members")) for x in rows[:4]])
+          found=_bulk_counts(requests.Session(),groups)
+          print("NEW_PARSER_MATCHED",len(found))
+          PY

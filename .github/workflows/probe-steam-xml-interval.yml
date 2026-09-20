@@ -1,10 +1,7 @@
 name: Probe Steam XML 1-second interval (read-only)
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-xml-interval.yml"
   workflow_dispatch:
 
 permissions:

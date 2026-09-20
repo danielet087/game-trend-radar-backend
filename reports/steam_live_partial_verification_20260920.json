@@ -1,0 +1,131 @@
+{
+  "report_type": "one_time_live_web_search_partial_verified_sample",
+  "date_taiwan": "2026-09-20",
+  "range_taiwan": {
+    "start": "2026-09-20",
+    "end": "2027-09-19"
+  },
+  "completeness": "INCOMPLETE_NOT_FULL_YEAR",
+  "sources": [
+    {
+      "name": "SteamDB displayed upcoming week W39 2026",
+      "url": "https://steamdb.info/upcoming/?week=2026W39",
+      "from_utc": "2026-09-21",
+      "through_utc": "2026-09-27",
+      "visible_products": 100,
+      "hit_100_cap": true,
+      "visible_follows_gte_5000": 17
+    },
+    {
+      "name": "SteamDB displayed upcoming week W01 2027",
+      "url": "https://steamdb.info/upcoming/?week=2027W01",
+      "from_utc": "2027-01-04",
+      "through_utc": "2027-01-10",
+      "visible_products": 21,
+      "hit_100_cap": false,
+      "visible_follows_gte_5000": 1
+    }
+  ],
+  "observed_only_totals": {
+    "visible_product_rows_across_two_nonoverlapping_weeks": 121,
+    "visible_follows_gte_5000": 18,
+    "individually_web_and_previous_store_metadata_crosschecked": 4,
+    "remaining_observed_high_follow_candidates_not_individually_revalidated_this_run": 14,
+    "annual_total": null,
+    "annual_eligible": null,
+    "annual_final": null
+  },
+  "qualification_rule": "game, full announced YYYY-MM-DD, not primarily sexual, in 365-day Taiwan window, SteamDB Follows >=5000; time shift only for a trustworthy UTC timestamp",
+  "records": [
+    {
+      "appid": 4358690,
+      "name": "Graveyard Keeper 2",
+      "steamdb_follows": 50926,
+      "steamdb_release_utc_calendar_date": "2026-09-22",
+      "steam_store_announced_date": "2026-09-22",
+      "previously_recorded_steam_release_time_utc": "2026-09-22T16:55:00Z",
+      "previously_recorded_taiwan_date": "2026-09-23",
+      "name_zh_tw": null,
+      "name_zh_cn": "守墓人2",
+      "supports_traditional_chinese": false,
+      "supports_simplified_chinese": true,
+      "supports_english": true,
+      "nonsexual_content_basis": "game description is graveyard/cemetery management",
+      "steamdb_week_url": "https://steamdb.info/upcoming/?week=2026W39",
+      "store_url": "https://store.steampowered.com/app/4358690/?l=tchinese",
+      "time_note": "Taiwan date retained from existing timestamp, not recomputed from day-only store display"
+    },
+    {
+      "appid": 3669870,
+      "name": "CONTROL Resonant",
+      "steamdb_follows": 47519,
+      "steamdb_release_utc_calendar_date": "2026-09-24",
+      "steam_store_announced_date": "2026-09-24",
+      "previously_recorded_steam_release_time_utc": "2026-09-24T14:00:00Z",
+      "previously_recorded_taiwan_date": "2026-09-24",
+      "name_zh_tw": "控制: 共振",
+      "name_zh_cn": "控制: 共振",
+      "supports_traditional_chinese": true,
+      "supports_simplified_chinese": true,
+      "supports_english": true,
+      "nonsexual_content_basis": "store content descriptor is violence/gore and general adult themes; not principally sexual",
+      "steamdb_week_url": "https://steamdb.info/upcoming/?week=2026W39",
+      "store_url": "https://store.steampowered.com/app/3669870/?l=tchinese"
+    },
+    {
+      "appid": 4019220,
+      "name": "Dressmaker",
+      "steamdb_follows": 11315,
+      "steamdb_release_utc_calendar_date": "2026-09-21",
+      "steam_store_announced_date": "2026-09-21",
+      "previously_recorded_steam_release_time_utc": "2026-09-21T16:00:00Z",
+      "previously_recorded_taiwan_date": "2026-09-22",
+      "name_zh_tw": null,
+      "name_zh_cn": "针影裁梦",
+      "supports_traditional_chinese": false,
+      "supports_simplified_chinese": true,
+      "supports_english": true,
+      "nonsexual_content_basis": "store describes sewing and craft gameplay",
+      "steamdb_week_url": "https://steamdb.info/upcoming/?week=2026W39",
+      "store_url": "https://store.steampowered.com/app/4019220/?l=tchinese"
+    },
+    {
+      "appid": 3660710,
+      "name": "Armatus",
+      "steamdb_follows": 14614,
+      "steamdb_release_utc_calendar_date": "2027-01-07",
+      "steam_store_announced_date": "2027-01-07",
+      "previously_recorded_steam_release_time_utc": "2027-01-07T17:00:00Z",
+      "previously_recorded_taiwan_date": "2027-01-08",
+      "name_zh_tw": null,
+      "name_zh_cn": null,
+      "supports_traditional_chinese": true,
+      "supports_simplified_chinese": true,
+      "supports_english": true,
+      "nonsexual_content_basis": "SteamDB info content descriptors show violence/gore and general mature content, not sexual descriptors",
+      "steamdb_week_url": "https://steamdb.info/upcoming/?week=2027W01",
+      "steamdb_app_url": "https://steamdb.info/app/3660710/info/",
+      "store_url": "https://store.steampowered.com/app/3660710/?l=tchinese"
+    }
+  ],
+  "existing_public_data": {
+    "repo": "danielet087/game-trend-radar",
+    "file": "data/steam_upcoming.json",
+    "count_before": 96,
+    "count_after": 96,
+    "new_records_added": 0,
+    "modified": false,
+    "reason": "All 4 individually crosschecked games already exist; third-party follows should not overwrite earlier official count fields."
+  },
+  "blockers": [
+    "2026W39 results hit SteamDB 100-product cap, so that week is incomplete without narrower intervals.",
+    "Only two nonoverlapping weekly windows were inspected; other portions of the year are not covered in this run.",
+    "Runtime direct HTTP DNS resolution failed for SteamDB, Steam Store, and GitHub; reading public web pages through web search is not a bulk page exporter.",
+    "SteamDB FAQ explicitly says scraping/crawling is not permitted; no automatic scraper was used.",
+    "Only 4 of 18 visible high-follow candidates received per-game content/language crosscheck; 14 not individually verified here."
+  ],
+  "automation_changed": false,
+  "github_actions_triggered": false,
+  "external_service_deployed": false,
+  "report_saved_to_new_file_only": true
+}

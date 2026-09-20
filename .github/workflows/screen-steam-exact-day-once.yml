@@ -1,0 +1,72 @@
+name: One-time screen all Steam candidates before Followers
+
+# User-approved initial wake; set manual-only as soon as this job begins.
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/screen-steam-exact-day-once.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: steam-year-exact-day-sex-gate
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - name: Checkout existing completed candidate state and catalog
+        uses: actions/checkout@v4
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Store API client and regression dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Check full-year precision and sex filters offline
+        run: python -m pytest -q tests/test_steam_candidate_date_gate.py tests/test_steam_candidate_pipeline.py
+      - name: Filter all 11467 saved games using Store Browse metadata only
+        run: >
+          python -m scripts.screen_steam_candidates_before_followers
+          --source data/steam_candidates.json
+          --output data/steam_candidates_eligible.json
+      - name: Verify metadata-only screening and safeguard original files
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          source=json.loads(Path("data/steam_candidates.json").read_text(encoding="utf-8"))
+          snapshot=json.loads(Path("data/steam_candidates_eligible.json").read_text(encoding="utf-8"))
+          by_id={int(g["appid"]):g for g in source["games"]}
+          assert len(source["games"])==11467 and snapshot["source_count"]==11467
+          assert 0<snapshot["count"]<snapshot["source_count"]
+          assert len(snapshot["games"])==snapshot["count"]
+          assert len({g["appid"] for g in snapshot["games"]})==snapshot["count"]
+          assert sum(snapshot["reasons"].values())==11467
+          assert snapshot["reasons"]["eligible"]==snapshot["count"]
+          for game in snapshot["games"]:
+              original=dict(game)
+              assert original.pop("release_display_precision")=="date_full"
+              assert original.pop("release_display_provider")
+              assert original.pop("sexual_content_screened") is True
+              assert original==by_id[int(game["appid"])]
+          state=json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
+          assert state["phase"]=="complete" and state["initial_complete"] is True
+          assert state["days_scanned"]==365
+          print("CANDIDATES_ORIGINAL",11467)
+          print("DATE_AND_CONTENT_ELIGIBLE",snapshot["count"])
+          print("SCREEN_REASONS",json.dumps(snapshot["reasons"],ensure_ascii=False))
+          PY
+          git diff --exit-code -- data/steam_candidates.json data/steam_candidate_state.json data/steam_prefilter_state.json data/steam_followers_cache.json
+      - name: Commit only derived screened snapshot, no existing candidate state changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_candidates_eligible.json
+          git commit -m "data: snapshot precise-date nonsexual candidates from full year [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

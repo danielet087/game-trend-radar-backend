@@ -1,8 +1,8 @@
 name: Probe Steam future-date discovery
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths: [.github/workflows/probe-steam-future-dates.yml]
+  workflow_dispatch:
+
 permissions:
   contents: read
 jobs:

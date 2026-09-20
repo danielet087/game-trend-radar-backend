@@ -15,7 +15,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from scripts.steam_candidate_pipeline import run
+from scripts.steam_candidate_pipeline import active_candidate_rows, run
 from scripts.update_steam_daily import load_json
 
 LOG = logging.getLogger(__name__)
@@ -96,12 +96,16 @@ def main() -> None:
     state = load_json(STATE, {})
     pre = load_json(PREFILTER, {})
     catalog = load_json(CATALOG, {})
+    if state.get("phase") not in ("followers", "complete"):
+        raise RuntimeError("Stage 2 not complete or catalog changed; refusing XML")
+    active_rows = active_candidate_rows(catalog, state)
     if (
-        state.get("phase") not in ("followers", "complete")
-        or not state.get("prefilter_complete")
+        not state.get("prefilter_complete")
         or not pre.get("complete")
-        or len(pre.get("games") or {}) != len(catalog.get("games") or [])
-        or len(catalog.get("games") or []) != 11467
+        or len(pre.get("games") or {}) != len(active_rows)
+        or not active_rows
+        or (not state.get("date_precision_required")
+            and len(catalog.get("games") or []) != 11467)
     ):
         raise RuntimeError("Stage 2 not complete or catalog changed; refusing XML")
     if state.get("phase") == "complete":

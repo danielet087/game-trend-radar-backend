@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T12:18:54.679Z",
+  "updated_at": "2026-09-20T12:20:07.477Z",
   "source_repository": "danielet087/game-trend-radar",
   "source_path": "data/steam_upcoming.json",
   "source_fingerprint_fields": [
@@ -83,17 +83,22 @@
       "enrichment_version": 1
     },
     "1173980": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"Shadow of the Road\",\"name_en\":\"Shadow of the Road\",\"name_zh_tw\":null,\"name_zh_cn\":\"暗影之路\",\"release_raw\":\"2026-11-12\",\"release_start\":\"2026-11-12\",\"release_time_utc\":\"2026-11-12T13:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1173980/6c1ef91b03a8585504ec3606088adccc6514d4d7/header.jpg?t=1787761923\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1173980/142f8b900434cc620ecad6bcb4992c35393a150b/capsule_616x353.jpg?t=1787761923\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/1173980/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/1173980/",
+      "tags_source_url": "https://store.steampowered.com/app/1173980/",
+      "genres_source_url": "https://store.steampowered.com/app/1173980/",
+      "store_release_date_reported": "2026-11-12",
+      "release_date_review": null
     },
     "1215940": {
       "status": "pending",
@@ -140,17 +145,24 @@
       "release_date_review": null
     },
     "1551980": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Clive Barker's Hellraiser: Revival\",\"name_en\":\"Clive Barker's Hellraiser: Revival\",\"release_raw\":\"8 Oct, 2026\",\"release_start\":\"2026-10-09\",\"release_time_utc\":\"2026-10-08T16:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551980/d1e7111b93b6a8b3eb029908887648348c2c55e6/header.jpg?t=1789651079\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1551980/6708f74679c5feca41a5f264a3b7068a8c2d383f/capsule_616x353.jpg?t=1789651079\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/1551980/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/1551980/",
+      "tags_source_url": "https://store.steampowered.com/app/1551980/",
+      "genres_source_url": "https://store.steampowered.com/app/1551980/",
+      "store_release_date_reported": "2026-10-08",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "1636440": {
       "status": "pending",
@@ -231,17 +243,24 @@
       "enrichment_version": 1
     },
     "1912410": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Minecraft Dungeons II\",\"name_en\":\"Minecraft Dungeons II\",\"name_zh_tw\":null,\"release_raw\":\"2026-09-30\",\"release_start\":\"2026-09-30\",\"release_time_utc\":\"2026-09-29T20:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1912410/86cbba83c1aaffa0b0efa4197ce29c2264ea9dc2/header.jpg?t=1789572111\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1912410/222677a2c4a3b8127d0dfbdccf59d70a4076f72e/capsule_616x353.jpg?t=1789572111\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/1912410/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/1912410/",
+      "tags_source_url": "https://store.steampowered.com/app/1912410/",
+      "genres_source_url": "https://store.steampowered.com/app/1912410/",
+      "store_release_date_reported": "2026-09-29",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "1963680": {
       "status": "pending",
@@ -296,17 +315,24 @@
       "enrichment_version": 1
     },
     "2141130": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Road Kings\",\"name_en\":\"Road Kings\",\"name_zh_tw\":null,\"release_raw\":\"2027-03-12\",\"release_start\":\"2027-03-12\",\"release_time_utc\":\"2027-03-11T17:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2141130/595b8c0564da20f99b548fe8088652db08ffb1a4/header.jpg?t=1787685834\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2141130/d77c27f75707f910620bbc10d577f823d4e462fa/capsule_616x353.jpg?t=1787685834\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2141130/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2141130/",
+      "tags_source_url": "https://store.steampowered.com/app/2141130/",
+      "genres_source_url": "https://store.steampowered.com/app/2141130/",
+      "store_release_date_reported": "2027-03-11",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2254990": {
       "status": "complete",
@@ -588,17 +614,22 @@
       "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2871520": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"Deep Dish Dungeon\",\"name_en\":\"Deep Dish Dungeon\",\"name_zh_tw\":null,\"name_zh_cn\":\"深馅地牢\",\"release_raw\":\"2026-10-13\",\"release_start\":\"2026-10-13\",\"release_time_utc\":\"2026-10-13T15:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2871520/a1fd75518d435add463b7740b923a8fddcc63d1f/header_alt_assets_0.jpg?t=1787852668\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2871520/a876a1b4e054705d6516888da7243dcc9a093100/capsule_616x353_alt_assets_0.jpg?t=1787852668\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2871520/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2871520/",
+      "tags_source_url": "https://store.steampowered.com/app/2871520/",
+      "genres_source_url": "https://store.steampowered.com/app/2871520/",
+      "store_release_date_reported": "2026-10-13",
+      "release_date_review": null
     },
     "2916700": {
       "status": "pending",
@@ -858,17 +889,24 @@
       "enrichment_version": 1
     },
     "3259780": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"FINAL FANTASY RESONANCE\",\"name_en\":\"FINAL FANTASY RESONANCE\",\"name_zh_tw\":null,\"release_raw\":\"2026-10-23\",\"release_start\":\"2026-10-23\",\"release_time_utc\":\"2026-10-22T16:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3259780/710da43babb2043f9f6ad0e50023e31167d94708/header.jpg?t=1788534743\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3259780/6591a4998a16491b6a7f1d3ad2b948f3da15b52e/capsule_616x353.jpg?t=1788534743\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3259780/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/3259780/",
+      "tags_source_url": "https://store.steampowered.com/app/3259780/",
+      "genres_source_url": "https://store.steampowered.com/app/3259780/",
+      "store_release_date_reported": "2026-10-22",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "3314580": {
       "status": "pending",
@@ -1186,17 +1224,24 @@
       "release_date_review": null
     },
     "4080220": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"EA SPORTS FC™ 27\",\"name_en\":\"EA SPORTS FC™ 27\",\"name_zh_tw\":null,\"release_raw\":\"2026-09-25\",\"release_start\":\"2026-09-25\",\"release_time_utc\":\"2026-09-24T23:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4080220/05d419a45653a1299ce46d13dbff4533fa076c1c/header.jpg?t=1788235145\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4080220/06545f12a4135794d55e087cebea817c75786b7b/capsule_616x353_alt_assets_0.jpg?t=1788235145\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4080220/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4080220/",
+      "tags_source_url": "https://store.steampowered.com/app/4080220/",
+      "genres_source_url": "https://store.steampowered.com/app/4080220/",
+      "store_release_date_reported": "2026-09-24",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "4084710": {
       "status": "pending",
@@ -1343,30 +1388,42 @@
       "enrichment_version": 1
     },
     "4260840": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"STRANGER THAN HEAVEN\",\"name_en\":\"STRANGER THAN HEAVEN\",\"release_raw\":\"14 Jan, 2027\",\"release_start\":\"2027-01-15\",\"release_time_utc\":\"2027-01-15T05:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4260840/3e40b76faf9a3eafb4397dd51308eb2e48ac3660/header.jpg?t=1789495895\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4260840/40e3a9fab4e19bbc4de6201680b5abf6ec7a115e/capsule_616x353.jpg?t=1789495895\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4260840/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4260840/",
+      "tags_source_url": "https://store.steampowered.com/app/4260840/",
+      "genres_source_url": "https://store.steampowered.com/app/4260840/",
+      "store_release_date_reported": "2027-01-14",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "4354570": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"FINAL FANTASY VII REVELATION\",\"name_en\":\"FINAL FANTASY VII REVELATION\",\"name_zh_tw\":null,\"release_raw\":\"2027-04-08\",\"release_start\":\"2027-04-08\",\"release_time_utc\":\"2027-04-08T14:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4354570/c82a370d62d715234771be34c6ff3c928c7d78e2/header.jpg?t=1788444187\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4354570/9063f18816557aa318ca4124156dd9a28c3e8292/capsule_616x353.jpg?t=1788444187\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4354570/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4354570/",
+      "tags_source_url": "https://store.steampowered.com/app/4354570/",
+      "genres_source_url": "https://store.steampowered.com/app/4354570/",
+      "store_release_date_reported": "2027-04-08",
+      "release_date_review": null
     },
     "4358660": {
       "status": "pending",
@@ -1428,17 +1485,22 @@
       "enrichment_version": 1
     },
     "4814120": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"ANANTA\",\"name_en\":\"ANANTA\",\"name_zh_tw\":\"無限大\",\"name_zh_cn\":\"无限大\",\"release_raw\":\"15 Jan, 2027\",\"release_start\":\"2027-01-15\",\"release_time_utc\":\"2027-01-15T15:00:00Z\",\"release_date_basis\":\"steamdb_explicit_utc_release_time_crosschecked_with_steam_store\",\"header_image\":\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4814120/header.jpg\",\"main_capsule_image\":\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4814120/capsule_616x353.jpg\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4814120/ANANTA/?l=tchinese\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:20:07.477Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4814120/",
+      "tags_source_url": "https://store.steampowered.com/app/4814120/",
+      "genres_source_url": "https://store.steampowered.com/app/4814120/",
+      "store_release_date_reported": "2027-01-15",
+      "release_date_review": null
     }
   }
 }

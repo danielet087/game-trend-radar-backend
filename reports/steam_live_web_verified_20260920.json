@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-09-20T11:41:15.326Z",
+  "checked_date_taiwan": "2026-09-20",
+  "mode": "chatgpt_web_search_only_no_actions_no_additional_services",
+  "goal": {
+    "release_window_taiwan": {
+      "from": "2026-09-20",
+      "through": "2027-09-19"
+    },
+    "requirements": [
+      "game_not_demo_or_dlc",
+      "full_yyyy_mm_dd_release_in_taiwan_window",
+      "not_primarily_sexual_content",
+      "Steam_hub_Follows_greater_than_5000"
+    ]
+  },
+  "coverage_status": "PARTIAL_NOT_FULL_YEAR",
+  "inspected_weeks": [
+    {
+      "url": "https://steamdb.info/upcoming/?week=2026W39",
+      "from_utc": "2026-09-21",
+      "to_utc": "2026-09-27",
+      "visible_product_rows": 100,
+      "hit_result_cap": true
+    },
+    {
+      "url": "https://steamdb.info/upcoming/?week=2026W41",
+      "from_utc": "2026-10-05",
+      "to_utc": "2026-10-11",
+      "visible_product_rows": 100,
+      "hit_result_cap": true
+    },
+    {
+      "url": "https://steamdb.info/upcoming/?week=2027W01",
+      "from_utc": "2027-01-04",
+      "to_utc": "2027-01-10",
+      "visible_product_rows": 21,
+      "hit_result_cap": false
+    },
+    {
+      "url": "https://steamdb.info/upcoming/?week=2027W07",
+      "from_utc": "2027-02-15",
+      "to_utc": "2027-02-21",
+      "visible_product_rows": 8,
+      "hit_result_cap": false
+    }
+  ],
+  "counts": {
+    "inspected_weekly_windows": 4,
+    "visible_product_rows_across_inspected_nonoverlapping_weeks": 229,
+    "known_new_public_eligible_games": 1,
+    "existing_public_games_before": 96,
+    "public_games_after": 97,
+    "public_games_unchanged": 96,
+    "final_yearwide_discovered": null,
+    "final_yearwide_exact_date_nonsexual_games": null,
+    "final_yearwide_follows_greater_than_5000": null,
+    "known_unique_appids_from_all_229_rows": null,
+    "reason_unknown": "Two inspected weeks hit SteamDB 100-result cap, 48+ other weekly windows not exhaustively inspected, and no full public search export. 229 is observed product rows, not an exhaustive game count."
+  },
+  "newly_added": [
+    {
+      "appid": 3393110,
+      "title": "AION 2",
+      "store_url": "https://store.steampowered.com/app/3393110/AION_2/",
+      "follows": 70503,
+      "follows_comparison": "greater_than_5000",
+      "follows_source": "https://steamdb.info/upcoming/?week=2026W41",
+      "follows_source_type": "third_party_steam_hub_followers",
+      "follows_observed_at": "2026-09-20T11:40:25Z",
+      "steamdb_utc_release": "2026-10-05T13:00:00Z",
+      "taiwan_release": "2026-10-05",
+      "taiwan_release_time": "21:00",
+      "title_zh_tw": null,
+      "title_zh_cn": null,
+      "english": true,
+      "traditional_chinese": false,
+      "simplified_chinese": false,
+      "not_sexual_basis": "SteamDB lists general mature content and violence/gore only, Steam describes an MMORPG. This is the full game AppID 3393110, not Playtest AppID 4972320.",
+      "date_source": "https://steamdb.info/app/3393110/info/",
+      "language_source": "https://store.steampowered.com/app/3393110/AION_2/?l=tchinese"
+    }
+  ],
+  "public_update": {
+    "repo": "danielet087/game-trend-radar",
+    "file": "data/steam_upcoming.json",
+    "commit_sha": "4cc0e644814eae1d9799bdd6a277db631354f27e",
+    "added_appids": [
+      3393110
+    ],
+    "after_count": 97,
+    "no_existing_appid_overwritten": true,
+    "other_existing_metadata_preserved": true
+  },
+  "limitations": [
+    "SteamDB forbids automated crawling; these are individual web-search page inspections only.",
+    "Direct network calls from the available code runtime fail at DNS resolution.",
+    "SteamDB Follows are third-party values and may differ from the existing official follower cache.",
+    "New game capsule/header URLs use Steam public standard fallbacks; actual image availability was not live verified.",
+    "No exhaustive annual candidate count or exact-date/content exclusion count can be established from these inspected windows."
+  ],
+  "github_actions_triggered": false,
+  "automation_reenabled": false,
+  "external_service_deployed": false
+}

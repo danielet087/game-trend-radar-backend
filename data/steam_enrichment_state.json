@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T12:40:16.063Z",
+  "updated_at": "2026-09-20T17:03:00Z",
   "source_repository": "danielet087/game-trend-radar",
   "source_path": "data/steam_upcoming.json",
   "source_fingerprint_fields": [
@@ -198,7 +198,8 @@
         "categories"
       ],
       "remaining_fields": [
-        "image_asset_audit"
+        "image_asset_audit",
+        "image_http_validation"
       ],
       "last_enriched_at": "2026-09-20T12:08:53.933Z",
       "enrichment_version": 1,
@@ -207,8 +208,37 @@
       "genres_source_url": "https://steamdb.info/app/1488490/info/",
       "store_release_date_reported": "2026-09-29",
       "release_date_review": null,
-      "image_assets_status": "pending_source_check",
-      "image_audit_version": 1
+      "image_assets_status": "partial_pending_http_validation",
+      "image_audit_version": 1,
+      "image_assets_checked_at": "2026-09-20T17:03:00Z",
+      "image_assets_source_url": "https://steamdb.info/app/1488490/history/",
+      "image_asset_modified_at_utc": "2026-07-09T17:30:57.000Z",
+      "image_assets": {
+        "header_tchinese": {
+          "url": null,
+          "asset_identifier": null,
+          "source_match": "not_verified",
+          "http_validation": "pending"
+        },
+        "main_capsule_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1488490/daabe3a1412b729b9f0d19b38a30370a46b8b3be/capsule_616x353.jpg?t=1789125248",
+          "asset_identifier": "daabe3a1412b729b9f0d19b38a30370a46b8b3be/capsule_616x353.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        },
+        "header_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1488490/28e511ff46672f9649744961fd6edbf19df75265/header.jpg?t=1789125248",
+          "asset_identifier": "28e511ff46672f9649744961fd6edbf19df75265/header.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        },
+        "capsule_image": {
+          "url": "7e483ece1117906b11bd6959a16e1f77f5a6e4d5/capsule_231x87.jpg",
+          "asset_identifier": "7e483ece1117906b11bd6959a16e1f77f5a6e4d5/capsule_231x87.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        }
+      }
     },
     "1551980": {
       "status": "partial",
@@ -841,7 +871,8 @@
       ],
       "remaining_fields": [
         "release_date_review",
-        "image_asset_audit"
+        "image_asset_audit",
+        "image_http_validation"
       ],
       "last_enriched_at": "2026-09-20T12:08:53.933Z",
       "enrichment_version": 1,
@@ -850,8 +881,37 @@
       "genres_source_url": "https://store.steampowered.com/app/2769570/Fable/",
       "store_release_date_reported": "2027-02-23",
       "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change",
-      "image_assets_status": "pending_source_check",
-      "image_audit_version": 1
+      "image_assets_status": "partial_pending_http_validation",
+      "image_audit_version": 1,
+      "image_assets_checked_at": "2026-09-20T17:03:00Z",
+      "image_assets_source_url": "https://steamdb.info/app/2769570/",
+      "image_asset_modified_at_utc": null,
+      "image_assets": {
+        "header_tchinese": {
+          "url": null,
+          "asset_identifier": null,
+          "source_match": "not_verified",
+          "http_validation": "pending"
+        },
+        "main_capsule_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2769570/2e243f1b987cb2841d0faa1082f9c63d7a86a700/capsule_616x353.jpg?t=1788984944",
+          "asset_identifier": "2e243f1b987cb2841d0faa1082f9c63d7a86a700/capsule_616x353.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        },
+        "header_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2769570/d2ffd7e15a91f3e5485601d3d876988ba3a859d7/header.jpg?t=1788984944",
+          "asset_identifier": "d2ffd7e15a91f3e5485601d3d876988ba3a859d7/header.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        },
+        "capsule_image": {
+          "url": "24f6ec304555c95bf5c1ee328ffa9caaea50a4f6/capsule_231x87.jpg",
+          "asset_identifier": "24f6ec304555c95bf5c1ee328ffa9caaea50a4f6/capsule_231x87.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        }
+      }
     },
     "2796640": {
       "status": "partial",
@@ -976,7 +1036,8 @@
         "categories"
       ],
       "remaining_fields": [
-        "image_asset_audit"
+        "image_asset_audit",
+        "image_http_validation"
       ],
       "last_enriched_at": "2026-09-20T12:08:53.933Z",
       "enrichment_version": 1,
@@ -985,8 +1046,37 @@
       "genres_source_url": "https://steamdb.info/app/2929250/",
       "store_release_date_reported": "2026-10-14",
       "release_date_review": null,
-      "image_assets_status": "pending_source_check",
-      "image_audit_version": 1
+      "image_assets_status": "partial_pending_http_validation",
+      "image_audit_version": 1,
+      "image_assets_checked_at": "2026-09-20T17:03:00Z",
+      "image_assets_source_url": "https://steamdb.info/app/2929250/config/",
+      "image_asset_modified_at_utc": "2026-08-11T13:13:19.000Z",
+      "image_assets": {
+        "header_tchinese": {
+          "url": null,
+          "asset_identifier": null,
+          "source_match": "not_verified",
+          "http_validation": "pending"
+        },
+        "main_capsule_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2929250/c9074a798026361d9c8521ef9a23d6e52c0bea38/capsule_616x353.jpg?t=1788424189",
+          "asset_identifier": "c9074a798026361d9c8521ef9a23d6e52c0bea38/capsule_616x353.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        },
+        "header_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2929250/header.jpg?t=1788424189",
+          "asset_identifier": "2929250/header.jpg",
+          "source_match": "legacy_header_path_confirmed",
+          "http_validation": "pending"
+        },
+        "capsule_image": {
+          "url": "36a5e318291b96b49df81d3d5de731b19c094a2b/capsule_231x87.jpg",
+          "asset_identifier": "36a5e318291b96b49df81d3d5de731b19c094a2b/capsule_231x87.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        }
+      }
     },
     "2963950": {
       "status": "partial",
@@ -1955,7 +2045,8 @@
       ],
       "remaining_fields": [
         "release_date_review",
-        "image_asset_audit"
+        "image_asset_audit",
+        "image_http_validation"
       ],
       "last_enriched_at": "2026-09-20T12:08:53.933Z",
       "enrichment_version": 1,
@@ -1964,8 +2055,37 @@
       "genres_source_url": "https://steamdb.info/app/4115450/info/",
       "store_release_date_reported": "2026-10-28",
       "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change",
-      "image_assets_status": "pending_source_check",
-      "image_audit_version": 1
+      "image_assets_status": "partial_pending_http_validation",
+      "image_audit_version": 1,
+      "image_assets_checked_at": "2026-09-20T17:03:00Z",
+      "image_assets_source_url": "https://steamdb.info/app/4115450/",
+      "image_asset_modified_at_utc": null,
+      "image_assets": {
+        "header_tchinese": {
+          "url": null,
+          "asset_identifier": null,
+          "source_match": "not_verified",
+          "http_validation": "pending"
+        },
+        "main_capsule_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4115450/98af27aecb2eedd674e4e18b5fb3e58754729589/capsule_616x353.jpg?t=1787142639",
+          "asset_identifier": "98af27aecb2eedd674e4e18b5fb3e58754729589/capsule_616x353.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        },
+        "header_image": {
+          "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4115450/7f882f889630270d3d3fb93825ac6f55b55e7a6c/header.jpg?t=1787142639",
+          "asset_identifier": "7f882f889630270d3d3fb93825ac6f55b55e7a6c/header.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        },
+        "capsule_image": {
+          "url": "aef06490c9a4ad912142fe3b766ee08a2b38ef80/capsule_231x87.jpg",
+          "asset_identifier": "aef06490c9a4ad912142fe3b766ee08a2b38ef80/capsule_231x87.jpg",
+          "source_match": "matched_source_asset",
+          "http_validation": "pending"
+        }
+      }
     },
     "4171850": {
       "status": "partial",
@@ -2266,9 +2386,9 @@
   "image_asset_audit": {
     "version": 1,
     "total_games": 98,
-    "source_checked_assets": 2,
-    "pending_source_check": 96,
-    "pending_http_validation": 2,
-    "description": "Text metadata completion is independent of image-source validation. Recheck asset versions even when input fingerprint is unchanged."
+    "source_checked_assets": 6,
+    "pending_source_check": 92,
+    "pending_http_validation": 6,
+    "description": "Four more existing image asset sets cross-checked against publicly indexed SteamDB Steam asset metadata; HTTP image loads not verified; no URL changes."
   }
 }

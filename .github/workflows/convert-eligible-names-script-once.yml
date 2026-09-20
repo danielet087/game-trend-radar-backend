@@ -1,0 +1,62 @@
+name: One-time convert eligible Steam titles to Traditional
+
+# Authorized one-time derived-field update, not a recurring scan.
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/convert-eligible-names-script-once.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Test source-title preservation, Steam date gate and script conversion
+        run: >
+          python -m pytest -q tests/test_steam_localized_titles.py
+          tests/test_steam_candidate_pipeline.py
+          tests/test_steam_candidate_date_gate.py
+      - name: Add only Traditional display fields to eligible candidate records
+        run: >
+          python -m scripts.convert_eligible_names_to_traditional_once
+          --snapshot data/steam_candidates_eligible.json
+      - name: Guard original 11467 source games and all Followers fields
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          path="data/steam_candidates_eligible.json"
+          prev=json.loads(subprocess.check_output(["git","show","HEAD:"+path],text=True))
+          curr=json.loads(Path(path).read_text(encoding="utf-8"))
+          assert curr.keys()==prev.keys()
+          assert len(curr["games"])==len(prev["games"])==3137
+          assert curr["source_count"]==11467
+          extra={"name_zh_tw_traditional","name_zh_cn_traditional","name_en_traditional"}
+          for old,new in zip(prev["games"],curr["games"]):
+              assert old["appid"]==new["appid"]
+              assert {k:v for k,v in old.items() if k not in extra}=={
+                  k:v for k,v in new.items() if k not in extra}
+          print("ELIGIBLE_DISPLAY_FIELDS_ONLY",len(curr["games"]),flush=True)
+          PY
+          git diff --exit-code -- data/steam_candidates.json data/steam_candidate_state.json data/steam_prefilter_state.json data/steam_followers_cache.json
+      - name: Save derived eligible titles, retain originals
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_candidates_eligible.json
+          if git diff --cached --quiet; then
+            echo "No derived titles changed"
+          else
+            git commit -m "data: derive Traditional script titles for eligible games [skip ci]"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi

@@ -108,9 +108,10 @@ def test_stage_one_advances_calendar_days_without_followers(monkeypatch):
         assert first["followers_queried"] == 0
         assert state["days_scanned"] == 1
         second = run_discovery(args, state, catalog)
-    assert second["phase"] == "prefilter"
+    assert second["phase"] == "date_precision"
     assert second["followers_queried"] == 0
     assert state["days_scanned"] == 2
+    assert state["date_precision_required"] is True
 
 
 def test_stage_three_refuses_xml_until_third_party_entire_catalog_complete(tmp_path):
@@ -163,3 +164,47 @@ def test_new_prefilter_is_separate_phase_before_official_queries(tmp_path, monke
     assert state["phase"] == "followers"
     assert state["prefilter_complete"] is True
     assert __import__("json").loads(pre_file.read_text())["games"]["101"]["priority"]
+
+def test_future_pipeline_verifies_public_display_before_ever_prefiltering(monkeypatch):
+    from scripts import steam_candidate_pipeline as pipeline
+    state = fresh_state(date(2026, 9, 19), 365)
+    state["phase"] = "date_precision"
+    state["days_scanned"] = 365
+    catalog = {"games": [
+        {"appid": 1, "name": "Full date", "release_precision": "day",
+         "release_start": "2026-10-01"},
+        {"appid": 2, "name": "Year-only hidden placeholder",
+         "release_precision": "day", "release_start": "2026-12-31"},
+        {"appid": 3, "name": "Sex-focused", "release_precision": "day",
+         "release_start": "2026-11-01"},
+    ]}
+    from unittest.mock import patch
+    meta = {
+        1: {"release": {"coming_soon_display": "date_full"}},
+        2: {"release": {"coming_soon_display": "date_year"}},
+        3: {"release": {"coming_soon_display": "date_full"},
+            "content_descriptorids": [3]},
+    }
+    original = [dict(x) for x in catalog["games"]]
+    with (
+        patch.object(pipeline, "fetch_metadata", return_value=meta) as browse,
+        patch.object(pipeline, "scan_batch") as third_party,
+        patch.object(pipeline, "SteamUpcomingCollector") as steam_xml,
+    ):
+        result = pipeline.run_date_precision_phase(state, catalog)
+    browse.assert_called_once()
+    third_party.assert_not_called()
+    steam_xml.assert_not_called()
+    assert result["fresh_follower_requests"] == 0
+    assert result["eligible_count"] == 1
+    assert state["phase"] == "prefilter"
+    assert [g["appid"] for g in pipeline.active_candidate_rows(catalog, state)] == [1]
+    assert catalog["games"] == original
+
+
+def test_fresh_state_cannot_skip_public_release_date_gate():
+    from scripts import steam_candidate_pipeline as pipeline
+    state = fresh_state(date(2026, 9, 19), 365)
+    state["phase"] = "prefilter"
+    with pytest.raises(RuntimeError, match="date gate incomplete"):
+        pipeline.active_candidate_rows({"games": [{"appid": 1}]}, state)

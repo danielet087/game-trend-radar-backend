@@ -123,6 +123,8 @@ def test_stage_three_refuses_xml_until_third_party_entire_catalog_complete(tmp_p
          "release_start": "2026-10-01", "release_end": "2026-10-01",
          "capsule_image": None, "store_url": "https://store.steampowered.com/app/101/"}
     ]}
+    catalog["date_precision_complete"] = True
+    catalog["date_precision_eligible"] = catalog["games"]
     args = argparse.Namespace(
         prefilter_state=str(tmp_path / "pre.json"),
         follower_cache=str(tmp_path / "official.json"),
@@ -142,6 +144,8 @@ def test_new_prefilter_is_separate_phase_before_official_queries(tmp_path, monke
     state = fresh_state(date(2026, 9, 19), 1)
     state["phase"] = "followers"
     state["days_scanned"] = 1
+    catalog["date_precision_complete"] = True
+    catalog["date_precision_eligible"] = catalog["games"]
     pre_file = tmp_path / "pre.json"
     args = argparse.Namespace(
         prefilter_state=str(pre_file), prefilter_batch_size=200,

@@ -432,7 +432,8 @@ def run_follower_batch(
         source = source_by_id.get(row.appid, {})
         for field in ("name_en", "name_zh_tw", "release_date_timezone",
                       "release_date_basis", "release_time_utc",
-                      "release_time_source", "discovered_by"):
+                      "release_time_source", "discovered_by",
+                      "release_display_precision", "sexual_content_screened"):
             item[field] = source.get(field)
         enriched.append(item)
     master["games"] = merge_partial_segment(master.get("games", []), enriched, today=today)
@@ -498,6 +499,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if phase in {"followers", "prefilter"}:
         if phase == "followers":
             save_json(master_file, master)
+        original_games = master.get("games", [])
+        if state.get("date_precision_required"):
+            allowed = {row["appid"] for row in active_candidate_rows(catalog, state)}
+            public_games = [row for row in original_games if row.get("appid") in allowed]
+        else:
+            public_games = original_games
         output = {
             "generated_at": stamp, "source": {
                 "catalog": "Steam IStoreQueryService/Query day-filter, TW",
@@ -511,6 +518,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "complete": state["initial_complete"],
                 "phase": state["phase"], "days_scanned": state["days_scanned"],
                 "candidate_count": catalog.get("count", 0),
+                "date_precision_eligible_count": state.get("date_precision_eligible_count"),
+                "date_precision_excluded_count": state.get("date_precision_excluded_count"),
+                "date_precision_complete": state.get("date_precision_complete", False),
                 "next_follower_index": state.get("next_follower_index", 0),
                 "coverage_exhaustive": False,
                 "prefilter_threshold": state.get("prefilter_threshold"),
@@ -525,15 +535,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "official_verified_count": state.get("official_verified_count", 0),
                 "last_attempt": state.get("last_attempt"),
             },
-            "count": len(master.get("games", [])) if not state.get("date_precision_required") else sum(
-                g.get("appid") in {row["appid"] for row in active_candidate_rows(catalog, state)}
-                for g in master.get("games", [])
-            ),
-            "games": (
-                [g for g in master.get("games", []) if
-                 g.get("appid") in {row["appid"] for row in active_candidate_rows(catalog, state)}]
-                if state.get("date_precision_required") else master.get("games", [])
-            ),
+            "count": len(public_games),
+            "games": public_games,
         }
         write_json(output, args.output)
     LOG.info("Steam two-stage run: %s", result)

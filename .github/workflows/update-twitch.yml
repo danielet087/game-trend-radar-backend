@@ -1,18 +1,8 @@
 name: Update Twitch live data
 
+# Paused by request: no automatic schedule, push, or workflow_run triggers.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "collectors/twitch_live.py"
-      - "scripts/update_twitch.py"
-      - "tests/test_twitch_live.py"
-      - ".github/workflows/update-twitch.yml"
-  schedule:
-    # 每小時第 37 分執行，避開整點常見的排程尖峰
-    - cron: "37 * * * *"
 
 permissions:
   contents: read

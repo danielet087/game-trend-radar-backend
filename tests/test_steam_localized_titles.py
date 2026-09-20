@@ -46,3 +46,21 @@ def test_keep_previous_reviewed_chinese_title_if_store_falls_back_to_english():
     result = enrich_tw_names(rows, {101: "English"})
     assert rows[0]["name_zh_tw"] == "已確認中文名稱"
     assert result["official_zh_tw"] == 1
+
+
+def test_official_simplified_marketing_title_has_separate_traditional_display():
+    from scripts.steam_localized_titles import add_traditional_display_names
+    game = {
+        "appid": 4019220,
+        "name_en": "Dressmaker",
+        "name_zh_cn": "针影裁梦",
+        "language_support": {"tchinese": False, "schinese": True, "english": True},
+    }
+    add_traditional_display_names(game)
+    assert game["name_zh_cn_traditional"] == "針影裁夢"
+    assert game["name_zh_cn"] == "针影裁梦"
+    assert game["language_support"]["tchinese"] is False
+    assert game["language_support"]["schinese"] is True
+    title = {"appid": 4094660, "name_zh_cn": "她在时间之外"}
+    add_traditional_display_names(title)
+    assert title["name_zh_cn_traditional"] == "她在時間之外"

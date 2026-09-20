@@ -1,10 +1,7 @@
 name: Probe Steam clan batch (read-only)
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-clan-batch.yml"
   workflow_dispatch:
 
 permissions:

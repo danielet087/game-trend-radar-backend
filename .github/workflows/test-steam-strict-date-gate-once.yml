@@ -1,0 +1,36 @@
+name: Verify strict Steam candidate date gate once
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/test-steam-strict-date-gate-once.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Validate strict precision code and new workflow guard
+        run: >
+          python -m py_compile
+          scripts/screen_steam_candidates_before_followers.py
+          scripts/steam_candidate_pipeline.py
+          scripts/run_full_steam_prefilter.py
+          scripts/run_steam_official_shortlist.py
+          scripts/steam_candidate_supervisor.py
+      - name: Test discovery date-gate third-party and official stage routing
+        run: >
+          python -m pytest -q
+          tests/test_steam_candidate_date_gate.py
+          tests/test_steam_candidate_pipeline.py
+          tests/test_steam_candidate_supervisor.py
+          tests/test_steam_follower_prefilter.py

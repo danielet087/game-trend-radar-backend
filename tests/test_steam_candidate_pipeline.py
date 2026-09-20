@@ -192,11 +192,16 @@ def test_future_pipeline_verifies_public_display_before_ever_prefiltering(monkey
     original = [dict(x) for x in catalog["games"]]
     with (
         patch.object(pipeline, "fetch_metadata", return_value=meta) as browse,
+        patch.object(pipeline, "fetch_store_tw_names",
+                     return_value={1: "正式繁體中文名稱"}) as tw_titles,
         patch.object(pipeline, "scan_batch") as third_party,
         patch.object(pipeline, "SteamUpcomingCollector") as steam_xml,
     ):
         result = pipeline.run_date_precision_phase(state, catalog)
     browse.assert_called_once()
+    tw_titles.assert_called_once()
+    assert catalog["date_precision_eligible"][0]["name_zh_tw"] == "正式繁體中文名稱"
+    assert catalog["date_precision_eligible"][0]["name_en"] == "Full date"
     third_party.assert_not_called()
     steam_xml.assert_not_called()
     assert result["fresh_follower_requests"] == 0

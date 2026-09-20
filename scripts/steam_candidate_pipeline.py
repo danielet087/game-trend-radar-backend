@@ -28,6 +28,7 @@ from scripts.steam_follower_prefilter import (
 from scripts.screen_steam_candidates_before_followers import (
     build_snapshot, fetch_metadata,
 )
+from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 
 LOG = logging.getLogger(__name__)
 QUERY_URL = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -247,6 +248,18 @@ def run_date_precision_phase(state: dict[str, Any], catalog: dict[str, Any]) -> 
     snapshot = build_snapshot(catalog, details)
     if snapshot["count"] <= 0:
         raise RuntimeError("No eligible exact-day games; check Store Browse response")
+    # Only the eligible candidates need a second, tchinese Store metadata pass.
+    # Do this BEFORE third-party Followers and preserve the original English title.
+    localized = fetch_store_tw_names(
+        session, [int(game["appid"]) for game in snapshot["games"]]
+    )
+    if len(localized) < snapshot["count"] * 0.95:
+        raise RuntimeError("Steam Traditional Chinese lookup mostly unavailable; date gate not complete")
+    name_result = enrich_tw_names(snapshot["games"], localized)
+    snapshot["official_zh_tw_titles_summary"] = name_result
+    snapshot["official_zh_tw_titles_provider"] = (
+        "Steam IStoreBrowseService/GetItems tchinese TW"
+    )
     # Do not rewrite catalog['games'] or the historical discovery count. Save a
     # derived candidate list, and only then allow third-party and XML stages.
     catalog["date_precision_eligible"] = snapshot["games"]
@@ -263,6 +276,7 @@ def run_date_precision_phase(state: dict[str, Any], catalog: dict[str, Any]) -> 
         "candidate_count": len(original),
         "eligible_count": snapshot["count"],
         "excluded_count": snapshot["excluded"],
+        "official_zh_tw_titles": name_result["official_zh_tw"],
         "reasons": snapshot["reasons"],
         "fresh_follower_requests": 0,
     }

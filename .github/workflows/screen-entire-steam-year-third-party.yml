@@ -1,10 +1,7 @@
 name: Stage 2 - screen all upcoming Steam games via third party
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/screen-entire-steam-year-third-party.yml"
   workflow_dispatch:
 
 permissions:

@@ -1,10 +1,7 @@
 name: Probe Steam clan diagnostics (read-only)
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-clan-diagnostics.yml"
   workflow_dispatch:
 
 permissions:

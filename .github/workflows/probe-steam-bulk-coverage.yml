@@ -1,10 +1,7 @@
 name: Probe 60 Steam group mappings and bulk coverage
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-bulk-coverage.yml"
   workflow_dispatch:
 
 permissions:

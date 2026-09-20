@@ -1,9 +1,7 @@
 name: One-time verify Steam TW title routing
 
+# Regression launched once; manual-only now.
 on:
-  push:
-    branches: [main]
-    paths: [".github/workflows/verify-steam-tw-title-routing-once.yml"]
   workflow_dispatch:
 
 permissions:

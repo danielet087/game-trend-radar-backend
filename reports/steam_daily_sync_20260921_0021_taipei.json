@@ -1,0 +1,208 @@
+{
+  "task": "Steam 遊戲資料同步",
+  "status": "無資料異動；搜尋部分完成且已提交真實查核報告",
+  "started_taipei": "2026-09-21 00:21:02+08:00",
+  "completed_utc": "2026-09-20T16:23:01.243Z",
+  "completed_taipei": "2026-09-21 00:23:01+08:00",
+  "timezone": "Asia/Taipei",
+  "window_taipei": {
+    "start": "2026-09-21",
+    "end": "2027-03-20",
+    "rule": "start date plus 6 calendar months minus one day, inclusive"
+  },
+  "method": "ChatGPT public web search/read individual SteamDB weekly pages and individual Steam store/SteamDB game pages; GitHub connector for before count and report; no SteamDB crawler",
+  "segment_progress": [
+    {
+      "month": "2026-09",
+      "status": "partial",
+      "weeks": [
+        "2026W39",
+        "2026W40"
+      ],
+      "complete": false
+    },
+    {
+      "month": "2026-10",
+      "status": "partial",
+      "weeks": [
+        "2026W40",
+        "2026W41",
+        "2026W42",
+        "2026W43",
+        "2026W44"
+      ],
+      "complete": false
+    },
+    {
+      "month": "2026-11",
+      "status": "partial",
+      "weeks": [
+        "2026W44",
+        "2026W45",
+        "2026W46",
+        "2026W47",
+        "2026W48",
+        "2026W49"
+      ],
+      "complete": false
+    },
+    {
+      "month": "2026-12",
+      "status": "partial",
+      "weeks": [
+        "2026W49",
+        "2026W50",
+        "2026W51",
+        "2026W52",
+        "2026W53"
+      ],
+      "complete": false
+    },
+    {
+      "month": "2027-01",
+      "status": "partial",
+      "weeks": [
+        "2026W53",
+        "2027W01",
+        "2027W02",
+        "2027W03",
+        "2027W04"
+      ],
+      "complete": false
+    },
+    {
+      "month": "2027-02",
+      "status": "partial",
+      "weeks": [
+        "2027W05",
+        "2027W06",
+        "2027W07",
+        "2027W08"
+      ],
+      "complete": false
+    },
+    {
+      "month": "2027-03",
+      "status": "partial",
+      "weeks": [
+        "2027W09",
+        "2027W10",
+        "2027W11"
+      ],
+      "complete": false
+    }
+  ],
+  "coverage": {
+    "weekly_windows_consulted_in_or_touching_window": 26,
+    "distinct_calendar_months_with_some_search": 7,
+    "fully_covered_months": 0,
+    "some_week_pages_capped_at_100": true,
+    "week_pages_partly_rendered_without_name_column": true,
+    "all_weekly_visible_row_count": null,
+    "all_unique_candidate_appids": null,
+    "all_unique_high_follows": null
+  },
+  "selected_individual_candidate_checks": [
+    {
+      "title": "We Were Here Tomorrow",
+      "appid": 2315050,
+      "outcome": "exclude_or_pending_exact_day",
+      "reason": "official Steam release only October 2026",
+      "official_url": "https://store.steampowered.com/app/2315050/We_Were_Here_Tomorrow/"
+    },
+    {
+      "title": "Nomad Drive",
+      "appid": 2223980,
+      "outcome": "exclude_or_pending_exact_day",
+      "reason": "official Steam release only October 2026",
+      "official_url": "https://store.steampowered.com/app/2223980/"
+    },
+    {
+      "title": "VOID DIVER: Escape from the Abyss",
+      "appid": 3438920,
+      "outcome": "exclude_or_pending_exact_day",
+      "reason": "official Steam release only year 2026",
+      "official_url": "https://store.steampowered.com/app/3438920/"
+    },
+    {
+      "title": "Gods, Death & Reapers",
+      "appid": 3086590,
+      "outcome": "exclude_or_pending_exact_day",
+      "reason": "official Steam release only year 2026",
+      "official_url": "https://store.steampowered.com/app/3086590/Project_Pantheon/"
+    },
+    {
+      "title": "Yu-Gi-Oh! TAG FORCE GX",
+      "outcome": "below_follows_threshold",
+      "third_party_follows": 3852,
+      "source": "https://steamdb.info/upcoming/?week=2027W07"
+    },
+    {
+      "title": "Romancing SaGa 3: Destinies United",
+      "outcome": "below_follows_threshold",
+      "third_party_follows": 2244,
+      "source": "https://steamdb.info/upcoming/?week=2027W07"
+    },
+    {
+      "title": "DRAGON QUEST MONSTERS: The Withered World",
+      "outcome": "below_follows_threshold",
+      "third_party_follows": 4052,
+      "source": "https://steamdb.info/upcoming/?week=2026W49"
+    },
+    {
+      "title": "Wo Long 2: Wings of Ember",
+      "outcome": "below_follows_threshold",
+      "third_party_follows": 3845,
+      "source": "https://steamdb.info/stats/gameratings/2027/?tagid=29482"
+    },
+    {
+      "title": "Volvy’s Adventure: Reslimed",
+      "appid": 4523120,
+      "outcome": "below_follows_threshold",
+      "third_party_follows": 436,
+      "source": "https://steamdb.info/app/4523120/charts/"
+    }
+  ],
+  "counts": {
+    "individually_reconciled_not_in_public_catalog": 9,
+    "nonqualifying_due_to_vague_official_release": 4,
+    "nonqualifying_due_to_follows_below_5000": 5,
+    "fully_qualified_new_game": 0,
+    "new_public": 0,
+    "updated_public": 0,
+    "removed_public": 0,
+    "failed_individual_lookups": 0,
+    "previously_published_public": 100,
+    "currently_published_public": 100,
+    "skipped_or_already_in_public_catalog": "not comprehensively counted; confirmed existing prominent games including Fable, ANANTA, Persona 4 Revival",
+    "pending_unchecked_candidate_count": null,
+    "remaining_full_coverage_count": null,
+    "current_run_all_products_seen_count": null,
+    "current_run_all_games_with_full_date_count": null,
+    "current_run_all_games_followers_gte_5000_count": null
+  },
+  "github": {
+    "public_repository": "danielet087/game-trend-radar",
+    "public_file": "data/steam_upcoming.json",
+    "public_blob_sha_before": "a3706a45cc49889e53d62a28e68e8da4861218e9",
+    "public_file_changed": false,
+    "public_file_commit": "本輪未提交（沒有新的完成資格確認遊戲或可靠的既有遊戲資料變動）",
+    "report_repository": "danielet087/game-trend-radar-backend",
+    "report_file": "reports/steam_daily_sync_20260921_0021_taipei.json",
+    "report_commit": null,
+    "report_readback_verified": false
+  },
+  "limitations": [
+    "SteamDB caps many weekly pages at 100 and sorting on the gameratings page may not apply to fetched page; month-level completeness is not established.",
+    "Some retrieved weekly views omitted game names in the parsed display; cannot count such rows as verified AppID records.",
+    "SteamDB prohibits automated crawling. No such crawler was used.",
+    "Not all weekly high-follow games or old public games reverified individually. No official Steam Community 429 encountered in the individual checks in this run.",
+    "Historical 11467 candidate estimate and 100 current published items were never counted as this run's newly fetched candidate count.",
+    "Previous run's THE DEAD WE KNEW release-date disagreement remains unresolved; not rechecked individually in this run.",
+    "Displayed release date for Warrior Cats retains Steam official Taiwan 2026-10-23 from last authorized correction.",
+    "Existing games outside rolling six-month range preserved."
+  ],
+  "github_actions_created_modified_triggered": false,
+  "automation_modified": false,
+  "cloud_deployed": false
+}

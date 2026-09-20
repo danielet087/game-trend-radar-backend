@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "checked_at_utc": "2026-09-20T11:50:39.742Z",
+  "date_basis": "Asia/Taipei",
+  "requested_range": {
+    "start": "2026-09-20",
+    "end": "2027-09-19",
+    "calendar_months_in_scope": 13
+  },
+  "goal": "game (exclude demo/DLC/playtest), public explicit full date in Taiwan within window, not primarily pornographic/sexual, Steam Game Follows > 5000; then localized name and true in-game language support",
+  "approach": "search-engine month-by-month discovery and individual public Steam Store/SteamDB verification; no automated SteamDB bulk crawler and no GitHub Actions",
+  "calendar_month_searches": [
+    {
+      "period": "2026-09-20~2026-09-30",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2026-10",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2026-11",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2026-12",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-01",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-02",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-03",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-04",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-05",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-06",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-07",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-08",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    },
+    {
+      "period": "2027-09-01~2027-09-19",
+      "searched": true,
+      "exhaustively_verified": false,
+      "qualified_count": null
+    }
+  ],
+  "result": {
+    "monthly_search_queries_submitted": 13,
+    "number_of_months_with_complete_candidate_export": 0,
+    "newly_qualified_games_confirmed": 1,
+    "previously_published_games": 97,
+    "published_games_after": 98,
+    "published_existing_games_rechecked_in_this_run": 0,
+    "yearwide_candidate_count": null,
+    "yearwide_game_and_full_date_nonsexual_count": null,
+    "yearwide_follows_over_5000_count": null,
+    "yearwide_final_count": null,
+    "annual_coverage_complete": false
+  },
+  "added": [
+    {
+      "appid": 4814120,
+      "name_en": "ANANTA",
+      "name_zh_tw": "無限大",
+      "name_zh_cn": "无限大",
+      "full_game": true,
+      "primarily_sexual": false,
+      "announced_date_on_official_tw_store": "2027-01-15",
+      "utc_release": "2027-01-15T15:00:00Z",
+      "taiwan_unlock_time": "2027-01-15T23:00:00+08:00",
+      "steamdb_follows": 23878,
+      "follows_source": "https://steamdb.info/app/4814120/charts/",
+      "follows_source_kind": "third_party_steam_hub_followers",
+      "supported_game_languages": {
+        "tchinese": true,
+        "schinese": true,
+        "english": true
+      },
+      "title_source": "https://store.steampowered.com/app/4814120/ANANTA/?l=tchinese",
+      "release_source": "https://steamdb.info/app/4814120/info/",
+      "sexual_content_basis": "Official Steam game page describes an open-world RPG with in-game purchases, social interactions and no primarily sexual description."
+    }
+  ],
+  "github": {
+    "repo_frontend": "danielet087/game-trend-radar",
+    "file": "data/steam_upcoming.json",
+    "frontend_commit": "97993b6e1d8609a3ed416d65ad0219365958ecf3",
+    "existing_game_fields_preserved": true,
+    "use_of_github_actions": false
+  },
+  "limits": [
+    "Monthly search-engine queries and indexed month-calendar results do NOT mean all Steam releases were fetched. SteamDB weeks or month tables can cap results at 100.",
+    "Only one genuinely missing game passed individual Store details / Follows / content / local time verification; the historical 97 are retained but were not all reverified now.",
+    "SteamDB disallows systematic automated crawling; public search snippets and individual game pages were used for discovery/verification only.",
+    "Direct terminal network to Steam/SteamDB currently unavailable; no successful full-year API/page export in this run.",
+    "Do not reinterpret 98 published games as complete 365-day census.",
+    "No daily ChatGPT automation was re-enabled, no GitHub Actions used, no extra cloud service deployed."
+  ]
+}

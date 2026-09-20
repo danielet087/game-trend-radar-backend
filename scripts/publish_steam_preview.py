@@ -11,6 +11,7 @@ from typing import Any
 import requests
 
 from scripts.steam_release_dates import fetch_store_browse_releases, resolved_store_date
+from scripts.steam_localized_titles import add_traditional_display_names
 from collectors.steam_upcoming import (
     STEAM_FOLLOWERS_URL, STEAM_SEARCH_URL, parse_follower_xml,
     parse_release_window, parse_search_results_html, taiwan_today, write_json,
@@ -71,6 +72,8 @@ def add_traditional_name(
     game["name"] = name_en or game["name"]
     game["name_en"] = name_en or game["name"]
     game["name_zh_tw"] = name_zh_tw
+    # Keep the official title untouched; UI uses converted display fields.
+    add_traditional_display_names(game)
 
 
 def normalized_metadata(

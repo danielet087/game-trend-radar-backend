@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T12:27:25.097Z",
+  "updated_at": "2026-09-20T12:32:38.602Z",
   "source_repository": "danielet087/game-trend-radar",
   "source_path": "data/steam_upcoming.json",
   "source_fingerprint_fields": [
@@ -1911,22 +1911,28 @@
       "content_review": "Steam tags include Hentai and Sexual Content. Verify whether this is principally a sexual game before publishing it as eligible."
     },
     "4814120": {
-      "status": "complete",
-      "source_fingerprint": "{\"name\":\"ANANTA\",\"name_en\":\"ANANTA\",\"name_zh_tw\":\"無限大\",\"name_zh_cn\":\"无限大\",\"release_raw\":\"15 Jan, 2027\",\"release_start\":\"2027-01-15\",\"release_time_utc\":\"2027-01-15T15:00:00Z\",\"release_date_basis\":\"steamdb_explicit_utc_release_time_crosschecked_with_steam_store\",\"header_image\":\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4814120/header.jpg\",\"main_capsule_image\":\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4814120/capsule_616x353.jpg\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4814120/ANANTA/?l=tchinese\"}",
+      "status": "partial",
+      "source_fingerprint": "{\"name\":\"ANANTA\",\"name_en\":\"ANANTA\",\"name_zh_tw\":\"無限大\",\"name_zh_cn\":\"无限大\",\"release_raw\":\"15 Jan, 2027\",\"release_start\":\"2027-01-15\",\"release_time_utc\":\"2027-01-15T15:00:00Z\",\"release_date_basis\":\"steamdb_explicit_utc_release_time_crosschecked_with_steam_store\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4814120/e8d9fd05e084b77fedbcf266c264b922e9c4b4b6/header_tchinese.jpg\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4814120/f794174f36d0eacd07cd99061f22c909fb71c2c9/capsule_616x353.jpg\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4814120/ANANTA/?l=tchinese\"}",
       "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "remaining_fields": [],
+      "remaining_fields": [
+        "image_http_validation"
+      ],
       "last_enriched_at": "2026-09-20T12:20:07.477Z",
       "enrichment_version": 1,
       "description_source_url": "https://store.steampowered.com/app/4814120/",
       "tags_source_url": "https://store.steampowered.com/app/4814120/",
       "genres_source_url": "https://store.steampowered.com/app/4814120/",
       "store_release_date_reported": "2027-01-15",
-      "release_date_review": null
+      "release_date_review": null,
+      "image_assets_source_url": "https://steamdb.info/app/4814120/history/",
+      "image_assets_checked_at": "2026-09-20T12:32:38.602Z",
+      "image_assets_result": "replaced_unversioned_urls_with_source_identified_asset_paths;HTTP_image_fetch_not_verified",
+      "image_assets_status": "awaiting_http_validation"
     }
   }
 }

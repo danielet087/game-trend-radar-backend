@@ -1,10 +1,7 @@
 name: Stage 3 - verify 4000 shortlist using Steam official XML
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/verify-steam-4000-shortlist-15s.yml"
   workflow_dispatch:
 
 permissions:

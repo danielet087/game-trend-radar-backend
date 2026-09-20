@@ -33,7 +33,7 @@ jobs:
         run: |
           python -m py_compile scripts/run_steam_official_shortlist.py
           python -m pytest -q
-      - name: Resume official Steam verification from saved 66 of 247 and publish each batch
+      - name: Resume remaining 106 officially shortlisted games at 30 seconds with batch publishing
         env:
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python -m scripts.run_steam_official_shortlist \
-            --interval 15 \
+            --interval 30 \
             --batch-size 25 \
             --max-minutes 100
       - name: Final strict verification summary

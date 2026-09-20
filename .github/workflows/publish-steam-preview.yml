@@ -1,15 +1,8 @@
 name: Publish Steam calendar preview
 
+# Paused by request: no automatic schedule, push, or workflow_run triggers.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/publish-steam-preview.yml"
-  schedule:
-    # 02:08 UTC = 10:08 Taiwan; before the daily Steam initialization run.
-    - cron: "8 2 * * *"
 
 permissions:
   contents: write

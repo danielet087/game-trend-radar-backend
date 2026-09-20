@@ -1,11 +1,8 @@
 name: Diagnose Phantom Blade Zero discovery
 
+# Paused by request: automatic workflow triggers disabled.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/diagnose-steam-app-4115450.yml"
 
 permissions:
   contents: read

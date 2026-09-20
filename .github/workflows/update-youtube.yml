@@ -1,18 +1,8 @@
 name: Update YouTube live data
 
+# Paused by request: no automatic schedule, push, or workflow_run triggers.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "collectors/youtube_live.py"
-      - "scripts/update_youtube.py"
-      - "tests/test_youtube_live.py"
-      - ".github/workflows/update-youtube.yml"
-  schedule:
-    # Twitch runs at :37; YouTube runs at :52.
-    - cron: "52 * * * *"
 
 permissions:
   contents: read

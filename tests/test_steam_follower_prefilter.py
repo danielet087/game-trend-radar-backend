@@ -120,7 +120,7 @@ def test_incomplete_screen_cannot_run_steam_xml(tmp_path):
                               follower_cache=str(tmp_path / "cache.json"))
     with patch.object(pipeline, "SteamUpcomingCollector") as collector:
         with pytest.raises(RuntimeError, match="Step 2 has not screened"):
-            pipeline.run_follower_batch(args, state, {"games": catalog}, {"games": []})
+            pipeline.run_follower_batch(args, state, {"games": catalog, "date_precision_complete": True, "date_precision_eligible": catalog}, {"games": []})
     collector.assert_not_called()
 
 
@@ -172,7 +172,7 @@ def test_completed_screen_checks_only_measured_4000_or_more(tmp_path):
 
     with patch.object(pipeline, "SteamUpcomingCollector", return_value=Collector()):
         result = pipeline.run_follower_batch(
-            args, state, {"games": catalog}, {"games": []},
+            args, state, {"games": catalog, "date_precision_complete": True, "date_precision_eligible": catalog}, {"games": []},
         )
     assert xml_calls == [[104]]
     assert result["fresh_follower_requests"] == 1
@@ -210,11 +210,11 @@ def test_screen_two_batches_before_any_steam_xml(tmp_path, monkeypatch):
         patch.object(pipeline, "scan_batch", side_effect=fake_scan),
         patch.object(pipeline, "SteamUpcomingCollector") as collector,
     ):
-        first = pipeline.run_prefilter_phase(args, state, {"games": catalog})
+        first = pipeline.run_prefilter_phase(args, state, {"games": catalog, "date_precision_complete": True, "date_precision_eligible": catalog})
         assert first["fresh_follower_requests"] == 0
         assert state["phase"] == "prefilter"
         assert state["prefilter_next_index"] == 2
-        second = pipeline.run_prefilter_phase(args, state, {"games": catalog})
+        second = pipeline.run_prefilter_phase(args, state, {"games": catalog, "date_precision_complete": True, "date_precision_eligible": catalog})
     collector.assert_not_called()
     assert second["fresh_follower_requests"] == 0
     assert state["phase"] == "followers"

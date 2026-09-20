@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T17:03:00Z",
+  "updated_at": "2026-09-20T17:17:00Z",
   "source_repository": "danielet087/game-trend-radar",
   "source_path": "data/steam_upcoming.json",
   "source_fingerprint_fields": [
@@ -1877,6 +1877,26 @@
       "image_assets_status": "pending_source_check",
       "image_audit_version": 1
     },
+    "3960600": {
+      "status": "partial",
+      "source_fingerprint": "{\"name\":\"Warrior Cats: Clans of the Forest\",\"name_en\":\"Warrior Cats: Clans of the Forest\",\"name_zh_tw\":null,\"name_zh_cn\":null,\"release_raw\":\"2026 年 10 月 23 日\",\"release_start\":\"2026-10-23\",\"release_time_utc\":\"2026-10-23T16:00:00Z\",\"release_date_basis\":\"steam_official_traditional_chinese_store_announced_calendar_date\",\"language_support\":{\"tchinese\":false,\"schinese\":false,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3960600/?l=tchinese\"}",
+      "completed_fields": [
+        "short_description",
+        "genres",
+        "tags",
+        "categories"
+      ],
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T17:17:00Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/3960600/Warrior_Cats_Clans_of_the_Forest/?curator_clanid=45680211",
+      "tags_source_url": "https://store.steampowered.com/app/3960600/Warrior_Cats_Clans_of_the_Forest/?curator_clanid=45680211",
+      "genres_source_url": "https://store.steampowered.com/app/3960600/Warrior_Cats_Clans_of_the_Forest/?curator_clanid=45680211",
+      "categories_source_url": "https://store.steampowered.com/app/3960600/Warrior_Cats_Clans_of_the_Forest/?curator_clanid=45680211",
+      "release_date_review": "Steam official TW date 2026-10-23 conflicts with SteamDB UTC time that converts to 2026-10-24; preserve official calendar date and existing source-conflict metadata."
+    },
     "4019220": {
       "status": "partial",
       "source_fingerprint": "{\"name\":\"Dressmaker\",\"name_en\":\"Dressmaker\",\"name_zh_tw\":null,\"name_zh_cn\":\"针影裁梦\",\"release_raw\":\"2026-09-22\",\"release_start\":\"2026-09-22\",\"release_time_utc\":\"2026-09-21T16:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4019220/f1cd08127872e60e4c47a4bc3e40d682d94741bf/header.jpg?t=1789129226\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4019220/dde8e789013d3ff938c10dffa3689e6977b0672c/capsule_616x353.jpg?t=1789129226\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4019220/\"}",
@@ -2244,6 +2264,23 @@
       "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change",
       "image_assets_status": "pending_source_check",
       "image_audit_version": 1
+    },
+    "4348910": {
+      "status": "complete",
+      "source_fingerprint": "{\"name\":\"Probably Stolen - Cyberpunk Shopkeeper Sim\",\"name_en\":\"Probably Stolen - Cyberpunk Shopkeeper Sim\",\"name_zh_tw\":null,\"name_zh_cn\":null,\"release_raw\":\"28 Oct, 2026\",\"release_start\":\"2026-10-28\",\"release_time_utc\":\"2026-10-28T15:55:00Z\",\"release_date_basis\":\"steamdb_explicit_utc_release_time_crosschecked_with_steam_store\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4348910/?l=tchinese\"}",
+      "completed_fields": [
+        "short_description",
+        "genres",
+        "tags",
+        "categories"
+      ],
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T17:17:00Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4348910/?curator_clanid=4777282",
+      "tags_source_url": "https://store.steampowered.com/app/4348910/?curator_clanid=4777282",
+      "genres_source_url": "https://store.steampowered.com/app/4348910/?curator_clanid=4777282",
+      "categories_source_url": "https://store.steampowered.com/app/4348910/?curator_clanid=4777282"
     },
     "4354570": {
       "status": "partial",

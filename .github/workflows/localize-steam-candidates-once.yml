@@ -1,10 +1,8 @@
 name: One-time official Steam TW names for eligible candidates
 
 # A single authorized localization run; switch to manual-only after starting.
+# One-time update started; manual-only thereafter.
 on:
-  push:
-    branches: [main]
-    paths: [".github/workflows/localize-steam-candidates-once.yml"]
   workflow_dispatch:
 
 permissions:

@@ -15,7 +15,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from scripts.steam_candidate_pipeline import run_prefilter_phase
+from scripts.steam_candidate_pipeline import active_candidate_rows, run_prefilter_phase
 from scripts.update_steam_daily import load_json, save_json
 
 LOG = logging.getLogger(__name__)
@@ -88,12 +88,13 @@ def main() -> None:
 
     state = load_json(STATE, {})
     catalog = load_json(CATALOG, {})
-    rows = catalog.get("games") or []
     if (state.get("mode") != "two_phase_steam_year"
         or state.get("days_scanned") != 365
-        or state.get("phase") not in ("prefilter", "followers")
-        or len(rows) < 11000):
+        or state.get("phase") not in ("prefilter", "followers")):
         raise RuntimeError("Year discovery incomplete or state unexpected; refusing to scan")
+    rows = active_candidate_rows(catalog, state)
+    if not rows or (not state.get("date_precision_required") and len(rows) < 11000):
+        raise RuntimeError("No verified eligible candidates or unexpected legacy catalog")
     args = argparse.Namespace(
         prefilter_state=str(PREFILTER),
         prefilter_batch_size=options.batch_size,

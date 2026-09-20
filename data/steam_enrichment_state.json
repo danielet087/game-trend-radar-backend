@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T12:32:38.602Z",
+  "updated_at": "2026-09-20T12:40:16.063Z",
   "source_repository": "danielet087/game-trend-radar",
   "source_path": "data/steam_upcoming.json",
   "source_fingerprint_fields": [
@@ -1400,7 +1400,7 @@
     },
     "3393110": {
       "status": "partial",
-      "source_fingerprint": "{\"name\":\"AION 2\",\"name_en\":\"AION 2\",\"name_zh_tw\":null,\"name_zh_cn\":\"AION 2\",\"release_raw\":\"Oct 5, 2026\",\"release_start\":\"2026-10-05\",\"release_time_utc\":\"2026-10-05T13:00:00Z\",\"release_date_basis\":\"steamdb_explicit_utc_store_release_time\",\"header_image\":\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3393110/header.jpg\",\"main_capsule_image\":\"https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3393110/capsule_616x353.jpg\",\"language_support\":{\"tchinese\":false,\"schinese\":false,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3393110/AION_2/\"}",
+      "source_fingerprint": "{\"name\":\"AION 2\",\"name_en\":\"AION 2\",\"name_zh_tw\":null,\"name_zh_cn\":\"AION 2\",\"release_raw\":\"Oct 5, 2026\",\"release_start\":\"2026-10-05\",\"release_time_utc\":\"2026-10-05T13:00:00Z\",\"release_date_basis\":\"steamdb_explicit_utc_store_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3393110/8ba6511e1889fd45561956e603d04fac1a89645e/header.jpg\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3393110/aac8c918571c7e5a82e8e8345126853d1470b68a/capsule_616x353.jpg\",\"language_support\":{\"tchinese\":false,\"schinese\":false,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3393110/AION_2/\"}",
       "completed_fields": [
         "short_description",
         "genres",
@@ -1408,7 +1408,7 @@
         "categories"
       ],
       "remaining_fields": [
-        "image_asset_audit"
+        "image_http_validation"
       ],
       "last_enriched_at": "2026-09-20T12:18:54.679Z",
       "enrichment_version": 1,
@@ -1417,8 +1417,10 @@
       "genres_source_url": "https://store.steampowered.com/app/3393110/",
       "store_release_date_reported": "2026-10-05",
       "release_date_review": null,
-      "image_assets_status": "pending_source_check",
-      "image_audit_version": 1
+      "image_assets_status": "awaiting_http_validation",
+      "image_audit_version": 1,
+      "image_assets_source_url": "https://steamdb.info/app/3393110/linked/",
+      "image_assets_checked_at": "2026-09-20T12:40:16.063Z"
     },
     "3431300": {
       "status": "partial",
@@ -2264,9 +2266,9 @@
   "image_asset_audit": {
     "version": 1,
     "total_games": 98,
-    "source_checked_assets": 1,
-    "pending_source_check": 97,
-    "pending_http_validation": 1,
+    "source_checked_assets": 2,
+    "pending_source_check": 96,
+    "pending_http_validation": 2,
     "description": "Text metadata completion is independent of image-source validation. Recheck asset versions even when input fingerprint is unchanged."
   }
 }

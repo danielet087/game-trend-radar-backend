@@ -1,10 +1,8 @@
 name: One-time screen all Steam candidates before Followers
 
 # User-approved initial wake; set manual-only as soon as this job begins.
+# One-time full-year screening initiated. Manual-only thereafter.
 on:
-  push:
-    branches: [main]
-    paths: [".github/workflows/screen-steam-exact-day-once.yml"]
   workflow_dispatch:
 
 permissions:

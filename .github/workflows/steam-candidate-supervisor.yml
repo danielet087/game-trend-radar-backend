@@ -7,16 +7,9 @@ name: Steam candidate supervisor
 # Once discovery is complete, dispatch one fresh-50-Followers batch and publish its results.
 # Manual continuity wake after first successful Followers publication (cursor 569/11467).
 
+# Paused by request: no automatic schedule, push, or workflow_run triggers.
 on:
   workflow_dispatch:
-  # Automatically resume as soon as a 50-Followers collector run completes.
-  # Cron remains a fallback if workflow_run delivery is delayed.
-  workflow_run:
-    workflows: ["Steam candidates then Followers"]
-    types: [completed]
-    branches: [main]
-  # Hosted-runner cron and push wakeups paused to conserve Actions minutes
-  # while Followers collection is migrated to a non-metered executor.
 
 permissions:
   actions: write

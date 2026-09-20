@@ -444,7 +444,10 @@ def run_follower_batch(
     for row in qualified:
         item = vars(row).copy()
         source = source_by_id.get(row.appid, {})
-        for field in ("name_en", "name_zh_tw", "release_date_timezone",
+        for field in ("name_en", "name_zh_tw", "name_zh_cn",
+                      "name_zh_tw_traditional", "name_zh_cn_traditional",
+                      "name_en_traditional", "language_support",
+                      "release_date_timezone",
                       "release_date_basis", "release_time_utc",
                       "release_time_source", "discovered_by",
                       "release_display_precision", "sexual_content_screened"):

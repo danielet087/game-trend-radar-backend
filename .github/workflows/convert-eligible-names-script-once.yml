@@ -1,10 +1,8 @@
 name: One-time convert eligible Steam titles to Traditional
 
 # Authorized one-time derived-field update, not a recurring scan.
+# One-time data update completed; workflow remains manual-only.
 on:
-  push:
-    branches: [main]
-    paths: [".github/workflows/convert-eligible-names-script-once.yml"]
   workflow_dispatch:
 
 permissions:

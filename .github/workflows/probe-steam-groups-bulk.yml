@@ -1,10 +1,7 @@
 name: Probe Steam groups third-party bulk (read-only)
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-groups-bulk.yml"
   workflow_dispatch:
 
 permissions:

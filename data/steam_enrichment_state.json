@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T12:24:03.630Z",
+  "updated_at": "2026-09-20T12:24:46.562Z",
   "source_repository": "danielet087/game-trend-radar",
   "source_path": "data/steam_upcoming.json",
   "source_fingerprint_fields": [
@@ -121,17 +121,24 @@
       "enrichment_version": 1
     },
     "1374860": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Nocturne\",\"name_en\":\"Nocturne\",\"name_zh_tw\":null,\"release_raw\":\"2026-09-23\",\"release_start\":\"2026-09-23\",\"release_time_utc\":\"2026-09-22T19:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1374860/065f6ec3b1e529f960b6df04320a3c3b13d2fb27/header.jpg?t=1787331543\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1374860/b64f2d1919b89502f00dd53b74d9c20e2a581bc0/capsule_616x353.jpg?t=1787331543\",\"language_support\":{\"tchinese\":false,\"schinese\":false,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/1374860/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/1374860/",
+      "tags_source_url": "https://store.steampowered.com/app/1374860/",
+      "genres_source_url": "https://store.steampowered.com/app/1374860/",
+      "store_release_date_reported": "2026-09-24",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "1488490": {
       "status": "complete",
@@ -610,30 +617,44 @@
       "enrichment_version": 1
     },
     "2712590": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Dragon Shelter\",\"name_en\":\"Dragon Shelter\",\"name_zh_tw\":null,\"name_zh_cn\":\"龙之庇护所 / Dragon Shelter\",\"release_raw\":\"2026-09-25\",\"release_start\":\"2026-09-25\",\"release_time_utc\":\"2026-09-24T17:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2712590/1946b71344161efc2a1e9941f9cd1d39ab5bf8c2/header.jpg?t=1789483881\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2712590/ee1b3261168699b0a520f06fe5285ec02690c89d/capsule_616x353.jpg?t=1789483881\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2712590/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2712590/",
+      "tags_source_url": "https://store.steampowered.com/app/2712590/",
+      "genres_source_url": "https://store.steampowered.com/app/2712590/",
+      "store_release_date_reported": "2026-09-24",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2738170": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Edge of Memories\",\"name_en\":\"Edge of Memories\",\"name_zh_tw\":null,\"release_raw\":\"2026-11-06\",\"release_start\":\"2026-11-06\",\"release_time_utc\":\"2026-11-05T17:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2738170/0282b90dab25408b4bc762148658a8244e275cf0/header.jpg?t=1789639216\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2738170/bff8ac3574915dd842acf6c0d1afe1a9beb192ad/capsule_616x353.jpg?t=1789639216\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2738170/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2738170/",
+      "tags_source_url": "https://store.steampowered.com/app/2738170/",
+      "genres_source_url": "https://store.steampowered.com/app/2738170/",
+      "store_release_date_reported": "2026-11-05",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2769570": {
       "status": "partial",
@@ -656,17 +677,22 @@
       "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2796640": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"The Magus Circle\",\"name_en\":\"The Magus Circle\",\"name_zh_tw\":null,\"release_raw\":\"2026-09-24\",\"release_start\":\"2026-09-24\",\"release_time_utc\":\"2026-09-24T13:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2796640/8b12afb768b576ef3c70445604dfe847bec7e9fb/header.jpg?t=1789485600\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2796640/5799817fdddf5b25043b8edc7cf6f1cb1e55fcb4/capsule_616x353.jpg?t=1789485600\",\"language_support\":{\"tchinese\":false,\"schinese\":false,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2796640/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2796640/",
+      "tags_source_url": "https://store.steampowered.com/app/2796640/",
+      "genres_source_url": "https://store.steampowered.com/app/2796640/",
+      "store_release_date_reported": "2026-09-24",
+      "release_date_review": null
     },
     "2826790": {
       "status": "pending",
@@ -720,17 +746,24 @@
       "release_date_review": null
     },
     "2916700": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Attack on Titan 3 / A.O.T. 3\",\"name_en\":\"Attack on Titan 3 / A.O.T. 3\",\"name_zh_tw\":\"進擊的巨人３\",\"name_zh_cn\":\"进击的巨人３\",\"release_raw\":\"9 Dec, 2026\",\"release_start\":\"2026-12-10\",\"release_time_utc\":\"2026-12-10T01:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2916700/4f8050e28af7bfa290b187dda2ecf776db7b6c85/header.jpg?t=1788934540\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2916700/ad90cf68f4eb9ebb7cd276dc16fca1cd1b0e0350/capsule_616x353.jpg?t=1788934540\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2916700/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2916700/",
+      "tags_source_url": "https://store.steampowered.com/app/2916700/",
+      "genres_source_url": "https://store.steampowered.com/app/2916700/",
+      "store_release_date_reported": "2026-12-09",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2929250": {
       "status": "complete",
@@ -970,17 +1003,24 @@
       "content_review": null
     },
     "3224600": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Am I Nima\",\"name_en\":\"Am I Nima\",\"name_zh_tw\":null,\"release_raw\":\"2026-11-28\",\"release_start\":\"2026-11-28\",\"release_time_utc\":\"2026-11-27T17:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3224600/ec4c212665296bd88ee2cb506455d6b1ceeb2c30/header.jpg?t=1788596365\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3224600/ea66a13c0190bd352a594e958dfdde2fd4a6f3dc/capsule_616x353.jpg?t=1788596365\",\"language_support\":{\"tchinese\":false,\"schinese\":false,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3224600/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/3224600/",
+      "tags_source_url": "https://store.steampowered.com/app/3224600/",
+      "genres_source_url": "https://store.steampowered.com/app/3224600/",
+      "store_release_date_reported": "2026-11-27",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "3230960": {
       "status": "partial",
@@ -1310,17 +1350,24 @@
       "enrichment_version": 1
     },
     "3841510": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"DYNASTY WARRIORS 3: Complete Edition Remastered\",\"name_en\":\"DYNASTY WARRIORS 3: Complete Edition Remastered\",\"name_zh_tw\":\"真・三國無雙２ with 猛將傳 Remastered\",\"name_zh_cn\":\"真・三国无双２ with 猛将传 Remastered\",\"release_raw\":\"30 Sep, 2026\",\"release_start\":\"2026-10-01\",\"release_time_utc\":\"2026-10-01T01:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3841510/3e4981c87cb8674a9668424e3560d1144d736ed5/header.jpg?t=1787905550\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3841510/3400714c1e0c3f01dc787ab29a066757a5347b99/capsule_616x353.jpg?t=1787905550\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3841510/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/3841510/",
+      "tags_source_url": "https://store.steampowered.com/app/3841510/",
+      "genres_source_url": "https://store.steampowered.com/app/3841510/",
+      "store_release_date_reported": "2026-09-30",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "3883570": {
       "status": "pending",
@@ -1445,17 +1492,22 @@
       "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "4094660": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"Rivage\",\"name_en\":\"Rivage\",\"name_zh_tw\":null,\"name_zh_cn\":\"她在时间之外\",\"release_raw\":\"2026-09-22\",\"release_start\":\"2026-09-22\",\"release_time_utc\":\"2026-09-22T14:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4094660/25ca531e261b1217387bbf4a039623002f233287/header.jpg?t=1789744312\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4094660/b92ce011ddcbda9b19968c381c56520931971356/capsule_616x353.jpg?t=1789744312\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4094660/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4094660/",
+      "tags_source_url": "https://store.steampowered.com/app/4094660/",
+      "genres_source_url": "https://store.steampowered.com/app/4094660/",
+      "store_release_date_reported": "2026-09-22",
+      "release_date_review": null
     },
     "4115450": {
       "status": "partial",
@@ -1531,17 +1583,24 @@
       "enrichment_version": 1
     },
     "4253770": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Muramasa: Revenant Blades\",\"name_en\":\"Muramasa: Revenant Blades\",\"name_zh_tw\":\"朧村正怪奇譚\",\"name_zh_cn\":\"胧村正怪奇谭\",\"release_raw\":\"2027-02-04\",\"release_start\":\"2027-02-04\",\"release_time_utc\":\"2027-02-04T05:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4253770/5707e55c90a88cfa12e2931fd9a5b0ec7af8529d/header.jpg?t=1789077364\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4253770/c60aa5559ca54c2241fe48a3ff5dab77299c6c7f/capsule_616x353.jpg?t=1789077364\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4253770/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4253770/",
+      "tags_source_url": "https://store.steampowered.com/app/4253770/",
+      "genres_source_url": "https://store.steampowered.com/app/4253770/",
+      "store_release_date_reported": "2027-02-03",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "4258290": {
       "status": "complete",
@@ -1562,17 +1621,22 @@
       "release_date_review": null
     },
     "4259190": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"Kingdom Rush 6: Genesis TD\",\"name_en\":\"Kingdom Rush 6: Genesis TD\",\"name_zh_tw\":\"王國保衛戰 6：重啟\",\"name_zh_cn\":\"王国保卫战 6：新启程\",\"release_raw\":\"2026-09-24\",\"release_start\":\"2026-09-24\",\"release_time_utc\":\"2026-09-24T13:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4259190/9f7d11479e98db4e5798ed936ca69f1ebb5cebe4/header.jpg?t=1789590210\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4259190/f9ea339a82ef42b74e44c85cbbafa7c0868baac8/capsule_616x353.jpg?t=1789590210\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4259190/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:24:46.562Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4259190/",
+      "tags_source_url": "https://store.steampowered.com/app/4259190/",
+      "genres_source_url": "https://store.steampowered.com/app/4259190/",
+      "store_release_date_reported": "2026-09-24",
+      "release_date_review": null
     },
     "4260840": {
       "status": "partial",

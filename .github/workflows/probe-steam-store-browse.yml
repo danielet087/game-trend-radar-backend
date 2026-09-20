@@ -1,11 +1,8 @@
 name: Probe Steam Store Browse release timestamp
 
+# Paused by request: automatic workflow triggers disabled.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-store-browse.yml"
 
 permissions:
   contents: read

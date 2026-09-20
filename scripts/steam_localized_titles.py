@@ -12,6 +12,27 @@ import re
 import time
 
 import requests
+from opencc import OpenCC
+
+_CONVERT_TO_TRADITIONAL = OpenCC("s2t")
+
+def display_in_traditional(raw: object) -> str | None:
+    """Convert script only; never change the original Steam Store name."""
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    return _CONVERT_TO_TRADITIONAL.convert(raw.strip())
+
+def add_traditional_display_names(game: dict) -> None:
+    for source, target in (
+        ("name_zh_tw", "name_zh_tw_traditional"),
+        ("name_zh_cn", "name_zh_cn_traditional"),
+        ("name_en", "name_en_traditional"),
+    ):
+        value = game.get(source)
+        if isinstance(value, str) and HAN.search(value):
+            game[target] = display_in_traditional(value)
+        else:
+            game.pop(target, None)
 
 LOG = logging.getLogger(__name__)
 STORE_URL = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
@@ -106,4 +127,7 @@ def enrich_tw_names(games: list[dict], store_names: dict[int, str]) -> dict[str,
             results["english_fallback"] += 1
         if appid not in store_names:
             results["store_not_returned"] += 1
+        # Steam tchinese titles can themselves contain Simplified glyphs.
+        # Store raw names for provenance and separate Traditional display values.
+        add_traditional_display_names(game)
     return results

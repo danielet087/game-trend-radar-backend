@@ -1,0 +1,51 @@
+{
+  "report_date_taiwan": "2026-09-20",
+  "task": "Steam future-one-year online discovery (independent web search)",
+  "status": "partial_public_web_search_only_not_full_365_day_discovery",
+  "date_window_taiwan": {
+    "start": "2026-09-20",
+    "end": "2027-09-19"
+  },
+  "official_store_search": {
+    "url": "https://store.steampowered.com/search/?filter=comingsoon&ignore_preferences=1&ndl=1",
+    "search_results_seen": 16995,
+    "search_results_scope": "All Products, all announced dates, excludes no adult content via preferences",
+    "note": "Search result total includes demos, DLC, soundtracks, products outside one-year period, and products without a precise YYYY-MM-DD date. This is NOT candidate game count."
+  },
+  "individually_checked_store_examples": [
+    {
+      "appid": 4115450,
+      "name": "Phantom Blade Zero",
+      "store_announced_date": "2026-10-28",
+      "store_url": "https://store.steampowered.com/app/4115450/Phantom_Blade_Zero/"
+    },
+    {
+      "appid": 4019220,
+      "name": "Dressmaker",
+      "store_announced_date": "2026-09-21",
+      "store_url": "https://store.steampowered.com/app/4019220/Dressmaker/"
+    },
+    {
+      "appid": 1488490,
+      "name": "Nivalis Nights",
+      "store_announced_date": "2026-09-29",
+      "store_url": "https://store.steampowered.com/app/1488490/Nivalis_Nights/"
+    }
+  ],
+  "counts": {
+    "official_store_upcoming_all_products_search": 16995,
+    "all_future_year_games_found": null,
+    "full_date_and_nonsexual_eligible": null,
+    "official_followers_at_least_5000_verified": null,
+    "final_enriched_games": null
+  },
+  "official_followers_queries_performed": 0,
+  "github_historical_candidates_11467_reused_as_fresh_search": false,
+  "changed_existing_data_files": [],
+  "limitations": [
+    "Web search exposes a results count and selected pages, but does not provide an export of every page for 365-day structured filtering in this execution.",
+    "Neither the 16,995 all-product result count nor the existing historical 11,467 backend count establishes this run's one-year game count.",
+    "No official Steam Community Followers verification was attempted on the full newly filtered population.",
+    "No scheduled or manual GitHub Actions workflow was invoked."
+  ]
+}

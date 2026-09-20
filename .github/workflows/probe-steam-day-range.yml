@@ -1,11 +1,9 @@
 name: Probe Steam day-range query
 # Re-run after private STEAM_WEB_API_KEY setup; never print secret.
 
+# Paused by request: automatic workflow triggers disabled.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [".github/workflows/probe-steam-day-range.yml"]
 
 permissions:
   contents: read

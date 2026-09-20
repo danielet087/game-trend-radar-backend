@@ -1,0 +1,171 @@
+{
+  "task_name": "Steam 遊戲資料同步",
+  "actual_started_at_taipei": "2026-09-21 00:10 (approximate, based on scheduler-provided local time; exact start timestamp unavailable)",
+  "actual_completed_at_utc": "2026-09-20T16:11:59.693Z",
+  "actual_completed_at_taipei": "2026-09-21 00:11:59",
+  "timezone": "Asia/Taipei",
+  "status": "partial_success",
+  "window_taiwan": {
+    "start": "2026-09-21",
+    "end": "2027-09-20",
+    "days": 365
+  },
+  "searched_by_web": [
+    "SteamDB next-7-days upcoming listings",
+    "SteamDB upcoming weeks 2026W43, W44, W45, W47",
+    "SteamDB October 2026 calendar",
+    "SteamDB individual pages for 4348910, 3960600, 4890760",
+    "Official Steam Store full pages for 4348910, 3960600, 4890760",
+    "Other date/week pages through search index"
+  ],
+  "search_completeness": "NOT_EXHAUSTIVE",
+  "coverage_by_calendar_month": [
+    {
+      "month": "2026-09",
+      "checked": "partial: next-7-days page and store release date for 4890760; not complete"
+    },
+    {
+      "month": "2026-10",
+      "checked": "partial: SteamDB calendar, weeks W43/W44 and selected store pages; capped at 100 rows"
+    },
+    {
+      "month": "2026-11",
+      "checked": "partial: SteamDB weeks W45 and W47, capped at 100 rows"
+    },
+    {
+      "month": "2026-12",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-01",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-02",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-03",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-04",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-05",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-06",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-07",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-08",
+      "checked": "not covered"
+    },
+    {
+      "month": "2027-09",
+      "checked": "not covered"
+    }
+  ],
+  "counts": {
+    "candidates_individually_reconciled_against_store_and_steamdb": 3,
+    "fully_qualified_new_games": 2,
+    "new": 2,
+    "updated_existing": 0,
+    "skipped_existing_records": 0,
+    "excluded_for_conflicting_past_official_store_date": 1,
+    "failed": 0,
+    "pending_full_year_coverage": "unknown",
+    "unverified_high_follows_others": "unknown",
+    "removed_from_existing": 0,
+    "before_public": 98,
+    "after_public": 100,
+    "unique_appids_after_public": 100,
+    "all_year_fetched_candidates": null,
+    "all_year_date_type_nonsexual_pass": null,
+    "all_year_follows_pass": null,
+    "historic_candidate_11467_not_used_as_current_run_count": true
+  },
+  "adds": [
+    {
+      "appid": 4348910,
+      "name": "Probably Stolen - Cyberpunk Shopkeeper Sim",
+      "steamdb_follows": 9700,
+      "follows_type": "Steam hub follows (third-party SteamDB)",
+      "follows_source": "https://steamdb.info/upcoming/?week=2026W44",
+      "follows_checked_at_utc": "2026-09-20T16:11:59.693Z",
+      "release_time_utc": "2026-10-28T15:55:00Z",
+      "taiwan_release": "2026-10-28",
+      "release_source": "https://steamdb.info/app/4348910/",
+      "official_store": "https://store.steampowered.com/app/4348910/?l=tchinese",
+      "game_languages": {
+        "traditional_chinese": false,
+        "simplified_chinese": true,
+        "english": true
+      },
+      "adult_note": "Official listing notes substance use/crime, not principally sexual content",
+      "demo_note": "Separate Steam page includes Demo link, but published AppID 4348910 is main game."
+    },
+    {
+      "appid": 3960600,
+      "name": "Warrior Cats: Clans of the Forest",
+      "steamdb_follows": 8367,
+      "follows_type": "Steam hub follows (third-party SteamDB)",
+      "follows_source": "https://steamdb.info/upcoming/?week=2026W43",
+      "follows_checked_at_utc": "2026-09-20T16:11:59.693Z",
+      "release_time_utc": "2026-10-23T16:00:00Z",
+      "taiwan_release": "2026-10-24",
+      "date_source": "https://steamdb.info/app/3960600/",
+      "official_store": "https://store.steampowered.com/app/3960600/?l=tchinese",
+      "game_languages": {
+        "traditional_chinese": false,
+        "simplified_chinese": false,
+        "english": true
+      },
+      "adult_note": "Fantasy violence; family-oriented cat adventure. English store shows E10+ rating."
+    }
+  ],
+  "excluded": [
+    {
+      "appid": 4890760,
+      "name": "THE DEAD WE KNEW: Open World Survival",
+      "steamdb_follows": 12663,
+      "steamdb_source": "https://steamdb.info/upcoming/?week=2026W43",
+      "steamdb_release_time_utc": "2026-10-22T17:00:00Z",
+      "official_store_source": "https://store.steampowered.com/app/4890760/?l=tchinese",
+      "official_store_display_release": "2026-09-17",
+      "reason": "Official Steam Store full date precedes current Taiwan window, in contradiction with SteamDB. Needs source reconciliation; do not publish until clarified."
+    }
+  ],
+  "github": {
+    "public_repository": "danielet087/game-trend-radar",
+    "public_file": "data/steam_upcoming.json",
+    "public_commit_sha": "6350e93232f8f88d41e7272e933b86e80e030a99",
+    "public_readback_verified": true,
+    "public_readback_result": {
+      "count": 100,
+      "unique_appids": 100,
+      "added_appids": [
+        4348910,
+        3960600
+      ]
+    },
+    "report_repository": "danielet087/game-trend-radar-backend",
+    "report_file": "reports/steam_daily_sync_20260921_0010_taipei.json"
+  },
+  "blockers": [
+    "SteamDB listing 100-product cap; actual full-year AppIDs unavailable this run",
+    "SteamDB forbids automated crawling",
+    "Individual Steam Store listings can have conflicting release dates versus SteamDB cached release timestamps",
+    "Unable to assert 13 calendar-month exhaustive coverage via search snippets"
+  ],
+  "github_actions_modified_or_run": false,
+  "automation_settings_modified": false,
+  "additional_services_deployed": false
+}

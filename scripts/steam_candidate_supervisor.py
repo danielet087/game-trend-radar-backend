@@ -82,7 +82,7 @@ def validate_state(state: dict[str, Any]) -> None:
         raise RuntimeError("Steam state is not two-phase; refusing to dispatch")
     phase = state.get("phase")
     days = int(state.get("days_scanned", -1))
-    if phase not in {"discovery", "prefilter", "followers", "complete"} or not 0 <= days <= 365:
+    if phase not in {"discovery", "date_precision", "prefilter", "followers", "complete"} or not 0 <= days <= 365:
         raise RuntimeError(f"Steam state has invalid phase or day count: {phase}, {days}")
     if phase == "discovery":
         anchor = date.fromisoformat(state["anchor_date"])
@@ -132,6 +132,11 @@ def check_once() -> str:
             "Dispatching all remaining release dates up to day 365 (no Followers).",
             days, state.get("next_date"),
             last_attempt.get("new_catalog_total", "unknown"),
+        )
+    elif phase == "date_precision":
+        LOG.info(
+            "Steam public full-date/sexual-content prescreen pending; no Followers "
+            "requests until the eligible catalogue is complete."
         )
     elif phase == "prefilter":
         LOG.info(

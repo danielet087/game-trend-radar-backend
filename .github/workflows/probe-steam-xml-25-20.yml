@@ -1,0 +1,48 @@
+name: Probe Steam XML 25s then 20s (read-only)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/probe-steam-xml-25-20.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Same lock as the OFFICIAL collection. Never add Steam XML load while
+# the production 30-second task is still processing the remaining games.
+concurrency:
+  group: steam-two-phase-initialization
+  cancel-in-progress: false
+
+jobs:
+  rate-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout private backend read-only
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install HTTP client
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Read-only sustained 25 and 20 second XML pilot
+        run: python -m scripts.probe_steam_xml_25_20
+      - name: Validate bounded report and preserve data
+        if: always()
+        run: |
+          if [ -f output/steam_xml_25_20_pilot.json ]; then
+            python -m json.tool output/steam_xml_25_20_pilot.json > /dev/null
+          fi
+          git diff --exit-code -- data/steam_candidate_state.json data/steam_followers_cache.json data/steam_upcoming_master.json
+      - name: Archive private pilot report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-xml-25-20-pilot
+          path: output/steam_xml_25_20_pilot.json
+          if-no-files-found: ignore
+          retention-days: 2

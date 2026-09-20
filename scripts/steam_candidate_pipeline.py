@@ -25,6 +25,9 @@ from scripts.update_steam_daily import load_json, merge_partial_segment, save_js
 from scripts.steam_follower_prefilter import (
     PRIORITY_THRESHOLD, scan_batch,
 )
+from scripts.screen_steam_candidates_before_followers import (
+    build_snapshot, fetch_metadata,
+)
 
 LOG = logging.getLogger(__name__)
 QUERY_URL = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -36,7 +39,8 @@ QUERY_INTERVAL_SECONDS = 1.5
 def fresh_state(anchor: date, days: int) -> dict[str, Any]:
     return {
         "version": 1, "mode": "two_phase_steam_year",
-        "phase": "discovery", "anchor_date": anchor.isoformat(),
+        "phase": "discovery", "date_precision_required": True,
+        "anchor_date": anchor.isoformat(),
         "end_date": (anchor + timedelta(days=days - 1)).isoformat(),
         "next_date": anchor.isoformat(), "days_scanned": 0,
         "next_follower_index": 0, "initial_complete": False,
@@ -197,7 +201,10 @@ def run_discovery(args: argparse.Namespace, state: dict[str, Any], catalog: dict
         "new_catalog_total": len(games_by_id), "followers_queried": 0,
     }
     if start > end:
-        state["phase"] = "prefilter"
+        # Query release timestamps often encode "2026" as 12/31 and "Q2"
+        # as a quarter-end day. Do not prefilter Followers until Store Browse
+        # confirms the displayed date is literally a full year/month/day.
+        state["phase"] = "date_precision"
         state["discovery_finished_at"] = datetime.now(timezone.utc).isoformat()
     catalog["games"] = sorted(
         games_by_id.values(), key=lambda x: (x["release_start"], x["appid"])
@@ -207,6 +214,59 @@ def run_discovery(args: argparse.Namespace, state: dict[str, Any], catalog: dict
     return {"phase": state["phase"], "days_processed": attempts,
             "days_scanned": state["days_scanned"],
             "candidate_count": catalog["count"], "followers_queried": 0}
+
+
+def active_candidate_rows(catalog: dict[str, Any], state: dict[str, Any]) -> list[dict[str, Any]]:
+    """Future runs use only the Store-verified eligible list.
+
+    Old, already-completed historical catalogues are left intact, including
+    their saved follower/prefilter cursors and original 11,467 records.
+    """
+    if state.get("date_precision_required"):
+        if not catalog.get("date_precision_complete"):
+            raise RuntimeError("Steam public display-date gate incomplete; no Followers allowed")
+        return catalog["date_precision_eligible"]
+    return catalog.get("games", [])
+
+
+def run_date_precision_phase(state: dict[str, Any], catalog: dict[str, Any]) -> dict[str, Any]:
+    """Full-year Store display + sexual-content gate BEFORE third-party reads."""
+    original = catalog.get("games", [])
+    if not original or int(state.get("days_scanned", 0)) < 365:
+        raise RuntimeError("Finish 365-day Steam discovery before date gate")
+    if catalog.get("date_precision_complete"):
+        state["phase"] = "prefilter"
+        return {"phase": "date_precision", "already_verified": True,
+                "eligible": len(catalog["date_precision_eligible"])}
+    session = requests.Session()
+    session.headers.update({"User-Agent": "GameTrendRadarPublicReleasePrecision/1.0"})
+    appids = [int(game["appid"]) for game in original]
+    if len(appids) != len(set(appids)):
+        raise RuntimeError("Duplicate AppID in Steam discovery catalogue")
+    details = fetch_metadata(session, sorted(appids))
+    snapshot = build_snapshot(catalog, details)
+    if snapshot["count"] <= 0:
+        raise RuntimeError("No eligible exact-day games; check Store Browse response")
+    # Do not rewrite catalog['games'] or the historical discovery count. Save a
+    # derived candidate list, and only then allow third-party and XML stages.
+    catalog["date_precision_eligible"] = snapshot["games"]
+    catalog["date_precision_summary"] = {
+        k: v for k, v in snapshot.items() if k != "games"
+    }
+    catalog["date_precision_complete"] = True
+    state["date_precision_complete"] = True
+    state["date_precision_eligible_count"] = snapshot["count"]
+    state["date_precision_excluded_count"] = snapshot["excluded"]
+    state["phase"] = "prefilter"
+    state["last_attempt"] = {
+        "phase": "date_precision",
+        "candidate_count": len(original),
+        "eligible_count": snapshot["count"],
+        "excluded_count": snapshot["excluded"],
+        "reasons": snapshot["reasons"],
+        "fresh_follower_requests": 0,
+    }
+    return dict(state["last_attempt"])
 
 
 def as_upcoming_game(raw: dict[str, Any]) -> UpcomingGame:
@@ -232,7 +292,7 @@ def run_prefilter_phase(
     args: argparse.Namespace, state: dict[str, Any], catalog: dict[str, Any],
 ) -> dict[str, Any]:
     """Phase 2: scan ONLY the third-party source, never instantiate XML collector."""
-    rows = catalog.get("games", [])
+    rows = active_candidate_rows(catalog, state)
     path = Path(args.prefilter_state)
     pre = load_json(path, {"version": 1, "next_index": 0,
                            "complete": False, "games": {}})
@@ -321,7 +381,7 @@ def run_follower_batch(
     master: dict[str, Any],
 ) -> dict[str, Any]:
     """Phase 3: ONLY official XML for titles measured >=4000 in phase 2."""
-    rows = catalog.get("games", [])
+    rows = active_candidate_rows(catalog, state)
     pre = load_json(Path(args.prefilter_state), {"games": {}})
     if not prefilter_complete(pre, rows):
         raise RuntimeError("Step 2 has not screened every candidate; no official XML allowed")
@@ -414,12 +474,14 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     phase = state.get("phase")
     if phase == "discovery":
         result = run_discovery(args, state, catalog)
+    elif phase == "date_precision":
+        result = run_date_precision_phase(state, catalog)
     elif phase == "prefilter" or (
         phase == "followers"
         and int(getattr(args, "prefilter_batch_size", 0) or 0) > 0
         and not prefilter_complete(
             load_json(Path(args.prefilter_state), {"games": []}),
-            catalog.get("games", []),
+            active_candidate_rows(catalog, state),
         )
     ):
         result = run_prefilter_phase(args, state, catalog)
@@ -463,8 +525,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 "official_verified_count": state.get("official_verified_count", 0),
                 "last_attempt": state.get("last_attempt"),
             },
-            "count": len(master.get("games", [])),
-            "games": master.get("games", []),
+            "count": len(master.get("games", [])) if not state.get("date_precision_required") else sum(
+                g.get("appid") in {row["appid"] for row in active_candidate_rows(catalog, state)}
+                for g in master.get("games", [])
+            ),
+            "games": (
+                [g for g in master.get("games", []) if
+                 g.get("appid") in {row["appid"] for row in active_candidate_rows(catalog, state)}]
+                if state.get("date_precision_required") else master.get("games", [])
+            ),
         }
         write_json(output, args.output)
     LOG.info("Steam two-stage run: %s", result)

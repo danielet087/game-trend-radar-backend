@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-20T12:21:16.937Z",
+  "updated_at": "2026-09-20T12:23:08.391Z",
   "source_repository": "danielet087/game-trend-radar",
   "source_path": "data/steam_upcoming.json",
   "source_fingerprint_fields": [
@@ -31,17 +31,24 @@
   ],
   "games": {
     "499170": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Order of the Sinking Star\",\"name_en\":\"Order of the Sinking Star\",\"name_zh_tw\":\"沉星之序\",\"name_zh_cn\":\"沉星之序\",\"release_raw\":\"8 Oct, 2026\",\"release_start\":\"2026-10-09\",\"release_time_utc\":\"2026-10-08T18:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/499170/deda420d9e42288f4734a068c707f4c156203969/header.jpg?t=1789703065\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/499170/3ffb98fc19a9672e5f31c41a168ac8002b0c1792/capsule_616x353.jpg?t=1789703065\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/499170/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/499170/",
+      "tags_source_url": "https://store.steampowered.com/app/499170/",
+      "genres_source_url": "https://store.steampowered.com/app/499170/",
+      "store_release_date_reported": "2026-10-08",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "632950": {
       "status": "pending",
@@ -224,17 +231,22 @@
       "content_review": null
     },
     "1706510": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"Songs of Glimmerwick\",\"name_en\":\"Songs of Glimmerwick\",\"name_zh_tw\":null,\"release_raw\":\"2026-09-30\",\"release_start\":\"2026-09-30\",\"release_time_utc\":\"2026-09-30T14:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1706510/2e6d0bc2ac7bac10bf9f90ca91d69a48ad76c255/header.jpg?t=1786643076\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1706510/0aa9ac47e02b5f3bb1fc86932ac3d675cee08344/capsule_616x353.jpg?t=1786643076\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/1706510/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/1706510/",
+      "tags_source_url": "https://store.steampowered.com/app/1706510/",
+      "genres_source_url": "https://store.steampowered.com/app/1706510/",
+      "store_release_date_reported": "2026-09-30",
+      "release_date_review": null
     },
     "1853440": {
       "status": "partial",
@@ -312,17 +324,24 @@
       "content_review": null
     },
     "2017940": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Pony Island 2: Panda Circus\",\"name_en\":\"Pony Island 2: Panda Circus\",\"name_zh_tw\":null,\"name_zh_cn\":\"小马岛2：熊猫马戏团\",\"release_raw\":\"2027-04-28\",\"release_start\":\"2027-04-28\",\"release_time_utc\":\"2027-04-27T18:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2017940/header.jpg?t=1787687297\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2017940/capsule_616x353.jpg?t=1787687297\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2017940/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2017940/",
+      "tags_source_url": "https://store.steampowered.com/app/2017940/",
+      "genres_source_url": "https://store.steampowered.com/app/2017940/",
+      "store_release_date_reported": "2027-04-27",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2067820": {
       "status": "pending",
@@ -338,17 +357,24 @@
       "enrichment_version": 1
     },
     "2121510": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Tenebris Somnia\",\"name_en\":\"Tenebris Somnia\",\"name_zh_tw\":null,\"release_raw\":\"2026-10-17\",\"release_start\":\"2026-10-17\",\"release_time_utc\":\"2026-10-16T17:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2121510/header.jpg?t=1782359332\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2121510/3459b1dc24cdbf20e3f9337889ca27b9e59305bf/capsule_616x353.jpg?t=1782359332\",\"language_support\":{\"tchinese\":false,\"schinese\":false,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2121510/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2121510/",
+      "tags_source_url": "https://store.steampowered.com/app/2121510/",
+      "genres_source_url": "https://store.steampowered.com/app/2121510/",
+      "store_release_date_reported": "2026-10-16",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2141130": {
       "status": "partial",
@@ -468,17 +494,24 @@
       "release_date_review": null
     },
     "2333000": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Silver Pines\",\"name_en\":\"Silver Pines\",\"release_raw\":\"8 Oct, 2026\",\"release_start\":\"2026-10-09\",\"release_time_utc\":\"2026-10-08T16:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2333000/628a0c6da8ac5a4410d6dc82cd88c8b0f090d1cf/header_alt_assets_1.jpg?t=1786617031\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2333000/98f94bbac879ad9fa118f607c8f2ed76819f8471/capsule_616x353_alt_assets_1.jpg?t=1786617031\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/2333000/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/2333000/",
+      "tags_source_url": "https://store.steampowered.com/app/2333000/",
+      "genres_source_url": "https://store.steampowered.com/app/2333000/",
+      "store_release_date_reported": "2026-10-08",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "2376260": {
       "status": "complete",
@@ -818,17 +851,24 @@
       "enrichment_version": 1
     },
     "3115160": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Warhammer 40,000: Boltgun 2\",\"name_en\":\"Warhammer 40,000: Boltgun 2\",\"name_zh_tw\":null,\"release_raw\":\"2026-10-15\",\"release_start\":\"2026-10-15\",\"release_time_utc\":\"2026-10-14T16:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3115160/5f9bb697da7c17abcfec3205446d896a4cd561bb/header.jpg?t=1787770843\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3115160/c23f810053b182f6b723bfed0e1a773966c060ae/capsule_616x353.jpg?t=1787770843\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3115160/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/3115160/",
+      "tags_source_url": "https://store.steampowered.com/app/3115160/",
+      "genres_source_url": "https://store.steampowered.com/app/3115160/",
+      "store_release_date_reported": "2026-10-14",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "3161310": {
       "status": "complete",
@@ -849,17 +889,24 @@
       "release_date_review": null
     },
     "3204330": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"County of Fortune\",\"name_en\":\"County of Fortune\",\"name_zh_tw\":\"財富郡：貿易與生產\",\"name_zh_cn\":\"财富郡：贸易与生产\",\"release_raw\":\"2026-11-05\",\"release_start\":\"2026-11-05\",\"release_time_utc\":\"2026-11-05T14:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3204330/header.jpg?t=1789570842\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3204330/c49d99b83954fe908fe6ff31449f7e3e617d89bb/capsule_616x353.jpg?t=1789570842\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3204330/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/3204330/",
+      "tags_source_url": "https://store.steampowered.com/app/3204330/",
+      "genres_source_url": "https://store.steampowered.com/app/3204330/",
+      "store_release_date_reported": null,
+      "release_date_review": "Store only specifies quarter or year; exact day in current public record needs independent verification"
     },
     "3219030": {
       "status": "complete",
@@ -1081,17 +1128,24 @@
       "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "3509420": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Planetbase 2\",\"name_en\":\"Planetbase 2\",\"name_zh_tw\":null,\"release_raw\":\"2027-03-19\",\"release_start\":\"2027-03-19\",\"release_time_utc\":\"2027-03-19T08:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3509420/801c499323cfc3602a83c7b941812996a533b86b/header.jpg?t=1788697630\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3509420/0b7d45c95902fddf5154f94829c51819aff65403/capsule_616x353.jpg?t=1788697630\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/3509420/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/3509420/",
+      "tags_source_url": "https://store.steampowered.com/app/3509420/",
+      "genres_source_url": "https://store.steampowered.com/app/3509420/",
+      "store_release_date_reported": null,
+      "release_date_review": "Store only specifies quarter or year; exact day in current public record needs independent verification"
     },
     "3558670": {
       "status": "partial",
@@ -1244,17 +1298,24 @@
       "enrichment_version": 1
     },
     "4019220": {
-      "status": "pending",
+      "status": "partial",
       "source_fingerprint": "{\"name\":\"Dressmaker\",\"name_en\":\"Dressmaker\",\"name_zh_tw\":null,\"name_zh_cn\":\"针影裁梦\",\"release_raw\":\"2026-09-22\",\"release_start\":\"2026-09-22\",\"release_time_utc\":\"2026-09-21T16:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4019220/f1cd08127872e60e4c47a4bc3e40d682d94741bf/header.jpg?t=1789129226\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4019220/dde8e789013d3ff938c10dffa3689e6977b0672c/capsule_616x353.jpg?t=1789129226\",\"language_support\":{\"tchinese\":false,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4019220/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [
+        "release_date_review"
+      ],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4019220/",
+      "tags_source_url": "https://store.steampowered.com/app/4019220/",
+      "genres_source_url": "https://store.steampowered.com/app/4019220/",
+      "store_release_date_reported": "2026-09-21",
+      "release_date_review": "Store displayed date differs from Asia/Taipei release_start; preserve verified release_time_utc and TW conversion; recheck on meaningful release-date change"
     },
     "4072240": {
       "status": "pending",
@@ -1426,17 +1487,22 @@
       "enrichment_version": 1
     },
     "4258290": {
-      "status": "pending",
+      "status": "complete",
       "source_fingerprint": "{\"name\":\"We Are So Cooked\",\"name_en\":\"We Are So Cooked\",\"name_zh_tw\":null,\"release_raw\":\"2026-10-15\",\"release_start\":\"2026-10-15\",\"release_time_utc\":\"2026-10-15T12:00:00Z\",\"release_date_basis\":\"steam_store_browse_release_time\",\"header_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4258290/87d5a0927985c5163d4625e40137060b5de45c11/header.jpg?t=1787893814\",\"main_capsule_image\":\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4258290/2e67f7ccc0605fdc49c0b16141235f8853de2b73/capsule_616x353.jpg?t=1787893814\",\"language_support\":{\"tchinese\":true,\"schinese\":true,\"english\":true},\"store_url\":\"https://store.steampowered.com/app/4258290/\"}",
-      "completed_fields": [],
-      "remaining_fields": [
+      "completed_fields": [
         "short_description",
         "genres",
         "tags",
         "categories"
       ],
-      "last_enriched_at": null,
-      "enrichment_version": 1
+      "remaining_fields": [],
+      "last_enriched_at": "2026-09-20T12:23:08.391Z",
+      "enrichment_version": 1,
+      "description_source_url": "https://store.steampowered.com/app/4258290/",
+      "tags_source_url": "https://store.steampowered.com/app/4258290/",
+      "genres_source_url": "https://store.steampowered.com/app/4258290/",
+      "store_release_date_reported": "2026-10-15",
+      "release_date_review": null
     },
     "4259190": {
       "status": "pending",

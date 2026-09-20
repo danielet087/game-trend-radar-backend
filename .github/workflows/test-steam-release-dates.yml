@@ -1,18 +1,8 @@
 name: Verify Steam Taiwan release dates
 
+# Paused by request: automatic workflow triggers disabled.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/test-steam-release-dates.yml"
-      - "scripts/steam_release_dates.py"
-      - "tests/test_steam_release_dates.py"
-      - "collectors/steam_upcoming.py"
-      - "tests/test_steam_future_discovery.py"
-      - "tests/test_steam_upcoming.py"
-      - "scripts/update_steam_daily.py"
 
 permissions:
   contents: read

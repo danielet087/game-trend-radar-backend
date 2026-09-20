@@ -1,10 +1,7 @@
 name: Probe Steam bulk 205-title stress sample
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-bulk-stress-v2.yml"
   workflow_dispatch:
 
 permissions:

@@ -1,10 +1,7 @@
 name: Probe shorter Steam XML interval safely (read-only)
 
+# Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/probe-steam-xml-shorter.yml"
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,134 @@
+name: One-time Steam live manual refresh
+# This job is invoked once by adding this workflow file. No cron or recurring automation.
+on:
+  push:
+    paths:
+      - .github/workflows/steam-manual-sync-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-manual-live-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Test Steam backend
+        run: python -m pytest -q
+      - name: Clone currently published frontend
+        run: git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+      - name: Capture before-state
+        run: cp frontend/data/steam_upcoming.json /tmp/steam-before.json
+      - name: Query Steam TW official Store Browse metadata for all public games
+        run: python -m scripts.sync_public_release_dates --frontend-data frontend/data --request-interval 2
+      - name: Fetch official Steam Community Followers sample and generate run report
+        run: |
+          python - <<'PY'
+          import json, os, time, requests
+          from pathlib import Path
+          from datetime import datetime, timezone, timedelta, date
+          from collectors.steam_upcoming import parse_follower_xml
+          before = json.loads(Path('/tmp/steam-before.json').read_text(encoding='utf-8'))
+          path = Path('frontend/data/steam_upcoming.json')
+          now_data = json.loads(path.read_text(encoding='utf-8'))
+          assert len(before['games']) > 0 and len(now_data['games']) > 0
+          assert before['filter']['country'] == now_data['filter']['country'] == 'TW'
+          assert before['filter']['min_followers'] == now_data['filter']['min_followers'] == 5000
+          old = {int(g['appid']): g for g in before['games']}
+          new = {int(g['appid']): g for g in now_data['games']}
+          assert set(old) == set(new), 'Release metadata refresh must not discard/add original games'
+          assert all(int(g['followers']) >= 5000 for g in new.values())
+          assert all(g.get('release_precision') == 'day' for g in new.values())
+          date_changes = [{'appid': id, 'name': g.get('name'), 'from': old[id].get('release_start'), 'to': g.get('release_start')} for id,g in new.items() if old[id].get('release_start') != g.get('release_start')]
+          sess = requests.Session()
+          sess.headers.update({'User-Agent':'Mozilla/5.0 (compatible; GameTrendRadar/0.5)'})
+          updated = []
+          errors = []
+          # Five official lookups maximum. Stop immediately on 429, never invent a count.
+          chosen = sorted(new.values(), key=lambda g: str(g.get('follower_checked_at') or ''))[:5]
+          for ix,g in enumerate(chosen):
+            if ix:
+              time.sleep(25)
+            aid = int(g['appid'])
+            try:
+              r = sess.get(f'https://steamcommunity.com/games/{aid}/memberslistxml/',params={'xml':1},timeout=22)
+              if r.status_code == 429:
+                errors.append({'appid':aid,'status':'HTTP 429; stopped official XML lookups'})
+                break
+              r.raise_for_status()
+              n = parse_follower_xml(r.text)
+              if n < 5000:
+                errors.append({'appid':aid,'status':f'Official count {n} below 5000; kept previous value pending confirmation'})
+                continue
+              previous = int(g['followers'])
+              g['followers'] = n
+              g['follower_checked_at'] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
+              updated.append({'appid':aid,'name':g.get('name'),'before':previous,'after':n,'delta':n-previous})
+            except Exception as e:
+              errors.append({'appid':aid,'status':f'{type(e).__name__}: {str(e)[:190]}'})
+              if '429' in str(e): break
+          games = sorted(new.values(),key=lambda g:(-int(g['followers']),str(g.get('release_start') or '9999-12-31'),int(g['appid'])))
+          assert all(int(g['followers']) >= 5000 for g in games)
+          assert len(games) == len(before['games'])
+          stamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
+          report = {'executed_at':stamp,'mode':'one_time_direct_steam_live_refresh','timezone':'Asia/Taipei',
+                    'scope':'refresh_existing_public_titles_not_full_year_rediscovery',
+                    'source':'Steam Store Browse TW and Steam Community XML',
+                    'prior_full_year_candidates':before.get('initialization',{}).get('candidate_count'),
+                    'before':len(before['games']),'after':len(games),'added':0,'removed':0,
+                    'store_appids_queried':len(games),'date_changed_count':len(date_changes),
+                    'date_changes':date_changes,'official_followers_attempted':len(updated)+len(errors),
+                    'official_followers_updates':updated,'official_followers_errors':errors,
+                    'rules':{'min_followers':5000,'exact_release_date':True,'region':'TW',
+                             'adult_filter':'retain_existing_screened_data','preserve_localized_names':True}}
+          now_data['games'] = games
+          now_data['count'] = len(games)
+          now_data['steam_manual_sync'] = report
+          path.write_text(json.dumps(now_data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          rpt=Path('frontend/data/steam_sync_last_run.json')
+          rpt.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:
+            f.write('## Steam manual TW live refresh\n\n')
+            for k in ('executed_at','before','after','added','store_appids_queried','date_changed_count','official_followers_attempted'):
+              f.write(f'- {k}: {report[k]}\n')
+            f.write(f"- Official Followers successes: {len(updated)}; errors: {len(errors)}\n")
+            f.write('- Existing 365-day discovery retained; no full-year rediscovery performed.\n')
+          print('STEAM_MANUAL_SYNC_RESULT '+json.dumps(report,ensure_ascii=False))
+          PY
+      - name: Validate public JSON
+        run: |
+          python -m json.tool frontend/data/steam_upcoming.json > /dev/null
+          python -m json.tool frontend/data/steam_preview.json > /dev/null
+          python -m json.tool frontend/data/steam_sync_last_run.json > /dev/null
+      - name: Publish live Steam results and run report to frontend GitHub
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          if [ -z "$FRONTEND_REPO_TOKEN" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN not configured; public files unchanged."
+            exit 1
+          fi
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_upcoming.json data/steam_preview.json data/steam_sync_last_run.json
+          git diff --cached --quiet && { echo "No changes to publish"; exit 0; }
+          git commit -m "data: one-time live Steam TW refresh and sync report"
+          git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
+          git pull --rebase origin main
+          git push origin HEAD:main

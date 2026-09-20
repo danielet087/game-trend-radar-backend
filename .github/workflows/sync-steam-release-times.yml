@@ -1,11 +1,8 @@
 name: Sync public Steam release timestamps
 
+# Paused by request: automatic workflow triggers disabled.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/sync-steam-release-times.yml"
 
 permissions:
   contents: read

@@ -1,0 +1,83 @@
+{
+  "report_type": "one_run_feasibility_validation_partial_not_full_year",
+  "local_date": "2026-09-20",
+  "goal": {
+    "start_taiwan": "2026-09-20",
+    "end_taiwan": "2027-09-19",
+    "filters": [
+      "upcoming",
+      "full_year_month_day_release",
+      "not primarily sexual content",
+      "game not demo dlc music or software",
+      "Steam community follows >= 5000 via permitted public source"
+    ],
+    "final_output": "qualified Steam games with localized names and actual language support"
+  },
+  "data_access": {
+    "week_2027_01_04_to_01_10": {
+      "url": "https://steamdb.info/upcoming/?week=2027W01",
+      "visible_result_total": 21,
+      "hit_100_cap": false,
+      "clearly_labeled_dlc_or_music": 4,
+      "other_rows": 17,
+      "visible_follows_at_least_5000": 1,
+      "game_meeting_threshold": "Armatus",
+      "claim": "Complete only for this single displayed weekly table at time searched, not whole year."
+    },
+    "month_2027_01": {
+      "url": "https://steamdb.info/stats/gameratings/2027/?min_release=2027-01-01&max_release=2027-01-31&upcoming_only=1&sort=followers_desc",
+      "visible_result_total": 100,
+      "hit_100_cap": true,
+      "sort_followers_desc_confirmed": false
+    },
+    "date_2026_12_30": {
+      "url": "https://steamdb.info/stats/gameratings/2026/?max_release=2026-12-30&min_release=2026-12-30&sort=followers_desc&upcoming_only=1",
+      "visible_result_total": 100,
+      "hit_100_cap": true,
+      "vague_quarter_and_month_release_rows_present": true
+    },
+    "direct_automated_network": {
+      "steamdb": false,
+      "steam_store": false,
+      "reason": "DNS name resolution failed in current container network"
+    },
+    "steamdb_automated_scraping_permitted": false,
+    "steamdb_policy_url": "https://steamdb.info/faq/"
+  },
+  "fully_checked_example": {
+    "appid": 3660710,
+    "steam_store_url": "https://store.steampowered.com/app/3660710/Armatus/?l=tchinese",
+    "name_en": "Armatus",
+    "store_description_zh_tw": "《阿瑪塔斯》",
+    "announced_store_release_date": "2027-01-07",
+    "actual_unlock_timestamp_utc": "2027-01-07T17:00:00Z",
+    "taiwan_unlock_date": "2027-01-08",
+    "steamdb_week_source": "https://steamdb.info/upcoming/?week=2027W01",
+    "steamdb_follows_seen": 14614,
+    "store_language_support": {
+      "traditional_chinese": {
+        "interface": true,
+        "full_audio": false,
+        "subtitles": true
+      },
+      "simplified_chinese": {
+        "interface": true,
+        "full_audio": false,
+        "subtitles": true
+      },
+      "english": {
+        "interface": true,
+        "full_audio": true,
+        "subtitles": true
+      }
+    },
+    "sexual_primary": false,
+    "adult_content_note": "Violence and gore; not primarily sexual content",
+    "qualifies_example": true
+  },
+  "annual_count": null,
+  "annual_eligible_count": null,
+  "annual_follows_at_least_5000": null,
+  "annual_final_count": null,
+  "note": "Verified one week as small-sample feasibility proof only; it is not a complete 365-day execution. No production catalog or automation modified and no GitHub Actions triggered."
+}

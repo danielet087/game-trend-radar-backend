@@ -1,0 +1,167 @@
+{
+  "task_name": "Steam 遊戲資料同步",
+  "run_mode": "manual run of existing scheduled-task instructions",
+  "status": "partial_success",
+  "started_at_taipei": "2026-09-22 00:04 approximate (conversation-local start time; exact scheduler start timestamp unavailable)",
+  "completed_at_taipei": "2026-09-22 00:10:56+08:00",
+  "timezone": "Asia/Taipei",
+  "search_window_taipei": {
+    "start": "2026-09-22",
+    "end": "2027-03-21",
+    "rule": "today through six calendar months minus one day, inclusive"
+  },
+  "sources_used": [
+    "SteamDB weekly upcoming pages W39-W53 2026 and W01-W11 2027 via web read/search",
+    "Steam official Store pages, including Traditional Chinese pages where available",
+    "Existing GitHub public catalog for dedupe and preservation"
+  ],
+  "coverage": {
+    "calendar_months_touched": [
+      "2026-09",
+      "2026-10",
+      "2026-11",
+      "2026-12",
+      "2027-01",
+      "2027-02",
+      "2027-03"
+    ],
+    "weekly_windows_consulted": 26,
+    "fully_covered_months": 0,
+    "half_year_complete": false,
+    "reason": "Many SteamDB weekly pages hit the 100-product display cap and systematic crawling is not permitted; web reads can verify visible high-follow candidates but cannot prove a complete census."
+  },
+  "counts": {
+    "individual_candidates_fully_checked_this_run": 11,
+    "new_public_games": 3,
+    "updated_existing_public_games": 0,
+    "removed_public_games": 0,
+    "excluded_primary_sexual_content": 2,
+    "excluded_below_5000_follows": 2,
+    "pending_exact_official_taiwan_date": 4,
+    "failures": 0,
+    "skipped_existing_high_follow_games": "not comprehensively counted; many visible qualifying games were already present in the public catalog",
+    "public_before": 100,
+    "public_after": 103,
+    "pending_unchecked_total": null,
+    "total_visible_products_across_all_week_pages": null,
+    "total_unique_candidates": null,
+    "reason_unknown_counts": "100-row caps and incomplete page visibility prevent a trustworthy all-candidate count."
+  },
+  "added": [
+    {
+      "appid": 3846830,
+      "name": "全軍破敵：幕府將軍2 完整版",
+      "name_en": "Total War: SHOGUN 2 - Complete Edition",
+      "official_taiwan_date": "2026-10-13",
+      "followers": 6500,
+      "followers_source": "SteamDB W42 2026",
+      "followers_official": false,
+      "languages": {
+        "tchinese": true,
+        "schinese": true,
+        "english": true
+      },
+      "sexual_screening": "Mild sexual themes rating only; game is historical strategy and not primarily sexual.",
+      "store_url": "https://store.steampowered.com/app/3846830/Total_War_SHOGUN_2__Complete_Edition/?l=tchinese"
+    },
+    {
+      "appid": 4017880,
+      "name": "異界揭蹤／ANOMALITH",
+      "name_en": "ANOMALITH",
+      "official_taiwan_date": "2026-10-28",
+      "followers": 5292,
+      "followers_source": "SteamDB W44 2026",
+      "followers_official": false,
+      "languages": {
+        "tchinese": true,
+        "schinese": true,
+        "english": true
+      },
+      "sexual_screening": "Survival horror/action RPG; no primary sexual theme identified in official store listing.",
+      "store_url": "https://store.steampowered.com/app/4017880/ANOMALITH/?l=tchinese"
+    },
+    {
+      "appid": 3884860,
+      "name": "The Wolf Among Us Remastered",
+      "name_en": "The Wolf Among Us Remastered",
+      "official_taiwan_date": "2026-10-29",
+      "followers": 5556,
+      "followers_source": "SteamDB W44 2026",
+      "followers_official": false,
+      "languages": {
+        "tchinese": false,
+        "schinese": false,
+        "english": true
+      },
+      "sexual_screening": "Steam warns of some nudity/sexual content and frequent violence/gore; primary game content is noir detective adventure, not sexual content.",
+      "store_url": "https://store.steampowered.com/app/3884860/The_Wolf_Among_Us_Remastered/?l=tchinese"
+    }
+  ],
+  "pending": [
+    {
+      "name": "Escape from Playtime",
+      "appid": 2087540,
+      "steamdb_follows": 6330,
+      "reason": "English Steam page has 2026-10-21, but the fetched official Traditional Chinese/Taiwan page currently shows only 即將推出; per current date rule, do not publish until Taiwan official date is explicit."
+    },
+    {
+      "name": "Loftia",
+      "appid": 2320980,
+      "steamdb_follows": 20404,
+      "reason": "Steam official page currently states 2026 / Fall 2026, not a full calendar date."
+    },
+    {
+      "name": "We Were Here Tomorrow",
+      "steamdb_follows": 11816,
+      "reason": "SteamDB has an exact weekly date, but previously verified official Steam page exposes only October 2026; retain pending exact-date status."
+    },
+    {
+      "name": "Nomad Drive",
+      "steamdb_follows": 13653,
+      "reason": "SteamDB has an exact weekly date, but previously verified official Steam page exposes only October 2026; retain pending exact-date status."
+    }
+  ],
+  "excluded": [
+    {
+      "name": "Laguna Rosa: A long story with reckless consequences",
+      "appid": 4450390,
+      "steamdb_follows": 5257,
+      "reason": "Official/SteamDB listing explicitly describes sexual content, nudity and hentai; excluded as primarily sexual."
+    },
+    {
+      "name": "Wild Life",
+      "appid": 1032980,
+      "steamdb_follows": 46060,
+      "reason": "Official Steam page explicitly describes a sex-positive adult game with varied fetishes and adult encounters; excluded as primarily sexual."
+    },
+    {
+      "name": "DRAGON QUEST MONSTERS: The Withered World",
+      "steamdb_follows": 4185,
+      "reason": "Below 5000 threshold."
+    },
+    {
+      "name": "Wo Long 2: Wings of Ember",
+      "steamdb_follows": 4238,
+      "reason": "Below 5000 threshold."
+    }
+  ],
+  "github": {
+    "frontend_repository": "danielet087/game-trend-radar",
+    "frontend_file": "data/steam_upcoming.json",
+    "frontend_commits": [
+      "71403d24ed7a8daf9cf8cecca10a8cd3b6fdcff6",
+      "3fed27d7e7d79478ee8286894e22c2922a98c437"
+    ],
+    "report_repository": "danielet087/game-trend-radar-backend",
+    "report_file": "reports/steam_daily_sync_20260922_manual_run.json",
+    "report_commit": null,
+    "readback_verified": false
+  },
+  "data_protection": {
+    "existing_games_preserved": true,
+    "out_of_six_month_existing_games_preserved": true,
+    "github_actions_modified_or_triggered": false,
+    "automation_modified": false,
+    "cloud_deployed": false
+  }
+}

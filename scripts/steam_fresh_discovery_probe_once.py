@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
+from bs4 import BeautifulSoup
 
 TZ = timezone(timedelta(hours=8))
 TODAY = datetime.now(TZ).date()
@@ -20,7 +21,7 @@ OUT.mkdir(exist_ok=True)
 session = requests.Session()
 session.headers.update({"User-Agent": "Mozilla/5.0 (compatible; GameTrendRadar-FreshDiscoveryProbe/1.0)", "Accept": "application/json,text/javascript,*/*;q=0.8"})
 started = time.monotonic()
-stat = {"start_date_taipei": str(TODAY), "end_date_taipei": str(END), "started_at_taipei": datetime.now(TZ).isoformat(), "source": "Live Steam Store search/results?json=1 and sample appdetails", "uses_existing_project_data": False, "request_pages": 0, "search_results_reported": None, "raw_rows_seen": 0, "distinct_ids_seen": 0, "valid_day_in_window": 0, "outside_window": 0, "missing_exact_day": 0, "missing_id": 0, "request_errors": [], "http_429_count": 0, "appdetails_sample_checked": 0, "appdetails_sample_agreed": 0, "appdetails_sample_disagreed": 0, "sample_failures": [], "stop_reason": None}
+stat = {"start_date_taipei": str(TODAY), "end_date_taipei": str(END), "started_at_taipei": datetime.now(TZ).isoformat(), "source": "Live Steam Store search/results?infinite=1 and sample appdetails", "uses_existing_project_data": False, "request_pages": 0, "search_results_reported": None, "raw_rows_seen": 0, "distinct_ids_seen": 0, "valid_day_in_window": 0, "outside_window": 0, "missing_exact_day": 0, "missing_id": 0, "request_errors": [], "http_429_count": 0, "appdetails_sample_checked": 0, "appdetails_sample_agreed": 0, "appdetails_sample_disagreed": 0, "sample_failures": [], "stop_reason": None}
 games = {}
 max_pages = 600
 max_seconds = 52 * 60
@@ -61,40 +62,47 @@ for page in range(max_pages):
     if time.monotonic() - started > max_seconds:
         stat["stop_reason"] = "max_seconds"
         break
-    params = {"query": "", "start": page * 100, "count": 100, "dynamic_data": "", "sort_by": "Released_ASC", "category1": 998, "filter": "comingsoon", "json": 1, "cc": "tw", "l": "english", "ndl": 1}
+    params = {"query": "", "start": page * 100, "count": 100, "dynamic_data": "", "sort_by": "Released_ASC", "category1": 998, "filter": "comingsoon", "infinite": 1, "cc": "tw", "l": "english", "ndl": 1}
     payload = request_json(URL, params)
     if not isinstance(payload, dict):
         stat["stop_reason"] = f"search_request_failed_page_{page}"
         break
-    if stat["search_results_reported"] is None:
+    if stat["request_pages"] == 0:
         stat["search_results_reported"] = payload.get("total_count")
         stat["first_response_keys"] = list(payload.keys())
-        stat["first_item_keys"] = list(payload.get("items", [{}])[0].keys()) if payload.get("items") else []
+        stat["first_item_keys"] = ["data-ds-appid", "search_name", "search_released"]
         print("LIVE_START " + json.dumps({"date": str(TODAY), "end": str(END), "reported_total": stat["search_results_reported"], "response_keys": stat["first_response_keys"], "item_keys": stat["first_item_keys"]}), flush=True)
-    items = payload.get("items", [])
+    html = payload.get("results_html")
+    if not isinstance(html, str):
+        stat["stop_reason"] = f"unexpected_schema_page_{page}"
+        break
+    items = BeautifulSoup(html, "html.parser").select("a.search_result_row")
     stat["request_pages"] += 1
     if not items:
         stat["stop_reason"] = "empty_search_page"
         break
     for item in items:
         stat["raw_rows_seen"] += 1
-        appid = item.get("id") or item.get("appid")
+        appid = item.get("data-ds-appid")
         if not appid or not str(appid).isdigit():
             stat["missing_id"] += 1
             continue
         appid = int(appid)
-        release_raw = item.get("release_date")
+        release_node = item.select_one(".search_released")
+        release_raw = release_node.get_text(" ", strip=True) if release_node else ""
+        name_node = item.select_one(".title")
         day = exact_date(release_raw)
         if day is None:
             stat["missing_exact_day"] += 1
         elif day < TODAY or day > END:
             stat["outside_window"] += 1
         elif appid not in games:
-            games[appid] = {"appid": appid, "name": item.get("name"), "release_date": str(day), "release_date_raw": release_raw, "steam_url": f"https://store.steampowered.com/app/{appid}/", "source": "Steam Store search live JSON", "appdetails_checked": False}
+            games[appid] = {"appid": appid, "name": name_node.get_text(" ", strip=True) if name_node else "", "release_date": str(day), "release_date_raw": release_raw, "steam_url": f"https://store.steampowered.com/app/{appid}/", "source": "Steam Store live search results_html", "appdetails_checked": False}
     stat["distinct_ids_seen"] = len(games)
     stat["valid_day_in_window"] = len(games)
     if page < 3 or (page + 1) % 20 == 0:
         print("LIVE_PAGE " + json.dumps({"page": page + 1, "rows": stat["raw_rows_seen"], "valid_day_in_window": len(games), "excluded_no_exact_day": stat["missing_exact_day"], "excluded_outside_window": stat["outside_window"], "seconds": int(time.monotonic()-started)}), flush=True)
+    time.sleep(0.7)
     if len(items) < 100:
         stat["stop_reason"] = "last_partial_search_page"
         break
@@ -102,7 +110,7 @@ else:
     stat["stop_reason"] = "max_pages"
 
 # Cross-check sampled results on a distinct Steam official endpoint. Do not pass off sample validation as full validation.
-for appid in list(games)[:20]:
+for appid in list(games)[:10]:
     if time.monotonic() - started > max_seconds + 90:
         break
     payload = request_json(APP_URL, {"appids": appid, "cc": "tw", "l": "english"}, retries=2)
@@ -129,7 +137,7 @@ stat["finished_at_taipei"] = datetime.now(TZ).isoformat()
 stat["duration_seconds"] = round(time.monotonic()-started, 1)
 stat["valid_day_in_window"] = len(games)
 stat["full_scan"] = stat["stop_reason"] in ("last_partial_search_page", "empty_search_page")
-stat["candidate_definition"] = "Official Steam Store comingsoon + category1=998 + exact YYYY-MM-DD in Taiwan-date interval, deduped by AppID. Appdetails verification only on first 20."
+stat["candidate_definition"] = "Official Steam Store comingsoon + category1=998 + exact YYYY-MM-DD in Taiwan-date interval, deduped by AppID. Appdetails verification only on first 10."
 stat["no_existing_data_files_accessed"] = True
 (OUT / "steam_fresh_discovery_probe_report.json").write_text(json.dumps(stat, ensure_ascii=False, indent=2), encoding="utf-8")
 (OUT / "steam_fresh_discovery_probe_games.json").write_text(json.dumps({"metadata": stat, "games": list(games.values())}, ensure_ascii=False, indent=2), encoding="utf-8")

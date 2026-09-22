@@ -1,0 +1,46 @@
+name: One-time Steam Store JSON shape diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-store-live-shape-once.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Compare live search HTML and JSON schemas, with no existing game data
+        run: |
+          python - <<'PY'
+          import json, requests, time
+          from bs4 import BeautifulSoup
+          s=requests.Session()
+          s.headers.update({"User-Agent":"Mozilla/5.0","Accept":"application/json,text/html,*/*"})
+          base={"query":"","start":0,"count":5,"sort_by":"Released_ASC","filter":"comingsoon","category1":998,"cc":"tw","l":"english","ndl":1}
+          for mode,ex in [("infinite",{"infinite":1}),("json",{"json":1}),("both",{"infinite":1,"json":1})]:
+            try:
+              r=s.get("https://store.steampowered.com/search/results/",params={**base,**ex},timeout=20)
+              print("MODE",mode,"STATUS",r.status_code,"URL",r.url)
+              r.raise_for_status()
+              j=r.json()
+              print("ROOT_KEYS",list(j.keys()))
+              print("TOTAL",j.get("total_count"),"START",j.get("start"))
+              print("ITEMS_SAMPLE",json.dumps(j.get("items",[])[:1],ensure_ascii=False)[:1100])
+              html=j.get("results_html") or j.get("html") or ""
+              print("HTML_LENGTH",len(html),"HTML_SAMPLE",html[:1100].replace("\\n"," "))
+              if html:
+                soup=BeautifulSoup(html,"html.parser")
+                row=soup.select_one("a.search_result_row")
+                print("ROW_SAMPLE",str(row)[:1700].replace("\\n"," ") if row else "NO ROW")
+                print("RELEASE_SAMPLE",str(row.select_one(".search_released"))[:350] if row else "NO ROW")
+            except Exception as e: print("MODE_ERROR",mode,type(e).__name__)
+            time.sleep(2)
+          PY

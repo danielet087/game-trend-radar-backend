@@ -1,12 +1,7 @@
 name: Security audit - historical Git objects and tests
 
-# One-time audit after creating this workflow. Remove the push trigger after
-# obtaining its result; original collectors remain manual-only.
+# Manual-only: run the full-history audit before publishing and after security changes.
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/security-audit-once.yml
   workflow_dispatch:
 
 permissions:

@@ -128,13 +128,20 @@ def query_one_day(
                 "include_basic_info": True, "include_release": True, "include_assets": True,
             },
         }
-        # Never print the API key or URL containing it.
-        response = session.get(
-            QUERY_URL,
-            params={"key": api_key, "input_json": json.dumps(query, separators=(",", ":"))},
-            timeout=35,
-        )
-        response.raise_for_status()
+        # Never print a request URL: requests exceptions can contain the key.
+        try:
+            response = session.get(
+                QUERY_URL,
+                params={"key": api_key, "input_json": json.dumps(query, separators=(",", ":"))},
+                timeout=35,
+            )
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            reason = f"HTTP {status}" if status is not None else type(exc).__name__
+            raise RuntimeError(
+                f"Steam Query failed for {day} at offset {offset}: {reason}"
+            ) from None
         data = response.json()
         result = data.get("response")
         if not isinstance(result, dict):

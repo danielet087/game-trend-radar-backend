@@ -1,0 +1,47 @@
+name: Experiment - independently fetch a fresh year of Steam upcoming games
+
+# This workflow is isolated from all normal Steam state and publication.
+# Its sole automatic trigger is creating/editing THIS workflow file.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-fresh-year-experiment-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-fresh-year-independent-experiment
+  cancel-in-progress: false
+
+jobs:
+  fresh-steam-year:
+    runs-on: ubuntu-latest
+    timeout-minutes: 59
+    steps:
+      - name: Checkout experiment code without old data
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_steam_upcoming_year_fresh.py
+            requirements.txt
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install official-search scraper dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Fetch Steam Store upcoming games freshly, page by page
+        run: python scripts/experiment_steam_upcoming_year_fresh.py --out output/steam_fresh_year_experiment --max-minutes 52
+      - name: Upload fresh raw candidates and experiment report, even if partial
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-fresh-year-experiment
+          path: output/steam_fresh_year_experiment/
+          if-no-files-found: warn
+          retention-days: 7

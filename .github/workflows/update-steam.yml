@@ -153,5 +153,5 @@ jobs:
           fi
 
           git commit -m "data: update Steam upcoming games"
-          git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
-          git push origin main
+          # Keep origin URL clean; authenticate each network operation without saving the PAT.
+          bash ../scripts/git_frontend_auth.sh push origin main

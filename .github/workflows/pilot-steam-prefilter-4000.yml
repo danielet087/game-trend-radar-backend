@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 concurrency:
-  # Mutual exclusion with the full self-hosted follower collector.
+  # Mutual exclusion with the full follower collector.
   group: steam-two-phase-initialization
   cancel-in-progress: false
 

@@ -4,7 +4,7 @@
 
 ## 已實際完成
 
-- 正式 `steam-two-phase.yml`、`steam-candidate-supervisor.yml`、`publish-steam-preview.yml` 改用 GitHub-hosted `ubuntu-latest`。
+- 正式 `steam-two-phase.yml`、`steam-candidate-supervisor.yml`、`publish-steam-preview.yml` 改用 GitHub-hosted `ubuntu-latest`；另外再次逐一核對 **全部 33 個 Workflow**，均使用 `ubuntu-latest`，不再有 `runs-on: ... self-hosted` 或將前端 PAT 放進 `git remote set-url` URL 的寫法。
 - Twitch OAuth 不再把 Client Secret 放進請求 URL，並以 HTTP 狀態或錯誤類型回報 API 失敗；Steam Query／YouTube API 的例外也移除含金鑰的 URL。
 - 前端跨 Repository 寫入改採暫時性 AskPass，避免把 `FRONTEND_REPO_TOKEN` 寫入 Git Remote URL；Token 的帳號設定由使用者另行處理並已表示完成。
 - 已加入 `tests/test_security_redaction.py`。

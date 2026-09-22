@@ -1,7 +1,11 @@
 name: Security audit - historical Git objects and tests
 
-# Manual-only: run the full-history audit before publishing and after security changes.
+# One-time post-fix verification; restore manual-only after checking the result.
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/security-audit-once.yml
   workflow_dispatch:
 
 permissions:

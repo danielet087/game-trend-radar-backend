@@ -21,11 +21,11 @@ concurrency:
 
 jobs:
   check:
-    # Dedicated trusted Linux runner; no GitHub-hosted Actions minutes.
-    runs-on: [self-hosted, linux, steam-followers]
+    # Ephemeral GitHub-hosted runner: safe default before making this repo public.
+    runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - name: Checkout latest private backend
+      - name: Checkout latest backend
         uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5

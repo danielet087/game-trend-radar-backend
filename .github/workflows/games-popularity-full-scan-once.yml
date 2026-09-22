@@ -1,0 +1,83 @@
+name: Experiment - full Games Popularity follower scan on fresh 3238
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/games-popularity-full-scan-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: isolated-games-popularity-full-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout scan script only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_games_popularity_full_scan.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Download fresh first-source prefilter artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf input
+          mkdir -p input
+          gh run download 35702182234             --repo "${GITHUB_REPOSITORY}"             --name steam-followers-prefilter-fresh             --dir input
+          test -s input/third_party_4000_priority.json
+          test -s input/third_party_below_4000.json
+          test -s input/third_party_unresolved.json
+          python - <<'PY'
+          import json
+          files=[
+            "input/third_party_4000_priority.json",
+            "input/third_party_below_4000.json",
+            "input/third_party_unresolved.json",
+          ]
+          rows=[]
+          for p in files:
+              rows += json.load(open(p,encoding="utf-8"))
+          assert len(rows)==3238, len(rows)
+          assert len({int(x["appid"]) for x in rows})==3238
+          print("Verified fresh candidate total:", len(rows))
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Query Games Popularity for all 3238 candidates
+        env:
+          GAMES_POPULARITY_API_KEY: ${{ secrets.GAMES_POPULARITY_API_KEY }}
+        run: >
+          python -u scripts/experiment_games_popularity_full_scan.py
+          --priority input/third_party_4000_priority.json
+          --below input/third_party_below_4000.json
+          --unresolved input/third_party_unresolved.json
+          --out output/games_popularity_full_scan
+          --workers 12
+          --threshold 4000
+
+      - name: Upload full second-source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: games-popularity-full-scan
+          path: output/games_popularity_full_scan/
+          if-no-files-found: warn
+          retention-days: 7

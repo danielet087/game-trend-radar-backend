@@ -1,0 +1,41 @@
+name: One-time fresh Steam Store 365-day discovery experiment
+
+# One-time push trigger only when this experimental workflow file itself is created/edited.
+# Subsequent project updates do NOT retrigger the probe.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-fresh-discovery-probe-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-fresh-discovery-probe-once
+  cancel-in-progress: false
+
+jobs:
+  live-discovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 58
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install isolated HTTP dependency
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Fresh Steam Store live discovery (no project data, no API key)
+        run: python -u -m scripts.steam_fresh_discovery_probe_once
+      - name: Upload only the newly retrieved evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-fresh-discovery-probe-${{ github.run_id }}
+          path: |
+            output/steam_fresh_discovery_probe_report.json
+            output/steam_fresh_discovery_probe_games.json
+          if-no-files-found: warn
+          retention-days: 7

@@ -24,21 +24,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download the fresh 3,469-game V3 artifact
+      - name: Download the fresh V3 dual-scan artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           rm -rf input_v3
           mkdir -p input_v3
           gh run download 35697396268             --repo "${GITHUB_REPOSITORY}"             --name fresh-steam-year-v3-dual-scan             --dir input_v3
-          test -s input_v3/union_of_two_fresh_v3_scans.json
+          test -s input_v3/inclusive_100_fresh_candidates.json
+          test -s input_v3/standard_100_fresh_candidates.json
           python - <<'PY'
           import json
-          p="input_v3/union_of_two_fresh_v3_scans.json"
-          d=json.load(open(p,encoding="utf-8"))
-          assert len(d)==3469, len(d)
-          assert len({int(x["appid"]) for x in d})==3469
-          print("Verified fresh V3 artifact input:", len(d), "unique AppIDs")
+          a=json.load(open("input_v3/inclusive_100_fresh_candidates.json",encoding="utf-8"))
+          b=json.load(open("input_v3/standard_100_fresh_candidates.json",encoding="utf-8"))
+          assert len(a)==3465, len(a)
+          assert len(b)==3234, len(b)
+          assert len({int(x["appid"]) for x in a})==3465
+          assert len({int(x["appid"]) for x in b})==3234
+          print("Verified fresh V3 inputs:", len(a), len(b))
           PY
 
       - name: Set up Python
@@ -49,13 +52,13 @@ jobs:
       - name: Install lightweight dependency
         run: python -m pip install --disable-pip-version-check requests
 
-      - name: Measure official AppDetails adult filtering
+      - name: Measure optimized official adult filtering
         run: >
           python -u scripts/experiment_filter_adult_content.py
-          --input input_v3/union_of_two_fresh_v3_scans.json
+          --inclusive input_v3/inclusive_100_fresh_candidates.json
+          --standard input_v3/standard_100_fresh_candidates.json
           --out output/steam_adult_filter_experiment
-          --batch-size 12
-          --pause 0.20
+          --pause 0.30
 
       - name: Validate exclusion cache before persistence
         run: |

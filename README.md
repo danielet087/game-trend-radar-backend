@@ -1,6 +1,6 @@
 # game-trend-radar-backend
 
-遊戲熱度追蹤與分析的私人資料蒐集端。此 Repository 保持 **Private**；公開網站放在 `game-trend-radar`。
+遊戲熱度追蹤與分析的資料蒐集端。目前此 Repository 仍為 **Private**，公開網站位於 `game-trend-radar`。公開前請完成 Settings/Secrets/Runner 的帳號層級檢查；安全稽核參見下方章節。
 
 ## 正在執行：完整第三方初篩（獨立第二階段）
 
@@ -15,7 +15,7 @@
 - [首次 200 款限量試跑](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454533202)：原始 Steam 官方完整複查游標 685 保留，第三方初篩 685→885，官方 XML 新查 5 款、0 款新增達 5,000；沒有 HTTP 429。曾錯把 200 款都當成第三方缺資料，**這是程式解析 Bug，不能當覆蓋率**。
 - [驗證第三方實際回應格式](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454944698)：已存的 200 個群組短 ID，第三方 HTTP 200，實際回傳 176 筆、找不到 24 筆；回傳 `id` 是 **JSON 字串**、`members` 是整數。先前程式錯誤限制 `id` 必須是整數。現已修改 `scripts/steam_follower_prefilter.py` 接受可解析的字串 ID，且會在往前掃描時**用一次 bulk 呼叫重新修復先前錯誤歸類的視窗**。
 - [修復後再跑 200 款](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454982484)：初篩游標 885→1085，先前 200 款已修復；累計 400 款第三方初篩，有會員數 276 款、缺資料 124 款。這批 400 款中第三方會員數 >= 4,000 為 0 款；**當時的舊流程**曾錯誤地優先查缺資料者，後來已依使用者三階段規則取消；官方累計多查 10 款，其中 0 款新增達 5,000，所以公開合格清單維持 48 款。舊版官方順序掃描游標仍在 685，新流程第三步有自己的驗證計數。
-- [71 項回歸測試通過](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454904769)。獨立的 `pilot-steam-prefilter-4000.yml` 是**手動**限量工作（每次最多 200 初篩＋5 次官方 XML，預設每次 XML 30 秒間隔），使用 GitHub-hosted Runner **會消耗私人專案 Actions 分鐘**，不可當作大批次的長期免費執行環境。正式 `steam-two-phase.yml` 仍要求 `self-hosted, linux, steam-followers` Runner；尚未見新的正式大批次成功執行。
+- [71 項回歸測試通過](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35454904769)。獨立的 `pilot-steam-prefilter-4000.yml` 是**手動**限量工作（每次最多 200 初篩＋5 次官方 XML，預設每次 XML 30 秒間隔），使用 GitHub-hosted Runner **會消耗私人專案 Actions 分鐘**，不可當作大批次的長期免費執行環境。（當時的歷史紀錄）正式 `steam-two-phase.yml` 現已改用 `ubuntu-latest`；不代表已進行新的正式大批次蒐集。
 
 ## 正式流程：Steam 官方候選 → 第三方 >= 4,000 → Steam 官方 >= 5,000
 
@@ -27,7 +27,7 @@
 
 數據意義：`prefilter_next_index` 加上 `prefilter_head_next_index` 是第三方初篩斷點；`next_follower_index=685` 為切換前的**歷史官方順序掃描游標**，不是新的階段三進度。第三步用 `priority_total` 與 `verified_priority_count` 表示真正候選的官方驗證進度。 `initial_complete` 表示完成本三階段流程；`coverage_exhaustive=false`，因為第三方低估與缺資料可能導致漏掉實際官方 >=5,000 的遊戲。
 
-GitHub 正式工作仍需 `[self-hosted, linux, steam-followers]` Runner；手動 pilot 會消耗 GitHub-hosted 分鐘，不會自動大量開跑。已存在的 **48 款 Steam 官方驗證上榜資料**保留，其中部分是在採用這個新門檻之前驗證的。
+正式工作已改用 GitHub-hosted `ubuntu-latest`。若 Repository 仍為 Private，將依方案扣除 Actions 分鐘；改成 Public 後標準 Runner 免費，但單一 Job 和 GitHub 資源仍有限制。所有正式 Workflow 目前維持手動觸發。已存在的 **48 款 Steam 官方驗證上榜資料**保留，其中部分是在採用這個新門檻之前驗證的。
 
 ## Steam 批次群組查詢：2026-09-19 實測紀錄
 
@@ -60,15 +60,16 @@ GitHub 正式工作仍需 `[self-hosted, linux, steam-followers]` Runner；手�
 
 現行三階段順序請以上方「正式流程」為準。舊版「6 個兩月區段」和 `update-steam.yml` 只作歷史說明，不可用於接續這批 11,467 款候選。
 
-`steam-two-phase.yml` 從保存的階段與游標接續；`steam-candidate-supervisor.yml` 可手動啟動，並在 collector 完成後接力。正式 collector 和 preview 都需要 `runs-on: [self-hosted, linux, steam-followers]`，只是 GitHub 的執行標籤，不會憑空提供執行機器。
+`steam-two-phase.yml` 從保存的階段與游標接續；`steam-candidate-supervisor.yml` 可手動啟動，並在 collector 完成後接力。正式 collector 和 preview 已使用 `runs-on: ubuntu-latest`，保留既有流程及斷點續跑。
 
-### 一次性啟動專用 runner
+### GitHub-hosted Runner 與公開前安全稽核
 
-- 在本私人 Repository 的 `Settings → Actions → Runners → New self-hosted runner` 選擇 Linux，於自己管理、可信任的常駐 Linux 主機按畫面中的即時指令下載與註冊（註冊 token 有時效，不要存進原始碼）。
-- 註冊時設定自訂標籤 `steam-followers`；GitHub 自動的 `self-hosted` 與 `linux` 標籤也必須存在。確認 runner 在 GitHub 頁面顯示 **Online**。
-- 確認主機有 Git、Python 3.12 的安裝能力、可連 GitHub/Steam 的網路，以及供資料和 pip 使用的空間。於 Linux 可依 GitHub 提示用 `sudo ./svc.sh install`、`sudo ./svc.sh start` 安裝常駐服務。
-- Runner Online 後，到 `Actions → Steam candidate supervisor → Run workflow` 手動啟動一次；之後 Followers 批次完成會觸發下一次 supervisor。若先前已有排隊中的 workflow，先檢查狀態，避免重複手動派送。
-- 追蹤進度看 `data/steam_candidate_state.json` 的第三方 `prefilter_next_index` / `prefilter_head_next_index` 和候選驗證 `verified_priority_count` / `priority_total`，以及公開站 `data/steam_upcoming.json` 的 `initialization`。**不要重設游標或清空 cache**。
+- 正式蒐集、supervisor 和 preview 使用 `runs-on: ubuntu-latest`，不再需要自行註冊 Linux Runner。
+- 若曾註冊舊 Runner，仍須在 `Settings → Actions → Runners` 手動移除；修改 Workflow 不會解除 GitHub 帳號中的 Runner 註冊。
+- `scripts/git_frontend_auth.sh` 透過一次性 AskPass 傳遞跨 Repo 發佈憑證；請將 `FRONTEND_REPO_TOKEN` 限縮為前端單一 Repository 的 `Contents: Read and write`，避免全帳號 Repo 存取。
+- 公開前用 `Actions → Security audit - historical Git objects and tests → Run workflow` 再次檢查全部可達 Git 歷史與回歸測試，掃描程式不輸出憑證原文。
+- 目前未由 API 更動 Repository visibility、Settings 中的 Runner 註冊、Secrets 本身或分支保護；這些屬帳號層級的安全設定。
+- 如需接續蒐集，到 `Actions → Steam candidate supervisor → Run workflow` 手動啟動。追蹤進度看 `data/steam_candidate_state.json` 的 `prefilter_next_index` / `prefilter_head_next_index`、`verified_priority_count` / `priority_total`，以及公開站 `data/steam_upcoming.json` 的 `initialization`。**不要重設游標或清空 cache**。
 
 
 ## 第一階段：Steam 未上市遊戲

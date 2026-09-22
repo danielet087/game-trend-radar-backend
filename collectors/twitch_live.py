@@ -48,16 +48,22 @@ class TwitchClient:
         self._last_request_at = 0.0
 
     def authenticate(self) -> None:
-        response = self.session.post(
-            TWITCH_TOKEN_URL,
-            params={
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-                "grant_type": "client_credentials",
-            },
-            timeout=self.timeout_seconds,
-        )
-        response.raise_for_status()
+        # Send credentials in the request body, never in a URL or an exception.
+        try:
+            response = self.session.post(
+                TWITCH_TOKEN_URL,
+                data={
+                    "client_id": self.client_id,
+                    "client_secret": self.client_secret,
+                    "grant_type": "client_credentials",
+                },
+                timeout=self.timeout_seconds,
+            )
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            reason = f"HTTP {status}" if status is not None else type(exc).__name__
+            raise RuntimeError(f"Twitch OAuth request failed: {reason}") from None
         payload = response.json()
         token = payload.get("access_token")
         if not token:
@@ -125,7 +131,8 @@ class TwitchClient:
                 return response.json()
 
             except (requests.Timeout, requests.ConnectionError, requests.HTTPError) as exc:
-                last_error = exc
+                status = getattr(getattr(exc, "response", None), "status_code", None)
+                last_error = f"HTTP {status}" if status is not None else type(exc).__name__
                 if attempt == 4:
                     break
                 time.sleep(min(2 ** attempt, 30))

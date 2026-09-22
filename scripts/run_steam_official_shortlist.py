@@ -71,15 +71,12 @@ def publish_official() -> None:
         raise RuntimeError("Cannot inspect public JSON staging")
     cmd("git", "-C", "frontend", "commit", "-m",
         "data: publish Steam-verified upcoming games from >=4000 shortlist")
-    # Token stays in runner environment, not GitHub files, report or public JSON.
-    cmd("git", "-C", "frontend", "remote", "set-url", "origin",
-        f"https://x-access-token:{token}@github.com/danielet087/game-trend-radar.git")
-    try:
-        cmd("git", "-C", "frontend", "pull", "--rebase", "origin", "main")
-        cmd("git", "-C", "frontend", "push", "origin", "HEAD:main")
-    finally:
-        cmd("git", "-C", "frontend", "remote", "set-url", "origin",
-            "https://github.com/danielet087/game-trend-radar.git")
+    # Authenticate one command at a time using a temporary askpass helper.
+    # Never persist the PAT in .git/config or pass it on a command line.
+    cmd("bash", "scripts/git_frontend_auth.sh", "-C", "frontend",
+        "pull", "--rebase", "origin", "main")
+    cmd("bash", "scripts/git_frontend_auth.sh", "-C", "frontend",
+        "push", "origin", "HEAD:main")
 
 
 def main() -> None:

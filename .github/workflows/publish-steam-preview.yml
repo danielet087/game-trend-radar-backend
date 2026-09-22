@@ -13,11 +13,11 @@ concurrency:
 
 jobs:
   publish:
-    # Preview can also fetch up to 45 Followers; keep it off hosted minutes.
-    runs-on: [self-hosted, linux, steam-followers]
+    # Preview may fetch Followers; run in a GitHub-hosted ephemeral VM.
+    runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Checkout private backend
+      - name: Checkout backend
         uses: actions/checkout@v4
 
       - name: Use latest committed private launch history

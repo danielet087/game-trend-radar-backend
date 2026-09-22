@@ -1,0 +1,62 @@
+name: Experiment - probe Steam Community group HTML follower fallback
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-group-html-followers-probe-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: isolated-group-html-followers-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout probe script only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_group_html_followers_probe.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Download fresh prefilter artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf input
+          mkdir -p input
+          gh run download 35702182234             --repo "${GITHUB_REPOSITORY}"             --name steam-followers-prefilter-fresh             --dir input
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+
+      - name: Probe official group HTML member count
+        run: >
+          python -u scripts/experiment_group_html_followers_probe.py
+          --unresolved input/third_party_unresolved.json
+          --priority input/third_party_4000_priority.json
+          --below input/third_party_below_4000.json
+          --out output/group_html_probe
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-group-html-followers-probe
+          path: output/group_html_probe/
+          if-no-files-found: warn
+          retention-days: 7

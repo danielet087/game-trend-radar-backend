@@ -1,9 +1,7 @@
 name: One-time Steam live manual refresh
-# This job is invoked once by adding this workflow file. No cron or recurring automation.
+# This one-time maintenance workflow is intentionally manual-only.
+# Editing this workflow must not trigger a live Steam scan or frontend publish.
 on:
-  push:
-    paths:
-      - .github/workflows/steam-manual-sync-once.yml
   workflow_dispatch:
 
 permissions:

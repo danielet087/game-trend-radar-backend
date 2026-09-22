@@ -1,0 +1,73 @@
+name: Experiment - fresh third-party 4000 Followers prefilter
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-followers-prefilter-fresh-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: isolated-fresh-followers-prefilter
+  cancel-in-progress: false
+
+jobs:
+  prefilter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout experiment script only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_followers_prefilter_fresh.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Download fresh post-adult-filter candidates
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf input
+          mkdir -p input
+          gh run download 35700715446             --repo "${GITHUB_REPOSITORY}"             --name steam-adult-filter-experiment             --dir input
+          test -s input/steam_candidates_after_adult_filter.json
+          python - <<'PY'
+          import json
+          p="input/steam_candidates_after_adult_filter.json"
+          d=json.load(open(p,encoding="utf-8"))
+          assert len(d)==3238, len(d)
+          assert len({int(x["appid"]) for x in d})==3238
+          print("Fresh non-adult candidate input:",len(d))
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Resolve Steam game groups then bulk-screen third-party Followers
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+        run: >
+          python -u scripts/experiment_followers_prefilter_fresh.py
+          --input input/steam_candidates_after_adult_filter.json
+          --out output/steam_followers_prefilter_fresh
+          --workers 8
+          --threshold 4000
+
+      - name: Upload complete benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-followers-prefilter-fresh
+          path: output/steam_followers_prefilter_fresh/
+          if-no-files-found: warn
+          retention-days: 7

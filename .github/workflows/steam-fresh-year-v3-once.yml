@@ -1,0 +1,46 @@
+name: Experiment V3 - fresh Steam one-year dual-scan comparison
+
+# Isolated one-off automatic launch upon creation/edit of this workflow only.
+# No schedule; no publishing to website; no writes to existing Steam state.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-fresh-year-v3-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: isolated-steam-year-v3-test
+  cancel-in-progress: false
+
+jobs:
+  fresh-compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Checkout only the experiment script (no existing datasets)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_steam_year_v3.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Use Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install lightweight search dependencies
+        run: python -m pip install --disable-pip-version-check requests beautifulsoup4
+      - name: Independently search full year twice using Steam official search
+        run: python -u scripts/experiment_steam_year_v3.py --out output/steam_fresh_year_v3 --max-minutes 40
+      - name: Save full evidence even if a pass is incomplete
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fresh-steam-year-v3-dual-scan
+          path: output/steam_fresh_year_v3/
+          retention-days: 7
+          if-no-files-found: warn

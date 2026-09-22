@@ -40,7 +40,9 @@ jobs:
                 soup=BeautifulSoup(html,"html.parser")
                 row=soup.select_one("a.search_result_row")
                 print("ROW_SAMPLE",str(row)[:1700].replace("\\n"," ") if row else "NO ROW")
-                print("RELEASE_SAMPLE",str(row.select_one(".search_released"))[:350] if row else "NO ROW")
+                print("RELEASE_SAMPLE",repr(str(row.select_one(".search_released")))[:900] if row else "NO ROW")
+                for rr in soup.select("a.search_result_row")[:5]:
+                  print("ROW_DETAIL",rr.get("data-ds-appid"),repr(rr.select_one(".title").get_text(" ",strip=True) if rr.select_one(".title") else ""),repr(rr.select_one(".search_released").get_text(" ",strip=True) if rr.select_one(".search_released") else ""),repr(rr.get("href"))[:200])
             except Exception as e: print("MODE_ERROR",mode,type(e).__name__)
             time.sleep(2)
           PY

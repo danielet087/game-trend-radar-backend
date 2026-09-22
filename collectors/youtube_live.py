@@ -139,12 +139,18 @@ class YouTubeClient:
     def get(self, endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
         query = dict(params)
         query["key"] = self.api_key
-        response = self.session.get(
-            f"{YOUTUBE_API_BASE}/{endpoint}",
-            params=query,
-            timeout=self.timeout_seconds,
-        )
-        response.raise_for_status()
+        try:
+            response = self.session.get(
+                f"{YOUTUBE_API_BASE}/{endpoint}",
+                params=query,
+                timeout=self.timeout_seconds,
+            )
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            # HTTPError/ConnectionError may embed a URL containing the API key.
+            status = getattr(getattr(exc, "response", None), "status_code", None)
+            reason = f"HTTP {status}" if status is not None else type(exc).__name__
+            raise RuntimeError(f"YouTube Data API {endpoint} failed: {reason}") from None
         payload = response.json()
         return payload if isinstance(payload, dict) else {}
 

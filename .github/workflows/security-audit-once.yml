@@ -1,11 +1,7 @@
 name: Security audit - historical Git objects and tests
 
-# One-time post-fix verification; restore manual-only after checking the result.
+# Read-only security audit; run manually before making this repo public.
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/security-audit-once.yml
   workflow_dispatch:
 
 permissions:

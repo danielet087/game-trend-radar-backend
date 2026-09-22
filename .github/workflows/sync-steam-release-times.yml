@@ -53,6 +53,6 @@ jobs:
             exit 0
           fi
           git commit -m "data: sync public TW release timestamps without refetching followers"
-          git remote set-url origin "https://x-access-token:${FRONTEND_REPO_TOKEN}@github.com/danielet087/game-trend-radar.git"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          # Keep origin URL clean; authenticate each network operation without saving the PAT.
+          bash ../scripts/git_frontend_auth.sh pull --rebase origin main
+          bash ../scripts/git_frontend_auth.sh push origin HEAD:main

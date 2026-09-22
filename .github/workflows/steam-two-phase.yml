@@ -11,11 +11,11 @@ concurrency:
   cancel-in-progress: false
 jobs:
   batch:
-    # Dedicated trusted Linux runner; no GitHub-hosted Actions minutes.
-    runs-on: [self-hosted, linux, steam-followers]
+    # Ephemeral GitHub-hosted runner: safe default before making this repo public.
+    runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
-      - name: Checkout private backend
+      - name: Checkout backend
         uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5

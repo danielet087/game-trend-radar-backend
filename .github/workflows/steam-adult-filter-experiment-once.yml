@@ -1,0 +1,95 @@
+name: Experiment - filter adult Steam candidates and build reusable exclusion cache
+
+# One-off launch on creation/edit only; no recurring schedule.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-adult-filter-experiment-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: isolated-steam-adult-filter-experiment
+  cancel-in-progress: false
+
+jobs:
+  filter-adult:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download the fresh 3,469-game V3 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm -rf input_v3
+          mkdir -p input_v3
+          gh run download 35697396268             --repo "${GITHUB_REPOSITORY}"             --name fresh-steam-year-v3-dual-scan             --dir input_v3
+          test -s input_v3/union_of_two_fresh_v3_scans.json
+          python - <<'PY'
+          import json
+          p="input_v3/union_of_two_fresh_v3_scans.json"
+          d=json.load(open(p,encoding="utf-8"))
+          assert len(d)==3469, len(d)
+          assert len({int(x["appid"]) for x in d})==3469
+          print("Verified fresh V3 artifact input:", len(d), "unique AppIDs")
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install lightweight dependency
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Measure official AppDetails adult filtering
+        run: >
+          python -u scripts/experiment_filter_adult_content.py
+          --input input_v3/union_of_two_fresh_v3_scans.json
+          --out output/steam_adult_filter_experiment
+          --batch-size 12
+          --pause 0.20
+
+      - name: Validate exclusion cache before persistence
+        run: |
+          python - <<'PY'
+          import json
+          p="output/steam_adult_filter_experiment/steam_adult_exclusion.json"
+          d=json.load(open(p,encoding="utf-8"))
+          assert d["criteria"]["exclude_content_descriptor_ids"] == [3,4]
+          assert d["criteria"]["demo_allowed"] is True
+          assert d["excluded_count"] == len(d["games"])
+          assert all(x["release_date"] for x in d["games"])
+          assert len({x["appid"] for x in d["games"]}) == len(d["games"])
+          print("Reusable exclusion cache validated:", d["excluded_count"], "adult products")
+          PY
+
+      - name: Persist reusable adult exclusion cache only
+        run: |
+          cp output/steam_adult_filter_experiment/steam_adult_exclusion.json data/steam_adult_exclusion.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_adult_exclusion.json
+          if git diff --cached --quiet; then
+            echo "Adult exclusion cache unchanged."
+          else
+            git commit -m "data: cache Steam adult-content exclusions with release dates"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Upload complete experiment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-adult-filter-experiment
+          path: output/steam_adult_filter_experiment/
+          if-no-files-found: warn
+          retention-days: 7

@@ -21,9 +21,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
-      - name: Fetch all branch refs explicitly
-        run: git fetch origin '+refs/heads/*:refs/remotes/origin/*' --tags --prune
+          persist-credentials: true
+      - name: Confirm full clone includes main and steam-state
+        run: |
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*' --tags --prune
+          git branch --remotes
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

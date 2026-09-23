@@ -23,6 +23,7 @@ jobs:
             scripts/experiment_official_daily_catchup_250.py
             experiments/steam_official_nearfirst_20260922/
             experiments/steam_official_followers_20260922/checkpoint.json
+            experiments/steam_official_daily_catchup/checkpoint.json
             data/steam_candidates_eligible.json
             data/steam_prefilter_state.json
             data/steam_followers_cache.json
@@ -50,6 +51,19 @@ jobs:
           other=json.loads(Path("experiments/steam_official_followers_20260922/checkpoint.json").read_text(encoding="utf-8"))
           q,source=make_queue(cp,rows,old,groups,catalog,pre,cache,other)
           assert len(cp["pending_candidates"])==1317
+
+          # Regression: load the real current dynamic checkpoint. AppID 4435490
+          # has no group ID and its fallback endpoint returned HTML. It must be
+          # parked as unresolved and must not block the other 795 pending games.
+          real_cp=json.loads(Path("experiments/steam_official_daily_catchup/checkpoint.json").read_text(encoding="utf-8"))
+          real_q,real_source=make_queue(real_cp,rows,old,groups,catalog,pre,cache,other)
+          assert "4435490" in real_cp.get("unresolved_candidates", {}), real_cp.get("unresolved_candidates")
+          assert all(str(x["appid"])!="4435490" for x in real_q)
+          assert len(real_q)==795, len(real_q)
+          assert sum(1 for x in real_q if x.get("group_id64"))==795
+          print("MISSING_GROUP_HTML_REGRESSION_PASS",json.dumps({
+              "parked":"4435490","remaining_queryable":len(real_q)
+          },ensure_ascii=False))
           assert len(q)>0
           assert len({int(x["appid"]) for x in q})==len(q)
           assert all(valid_date(x["release_date"]) for x in q)
@@ -66,3 +80,4 @@ jobs:
                 json.dumps({"frozen":len(rows),"prior_verified":len(old["official_results"]),
                             "remaining_now":len(q),"source":source},ensure_ascii=False))
           PY
+# 2026-09-23 regression trigger: verify single missing-group HTML fallback is parked before resuming one-off.

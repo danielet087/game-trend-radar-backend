@@ -37,7 +37,7 @@ def ts():
 def store(path,value):
     path.parent.mkdir(parents=True,exist_ok=True)
     temp=path.with_name(path.name+".tmp")
-    temp.write_text(json.dumps(value,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    temp.write_text(json.dumps(value,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     temp.replace(path)
 
 def push_checkpoint():
@@ -62,11 +62,11 @@ def push_checkpoint():
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument("--max-seconds",type=int,default=3300)
-    p.add_argument("--max-attempts",type=int,default=260)
+    p.add_argument("--max-seconds",type=int,default=3600)
+    p.add_argument("--max-attempts",type=int,default=500)
     p.add_argument("--checkpoint-every",type=int,default=5)
     args=p.parse_args()
-    if not 60<=args.max_seconds<=3420 or not 1<=args.max_attempts<=300:
+    if not 60<=args.max_seconds<=3660 or not 1<=args.max_attempts<=500:
         raise ValueError("Unsafe stress duration or maximum request count")
     cohort=json.loads(SOURCE.read_text(encoding="utf-8"))
     unresolved=json.loads(GROUPS.read_text(encoding="utf-8"))

@@ -16,7 +16,7 @@ permissions:
 # Same group as the existing hourly schedule: zero concurrent Steam XML jobs.
 concurrency:
   group: isolated-official-nearfirst-frozen-20260922
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   catch-up:
@@ -55,7 +55,20 @@ jobs:
           c=json.loads((p/"checkpoint.json").read_text(encoding="utf-8"))
           assert len(q)==1317
           assert c["cohort"]=="steam_fresh_20260922_post_adult_1317_near_release"
-          print("ONEOFF_VALID frozen_source=",len(q),"already_official=",len(c["official_results"]))
+
+          from scripts.experiment_official_daily_catchup_250 import make_queue
+          daily=json.loads(Path("experiments/steam_official_daily_catchup/checkpoint.json").read_text(encoding="utf-8"))
+          groups=json.loads((p/"source_unresolved.json").read_text(encoding="utf-8"))
+          eligible=json.loads(Path("data/steam_candidates_eligible.json").read_text(encoding="utf-8"))
+          prefilter=json.loads(Path("data/steam_prefilter_state.json").read_text(encoding="utf-8"))
+          cache=json.loads(Path("data/steam_followers_cache.json").read_text(encoding="utf-8"))
+          other=json.loads(Path("experiments/steam_official_followers_20260922/checkpoint.json").read_text(encoding="utf-8"))
+          pending,status=make_queue(daily,q,c,groups,eligible,prefilter,cache,other)
+          assert "4435490" in daily.get("unresolved_candidates", {}), daily.get("unresolved_candidates")
+          assert all(str(x["appid"])!="4435490" for x in pending)
+          assert all(x.get("group_id64") for x in pending), [x["appid"] for x in pending if not x.get("group_id64")]
+          print("ONEOFF_VALID frozen_source=",len(q),"already_official=",len(c["official_results"]),
+                "queryable_now=",len(pending),"parked=",list(daily.get("unresolved_candidates",{})))
           PY
 
       - name: Finish existing dynamic backlog in isolated <=250-game batches
@@ -194,3 +207,4 @@ jobs:
           retention-days: 30
 # 2026-09-23 explicit user-requested restart: apply 15m-24h cooldown and drain current 796-game backlog.
 # Retry after transient 200 non-XML Steam response using bounded cooldown; still one-off only.
+# 2026-09-23 repaired restart: cancel stale one-off instance, validate parked AppID 4435490, continue queryable backlog.

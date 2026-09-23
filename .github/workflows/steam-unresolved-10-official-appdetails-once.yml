@@ -1,0 +1,66 @@
+name: Experiment - 10 random unresolved official Steam appdetails
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-unresolved-10-official-appdetails-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: isolated-unresolved-10-appdetails
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Checkout only isolated diagnostic script
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_unresolved_10_steam_appdetails.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Fetch original frozen 1317 unresolved cohort
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh run download 35811490947 --repo "${GITHUB_REPOSITORY}" --name steam-followers-priority-queues-20260922 --dir input
+          test -s input/first_source_missing_both_unmeasured.json
+          python - <<'PY'
+          import json
+          p='input/first_source_missing_both_unmeasured.json'
+          d=json.load(open(p,encoding='utf-8'))
+          assert len(d)==1317,len(d)
+          print('COHORT_1317_OK',len(d))
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install requests and validate syntax
+        run: |
+          python -m pip install --disable-pip-version-check requests
+          python -m py_compile scripts/experiment_unresolved_10_steam_appdetails.py
+
+      - name: Perform 10 individual official Steam AppDetails lookups
+        run: python -u scripts/experiment_unresolved_10_steam_appdetails.py
+
+      - name: Upload sample and detailed report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unresolved-10-official-steam-appdetails
+          path: output/steam_official_appdetails_unresolved_10/
+          if-no-files-found: warn
+          retention-days: 30

@@ -4,15 +4,13 @@ on:
   push:
     branches: [main]
     paths:
-      - .github/workflows/steam-official-nearfirst-batch-once.yml
+      # Explicit external batch handoff only; checkpoint commits do not retrigger.
+      - experiments/steam_official_nearfirst_20260922/manual_batch_trigger.txt
   workflow_dispatch:
-  schedule:
-    # Every 2 hours at :37 UTC; 3 official XML calls max per run.
-    - cron: "37 */2 * * *"
 
 permissions:
   contents: write
-  actions: write
+  actions: read
 
 concurrency:
   group: isolated-official-nearfirst-frozen-20260922

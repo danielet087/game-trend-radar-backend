@@ -1,11 +1,11 @@
 name: Steam official Followers daily catchup 250 (externally triggered only)
 
-# NO GitHub cron. Six ChatGPT hourly automations may request one run.
+# GitHub-only scheduler; no ChatGPT/marker-based triggers.
+# Taiwan 06:00..23:00 hourly; GitHub can delay schedule start.
 on:
-  push:
-    branches: [main]
-    paths:
-      - experiments/steam_official_daily_catchup/requests/**
+  schedule:
+    - cron: "0 6-23 * * *"
+      timezone: "Asia/Taipei"
   workflow_dispatch:
 
 permissions:
@@ -55,7 +55,21 @@ jobs:
           print("CATCHUP_INPUT_OK original_cohort=1317 confirmed="+str(len(d["official_results"])))
           PY
 
+      - name: Check Taiwan execution window (exclude delayed schedules outside 06–23)
+        id: window
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          HOUR="$(TZ=Asia/Taipei date +%H)"
+          if [ "$EVENT" = "workflow_dispatch" ] || { [ "$HOUR" -ge 6 ] && [ "$HOUR" -le 23 ]; }; then
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            echo "Scheduled run delayed to Taiwan hour $HOUR outside 06–23; no Steam requests." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Fetch up to 250 NEW official counts in date order with >=8s pacing
+        if: steps.window.outputs.proceed == 'true'
         run: >
           python -u scripts/experiment_official_daily_catchup_250.py
           --max-requests 250

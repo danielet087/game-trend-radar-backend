@@ -7,7 +7,8 @@ Frozen cohort: `steam_fresh_20260922_post_adult_1317_near_release`. It is
 
 - [2026-09-23 initial run 35814756620](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35814756620): 3/3 official `memberCount` results (HTTP 200), zero 429, 28-second spacing.
 - [2026-09-23 second run 35815045289](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35815045289): another 3/3 HTTP 200, zero 429.
-- **6/1317 have actual official count; 0 above 5000 in those six; 1311 remain.** Never infer the remaining games' Followers from this early-date pilot.
+- [2026-09-23 third run 35815384796](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35815384796): another 3/3 HTTP 200, zero 429; all nine 2026-09-23 candidates are now verified.
+- **9/1317 have actual official count; 0 above 5000 in those nine; 1308 remain.** Never infer the remaining games' Followers from this early-date pilot.
 
 ## Queue and limits
 

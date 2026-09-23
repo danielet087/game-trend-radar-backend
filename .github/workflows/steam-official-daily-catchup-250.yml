@@ -5,7 +5,7 @@ on:
   push:
     branches: [main]
     paths:
-      - experiments/steam_official_daily_catchup/manual_batch_trigger.txt
+      - experiments/steam_official_daily_catchup/requests/**
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,58 @@
+name: Experiment - why 1358 Steam group IDs are missing from third party
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-group-coverage-missing-probe-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: isolated-steam-group-coverage-probe
+  cancel-in-progress: false
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout ONLY read-only probe script
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_group_coverage_missing_probe.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Download frozen 2026-09-22 third-party prescreen artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input
+          test -s input/third_party_unresolved.json
+          test -s input/third_party_4000_priority.json
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install requests
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Compare missing/known group IDs by direct/bulk/name queries
+        run: python -u scripts/experiment_group_coverage_missing_probe.py
+
+      - name: Save evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-group-coverage-missing-probe
+          path: output/group_coverage_probe/
+          retention-days: 14
+          if-no-files-found: warn

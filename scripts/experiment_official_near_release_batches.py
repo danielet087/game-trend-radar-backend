@@ -20,8 +20,8 @@ import requests
 TZ=ZoneInfo("Asia/Taipei")
 BASE=103582791429521408
 COHORT="steam_fresh_20260922_post_adult_1317_near_release"
-INPUT="input/first_source_missing_both_unmeasured.json"
-SOURCE="input/third_party_unresolved.json"
+INPUT="input/queue/first_source_missing_both_unmeasured.json"
+SOURCE="input/prefilter/third_party_unresolved.json"
 URL="https://steamcommunity.com/gid/{}/memberslistxml/?xml=1"
 
 def now():

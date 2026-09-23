@@ -1,0 +1,62 @@
+name: Experiment - Steam CM actual clan members for 20 groups
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-cm-clan-members-20-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: isolated-steam-cm-20-clan-members
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout only experimental script and official read-only checkpoint
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_cm_clan_members_20.py
+            experiments/steam_official_followers_20260922/
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Fetch original independent first source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input
+          test -s input/third_party_4000_priority.json
+          test -s input/third_party_unresolved.json
+          test -s experiments/steam_official_followers_20260922/checkpoint.json
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Steam Client and validate probe
+        run: |
+          python -m pip install --disable-pip-version-check "steam[client]==1.4.4"
+          python -m py_compile scripts/experiment_cm_clan_members_20.py
+
+      - name: Anonymous CM request friend data then clan activity data
+        run: python -u scripts/experiment_cm_clan_members_20.py
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-cm-clan-members-20
+          path: output/cm_follower_members_pilot/
+          if-no-files-found: warn
+          retention-days: 30

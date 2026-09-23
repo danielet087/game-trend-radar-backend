@@ -84,11 +84,11 @@ def main():
         if not isinstance(r.get("release_date"),str) or len(r["release_date"])!=10:
             raise ValueError("Missing exact release date")
         group=group_ids[appid]
-        if not isinstance(group,int) or group<0:
-            raise ValueError(f"Group mapping missing for AppID {appid}; do not fabricate ID")
+        if group is not None and (not isinstance(group,int) or group<0):
+            raise ValueError(f"Malformed Group ID for AppID {appid}")
         cohort[appid]={
             "appid":appid,"name":r.get("name"),"release_date":r["release_date"],
-            "group_id64":str(BASE+group),
+            "group_id64":str(BASE+group) if group is not None else None,
             "steam_url":r.get("steam_url"),
         }
 
@@ -153,7 +153,9 @@ def main():
         attempted+=1
         timestamp=now().isoformat()
         try:
-            response=session.get(URL.format(row["group_id64"]),timeout=(7,22))
+            endpoint=(URL.format(row["group_id64"]) if row["group_id64"]
+                      else f"https://steamcommunity.com/games/{aid}/memberslistxml/?xml=1")
+            response=session.get(endpoint,timeout=(7,22))
             status=response.status_code
             if status==429:
                 state["rate_limit_count"]+=1
@@ -176,7 +178,8 @@ def main():
             root=ET.fromstring(response.content)
             raw=root.findtext(".//memberCount")
             got_gid=root.findtext(".//groupID64")
-            if got_gid!=row["group_id64"]:
+            if (not got_gid or not got_gid.isdigit() or
+                    (row["group_id64"] is not None and got_gid!=row["group_id64"])):
                 state["attempt_events"].append({"appid":aid,"when":timestamp,"http":status,
                      "status":"group_id_mismatch","expected":row["group_id64"],"got":got_gid})
                 stop="group_id_mismatch_stop";persist(stop);break
@@ -186,7 +189,8 @@ def main():
                 stop="missing_member_count_stop";persist(stop);break
             follower=int(raw.strip().replace(",",""))
             done[str(aid)]={
-                **row,"official_followers":follower,"official_ge5000":follower>=5000,
+                **row,"group_id64":got_gid,"official_followers":follower,
+                "official_ge5000":follower>=5000,
                 "official_checked_at_taipei":timestamp,
                 "official_source":"Steam Community gid64 memberslistxml memberCount",
             }

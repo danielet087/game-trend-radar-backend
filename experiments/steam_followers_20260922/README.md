@@ -33,3 +33,30 @@ This folder is **experiment-only**. None of the scripts/workflows here reads or 
 - [Authenticated 429 comparison](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35809491959)
 - [Official checkpoint replay](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35809710469)
 
+
+## 2026-09-23 read-only first-provider coverage diagnosis
+
+[Run 35811124173](https://github.com/danielet087/game-trend-radar-backend/actions/runs/35811124173)
+tested 30 stratified unresolved (mapped Group IDs) and 10 known positive controls:
+
+- `GET /api/groups/{short_id}`: **0/30** unresolved recovered and **30/30 HTTP 404**; **10/10** known controls recovered.
+- `POST /api/groups/bulk`: 30 short IDs returned `data=[]`, `notFound=30`.
+- Full SteamID64 form is **not** an alternate lookup solution: test batch of 5 failed HTTP 500.
+- Exact game-name search: 0/8 nonempty matches.
+- One candidate has NO Steam group short ID; the rest of the unresolved from this frozen cohort have valid mappings. These are **not proven zero Followers**; this third-party database does not have those group records.
+- Therefore retrying the same third-party endpoint or changing ID formatting is not a meaningful 1,358-game recovery strategy.
+
+Steamworks docs explain game followers as members of the game community group:
+https://partner.steamgames.com/doc/marketing/followers
+
+Official Steam Community XML remains appropriate **only** when rate limits permit:
+https://partner.steamgames.com/documentation/community_data
+
+### Decision
+
+Keep existing Steam third-party numbers as the quick *candidate prioritization* layer.
+Do not consider its 404/notFound games as below the 4,000 threshold.
+Treat API Key 429 as an account/service problem, not a reason to cycle IPs or repeatedly re-run.
+Build a bounded official verification queue for unresolved, prioritizing imminent release dates
+and other **non-follower scheduling signals**. Never display a guessed number as Followers.
+Continue using checkpoints and stop immediately on 429; no monthly API quota assumptions.

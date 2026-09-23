@@ -243,11 +243,12 @@ def main():
             print("RESUME_STOP preflight_" + reason + " pending=" + str(final["pending"]), flush=True)
             print("RESUME_FINAL " + json.dumps(final, ensure_ascii=False, sort_keys=True), flush=True)
             return
-    for offset in range(0, min(len(pending), max(0, args.max_new - successful_preflight)), args.batch_size):
+    run_limit = min(len(pending), max(0, args.max_new - successful_preflight))
+    for offset in range(0, run_limit, args.batch_size):
         if time.monotonic() > deadline - 30:
             stop_reason = "time_budget_reached"
             break
-        chunk = pending[offset: offset + args.batch_size]
+        chunk = pending[offset: min(offset + args.batch_size, run_limit)]
         throttled = False
         blocked = False
         with ThreadPoolExecutor(max_workers=args.workers) as pool:

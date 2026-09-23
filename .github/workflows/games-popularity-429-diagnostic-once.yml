@@ -1,0 +1,31 @@
+name: Experiment - diagnose Games Popularity 429
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/games-popularity-429-diagnostic-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_gp_429_diagnostic.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Compare one authenticated and one anonymous API response
+        env:
+          GAMES_POPULARITY_API_KEY: ${{ secrets.GAMES_POPULARITY_API_KEY }}
+        run: python -u scripts/experiment_gp_429_diagnostic.py

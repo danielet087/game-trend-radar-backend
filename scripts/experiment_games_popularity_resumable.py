@@ -210,6 +210,22 @@ def main():
         return report
 
     persist("started")
+    # Probe ONE app before starting worker batches. An account-level 429 must
+    # not fan out to 25+ useless requests (the September 23 test proved this).
+    if pending:
+        first = pending[0]
+        preflight = lookup(first, key)
+        requests_this_run += 1
+        if preflight.get("status") in FINAL_STATES:
+            results[str(first)] = preflight
+            pending = pending[1:]
+            persist("preflight_ok")
+        elif preflight.get("status") in ("rate_limited", "auth_or_quota_block"):
+            reason = preflight["status"]
+            final = persist(reason)
+            print("RESUME_STOP preflight_" + reason + " pending=" + str(final["pending"]), flush=True)
+            print("RESUME_FINAL " + json.dumps(final, ensure_ascii=False, sort_keys=True), flush=True)
+            return
     for offset in range(0, min(len(pending), args.max_new), args.batch_size):
         if time.monotonic() > deadline - 30:
             stop_reason = "time_budget_reached"

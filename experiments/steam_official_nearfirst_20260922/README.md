@@ -1,5 +1,7 @@
 # Steam official Followers — near-release, small-batch experiment
 
+**Historical workflow:** Its GitHub cron was removed, and the old ChatGPT every-two-hours/three-games automation is paused. The cumulative checkpoint contains **384** official results after the verified September 23 one-hour throughput test. New daily 250-game batches use the separate dynamic catch-up workflow/checkpoint (see `../steam_official_daily_catchup/README.md`). The initial 9-game numbers below are a historical snapshot, not current progress.
+
 Frozen cohort: `steam_fresh_20260922_post_adult_1317_near_release`. It is
 **not** an automatically refreshed daily Steam candidate scan.
 
@@ -14,12 +16,12 @@ Frozen cohort: `steam_fresh_20260922_post_adult_1317_near_release`. It is
 
 - Sort by Taiwan release date: today/future first, oldest release dates last; within a day by AppID. The five titles already released 2026-09-22 remain in the cohort and are **not** silently removed.
 - Max **3 official XML requests per run**, **28 seconds** between requests, serialized, no simultaneous fanout.
-- Scheduled every **2 hours** at UTC minute 37 (Taiwan minute 37, even local hours), subject to normal GitHub Actions scheduling delays. A scheduled run is not a promise that Steam will serve responses.
+- **Historical setting only:** previously every two hours; **now NO GitHub cron** and this three-game workflow is superseded by the dynamic 250-game batches.
 - On the first HTTP 429, stop immediately; wait at least 48 hours before any further official request. Repeated 429 escalates cooldown (up to 168 hours). HTTP 401/403, 5xx and malformed group data also halt the batch. Missing data is never treated as zero.
 - Each successful numeric result is saved immediately, and the checkpoint and immutable input lists are committed to this **experiment-only** folder.
 - Results are based on official Steam Community XML `memberCount`, not Steam Store `appdetails`, third-party followers or wishlists.
-- The workflow attempts to disable its own recurrence when all 1,317 have official results.
-- **This separate scheduled GitHub Actions task does use GitHub Actions minutes.** Production sync, frontend, previous follower cache and their workflows were not changed.
+- Its former self-disable clause is historical; no GitHub cron remains.
+- When explicitly triggered, this workflow uses GitHub Actions minutes. The new ChatGPT-orchestrated dynamic 250-game workflow also uses Actions minutes, but has no GitHub cron. Production sync, frontend and prior Followers Cache are unchanged.
 
 ## Files
 

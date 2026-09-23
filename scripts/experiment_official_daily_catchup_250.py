@@ -142,7 +142,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         "eligible_count": len(eligible.get("games", [])),
     }
     today = clock().date().isoformat()
-    if utc_date_as_taipei(prefilter.get("updated_at")) == today:
+    if (utc_date_as_taipei(prefilter.get("updated_at")) == today
+            and utc_date_as_taipei(eligible.get("screened_at")) == today):
         rows = eligible.get("games")
         pre = prefilter.get("games")
         if not isinstance(rows, list) or not isinstance(pre, dict):
@@ -197,7 +198,10 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         if aid not in existing_official
     ]
     pending.sort(key=lambda r: (
-        r["release_date"] < today, r["release_date"], r["appid"]
+        r["release_date"] < today,
+        r["release_date"] if r["release_date"] >= today
+        else -datetime.fromisoformat(r["release_date"]).date().toordinal(),
+        r["appid"],
     ))
     daily["combined_pending_now"] = len(pending)
     daily["completed_legacy"] = len(legacy_cp["official_results"])

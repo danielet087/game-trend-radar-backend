@@ -52,6 +52,11 @@ jobs:
           print("STRESS_INPUT_VALID frozen_1317=true already_done="+str(len(cp["official_results"])))
           PY
 
+      - name: Configure Git identity before incremental checkpoint commits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: ONE HOUR progressively paced official memberCount stress test
         run: >
           python -u scripts/experiment_official_hour_stress.py

@@ -1,0 +1,31 @@
+name: Test content backend token split once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/test-content-backend-token-split-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send verified game refresh event
+        env:
+          GH_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${GH_TOKEN:-}"
+          gh api --method POST \
+            repos/danielet087/game-trend-radar-content-backend/dispatches \
+            -f event_type=steam_game_refresh \
+            -F 'client_payload[appid]=2087540' \
+            -F 'client_payload[official_followers]=6613' \
+            -f 'client_payload[release_date]=2026-10-21' \
+            -f 'client_payload[official_checked_at_taipei]=2026-09-23T14:43:20.202290+08:00' \
+            -f 'client_payload[source_repository]=danielet087/game-trend-radar-backend'
+          echo "TOKEN_SPLIT_DISPATCH_SENT"

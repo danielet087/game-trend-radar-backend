@@ -12862,11 +12862,26 @@
       "next_request_after_taipei": "2026-09-23T16:27:23.799995+08:00"
     }
   ],
-  "next_request_after_taipei": "2026-09-23T16:27:23.799995+08:00",
+  "next_request_after_taipei": null,
   "rate_limit_count": 1,
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
-  "temporary_error_count": 2,
-  "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app."
+  "temporary_error_count": 0,
+  "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
+  "unresolved_candidates": {
+    "4435490": {
+      "appid": 4435490,
+      "name": "Call of Duty®: Modern Warfare® 4",
+      "release_date": "2026-10-22",
+      "group_id64": null,
+      "steam_url": "https://store.steampowered.com/app/4435490/",
+      "queue_source": "frozen_20260922_original_third_party_missing",
+      "status": "official_xml_fallback_returned_html",
+      "resolution": "retry when a valid official group ID is available",
+      "official_followers": null,
+      "recorded_from_attempt_taipei": "2026-09-23T15:57:23.607757+08:00"
+    }
+  },
+  "checkpoint_migration_note": "Clear transient XML-error cooldown only for confirmed AppID 4435490 without group ID; preserve HTTP 429 history and official results."
 }

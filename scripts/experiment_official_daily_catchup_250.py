@@ -217,6 +217,7 @@ def main():
     if not 120 <= args.max_seconds <= 3500 or not 1 <= args.save_every <= 20:
         raise ValueError("Invalid duration/save interval")
     started = time.monotonic()
+    started_at_taipei = clock().isoformat()
     original = read(FROZEN / "source_queue.json")
     oldgroups = read(FROZEN / "source_unresolved.json")
     oldcp = read(FROZEN / "checkpoint.json")
@@ -361,7 +362,7 @@ def main():
     pending_left = max(0, len(q) - successful)
     report = {
         "source_status": source_status,
-        "start_taipei": cp.get("created_at_taipei"),
+        "start_taipei": started_at_taipei,
         "finish_taipei": clock().isoformat(),
         "stop_reason": stop,
         "elapsed_seconds": round(time.monotonic() - started, 2),

@@ -1,0 +1,189 @@
+{
+  "task_name": "Steam 遊戲資料同步",
+  "run_date_taipei": "2026-09-23",
+  "run_mode": "user-invoked existing schedule instruction; automation schedule unchanged",
+  "actual_start_taipei": "2026-09-23 10:16+08:00 (supplied conversation-local time at invocation)",
+  "actual_completion_utc": "2026-09-23T02:19:33.346Z",
+  "actual_completion_taipei": "2026-09-23 10:19:33+08:00",
+  "status": "partial_success_existing_records_corrected",
+  "search_interval_taipei": {
+    "start": "2026-09-23",
+    "end": "2027-03-22",
+    "rule": "six calendar months minus one day, inclusive"
+  },
+  "scope_progress": [
+    {
+      "month": "2026-09",
+      "coverage": "partial",
+      "sources": [
+        "https://steamdb.info/upcoming/?week=2026W39",
+        "https://store.steampowered.com/app/3431300/Slow_Roads/?l=tchinese",
+        "https://store.steampowered.com/app/2712590/Dragon_Shelter/?l=tchinese"
+      ],
+      "verified_full_month": false
+    },
+    {
+      "month": "2026-10",
+      "coverage": "partial",
+      "sources": [
+        "https://steamdb.info/upcoming/?week=2026W40",
+        "https://steamdb.info/upcoming/?week=2026W42",
+        "https://steamdb.info/upcoming/?week=2026W43",
+        "https://steamdb.info/upcoming/?week=2026W44",
+        "https://store.steampowered.com/app/2562390/Bennys_Backrooms/"
+      ],
+      "verified_full_month": false
+    },
+    {
+      "month": "2026-11",
+      "coverage": "partial",
+      "sources": [
+        "https://steamdb.info/upcoming/?week=2026W46",
+        "https://steamdb.info/upcoming/?week=2026W48"
+      ],
+      "verified_full_month": false
+    },
+    {
+      "month": "2026-12",
+      "coverage": "partial",
+      "sources": [
+        "https://steamdb.info/upcoming/?week=2026W50",
+        "https://steamdb.info/upcoming/?week=2026W52"
+      ],
+      "verified_full_month": false
+    },
+    {
+      "month": "2027-01",
+      "coverage": "partial",
+      "sources": [
+        "https://steamdb.info/upcoming/?week=2027W02",
+        "https://steamdb.info/upcoming/?week=2027W04"
+      ],
+      "verified_full_month": false
+    },
+    {
+      "month": "2027-02",
+      "coverage": "partial",
+      "sources": [
+        "https://steamdb.info/upcoming/?week=2027W06",
+        "https://steamdb.info/upcoming/?week=2027W07",
+        "https://steamdb.info/upcoming/?week=2027W08"
+      ],
+      "verified_full_month": false
+    },
+    {
+      "month": "2027-03",
+      "coverage": "partial",
+      "sources": [
+        "https://steamdb.info/upcoming/?week=2027W09",
+        "https://steamdb.info/upcoming/?week=2027W10"
+      ],
+      "verified_full_month": false
+    }
+  ],
+  "counts": {
+    "github_public_records_examined_for_existence_and_dedupe": 103,
+    "github_private_master_records_examined_for_dedupe": 237,
+    "historical_unpublished_candidates_with_master_follows_gte5000_and_date_in_range_excluding_quarter_end_sentinels": 11,
+    "individual_games_rechecked_with_external_public_sources": 5,
+    "updated_existing": 2,
+    "new_public": 0,
+    "removed": 0,
+    "failed_qualified_updates": 0,
+    "excluded_primarily_sexual_confirmed_this_run": 1,
+    "withheld_due_to_imprecise_date_confirmed_this_run": 2,
+    "skipped_unpublished_other_master_candidates": "not individually verified; 8 of the historical 11 remain unconfirmed this run",
+    "public_before": 103,
+    "public_after": 103,
+    "distinct_week_pages_or_indexed_weekly_results_consulted": 16,
+    "actual_unique_steamdb_rows_captured": null,
+    "date_content_type_pass_for_full_six_month_window": null,
+    "followers_pass_for_full_six_month_window": null,
+    "pending_or_unresolved_overall": null,
+    "complete_six_month_coverage": false
+  },
+  "updated": [
+    {
+      "appid": 3431300,
+      "name": "Slow Roads",
+      "old_taiwan_date": "2026-09-24",
+      "official_taiwan_date": "2026-09-23",
+      "source": "https://store.steampowered.com/app/3431300/Slow_Roads/?l=tchinese",
+      "preserved_original_utc": "2026-09-23T17:00:00Z",
+      "timestamp_to_taiwan_date": "2026-09-24",
+      "changed_fields": [
+        "release_start",
+        "release_end",
+        "release_raw",
+        "release_date_basis",
+        "release_date_source",
+        "release_date_verified_at",
+        "release_time_status",
+        "release_time_conflict"
+      ]
+    },
+    {
+      "appid": 2712590,
+      "name": "Dragon Shelter",
+      "old_taiwan_date": "2026-09-25",
+      "official_taiwan_date": "2026-09-24",
+      "source": "https://store.steampowered.com/app/2712590/Dragon_Shelter/?l=tchinese",
+      "preserved_original_utc": "2026-09-24T17:00:00Z",
+      "timestamp_to_taiwan_date": "2026-09-25",
+      "changed_fields": [
+        "release_start",
+        "release_end",
+        "release_raw",
+        "release_date_basis",
+        "release_date_source",
+        "release_date_verified_at",
+        "release_time_status",
+        "release_time_conflict"
+      ]
+    }
+  ],
+  "withheld": [
+    {
+      "appid": 2562390,
+      "name": "Benny's Backrooms",
+      "reason": "Official Steam release only Q4/October 2026, not an exact day",
+      "source": "https://store.steampowered.com/app/2562390/Bennys_Backrooms/"
+    },
+    {
+      "appid": 1159150,
+      "name": "BOC: Birth of Cultures",
+      "reason": "Official Steam release only February 2027, not an exact day",
+      "source": "https://store.steampowered.com/app/1159150/BOC/"
+    },
+    {
+      "appid": 3850550,
+      "name": "Isekai: Waifu Overlord",
+      "reason": "Primarily sexually explicit NSFW content (including Hentai), excluded",
+      "source": "https://store.steampowered.com/app/3850550?l=english"
+    }
+  ],
+  "data_source_constraints": [
+    "SteamDB weekly views frequently cap at 100 entries. Some web-rendered rows are missing names and AppIDs; these were not counted as acquired candidate products.",
+    "Only search-readable public results and individual pages were consulted, not an automated SteamDB crawler.",
+    "Historical 11467 candidates and all 237 master entries are context/dedupe only, not counted as newly fetched rows.",
+    "No Steam or Steam Community HTTP 429 observed from accessible web results; absence of 429 is not proof of unlimited access.",
+    "No fully verified six-month inventory available; no fabricated row/qualified counts."
+  ],
+  "github": {
+    "frontend_repo": "danielet087/game-trend-radar",
+    "frontend_path": "data/steam_upcoming.json",
+    "frontend_commit": "4ccc36107fd2d148b7372950ddf688f6fc51a08b",
+    "frontend_content_sha": "f7fa28f118594a18391e53f75d5c79ae9ebd4e64",
+    "frontend_readback_verified": true,
+    "frontend_readback_count": 103,
+    "frontend_readback_unique_appids": 103,
+    "master_repo": "danielet087/game-trend-radar-backend",
+    "master_path": "data/steam_upcoming_master.json",
+    "master_commit": "not_modified; old incomplete/placeholder dates preserved for separate candidate scrutiny",
+    "report_path": "reports/steam_daily_sync_20260923_manual_run.json",
+    "report_commit": null
+  },
+  "schedule_modified": false,
+  "github_actions_created_modified_or_manually_triggered": false,
+  "cloud_services_deployed": false
+}

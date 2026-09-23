@@ -1,0 +1,164 @@
+name: ONE-OFF Steam official Followers backlog catchup - no schedule changes
+
+# Created only to fulfill the user's explicit unscheduled catch-up request.
+# This workflow has no cron and no workflow_dispatch; it runs once on creation.
+# Existing hourly Steam workflow remains unchanged.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-official-backlog-oneoff-20260923.yml
+
+permissions:
+  contents: write
+  actions: read
+
+# Same group as the existing hourly schedule: zero concurrent Steam XML jobs.
+concurrency:
+  group: isolated-official-nearfirst-frozen-20260922
+  cancel-in-progress: false
+
+jobs:
+  catch-up:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - name: Checkout existing scanner plus original, daily and official checkpoints
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_official_daily_catchup_250.py
+            experiments/steam_official_nearfirst_20260922/
+            experiments/steam_official_followers_20260922/checkpoint.json
+            experiments/steam_official_daily_catchup/
+            data/steam_candidates_eligible.json
+            data/steam_prefilter_state.json
+            data/steam_followers_cache.json
+          sparse-checkout-cone-mode: false
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up safe durable checkpoint writes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -m pip install --disable-pip-version-check requests
+          python -m py_compile scripts/experiment_official_daily_catchup_250.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("experiments/steam_official_nearfirst_20260922")
+          q=json.loads((p/"source_queue.json").read_text(encoding="utf-8"))
+          c=json.loads((p/"checkpoint.json").read_text(encoding="utf-8"))
+          assert len(q)==1317
+          assert c["cohort"]=="steam_fresh_20260922_post_adult_1317_near_release"
+          print("ONEOFF_VALID frozen_source=",len(q),"already_official=",len(c["official_results"]))
+          PY
+
+      - name: Finish existing dynamic backlog in up to five 250-game batches
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p output/steam_official_backlog_oneoff
+          for n in 1 2 3 4 5; do
+            echo "ONEOFF_BATCH_BEGIN $n / 5"
+            python -u scripts/experiment_official_daily_catchup_250.py \
+              --max-requests 250 \
+              --interval 8 \
+              --max-seconds 3450 \
+              --save-every 10
+            cp output/steam_official_daily_catchup/report.json "output/steam_official_backlog_oneoff/batch_${n}_report.json"
+            cp output/steam_official_daily_catchup/attempts.json "output/steam_official_backlog_oneoff/batch_${n}_attempts.json"
+            python - "$n" <<'PY'
+          import json,sys,os
+          r=json.load(open("output/steam_official_daily_catchup/report.json",encoding="utf-8"))
+          n=int(sys.argv[1])
+          msg={
+            "batch":n,
+            "stop":r["stop_reason"],
+            "official_new":r["official_new_this_run"],
+            "official_total":r["combined_official_completed"],
+            "remaining":r["remaining_queue"],
+            "http_429":r["http_429_this_run"],
+            "source_status":r["source_status"]["status"],
+          }
+          print("ONEOFF_BATCH_FINAL",json.dumps(msg,ensure_ascii=False,sort_keys=True),flush=True)
+          with open("output/steam_official_backlog_oneoff/summary.jsonl","a",encoding="utf-8") as f:
+            f.write(json.dumps(msg,ensure_ascii=False)+"\n")
+          PY
+            state="$(python - <<'PY'
+          import json
+          r=json.load(open("output/steam_official_daily_catchup/report.json",encoding="utf-8"))
+          if r["stop_reason"] in {"first_http_429","official_429_cooldown_no_request",
+                                "legacy_official_429_cooldown_no_request",
+                                "http_access_or_server_error","transport_or_xml_error",
+                                "invalid_official_xml","unexpected_http",
+                                "git_checkpoint_failure","final_git_checkpoint_failure"}:
+            print("stop")
+          elif r["remaining_queue"]==0:
+            print("empty")
+          elif r["official_new_this_run"]==0:
+            print("stop")
+          else:
+            print("continue")
+          PY
+          )"
+            echo "ONEOFF_DECISION $state"
+            if [[ "$state" != "continue" ]]; then
+              break
+            fi
+          done
+
+      - name: Save final checkpoint, if a last partial batch was interrupted
+        if: always()
+        run: |
+          FILE="experiments/steam_official_daily_catchup/checkpoint.json"
+          if [ -s "$FILE" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add "$FILE"
+            if ! git diff --cached --quiet; then
+              git commit -m "experiment: persist one-off official Followers backlog"
+              git pull --rebase origin main
+              git push origin HEAD:main
+            fi
+          fi
+
+      - name: Summarize all actual catch-up batches
+        if: always()
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,os
+          p=Path("output/steam_official_backlog_oneoff")
+          files=sorted(p.glob("batch_*_report.json"))
+          lines=["## One-off Steam official Followers backlog","",
+                 "One-off only: the hourly GitHub schedule and all ChatGPT schedules were left unchanged.",""]
+          total=0
+          for file in files:
+            r=json.loads(file.read_text(encoding="utf-8"))
+            number=int(file.name.split("_")[1])
+            total+=r["official_new_this_run"]
+            lines.append(f"- Batch {number}: new {r['official_new_this_run']}, remaining {r['remaining_queue']}, HTTP 429 {r['http_429_this_run']}, stop {r['stop_reason']}")
+          lines.append(f"- Total new official records this one-off: **{total}**")
+          if files:
+            last=json.loads(files[-1].read_text(encoding="utf-8"))
+            lines.extend([f"- Last reported pending: **{last['remaining_queue']}**",
+                          f"- Official combined completed: **{last['combined_official_completed']}**",
+                          f"- Source status: **{last['source_status']['status']}**"])
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
+            f.write("\n".join(lines)+"\n")
+          print("ONEOFF_SUMMARY",json.dumps({"batch_count":len(files),"new_official":total},ensure_ascii=False))
+          PY
+
+      - name: Upload result reports (including on failure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-steam-followers-backlog-oneoff-20260923
+          path: output/steam_official_backlog_oneoff/
+          if-no-files-found: warn
+          retention-days: 30

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from email.utils import parsedate_to_datetime
 import subprocess
 import time
@@ -97,6 +98,117 @@ def valid_date(value):
         return datetime.fromisoformat(value).date().isoformat() == value and len(value) == 10
     except ValueError:
         return False
+
+
+def content_dispatch_signature(result):
+    return (
+        f"{int(result['appid'])}:"
+        f"{int(result['official_followers'])}:"
+        f"{result['release_date']}"
+    )
+
+
+def dispatch_content_event(cp, result):
+    """Notify the independent content backend after official >=5000 verification.
+
+    Today the receiver lives as a logically separate backend/workflow in this
+    repository. CONTENT_BACKEND_REPOSITORY can later point at a dedicated repo
+    without changing the Followers scanner.
+    """
+    if not checked_numeric(result.get("official_followers")) or result["official_followers"] < 5000:
+        return "not_qualified"
+    if not valid_date(result.get("release_date")):
+        return "invalid_release_date"
+
+    target = (os.environ.get("CONTENT_BACKEND_REPOSITORY") or
+              os.environ.get("GITHUB_REPOSITORY") or "").strip()
+    token = (os.environ.get("CONTENT_BACKEND_TOKEN") or
+             os.environ.get("GITHUB_TOKEN") or "").strip()
+    if not target or not token:
+        return "not_configured"
+
+    aid = str(int(result["appid"]))
+    signature = content_dispatch_signature(result)
+    registry = cp.setdefault("content_dispatches", {})
+    prior = registry.get(aid) or {}
+    if prior.get("signature") == signature and prior.get("status") == "dispatched":
+        return "already_dispatched"
+
+    payload = {
+        "event_type": "steam_game_qualified",
+        "client_payload": {
+            "appid": int(aid),
+            "official_followers": int(result["official_followers"]),
+            "release_date": result["release_date"],
+            "official_checked_at_taipei": result.get("official_checked_at_taipei"),
+            "official_source": result.get("official_source"),
+            "source_repository": os.environ.get("GITHUB_REPOSITORY"),
+            "signature": signature,
+        },
+    }
+    attempted = clock().isoformat()
+    try:
+        response = requests.post(
+            f"https://api.github.com/repos/{target}/dispatches",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "GameTrendRadarFollowersDispatch/1.0",
+            },
+            json=payload,
+            timeout=20,
+        )
+        if response.status_code == 204:
+            registry[aid] = {
+                "signature": signature,
+                "status": "dispatched",
+                "target_repository": target,
+                "event_type": "steam_game_qualified",
+                "dispatched_at_taipei": attempted,
+            }
+            print("CONTENT_DISPATCH_OK", aid, signature, flush=True)
+            return "dispatched"
+        registry[aid] = {
+            "signature": signature,
+            "status": "failed",
+            "target_repository": target,
+            "http": response.status_code,
+            "attempted_at_taipei": attempted,
+        }
+        print("CONTENT_DISPATCH_FAILED", aid, response.status_code, flush=True)
+        return "failed"
+    except requests.RequestException as exc:
+        registry[aid] = {
+            "signature": signature,
+            "status": "failed",
+            "target_repository": target,
+            "error_type": type(exc).__name__,
+            "attempted_at_taipei": attempted,
+        }
+        print("CONTENT_DISPATCH_FAILED", aid, type(exc).__name__, flush=True)
+        return "failed"
+
+
+def retry_pending_content_dispatches(cp, limit=25):
+    """Retry qualified outcomes that were saved before an event was delivered."""
+    retried = 0
+    for result in sorted(
+        cp.get("official_results", {}).values(),
+        key=lambda x: (x.get("release_date", "9999-12-31"), int(x.get("appid", 0))),
+    ):
+        if retried >= limit:
+            break
+        if not checked_numeric(result.get("official_followers")) or result["official_followers"] < 5000:
+            continue
+        aid = str(int(result["appid"]))
+        prior = (cp.get("content_dispatches") or {}).get(aid) or {}
+        signature = content_dispatch_signature(result)
+        if prior.get("signature") == signature and prior.get("status") == "dispatched":
+            continue
+        dispatch_content_event(cp, result)
+        retried += 1
+    return retried
 
 
 def git_push():
@@ -286,6 +398,11 @@ def main():
             "rate_limit_count": 0,
             "created_at_taipei": clock().isoformat(),
         }
+    cp.setdefault("content_dispatches", {})
+    retried_dispatches = retry_pending_content_dispatches(cp)
+    if retried_dispatches:
+        save(CHECKPOINT, cp)
+
     q, source_status = make_queue(
         cp, original, oldcp, oldgroups, eligible, prefilter,
         official_cache, other_official
@@ -374,6 +491,10 @@ def main():
                             "official_checked_at_taipei": clock().isoformat(),
                             "official_source": "Steam Community XML memberCount",
                         }
+                        if count >= 5000:
+                            event["content_dispatch"] = dispatch_content_event(
+                                cp, cp["official_results"][str(aid)]
+                            )
                         cp["rate_limit_count"] = 0
                         cp["temporary_error_count"] = 0
                         cp["next_request_after_taipei"] = None
@@ -445,7 +566,7 @@ def main():
         "http_429_this_run": sum(e["http"] == 429 for e in attempts),
         "next_request_after_taipei": cp.get("next_request_after_taipei"),
         "production_cache_modified": False,
-        "github_actions_hourly_schedule": "06:00-23:00 Asia/Taipei",
+        "github_actions_hourly_schedule": "03:00-23:00 Asia/Taipei",
     }
     # Calculate new qualified strictly from saved outcomes in this batch, not timestamps.
     ids = {str(e["appid"]) for e in attempts if e["status"] == "ok"}

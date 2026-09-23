@@ -1,0 +1,94 @@
+name: Experiment - resumable Games Popularity Followers 3238
+
+# One-off kickoff; no schedule or automatic chaining.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/games-popularity-resumable-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: isolated-games-popularity-checkpoint-20260922
+  cancel-in-progress: false
+
+jobs:
+  resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - name: Checkout only experimental script and checkpoint
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_games_popularity_resumable.py
+            experiments/games_popularity_20260922/
+          sparse-checkout-cone-mode: false
+
+      - name: Download independent 3238-candidate source artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input
+          python - <<'PY'
+          import json
+          paths=["third_party_4000_priority","third_party_below_4000","third_party_unresolved"]
+          rows=[row for path in paths for row in json.load(open("input/"+path+".json",encoding="utf-8"))]
+          assert len(rows)==3238, len(rows)
+          assert len(set(int(row["appid"]) for row in rows))==3238
+          print("FROZEN_FRESH_COHORT_OK",len(rows))
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install requests
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Run one bounded, checkpointable Games Popularity pass
+        env:
+          GAMES_POPULARITY_API_KEY: ${{ secrets.GAMES_POPULARITY_API_KEY }}
+        run: >
+          python -u scripts/experiment_games_popularity_resumable.py
+          --priority input/third_party_4000_priority.json
+          --below input/third_party_below_4000.json
+          --unresolved input/third_party_unresolved.json
+          --checkpoint experiments/games_popularity_20260922/checkpoint.json
+          --out output/games_popularity_resumable
+          --workers 3
+          --batch-size 25
+          --max-minutes 10
+
+      - name: Persist completed results without touching production state
+        if: always()
+        run: |
+          if [ -s experiments/games_popularity_20260922/checkpoint.json ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add experiments/games_popularity_20260922/checkpoint.json
+            if git diff --cached --quiet; then
+              echo "No new checkpoint data."
+            else
+              git commit -m "experiment: checkpoint Games Popularity follower coverage"
+              git pull --rebase origin main
+              git push origin HEAD:main
+            fi
+          else
+            echo "No checkpoint produced."
+          fi
+
+      - name: Upload human-readable report and combined shortlist
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: games-popularity-resumable-20260922
+          path: output/games_popularity_resumable/
+          retention-days: 30
+          if-no-files-found: warn

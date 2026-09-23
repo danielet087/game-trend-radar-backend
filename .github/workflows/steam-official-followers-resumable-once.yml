@@ -47,6 +47,9 @@ jobs:
       - name: Install requests
         run: python -m pip install --disable-pip-version-check requests
 
+      - name: Check verification script syntax
+        run: python -m py_compile scripts/experiment_official_followers_resumable.py
+
       - name: Restore 90 official results and retry only pending AppIDs
         run: >
           python -u scripts/experiment_official_followers_resumable.py

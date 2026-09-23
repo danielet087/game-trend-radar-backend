@@ -4,7 +4,7 @@ on:
   # Daily Taiwan midnight refresh: rebuild the rolling 365-day candidate set,
   # verify exact Store date + non-adult eligibility, then finish third-party
   # Followers prescreen. Official XML verification is handed to the separate
-  # 06:00-23:00 hourly catch-up workflow.
+  # 03:00-23:00 hourly catch-up workflow.
   schedule:
     - cron: "0 0 * * *"
       timezone: "Asia/Taipei"
@@ -85,7 +85,7 @@ jobs:
               raise SystemExit(f"Daily refresh did not reach Followers handoff: {state.get('phase')}")
           if not pre.get("complete"):
               raise SystemExit("Daily third-party prescreen incomplete")
-          print("DAILY_STEAM_REFRESH_READY_FOR_0600",
+          print("DAILY_STEAM_REFRESH_READY_FOR_0300",
                 "eligible=",state.get("date_precision_eligible_count"),
                 "prefilter_screened=",state.get("prefilter_screened_count"))
           PY

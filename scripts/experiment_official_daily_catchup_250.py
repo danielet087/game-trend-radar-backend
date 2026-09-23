@@ -12,10 +12,11 @@ from __future__ import annotations
 
 import argparse
 import json
+from email.utils import parsedate_to_datetime
 import subprocess
 import time
 import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -32,6 +33,27 @@ CHECKPOINT = ROOT / "checkpoint.json"
 TZ = ZoneInfo("Asia/Taipei")
 GROUP_BASE = 103582791429521408
 COHORT = "steam_official_daily_catchup_dynamic_v1"
+
+
+def steam_429_cooldown(response, failure_count, now):
+    """15m, 30m, 1h, 2h, 4h ... capped at 24h; honor longer Retry-After."""
+    minutes = min(24 * 60, 15 * (2 ** min(max(failure_count - 1, 0), 7)))
+    cooldown_until = now + timedelta(minutes=minutes)
+    header = response.headers.get("Retry-After")
+    if header:
+        try:
+            value = header.strip()
+            if value.isdigit():
+                server_until = now + timedelta(seconds=int(value))
+            else:
+                server_until = parsedate_to_datetime(value)
+                if server_until.tzinfo is None:
+                    server_until = server_until.replace(tzinfo=timezone.utc)
+                server_until = server_until.astimezone(TZ)
+            cooldown_until = max(cooldown_until, server_until)
+        except (TypeError, ValueError, OverflowError):
+            pass  # Invalid Retry-After: retain locally configured backoff.
+    return cooldown_until
 
 
 def clock():
@@ -291,10 +313,12 @@ def main():
                 if response.status_code == 429:
                     event["status"] = "rate_limited"
                     cp["rate_limit_count"] += 1
-                    hours = min(168, 48 * (2 ** min(cp["rate_limit_count"] - 1, 2)))
-                    cp["next_request_after_taipei"] = (
-                        clock() + timedelta(hours=hours)
+                    if response.headers.get("Retry-After"):
+                        event["retry_after_header"] = response.headers["Retry-After"][:128]
+                    cp["next_request_after_taipei"] = steam_429_cooldown(
+                        response, cp["rate_limit_count"], clock()
                     ).isoformat()
+                    event["next_request_after_taipei"] = cp["next_request_after_taipei"]
                     stop = "first_http_429"
                 elif response.status_code in (401, 403) or response.status_code >= 500:
                     event["status"] = "access_or_server_error"

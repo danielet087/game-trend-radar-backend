@@ -1,0 +1,30 @@
+name: Test content backend cross-repo ping once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/test-content-backend-crossrepo-ping-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Send harmless repository_dispatch ping
+        env:
+          GH_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN is missing"
+            exit 1
+          fi
+          gh api --method POST \
+            repos/danielet087/game-trend-radar-content-backend/dispatches \
+            -f event_type=content_backend_ping \
+            -f 'client_payload[source_repository]=danielet087/game-trend-radar-backend'
+          echo "CROSS_REPO_CONTENT_BACKEND_PING_SENT"

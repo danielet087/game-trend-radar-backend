@@ -1,0 +1,43 @@
+name: Refresh ALL published Steam >=5000 content
+
+on:
+  workflow_dispatch:
+    inputs:
+      interval_seconds:
+        description: Seconds between Backend B refresh events (20-180)
+        required: true
+        default: "40"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-refresh-all-qualified-content
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Checkout refresh dispatcher only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/dispatch_content_refresh_events.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Validate dispatcher
+        run: python -m py_compile scripts/dispatch_content_refresh_events.py
+
+      - name: Refresh every currently published official Followers >=5000 game
+        env:
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+          INTERVAL_SECONDS: ${{ inputs.interval_seconds }}
+        run: |
+          set -euo pipefail
+          python -u scripts/dispatch_content_refresh_events.py \
+            --interval-seconds "$INTERVAL_SECONDS" \
+            --reason manual_all_published_ge5000_refresh

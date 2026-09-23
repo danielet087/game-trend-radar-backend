@@ -20,7 +20,9 @@ jobs:
         with:
           sparse-checkout: |
             .github/workflows/steam-official-daily-catchup-250.yml
+            .github/workflows/steam-content-enrichment-dispatch.yml
             scripts/experiment_official_daily_catchup_250.py
+            content_backend/
             experiments/steam_official_nearfirst_20260922/
             experiments/steam_official_followers_20260922/checkpoint.json
             experiments/steam_official_daily_catchup/checkpoint.json
@@ -34,8 +36,9 @@ jobs:
           python-version: "3.12"
       - name: Validate Python syntax and real source-to-queue assembly WITHOUT Steam HTTP
         run: |
-          python -m pip install --disable-pip-version-check requests pyyaml
-          python -m py_compile scripts/experiment_official_daily_catchup_250.py
+          python -m pip install --disable-pip-version-check requests pyyaml opencc-python-reimplemented
+          python -m py_compile scripts/experiment_official_daily_catchup_250.py content_backend/enrich_game.py
+          PYTHONPATH=content_backend python -m unittest -q content_backend/test_enrich_game.py
           python - <<'PY'
           import json
           from pathlib import Path
@@ -52,15 +55,14 @@ jobs:
           q,source=make_queue(cp,rows,old,groups,catalog,pre,cache,other)
           assert len(cp["pending_candidates"])==1317
 
-          # Regression: load the real current dynamic checkpoint. AppID 4435490
-          # has no group ID and its fallback endpoint returned HTML. It must be
-          # parked as unresolved and must not block the other 795 pending games.
+          # Regression: AppID 4435490 has no group ID and its fallback endpoint
+          # returned HTML. It stays parked while every actually queryable row
+          # must have a real group ID. The queue length is intentionally dynamic.
           real_cp=json.loads(Path("experiments/steam_official_daily_catchup/checkpoint.json").read_text(encoding="utf-8"))
           real_q,real_source=make_queue(real_cp,rows,old,groups,catalog,pre,cache,other)
           assert "4435490" in real_cp.get("unresolved_candidates", {}), real_cp.get("unresolved_candidates")
           assert all(str(x["appid"])!="4435490" for x in real_q)
-          assert len(real_q)==795, len(real_q)
-          assert sum(1 for x in real_q if x.get("group_id64"))==795
+          assert all(x.get("group_id64") for x in real_q), [x["appid"] for x in real_q if not x.get("group_id64")]
           print("MISSING_GROUP_HTML_REGRESSION_PASS",json.dumps({
               "parked":"4435490","remaining_queryable":len(real_q)
           },ensure_ascii=False))
@@ -73,11 +75,17 @@ jobs:
           config=load(Path(".github/workflows/steam-official-daily-catchup-250.yml").read_text(encoding="utf-8"),Loader=BaseLoader)
           events=config["on"]
           assert "push" not in events and "schedule" in events and "workflow_dispatch" in events
-          assert events["schedule"]==[{"cron":"0 6-23 * * *","timezone":"Asia/Taipei"}],events["schedule"]
+          assert events["schedule"]==[{"cron":"0 3-23 * * *","timezone":"Asia/Taipei"}],events["schedule"]
           assert config["concurrency"]["cancel-in-progress"]=="false"
+          receiver=load(Path(".github/workflows/steam-content-enrichment-dispatch.yml").read_text(encoding="utf-8"),Loader=BaseLoader)
+          receiver_events=receiver["on"]
+          assert "repository_dispatch" in receiver_events
+          assert "steam_game_qualified" in receiver_events["repository_dispatch"]["types"]
+          print("CONTENT_BACKEND_EVENT_VALIDATION_PASS",receiver_events["repository_dispatch"])
           print("GITHUB_SELF_SCHEDULE_VALIDATION_PASS",events["schedule"])
           print("CATCHUP_STATIC_VALIDATION_PASS",
                 json.dumps({"frozen":len(rows),"prior_verified":len(old["official_results"]),
                             "remaining_now":len(q),"source":source},ensure_ascii=False))
           PY
 # 2026-09-23 regression trigger: verify single missing-group HTML fallback is parked before resuming one-off.
+# 2026-09-23 validation trigger: 03-23 schedule plus event-driven content backend.

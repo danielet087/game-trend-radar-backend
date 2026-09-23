@@ -1,0 +1,50 @@
+name: Refresh Steam releasing-soon content
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: Taiwan release window from today (default matches frontend upcoming = 45 days)
+        required: true
+        default: "45"
+        type: string
+      interval_seconds:
+        description: Seconds between Backend B refresh events (20-180)
+        required: true
+        default: "40"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-refresh-releasing-soon-content
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Checkout refresh dispatcher only
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/dispatch_content_refresh_events.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Validate dispatcher
+        run: python -m py_compile scripts/dispatch_content_refresh_events.py
+
+      - name: Refresh currently published games releasing soon in Taiwan
+        env:
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+          WINDOW_DAYS: ${{ inputs.days }}
+          INTERVAL_SECONDS: ${{ inputs.interval_seconds }}
+        run: |
+          set -euo pipefail
+          python -u scripts/dispatch_content_refresh_events.py \
+            --window-days "$WINDOW_DAYS" \
+            --interval-seconds "$INTERVAL_SECONDS" \
+            --reason manual_releasing_soon_refresh

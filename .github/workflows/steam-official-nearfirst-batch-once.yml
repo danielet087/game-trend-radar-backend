@@ -6,10 +6,13 @@ on:
     paths:
       - .github/workflows/steam-official-nearfirst-batch-once.yml
   workflow_dispatch:
+  schedule:
+    # Every 2 hours at :37 UTC; 3 official XML calls max per run.
+    - cron: "37 */2 * * *"
 
 permissions:
   contents: write
-  actions: read
+  actions: write
 
 concurrency:
   group: isolated-official-nearfirst-frozen-20260922
@@ -28,21 +31,30 @@ jobs:
             experiments/steam_official_nearfirst_20260922/
           sparse-checkout-cone-mode: false
 
-      - name: Download original frozen missing-followers and group mapping
+      - name: Freeze original 1317-app queue for all future batches
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p input/queue input/prefilter
-          gh run download 35811490947 --repo "${GITHUB_REPOSITORY}" --name steam-followers-priority-queues-20260922 --dir input/queue
-          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input/prefilter
+          mkdir -p experiments/steam_official_nearfirst_20260922
+          TARGET="experiments/steam_official_nearfirst_20260922"
+          if [ -s "$TARGET/source_queue.json" ] && [ -s "$TARGET/source_unresolved.json" ]; then
+            echo "Reusing existing durable frozen cohort."
+          else
+            mkdir -p input/queue input/prefilter
+            gh run download 35811490947 --repo "${GITHUB_REPOSITORY}" --name steam-followers-priority-queues-20260922 --dir input/queue
+            gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input/prefilter
+            cp input/queue/first_source_missing_both_unmeasured.json "$TARGET/source_queue.json"
+            cp input/prefilter/third_party_unresolved.json "$TARGET/source_unresolved.json"
+          fi
           python - <<'PY'
           import json
-          a=json.load(open("input/queue/first_source_missing_both_unmeasured.json",encoding="utf-8"))
-          b=json.load(open("input/prefilter/third_party_unresolved.json",encoding="utf-8"))
+          root="experiments/steam_official_nearfirst_20260922/"
+          a=json.load(open(root+"source_queue.json",encoding="utf-8"))
+          b=json.load(open(root+"source_unresolved.json",encoding="utf-8"))
           assert len(a)==1317 and len(b)==1358,(len(a),len(b))
           assert len({int(x["appid"]) for x in a})==1317
           assert all(x["release_date"] and len(x["release_date"])==10 for x in a)
-          print("OFFICIAL_NEARFIRST_INPUT_OK",len(a),"earliest",min(x["release_date"] for x in a))
+          print("OFFICIAL_NEARFIRST_FROZEN_INPUT_OK",len(a),"earliest",min(x["release_date"] for x in a))
           PY
 
       - name: Set up Python 3.12
@@ -70,12 +82,29 @@ jobs:
           if [ -s experiments/steam_official_nearfirst_20260922/checkpoint.json ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add experiments/steam_official_nearfirst_20260922/checkpoint.json
+            git add experiments/steam_official_nearfirst_20260922/checkpoint.json experiments/steam_official_nearfirst_20260922/source_queue.json experiments/steam_official_nearfirst_20260922/source_unresolved.json
             if ! git diff --cached --quiet; then
               git commit -m "experiment: checkpoint near-release Steam official Followers small batch"
               git pull --rebase origin main
               git push origin HEAD:main
             fi
+          fi
+
+      - name: Auto-disable schedule when entire frozen cohort is complete
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json,os
+          p="experiments/steam_official_nearfirst_20260922/checkpoint.json"
+          d=json.load(open(p,encoding="utf-8"))
+          assert len(d["official_results"])<=1317
+          print("Frozen queue official results:",len(d["official_results"]),"/1317")
+          PY
+          if [ "$(python -c 'import json; d=json.load(open("experiments/steam_official_nearfirst_20260922/checkpoint.json")); print("true" if len(d["official_results"])==1317 else "false")')" = "true" ]; then
+            echo "All 1317 official records complete; disable recurring workflow."
+            gh api -X PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/steam-official-nearfirst-batch-once.yml/disable"
           fi
 
       - name: Upload next date-ordered queue and official Followers

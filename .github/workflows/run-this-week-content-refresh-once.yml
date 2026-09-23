@@ -1,0 +1,36 @@
+name: Run this week Steam content refresh once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/run-this-week-content-refresh-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout refresh dispatcher
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/dispatch_content_refresh_events.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Validate dispatcher
+        run: python -m py_compile scripts/dispatch_content_refresh_events.py
+
+      - name: Refresh games releasing this week through Sunday Taiwan time
+        env:
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+        run: |
+          set -euo pipefail
+          python -u scripts/dispatch_content_refresh_events.py \
+            --window-days 4 \
+            --interval-seconds 40 \
+            --reason requested_this_week_refresh_20260923_to_20260927

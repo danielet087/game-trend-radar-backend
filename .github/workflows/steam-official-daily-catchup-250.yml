@@ -72,7 +72,7 @@ jobs:
         if: steps.window.outputs.proceed == 'true'
         env:
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
-          CONTENT_BACKEND_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
         run: >
           python -u scripts/experiment_official_daily_catchup_250.py
           --max-requests 250

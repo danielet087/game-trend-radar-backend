@@ -1,0 +1,83 @@
+name: Experiment - resume official Steam Followers from verified 90
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-official-followers-resumable-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: isolated-official-followers-checkpoint-20260922
+  cancel-in-progress: false
+
+jobs:
+  resume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout only experimental script and checkpoint
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_official_followers_resumable.py
+            experiments/steam_official_followers_20260922/
+          sparse-checkout-cone-mode: false
+
+      - name: Download first-source shortlist and previous official outcomes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input prior
+          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input
+          gh run download 35702440920 --repo "${GITHUB_REPOSITORY}" --name steam-official-followers-verify-fresh --dir prior
+          test -s input/third_party_4000_priority.json
+          test -s prior/official_5000_qualified.json
+          test -s prior/official_below_5000.json
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install requests
+        run: python -m pip install --disable-pip-version-check requests
+
+      - name: Restore 90 official results and retry only pending AppIDs
+        run: >
+          python -u scripts/experiment_official_followers_resumable.py
+          --input input/third_party_4000_priority.json
+          --prior-dir prior
+          --checkpoint experiments/steam_official_followers_20260922/checkpoint.json
+          --out output/official_followers_resumable
+          --max-minutes 7
+          --interval 25
+
+      - name: Preserve official checkpoint independently of run status
+        if: always()
+        run: |
+          if [ -s experiments/steam_official_followers_20260922/checkpoint.json ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add experiments/steam_official_followers_20260922/checkpoint.json
+            if git diff --cached --quiet; then
+              echo "Official checkpoint unchanged."
+            else
+              git commit -m "experiment: checkpoint official follower verification"
+              git pull --rebase origin main
+              git push origin HEAD:main
+            fi
+          fi
+
+      - name: Upload official verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-official-followers-resumable-20260922
+          path: output/official_followers_resumable/
+          retention-days: 30
+          if-no-files-found: warn

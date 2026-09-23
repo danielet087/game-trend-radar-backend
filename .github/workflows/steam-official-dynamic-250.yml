@@ -1,0 +1,130 @@
+name: Steam official Followers - ChatGPT dynamic 250 batch
+
+# NO GITHUB CRON. Explicit ChatGPT handoff edits batch_trigger.txt.
+# Editing this workflow itself runs only dry-run preflight (zero official calls).
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-official-dynamic-250.yml
+      - experiments/steam_official_dynamic_backfill/batch_trigger.txt
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Check queue and code without querying Steam
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: isolated-official-nearfirst-frozen-20260922
+  cancel-in-progress: false
+
+jobs:
+  dynamic-batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - name: Checkout checkpoint plus upstream eligible and follower screening
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/official_followers_dynamic_backfill.py
+            experiments/steam_official_nearfirst_20260922/
+            data/steam_candidates_eligible.json
+            data/steam_prefilter_state.json
+            data/steam_followers_cache.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up safe checkpoint writer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python -m pip install --disable-pip-version-check requests
+          python -m py_compile scripts/official_followers_dynamic_backfill.py
+
+      - name: Validate dynamic input and queue without Steam requests
+        run: >
+          python -u scripts/official_followers_dynamic_backfill.py
+          --dry-run --max-requests 250 --interval 8 --max-seconds 3000
+
+      - name: Verify direct external batch handoff
+        id: authorize
+        env:
+          MESSAGE: ${{ github.event.head_commit.message }}
+          EVENT: ${{ github.event_name }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$EVENT" = "push" ] && [[ "$MESSAGE" == request\ dynamic\ official\ followers\ batch* ]]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT" = "workflow_dispatch" ] && [ "$DRY_RUN" = "false" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"
+            echo "Preflight only: no authorized batch trigger."
+          fi
+
+      - name: Up to 250 official XML records by nearest Taiwan date
+        if: steps.authorize.outputs.go == 'true'
+        run: >
+          python -u scripts/official_followers_dynamic_backfill.py
+          --max-requests 250 --interval 8 --max-seconds 3000
+          --checkpoint-every 10
+
+      - name: Preserve any final checkpoint if the scanner terminated early
+        if: always()
+        run: |
+          FILE=experiments/steam_official_nearfirst_20260922/checkpoint.json
+          if [ -s "$FILE" ]; then
+            git add "$FILE"
+            if ! git diff --cached --quiet; then
+              git commit -m "experiment: finalize dynamic official Followers checkpoint"
+              git pull --rebase origin main
+              git push origin HEAD:main
+            fi
+          fi
+
+      - name: Report completed and pending counts
+        if: always()
+        run: |
+          if [ -s output/steam_official_dynamic_batch/report.json ]; then
+            python - <<'PY'
+          import json,os
+          r=json.load(open("output/steam_official_dynamic_batch/report.json",encoding="utf-8"))
+          lines=[
+            "## ChatGPT-controlled Steam official Followers batch",
+            "",
+            f"- Status: **{r['status']}**",
+            f"- Official XML checked this batch: **{r['requests_this_batch']}**",
+            f"- New official memberCount: **{r['new_official_this_batch']}**",
+            f"- New official >= 5,000: **{r['new_ge5000']}**",
+            f"- Official checkpoint total: **{r['total_official_checkpoint']}**",
+            f"- Pending dynamic queue: **{r['pending_at_end_of_batch']}**",
+            f"- New daily missing candidates outside original frozen queue: **{r['extra_daily_missing_not_in_frozen']}**",
+            f"- Upstream eligibility snapshot: **{r.get('eligible_screened_at')}**",
+            f"- Upstream prefilter snapshot: **{r.get('prefilter_updated_at')}**",
+            f"- HTTP 429: **{r['http_429']}**",
+            f"- Next allowed request: **{r.get('next_request_after_taipei') or 'now'}**",
+            "",
+            "Original production frontend, Followers Cache and sync cursor unchanged."
+          ]
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
+            f.write("\n".join(lines)+"\n")
+          print("DYNAMIC_SUMMARY_WRITTEN")
+          PY
+          fi
+
+      - name: Save per-batch report and official request statuses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-official-dynamic-250-report
+          path: output/steam_official_dynamic_batch/
+          if-no-files-found: warn
+          retention-days: 30

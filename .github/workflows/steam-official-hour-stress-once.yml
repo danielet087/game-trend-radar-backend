@@ -1,0 +1,113 @@
+name: Experiment - one hour official Steam Followers stress (one-off)
+
+# No schedule, not triggered by checkpoint commits, not a production task.
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-official-hour-stress-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  # Serialize against the ChatGPT-orchestrated 3-game workflow.
+  group: isolated-official-nearfirst-frozen-20260922
+  cancel-in-progress: false
+
+jobs:
+  one-hour-stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout ONLY experimental official scanner and frozen input
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_official_hour_stress.py
+            experiments/steam_official_nearfirst_20260922/
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install minimal dependency and validate syntax
+        run: |
+          python -m pip install --disable-pip-version-check requests
+          python -m py_compile scripts/experiment_official_hour_stress.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("experiments/steam_official_nearfirst_20260922")
+          cohort=json.loads((root/"source_queue.json").read_text(encoding="utf-8"))
+          third=json.loads((root/"source_unresolved.json").read_text(encoding="utf-8"))
+          cp=json.loads((root/"checkpoint.json").read_text(encoding="utf-8"))
+          assert len(cohort)==1317 and len(third)==1358
+          assert len(set(int(g["appid"]) for g in cohort))==1317
+          assert cp["cohort"]=="steam_fresh_20260922_post_adult_1317_near_release"
+          print("STRESS_INPUT_VALID frozen_1317=true already_done="+str(len(cp["official_results"])))
+          PY
+
+      - name: ONE HOUR progressively paced official memberCount stress test
+        run: >
+          python -u scripts/experiment_official_hour_stress.py
+          --max-seconds 3600
+          --max-attempts 500
+          --checkpoint-every 5
+
+      - name: Final durable checkpoint push after normal script exit
+        if: always()
+        run: |
+          ROOT="experiments/steam_official_nearfirst_20260922"
+          if [ -s "$ROOT/checkpoint.json" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add "$ROOT/checkpoint.json"
+            if ! git diff --cached --quiet; then
+              git commit -m "experiment: finalize official Followers hourly stress test"
+              git pull --rebase origin main
+              git push origin HEAD:main
+            else
+              echo "Already pushed incremental result or no new requests."
+            fi
+          fi
+
+      - name: Final GitHub summary of observed throughput
+        if: always()
+        run: |
+          if [ -s output/steam_official_hour_stress/report.json ]; then
+            python - <<'PY'
+          import json,os
+          r=json.load(open("output/steam_official_hour_stress/report.json",encoding="utf-8"))
+          lines=[
+            "## Steam official Followers — 1-hour pressure test",
+            "",
+            f"- Stop reason: **{r['stop_reason']}**",
+            f"- Window measured: **{r['duration_seconds']} / {r['duration_budget_seconds']} seconds**",
+            f"- Official successful this test: **{r['new_official_records']}**",
+            f"- Total official completed: **{r['total_official_records']} / {r['input_1317']}**",
+            f"- Remaining: **{r['pending']}**",
+            f"- HTTP requests: **{r['requests_sent']}**, 429: **{r['http_429']}**",
+            f"- Observed per-hour throughput (not guaranteed): **{r['successful_per_elapsed_hour']}**",
+            "",
+            "Intervals by stage:"
+          ]
+          for name,stage in r["phases"].items():
+            lines.append(f"- {name}: {stage['interval_s']}s, successes {stage['successes']}, 429 {stage['http_429']}, errors {stage['errors']}")
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
+            f.write("\\n".join(lines)+"\\n")
+          PY
+          fi
+
+      - name: Upload time-series attempts and final report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-official-followers-hour-pressure-test
+          path: output/steam_official_hour_stress/
+          if-no-files-found: warn
+          retention-days: 30

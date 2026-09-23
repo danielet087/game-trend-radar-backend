@@ -20,9 +20,7 @@ jobs:
         with:
           sparse-checkout: |
             .github/workflows/steam-official-daily-catchup-250.yml
-            .github/workflows/steam-content-enrichment-dispatch.yml
             scripts/experiment_official_daily_catchup_250.py
-            content_backend/
             experiments/steam_official_nearfirst_20260922/
             experiments/steam_official_followers_20260922/checkpoint.json
             experiments/steam_official_daily_catchup/checkpoint.json
@@ -37,8 +35,10 @@ jobs:
       - name: Validate Python syntax and real source-to-queue assembly WITHOUT Steam HTTP
         run: |
           python -m pip install --disable-pip-version-check requests pyyaml opencc-python-reimplemented
-          python -m py_compile scripts/experiment_official_daily_catchup_250.py content_backend/enrich_game.py
-          PYTHONPATH=content_backend python -m unittest -q content_backend/test_enrich_game.py
+          python -m py_compile scripts/experiment_official_daily_catchup_250.py
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar-content-backend.git content-backend
+          python -m py_compile content-backend/content_backend/enrich_game.py
+          PYTHONPATH=content-backend/content_backend python -m unittest -q content-backend/content_backend/test_enrich_game.py
           python - <<'PY'
           import json
           from pathlib import Path
@@ -77,7 +77,7 @@ jobs:
           assert "push" not in events and "schedule" in events and "workflow_dispatch" in events
           assert events["schedule"]==[{"cron":"0 3-23 * * *","timezone":"Asia/Taipei"}],events["schedule"]
           assert config["concurrency"]["cancel-in-progress"]=="false"
-          receiver=load(Path(".github/workflows/steam-content-enrichment-dispatch.yml").read_text(encoding="utf-8"),Loader=BaseLoader)
+          receiver=load(Path("content-backend/.github/workflows/steam-content-enrichment-dispatch.yml").read_text(encoding="utf-8"),Loader=BaseLoader)
           receiver_events=receiver["on"]
           assert "repository_dispatch" in receiver_events
           assert "steam_game_qualified" in receiver_events["repository_dispatch"]["types"]

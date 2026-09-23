@@ -1,0 +1,141 @@
+name: Steam qualified game content enrichment
+
+on:
+  repository_dispatch:
+    types: [steam_game_qualified, steam_game_refresh]
+  workflow_dispatch:
+    inputs:
+      appid:
+        description: Steam AppID
+        required: true
+        type: string
+      official_followers:
+        description: Verified Steam Community memberCount
+        required: true
+        type: string
+      release_date:
+        description: Exact Taiwan release date YYYY-MM-DD
+        required: true
+        type: string
+      official_checked_at_taipei:
+        description: Optional official Followers verification timestamp
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-content-enrichment-${{ github.event.client_payload.appid || inputs.appid }}
+  cancel-in-progress: false
+
+jobs:
+  enrich-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      APPID: ${{ github.event.client_payload.appid || inputs.appid }}
+      OFFICIAL_FOLLOWERS: ${{ github.event.client_payload.official_followers || inputs.official_followers }}
+      RELEASE_DATE: ${{ github.event.client_payload.release_date || inputs.release_date }}
+      OFFICIAL_CHECKED_AT_TAIPEI: ${{ github.event.client_payload.official_checked_at_taipei || inputs.official_checked_at_taipei }}
+
+    steps:
+      - name: Checkout independent content backend code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            content_backend/
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
+      - name: Validate qualified-game event
+        run: |
+          python - <<'PY'
+          import os,re
+          appid=os.environ.get("APPID","")
+          followers=os.environ.get("OFFICIAL_FOLLOWERS","")
+          release=os.environ.get("RELEASE_DATE","")
+          assert appid.isdigit() and int(appid)>0, appid
+          assert followers.isdigit() and int(followers)>=5000, followers
+          assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", release), release
+          print("CONTENT_EVENT_VALID", appid, followers, release)
+          PY
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install content backend dependencies and run offline tests
+        run: |
+          python -m pip install --disable-pip-version-check -r content_backend/requirements.txt
+          python -m py_compile content_backend/enrich_game.py
+          PYTHONPATH=content_backend python -m unittest -q content_backend/test_enrich_game.py
+
+      - name: Checkout public frontend with write token
+        env:
+          GH_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN is missing"
+            exit 1
+          fi
+          gh auth setup-git
+          gh repo clone danielet087/game-trend-radar frontend -- --depth 1
+
+      - name: Enrich one qualified game from Steam and upsert public JSON
+        run: |
+          python content_backend/enrich_game.py \
+            --appid "$APPID" \
+            --followers "$OFFICIAL_FOLLOWERS" \
+            --release-date "$RELEASE_DATE" \
+            --follower-checked-at "$OFFICIAL_CHECKED_AT_TAIPEI" \
+            --data-dir frontend/data
+
+      - name: Validate public contract before publishing
+        run: |
+          python - <<'PY'
+          import json,os,re
+          from pathlib import Path
+          p=Path("frontend/data/steam_upcoming.json")
+          doc=json.loads(p.read_text(encoding="utf-8"))
+          aid=int(os.environ["APPID"])
+          rows=[x for x in doc.get("games",[]) if int(x.get("appid",-1))==aid]
+          assert len(rows)==1, len(rows)
+          row=rows[0]
+          assert int(row["followers"])>=5000
+          assert row.get("release_display_precision")=="date_full"
+          assert row.get("release_precision")=="day"
+          assert row.get("release_date_timezone")=="Asia/Taipei"
+          assert row.get("sexual_content_screened") is True
+          assert row.get("header_image") or row.get("main_capsule_image")
+          assert isinstance(row.get("language_support"),dict)
+          assert isinstance(row.get("tags"),list)
+          assert isinstance(row.get("genres"),list)
+          assert doc.get("count")==len(doc.get("games",[]))
+          assert all(
+              re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(x.get("release_start","")))
+              for x in doc.get("games",[])
+          )
+          print("PUBLIC_CONTENT_VALID",aid,
+                "tags",len(row["tags"]),"genres",len(row["genres"]))
+          PY
+
+      - name: Publish enriched Steam game to frontend
+        env:
+          GH_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_upcoming.json
+          if git diff --cached --quiet; then
+            echo "CONTENT_ALREADY_CURRENT AppID=$APPID"
+            exit 0
+          fi
+          git commit -m "data: enrich qualified Steam AppID $APPID [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "CONTENT_PUBLISHED AppID=$APPID Followers=$OFFICIAL_FOLLOWERS"

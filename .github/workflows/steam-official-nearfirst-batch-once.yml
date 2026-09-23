@@ -107,6 +107,36 @@ jobs:
             gh api -X PUT "repos/${GITHUB_REPOSITORY}/actions/workflows/steam-official-nearfirst-batch-once.yml/disable"
           fi
 
+      - name: Publish a result summary for EVERY run
+        if: always()
+        run: |
+          if [ -s output/steam_official_nearfirst/report.json ]; then
+            python - <<'PY'
+          import json,os
+          r=json.load(open("output/steam_official_nearfirst/report.json",encoding="utf-8"))
+          rows=[
+            "## Steam official Followers — nearest release batch",
+            "",
+            f"- Status: **{r['status']}**",
+            f"- Total official results: **{r['completed']} / {r['total']}**",
+            f"- Requests this run: **{r['requests_this_run']}**",
+            f"- Verified >=5,000: **{r['official_ge5000']}**",
+            f"- Verified below 5,000: **{r['official_below5000']}**",
+            f"- Still pending: **{r['pending']}**",
+            f"- Pending today: **{r['pending_today']}**",
+            f"- Pending within next 7 days: **{r['pending_next_7_days']}**",
+            f"- Next allowed request after: **{r.get('next_request_after_taipei') or 'now'}**",
+            "",
+            "No production Steam sync/cache/frontend was changed."
+          ]
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
+            f.write("\\n".join(rows)+"\\n")
+          print("OFFICIAL_NEARFIRST_STEP_SUMMARY_WRITTEN",flush=True)
+          PY
+          else
+            echo "No output report generated." >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
       - name: Upload next date-ordered queue and official Followers
         if: always()
         uses: actions/upload-artifact@v4

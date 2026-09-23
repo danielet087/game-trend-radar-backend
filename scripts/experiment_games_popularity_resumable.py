@@ -60,7 +60,7 @@ def lookup(appid, key):
         with requests.Session() as session:
             response = session.get(
                 ENDPOINT.format(appid=appid),
-                params={"apiKey": key},
+                params={"apiKey": key} if key else {},
                 headers={"User-Agent": "GameTrendRadar-GamesPopularityCheckpoint/2.0"},
                 timeout=(5, 12),
             )
@@ -128,6 +128,8 @@ def summarize(rows, results, status, started, threshold):
         "elapsed_this_run_seconds": round(time.monotonic() - started, 2),
         "updated_at_taipei": datetime.now(ZoneInfo("Asia/Taipei")).isoformat(),
         "counts_not_official": True,
+        "anonymous_observations": sum(x.get("api_auth_mode") == "anonymous" for x in measured.values()),
+        "authenticated_observations": sum(x.get("api_auth_mode") == "authenticated" for x in measured.values()),
     }
 
 
@@ -143,12 +145,13 @@ def main():
     parser.add_argument("--max-minutes", type=float, default=12)
     parser.add_argument("--max-new", type=int, default=3238)
     parser.add_argument("--threshold", type=int, default=4000)
+    parser.add_argument("--anonymous", action="store_true", help="Use only public anonymous quota; never transmit API key")
     args = parser.parse_args()
     if not 1 <= args.workers <= 6 or not 1 <= args.batch_size <= 50:
         raise ValueError("Unsafe batch or worker count")
 
-    key = os.environ.get("GAMES_POPULARITY_API_KEY", "").strip()
-    if not key:
+    key = "" if args.anonymous else os.environ.get("GAMES_POPULARITY_API_KEY", "").strip()
+    if not key and not args.anonymous:
         raise RuntimeError("GAMES_POPULARITY_API_KEY is missing")
 
     rows = read_candidates([
@@ -169,8 +172,20 @@ def main():
     out = Path(args.out)
     started = time.monotonic()
     deadline = started + args.max_minutes * 60
-    pending = [aid for aid in sorted(rows) if results.get(str(aid), {}).get("status") not in FINAL_STATES]
+    def priority_order(aid):
+        row = rows[aid]
+        first = row["steam_groups_followers"]
+        if isinstance(first, int) and 3000 <= first < args.threshold:
+            return (0, -first, aid)
+        if first is None:
+            return (1, row.get("release_date") or "", aid)
+        if isinstance(first, int) and first >= args.threshold:
+            return (2, -first, aid)
+        return (3, -(first or 0), aid)
+
+    pending = [aid for aid in sorted(rows, key=priority_order) if results.get(str(aid), {}).get("status") not in FINAL_STATES]
     requests_this_run = 0
+    successful_preflight = 0
     stop_reason = "complete" if not pending else "budget"
     print(f"RESUME_START cohort={COHORT_ID} total={len(rows)} "
           f"already_resolved={len(rows)-len(pending)} pending={len(pending)}", flush=True)
@@ -215,10 +230,12 @@ def main():
     if pending:
         first = pending[0]
         preflight = lookup(first, key)
+        preflight["api_auth_mode"] = "anonymous" if args.anonymous else "authenticated"
         requests_this_run += 1
         if preflight.get("status") in FINAL_STATES:
             results[str(first)] = preflight
             pending = pending[1:]
+            successful_preflight = 1
             persist("preflight_ok")
         elif preflight.get("status") in ("rate_limited", "auth_or_quota_block"):
             reason = preflight["status"]
@@ -226,7 +243,7 @@ def main():
             print("RESUME_STOP preflight_" + reason + " pending=" + str(final["pending"]), flush=True)
             print("RESUME_FINAL " + json.dumps(final, ensure_ascii=False, sort_keys=True), flush=True)
             return
-    for offset in range(0, min(len(pending), args.max_new), args.batch_size):
+    for offset in range(0, min(len(pending), max(0, args.max_new - successful_preflight)), args.batch_size):
         if time.monotonic() > deadline - 30:
             stop_reason = "time_budget_reached"
             break
@@ -238,6 +255,7 @@ def main():
             for future in as_completed(futures):
                 aid = futures[future]
                 response = future.result()
+                response["api_auth_mode"] = "anonymous" if args.anonymous else "authenticated"
                 requests_this_run += 1
                 status = response.get("status")
                 if status in FINAL_STATES:

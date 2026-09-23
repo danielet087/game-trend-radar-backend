@@ -69,7 +69,7 @@ def main():
     started = time.monotonic()
     deadline = started + args.max_minutes * 60
     pending = [aid for aid in cohort if aid not in verified]
-    requests = 0
+    request_count = 0
 
     def persist(status):
         now = datetime.now(ZoneInfo("Asia/Taipei")).isoformat()
@@ -98,7 +98,7 @@ def main():
             "qualified_5000": len(qualified),
             "below_5000": len(below),
             "still_pending": len(todo),
-            "requests_this_run": requests,
+            "requests_this_run": request_count,
             "elapsed_seconds": round(time.monotonic() - started, 2),
             "old_production_follower_cache_read": False,
             "timestamp_taipei": now,
@@ -122,7 +122,7 @@ def main():
             if wait > 0:
                 time.sleep(wait)
         last_request = time.monotonic()
-        requests += 1
+        request_count += 1
         try:
             response = sess.get(URL.format(appid=aid), timeout=(8, 25))
             if response.status_code == 429:

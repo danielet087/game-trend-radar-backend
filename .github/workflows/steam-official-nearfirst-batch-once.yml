@@ -32,13 +32,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          mkdir -p input
-          gh run download 35811490947 --repo "${GITHUB_REPOSITORY}" --name steam-followers-priority-queues-20260922 --dir input
-          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input
+          mkdir -p input/queue input/prefilter
+          gh run download 35811490947 --repo "${GITHUB_REPOSITORY}" --name steam-followers-priority-queues-20260922 --dir input/queue
+          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input/prefilter
           python - <<'PY'
           import json
-          a=json.load(open("input/first_source_missing_both_unmeasured.json",encoding="utf-8"))
-          b=json.load(open("input/third_party_unresolved.json",encoding="utf-8"))
+          a=json.load(open("input/queue/first_source_missing_both_unmeasured.json",encoding="utf-8"))
+          b=json.load(open("input/prefilter/third_party_unresolved.json",encoding="utf-8"))
           assert len(a)==1317 and len(b)==1358,(len(a),len(b))
           assert len({int(x["appid"]) for x in a})==1317
           assert all(x["release_date"] and len(x["release_date"])==10 for x in a)

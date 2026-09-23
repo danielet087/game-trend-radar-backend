@@ -1,0 +1,29 @@
+name: Test qualified-game content dispatch once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/test-content-backend-dispatch-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch one already verified qualified game
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/$REPO/dispatches" \
+            -f event_type=steam_game_qualified \
+            -F 'client_payload[appid]=2087540' \
+            -F 'client_payload[official_followers]=6613' \
+            -f 'client_payload[release_date]=2026-10-21' \
+            -f 'client_payload[official_checked_at_taipei]=2026-09-23T14:43:20.202290+08:00'
+          echo "TEST_CONTENT_DISPATCH_SENT AppID=2087540 Followers=6613"

@@ -1,0 +1,59 @@
+name: Experiment - validate dynamic 250 Followers queue without Steam queries
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-catchup-250-static-validation-once.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_official_daily_catchup_250.py
+            experiments/steam_official_nearfirst_20260922/
+            experiments/steam_official_followers_20260922/checkpoint.json
+            data/steam_candidates_eligible.json
+            data/steam_prefilter_state.json
+            data/steam_followers_cache.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate Python syntax and real source-to-queue assembly WITHOUT Steam HTTP
+        run: |
+          python -m pip install --disable-pip-version-check requests
+          python -m py_compile scripts/experiment_official_daily_catchup_250.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.experiment_official_daily_catchup_250 import make_queue,group_to_gid,valid_date
+          root=Path("experiments/steam_official_nearfirst_20260922")
+          cp={"pending_candidates":{},"official_results":{}}
+          rows=json.loads((root/"source_queue.json").read_text(encoding="utf-8"))
+          old=json.loads((root/"checkpoint.json").read_text(encoding="utf-8"))
+          groups=json.loads((root/"source_unresolved.json").read_text(encoding="utf-8"))
+          catalog=json.loads(Path("data/steam_candidates_eligible.json").read_text(encoding="utf-8"))
+          pre=json.loads(Path("data/steam_prefilter_state.json").read_text(encoding="utf-8"))
+          cache=json.loads(Path("data/steam_followers_cache.json").read_text(encoding="utf-8"))
+          other=json.loads(Path("experiments/steam_official_followers_20260922/checkpoint.json").read_text(encoding="utf-8"))
+          q,source=make_queue(cp,rows,old,groups,catalog,pre,cache,other)
+          assert len(cp["pending_candidates"])==1317
+          assert len(q)>0
+          assert len({int(x["appid"]) for x in q})==len(q)
+          assert all(valid_date(x["release_date"]) for x in q)
+          assert all(str(x["appid"]) not in old["official_results"] for x in q)
+          assert group_to_gid(None) is None and group_to_gid(45053554)=="103582791474574962"
+          print("CATCHUP_STATIC_VALIDATION_PASS",
+                json.dumps({"frozen":len(rows),"prior_verified":len(old["official_results"]),
+                            "remaining_now":len(q),"source":source},ensure_ascii=False))
+          PY

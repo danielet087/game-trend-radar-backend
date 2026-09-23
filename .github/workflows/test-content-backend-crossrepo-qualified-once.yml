@@ -32,3 +32,5 @@ jobs:
             -f 'client_payload[official_checked_at_taipei]=2026-09-23T14:43:20.202290+08:00' \
             -f 'client_payload[source_repository]=danielet087/game-trend-radar-backend'
           echo "CROSS_REPO_QUALIFIED_DISPATCH_SENT AppID=2087540"
+
+# retry after dedicated content backend secret wiring fix

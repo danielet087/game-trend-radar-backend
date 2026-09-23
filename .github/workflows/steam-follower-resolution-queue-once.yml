@@ -1,0 +1,47 @@
+name: Experiment - build 3238-game follower resolution priority queues
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-follower-resolution-queue-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout only independent experiment and checkpoints
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_build_follower_priority_queue.py
+            experiments/games_popularity_20260922/
+            experiments/steam_official_followers_20260922/
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Retrieve frozen 3238 non-adult candidate prescreen
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh run download 35702182234 --repo "${GITHUB_REPOSITORY}" --name steam-followers-prefilter-fresh --dir input
+      - name: Use Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate and partition the independent follower cohort
+        run: python -u scripts/experiment_build_follower_priority_queue.py
+      - name: Save queues and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-followers-priority-queues-20260922
+          path: output/followers_pending_plan/
+          retention-days: 14
+          if-no-files-found: warn

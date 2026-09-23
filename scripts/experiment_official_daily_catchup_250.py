@@ -1,4 +1,4 @@
-"""Dynamic near-release official Followers catch-up, one externally triggered hourly batch.
+"""Dynamic near-release official Followers catch-up, one GitHub-scheduled hourly batch.
 
 Inputs: persisted September 22 missing-source cohort plus eligible candidates
 from a genuinely fresh daily follower prefilter. A stale/disabled daily scan is
@@ -388,7 +388,7 @@ def main():
         "http_429_this_run": sum(e["http"] == 429 for e in attempts),
         "next_request_after_taipei": cp.get("next_request_after_taipei"),
         "production_cache_modified": False,
-        "no_github_cron": True,
+        "github_actions_hourly_schedule": "06:00-23:00 Asia/Taipei",
     }
     # Calculate new qualified strictly from saved outcomes in this batch, not timestamps.
     ids = {str(e["appid"]) for e in attempts if e["status"] == "ok"}

@@ -1,0 +1,53 @@
+name: Experiment - 10 random unresolved Steam official followers
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/steam-unresolved-10-official-followers-once.yml
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: isolated-official-followers-10-random
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout isolated official Steam follower experiment
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/experiment_unresolved_10_official_followers.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - name: Download frozen 1317 no-Followers candidate list
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p input
+          gh run download 35811490947 --repo "${GITHUB_REPOSITORY}" --name steam-followers-priority-queues-20260922 --dir input
+          test -s input/first_source_missing_both_unmeasured.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install requests and validate probe syntax
+        run: |
+          python -m pip install --disable-pip-version-check requests
+          python -m py_compile scripts/experiment_unresolved_10_official_followers.py
+      - name: Check 10 randomly sampled official follower counts
+        run: python -u scripts/experiment_unresolved_10_official_followers.py
+      - name: Upload follower results and precise rate-limit statuses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-unresolved-random10-official-followers
+          path: output/steam_official_followers_random10/
+          if-no-files-found: warn
+          retention-days: 30

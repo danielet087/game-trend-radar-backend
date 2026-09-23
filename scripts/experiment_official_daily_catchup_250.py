@@ -215,10 +215,29 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
 
     # Skip all verified numbers, even if another producer discovered the same
     # AppID today. Never imply old cache is a fresh follower verification.
-    pending = [
-        row for aid, row in cp["pending_candidates"].items()
-        if aid not in existing_official
-    ]
+    # If a fallback /games/{appid}/memberslistxml endpoint has already returned
+    # HTML for an AppID with no official group ID, park ONLY that AppID.
+    # Do not falsely record an official follower count or stall all later games.
+    bad_missing_group = {
+        str(event.get("appid")) for event in cp.get("attempt_events", [])
+        if event.get("http") == 200
+        and event.get("error_type") == "ParseError"
+        and "text/html" in event.get("content_type", "").lower()
+    }
+    pending = []
+    for aid, row in cp["pending_candidates"].items():
+        if aid in existing_official:
+            continue
+        if aid in bad_missing_group and row.get("group_id64") is None:
+            cp.setdefault("unresolved_candidates", {})[aid] = {
+                **row,
+                "status": "official_xml_fallback_returned_html",
+                "resolution": "retry when a valid official group ID is available",
+                "official_followers": None,
+            }
+            continue
+        cp.setdefault("unresolved_candidates", {}).pop(aid, None)
+        pending.append(row)
     pending.sort(key=lambda r: (
         r["release_date"] < today,
         r["release_date"] if r["release_date"] >= today

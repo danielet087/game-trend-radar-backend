@@ -55,21 +55,24 @@ jobs:
           print("CATCHUP_INPUT_OK original_cohort=1317 confirmed="+str(len(d["official_results"])))
           PY
 
-      - name: Check Taiwan execution window (exclude delayed schedules outside 06–23)
+      - name: Check Taiwan execution window (exclude delayed schedules outside 03–23)
         id: window
         env:
           EVENT: ${{ github.event_name }}
         run: |
           HOUR="$(TZ=Asia/Taipei date +%H)"
-          if [ "$EVENT" = "workflow_dispatch" ] || { [ "$HOUR" -ge 6 ] && [ "$HOUR" -le 23 ]; }; then
+          if [ "$EVENT" = "workflow_dispatch" ] || { [ "$HOUR" -ge 3 ] && [ "$HOUR" -le 23 ]; }; then
             echo "proceed=true" >> "$GITHUB_OUTPUT"
           else
             echo "proceed=false" >> "$GITHUB_OUTPUT"
-            echo "Scheduled run delayed to Taiwan hour $HOUR outside 06–23; no Steam requests." >> "$GITHUB_STEP_SUMMARY"
+            echo "Scheduled run delayed to Taiwan hour $HOUR outside 03–23; no Steam requests." >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Fetch up to 250 NEW official counts in date order with >=8s pacing
         if: steps.window.outputs.proceed == 'true'
+        env:
+          CONTENT_BACKEND_REPOSITORY: ${{ github.repository }}
+          CONTENT_BACKEND_TOKEN: ${{ github.token }}
         run: >
           python -u scripts/experiment_official_daily_catchup_250.py
           --max-requests 250
@@ -107,7 +110,7 @@ jobs:
             f"- 今日新加入：**{r['source_status']['added_from_daily']}**",
             f"- 冷卻到：**{r.get('next_request_after_taipei') or '無'}**",
             f"- 實際耗時：**{r['elapsed_seconds']}秒**",
-            "只更新獨立官方查詢 Checkpoint，不修改正式網站和 Followers Cache。",
+            "Followers 工作不直接改前端；每筆官方 >=5000 會觸發獨立內容後端補資料並發布前端。",
           ]
           with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
             f.write("\n".join(lines)+"\n")

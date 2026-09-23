@@ -356,13 +356,27 @@ def main():
                             "official_source": "Steam Community XML memberCount",
                         }
                         cp["rate_limit_count"] = 0
+                        cp["temporary_error_count"] = 0
                         cp["next_request_after_taipei"] = None
             except (requests.RequestException, ET.ParseError) as exc:
                 event["status"] = "transport_or_xml_error"
                 event["error_type"] = type(exc).__name__
+                if isinstance(exc, ET.ParseError):
+                    event["content_type"] = response.headers.get("Content-Type", "")[:100]
+                    event["response_bytes"] = len(response.content)
+                    event["response_prefix"] = response.content[:180].decode(
+                        "utf-8", errors="replace"
+                    )
+                cp["temporary_error_count"] = min(
+                    8, cp.get("temporary_error_count", 0) + 1
+                )
+                minutes = min(
+                    24 * 60, 15 * (2 ** (cp["temporary_error_count"] - 1))
+                )
                 cp["next_request_after_taipei"] = (
-                    clock() + timedelta(hours=12)
+                    clock() + timedelta(minutes=minutes)
                 ).isoformat()
+                event["next_request_after_taipei"] = cp["next_request_after_taipei"]
                 stop = "transport_or_xml_error"
             attempts.append(event)
             cp["attempt_events"].append(event)

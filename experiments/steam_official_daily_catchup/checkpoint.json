@@ -12847,13 +12847,26 @@
       "http": 200,
       "status": "transport_or_xml_error",
       "error_type": "ParseError"
+    },
+    {
+      "appid": 4435490,
+      "when_taipei": "2026-09-23T15:57:23.607757+08:00",
+      "release_date": "2026-10-22",
+      "queue_source": "frozen_20260922_original_third_party_missing",
+      "http": 200,
+      "status": "transport_or_xml_error",
+      "error_type": "ParseError",
+      "content_type": "text/html; charset=UTF-8",
+      "response_bytes": 23005,
+      "response_prefix": "<!DOCTYPE html>\n<html class=\" responsive DesktopUI\" lang=\"en\"  >\n<head>\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n\t\t\t<meta name=\"viewport\" content=\"width",
+      "next_request_after_taipei": "2026-09-23T16:27:23.799995+08:00"
     }
   ],
-  "next_request_after_taipei": "2026-09-23T15:57:21+08:00",
+  "next_request_after_taipei": "2026-09-23T16:27:23.799995+08:00",
   "rate_limit_count": 1,
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
-  "temporary_error_count": 1,
+  "temporary_error_count": 2,
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app."
 }

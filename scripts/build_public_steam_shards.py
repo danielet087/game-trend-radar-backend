@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.steam_localized_titles import add_traditional_display_names
+from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 
 CORE_FIELDS = {
     "appid", "followers", "follower_checked_at",
@@ -94,16 +95,25 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
     calendar_dir = frontend / "data" / "calendar"
     lists_dir = frontend / "data" / "lists"
 
+    blocked = excluded_appids()
     existing: dict[int, dict[str, Any]] = {}
     if games_dir.exists():
         for path in games_dir.glob("*.json"):
             row = load_json(path, None)
-            if valid_record(row):
+            if valid_record(row) and not is_disallowed(row, blocked):
                 existing[int(row["appid"])] = row
+
+    # Removed adult titles must not survive as stale independent AppID files.
+    for path in games_dir.glob("*.json"):
+        try:
+            if int(path.stem) in blocked:
+                path.unlink()
+        except ValueError:
+            continue
 
     changed_games = 0
     for row in incoming_games:
-        if not valid_record(row):
+        if not valid_record(row) or is_disallowed(row, blocked):
             continue
         appid = int(row["appid"])
         merged = merge_game(existing.get(appid, {}), row)

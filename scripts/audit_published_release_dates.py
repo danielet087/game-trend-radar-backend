@@ -296,6 +296,24 @@ def audit(
         "games": sorted(excluded, key=lambda x: (x["previous_release_start"], x["appid"])),
     })
 
+    # Keep the legacy fallback aligned with the audited sharded catalogue.
+    legacy_path = data_dir / "steam_upcoming.json"
+    legacy = load(legacy_path, {})
+    if isinstance(legacy, dict):
+        legacy["generated_at"] = now.isoformat()
+        legacy["count"] = len(kept)
+        legacy["games"] = sorted(
+            kept.values(),
+            key=lambda g: (
+                str(g.get("release_start") or "9999-12-31"),
+                -int(g.get("followers") or 0),
+                int(g["appid"]),
+            ),
+        )
+        legacy["release_date_audited"] = True
+        legacy["release_date_policy"] = "future_requires_store_date_full"
+        write_if_changed(legacy_path, legacy)
+
     index.update({
         "generated_at": now.isoformat(),
         "game_count": len(kept),

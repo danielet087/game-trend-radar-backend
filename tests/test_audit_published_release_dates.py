@@ -87,3 +87,15 @@ def test_audit_removes_uncertain_future_but_keeps_exact_and_history(tmp_path: Pa
 
     september = json.loads((data / "calendar" / "2026-09.json").read_text(encoding="utf-8"))
     assert [row["appid"] for row in september["games"]] == [1]
+
+    # Re-running an already-clean public catalogue must NOT erase the pending
+    # exclusion ledger for games that are no longer published.
+    second = audit(
+        data, session=Session(), interval=0, today=date(2026, 9, 25)
+    )
+    assert second["future_uncertain_removed"] == 0
+    assert second["date_exclusions_tracked"] == 1
+    excluded_again = json.loads(
+        (data / "excluded_date_appids.json").read_text(encoding="utf-8")
+    )
+    assert excluded_again["appids"] == [3956640]

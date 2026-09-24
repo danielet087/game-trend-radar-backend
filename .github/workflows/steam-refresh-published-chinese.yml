@@ -1,0 +1,83 @@
+name: Refresh Chinese names for already followed Steam games
+
+on:
+  push:
+    paths:
+      - ".github/workflows/steam-refresh-published-chinese.yml"
+      - "scripts/refresh_published_chinese_titles.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-refresh-published-chinese
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout backend localization code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Validate localization without Followers calls
+        run: |
+          python -m pytest -q tests/test_refresh_published_chinese_titles.py tests/test_steam_localized_titles.py
+      - name: Checkout the current published games and calendar shards
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FRONTEND_REPO_TOKEN:-}" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN is required."
+            exit 1
+          fi
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+      - name: Fetch official Steam TW and CN Store names for every published qualified AppID
+        run: |
+          set -euo pipefail
+          python -m scripts.refresh_published_chinese_titles \
+            --data-dir frontend/data --batch-size 30 --interval 2
+      - name: Validate only localized fields were changed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from subprocess import check_output
+
+          root = Path("frontend")
+          files = check_output(["git", "-C", str(root), "diff", "--name-only"],
+                               text=True).splitlines()
+          for filename in files:
+              assert filename.startswith(("data/games/", "data/calendar/")), filename
+              assert filename.endswith(".json"), filename
+          for month in (root / "data" / "calendar").glob("????-??.json"):
+              data = json.loads(month.read_text(encoding="utf-8"))
+              assert data["count"] == len(data["games"]), month
+              assert len({int(r["appid"]) for r in data["games"]}) == len(data["games"])
+          print("NAME_ONLY_SHARDS", len(files))
+          PY
+      - name: Publish the changed AppIDs and calendar months in one commit
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/games data/calendar
+          if git diff --cached --quiet; then
+            echo "CHINESE_TITLE_REFRESH_NO_CHANGES"
+            exit 0
+          fi
+          git commit -m "data: refresh Chinese titles for all published Steam games"
+          bash ../scripts/git_frontend_auth.sh pull --rebase origin main
+          bash ../scripts/git_frontend_auth.sh push origin HEAD:main
+          echo "CHINESE_TITLE_REFRESH_PUBLISHED"

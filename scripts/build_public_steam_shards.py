@@ -26,6 +26,15 @@ def load_json(path: Path, default: Any) -> Any:
 
 
 def write_if_changed(path: Path, payload: Any) -> bool:
+    # Timestamps are not content changes. Reuse the prior timestamp so a
+    # single updated AppID cannot rewrite every monthly shard on each run.
+    if isinstance(payload, dict) and "generated_at" in payload:
+        prior = load_json(path, {})
+        if isinstance(prior, dict):
+            comparable_old = {k: v for k, v in prior.items() if k != "generated_at"}
+            comparable_new = {k: v for k, v in payload.items() if k != "generated_at"}
+            if comparable_old == comparable_new:
+                return False
     text = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
     try:
         if path.read_text(encoding="utf-8") == text:

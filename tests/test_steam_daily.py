@@ -1,8 +1,8 @@
 from datetime import date
 
 from scripts.update_steam_daily import (
-    add_months, merge_segment, reopen_first_segment_missing_alternative_search,
-    next_unfinished_segment,
+    add_months, merge_partial_segment, merge_segment,
+    reopen_first_segment_missing_alternative_search, next_unfinished_segment,
 )
 
 
@@ -78,3 +78,30 @@ def test_next_segment_skips_already_completed_windows_after_backfill() -> None:
     ]
     assert next_unfinished_segment(completed, 6) == 3
     assert next_unfinished_segment([{"segment": i} for i in range(6)], 6) == 6
+
+
+def test_merge_partial_segment_keeps_already_released_calendar_history() -> None:
+    existing = [
+        {
+            "appid": 10,
+            "name": "Already Released",
+            "followers": 8000,
+            "release_raw": "2026-09-22",
+            "release_start": "2026-09-22",
+            "release_end": "2026-09-22",
+        }
+    ]
+    incoming = [
+        {
+            "appid": 11,
+            "name": "Future Game",
+            "followers": 9000,
+            "release_raw": "2026-10-01",
+            "release_start": "2026-10-01",
+            "release_end": "2026-10-01",
+        }
+    ]
+
+    result = merge_partial_segment(existing, incoming, today=date(2026, 9, 24))
+
+    assert {row["appid"] for row in result} == {10, 11}

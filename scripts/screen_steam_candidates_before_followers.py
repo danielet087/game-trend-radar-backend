@@ -20,6 +20,8 @@ from pathlib import Path
 
 import requests
 
+from scripts.steam_adult_exclusions import excluded_appids
+
 LOG = logging.getLogger(__name__)
 STORE_BROWSE_URL = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 DEFAULT_INPUT = Path("data/steam_candidates.json")
@@ -135,7 +137,11 @@ def build_snapshot(catalog: dict, store_items: dict[int, dict]) -> dict:
         raise ValueError("Invalid original candidate games array")
     result: list[dict] = []
     reasons = Counter()
+    blocked = excluded_appids()
     for game in original:
+        if int(game["appid"]) in blocked:
+            reasons["audited_adult_exclusion"] += 1
+            continue
         row, status = classify(game, store_items.get(int(game["appid"])))
         reasons[status] += 1
         if row is not None:

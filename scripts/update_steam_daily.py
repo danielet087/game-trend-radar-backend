@@ -11,6 +11,7 @@ from typing import Any
 
 from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_window, taiwan_today, write_json
 from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
+from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 
 LOGGER = logging.getLogger(__name__)
 
@@ -86,7 +87,10 @@ def merge_segment(
     ]
 
     merged: dict[int, dict[str, Any]] = {}
+    blocked = excluded_appids()
     for game in base + segment_games:
+        if is_disallowed(game, blocked):
+            continue
         try:
             appid = int(game["appid"])
         except (KeyError, TypeError, ValueError):
@@ -116,7 +120,10 @@ def merge_partial_segment(
     actually returned that game's Followers.
     """
     by_appid: dict[int, dict[str, Any]] = {}
+    blocked = excluded_appids()
     for game in prune_released(existing_games, today) + newly_qualified:
+        if is_disallowed(game, blocked):
+            continue
         try:
             appid = int(game["appid"])
         except (KeyError, ValueError, TypeError):
@@ -231,7 +238,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     state["total_segments"] = int(state.get("total_segments") or args.total_segments)
 
     master = load_json(master_path, {"games": []})
-    existing_games = corrected_games(master.get("games") if isinstance(master.get("games"), list) else [])
+    blocked = excluded_appids()
+    existing_games = corrected_games([
+        row for row in (master.get("games") if isinstance(master.get("games"), list) else [])
+        if not is_disallowed(row, blocked)
+    ])
 
     collector = SteamUpcomingCollector(
         country=args.country,

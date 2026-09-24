@@ -64,3 +64,25 @@ def test_official_simplified_marketing_title_has_separate_traditional_display():
     title = {"appid": 4094660, "name_zh_cn": "她在时间之外"}
     add_traditional_display_names(title)
     assert title["name_zh_cn_traditional"] == "她在時間之外"
+
+
+def test_display_name_prefers_tw_then_converted_cn_then_en():
+    from scripts.steam_localized_titles import add_traditional_display_names
+    both = {
+        "appid": 1, "name_en": "English", "name_zh_tw": "繁體正式名稱",
+        "name_zh_cn": "简体备用名称",
+        "language_support": {"tchinese": False, "schinese": True},
+    }
+    add_traditional_display_names(both)
+    assert both["display_name"] == "繁體正式名稱"
+    assert both["display_name_source"] == "tchinese"
+
+    cn = {"appid": 2, "name_en": "English", "name_zh_cn": "针影裁梦"}
+    add_traditional_display_names(cn)
+    assert cn["display_name"] == "針影裁夢"
+    assert cn["display_name_source"] == "schinese_converted"
+
+    en = {"appid": 3, "name_en": "English"}
+    add_traditional_display_names(en)
+    assert en["display_name"] == "English"
+    assert en["display_name_source"] == "english"

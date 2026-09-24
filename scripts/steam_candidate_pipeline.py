@@ -29,6 +29,7 @@ from scripts.screen_steam_candidates_before_followers import (
     build_snapshot, fetch_metadata,
 )
 from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
+from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 
 LOG = logging.getLogger(__name__)
 QUERY_URL = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -233,8 +234,11 @@ def active_candidate_rows(catalog: dict[str, Any], state: dict[str, Any]) -> lis
     if state.get("date_precision_required"):
         if not catalog.get("date_precision_complete"):
             raise RuntimeError("Steam public display-date gate incomplete; no Followers allowed")
-        return catalog["date_precision_eligible"]
-    return catalog.get("games", [])
+        rows = catalog["date_precision_eligible"]
+    else:
+        rows = catalog.get("games", [])
+    blocked = excluded_appids()
+    return [row for row in rows if not is_disallowed(row, blocked)]
 
 
 def run_date_precision_phase(state: dict[str, Any], catalog: dict[str, Any]) -> dict[str, Any]:
@@ -460,7 +464,11 @@ def run_follower_batch(
                       "release_display_precision", "sexual_content_screened"):
             item[field] = source.get(field)
         enriched.append(item)
-    master["games"] = merge_partial_segment(master.get("games", []), enriched, today=today)
+    blocked = excluded_appids()
+    master["games"] = [
+        row for row in merge_partial_segment(master.get("games", []), enriched, today=today)
+        if not is_disallowed(row, blocked)
+    ]
     master["updated_at"] = datetime.now(timezone.utc).isoformat()
     after_cache = load_json(Path(args.follower_cache), {"games": {}}).get("games") or {}
     verified = sum(str(x["appid"]) in after_cache for x in priority_rows)
@@ -523,7 +531,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     if phase in {"followers", "prefilter"}:
         if phase == "followers":
             save_json(master_file, master)
-        original_games = master.get("games", [])
+        blocked = excluded_appids()
+        original_games = [
+            row for row in master.get("games", [])
+            if not is_disallowed(row, blocked)
+        ]
         if state.get("date_precision_required"):
             # The daily eligible catalogue is a rolling FUTURE window. Keep
             # using it as the allow-list for future titles, but never let it

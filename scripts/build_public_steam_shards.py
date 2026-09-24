@@ -111,6 +111,16 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
         if write_if_changed(games_dir / f"{appid}.json", merged):
             changed_games += 1
 
+    # Also backfill records that were not present in today's rolling
+    # Followers output. Released games must retain their localized names.
+    for appid, game in existing.items():
+        previous = dict(game)
+        add_traditional_display_names(game)
+        game["storage_version"] = 2
+        if game != previous:
+            if write_if_changed(games_dir / f"{appid}.json", game):
+                changed_games += 1
+
     rows = sorted(
         existing.values(),
         key=lambda g: (

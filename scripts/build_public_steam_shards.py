@@ -105,7 +105,10 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
     def publishable(game: dict[str, Any]) -> bool:
         if not valid_record(game) or is_disallowed(game, blocked):
             return False
-        if int(game["appid"]) in unconfirmed_ids:
+        if (
+            int(game["appid"]) in unconfirmed_ids
+            and game.get("release_display_precision") != "date_full"
+        ):
             return False
         # A Query API timestamp is NOT a user-visible full-date announcement.
         # Once the audited public catalogue is activated, every future record
@@ -125,7 +128,12 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
     # AppID files after an audit. Historical released records remain.
     for path in games_dir.glob("*.json"):
         try:
-            if int(path.stem) in blocked | unconfirmed_ids:
+            appid = int(path.stem)
+            row = load_json(path, {})
+            if appid in blocked or (
+                appid in unconfirmed_ids
+                and row.get("release_display_precision") != "date_full"
+            ):
                 path.unlink()
         except ValueError:
             continue
@@ -135,7 +143,7 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
         if not valid_record(row) or is_disallowed(row, blocked):
             continue
         appid = int(row["appid"])
-        if appid in unconfirmed_ids:
+        if appid in unconfirmed_ids and row.get("release_display_precision") != "date_full":
             continue
         prior = existing.get(appid, {})
         merged = merge_game(prior, row)

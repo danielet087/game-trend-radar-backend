@@ -524,11 +524,23 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         if phase == "followers":
             save_json(master_file, master)
         original_games = master.get("games", [])
-        # The daily candidate catalogue is intentionally a rolling future
-        # window. It is NOT an allow-list for the release calendar: games that
-        # already qualified must remain visible on their historical dates
-        # after release.
-        public_games = original_games
+        if state.get("date_precision_required"):
+            # The daily eligible catalogue is a rolling FUTURE window. Keep
+            # using it as the allow-list for future titles, but never let it
+            # erase a game that was already formally qualified and has since
+            # released. Historical calendar dates are persistent.
+            allowed = {row["appid"] for row in active_candidate_rows(catalog, state)}
+            today_iso = taiwan_today().isoformat()
+            public_games = [
+                row for row in original_games
+                if row.get("appid") in allowed
+                or (
+                    isinstance(row.get("release_start"), str)
+                    and row["release_start"] < today_iso
+                )
+            ]
+        else:
+            public_games = original_games
         output = {
             "generated_at": stamp, "source": {
                 "catalog": "Steam IStoreQueryService/Query day-filter, TW",

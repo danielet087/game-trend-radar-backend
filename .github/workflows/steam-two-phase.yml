@@ -219,16 +219,16 @@ jobs:
             exit 1
           fi
           git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
-          cp output/steam_upcoming.json frontend/data/steam_upcoming.json
+          python -m scripts.build_public_steam_shards --input output/steam_upcoming.json --frontend frontend
           cd frontend
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/steam_upcoming.json
+          git add data/index.json data/calendar data/games data/lists
           if git diff --cached --quiet; then
             echo "Public JSON already matches."
             exit 0
           fi
-          git commit -m "data: publish Steam games after each 50-Followers batch"
+          git commit -m "data: publish sharded Steam calendar updates"
           # Keep origin URL clean; authenticate each network operation without saving the PAT.
           bash ../scripts/git_frontend_auth.sh pull --rebase origin main
           bash ../scripts/git_frontend_auth.sh push origin HEAD:main

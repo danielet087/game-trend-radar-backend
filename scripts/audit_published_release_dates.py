@@ -122,6 +122,12 @@ def audit(
 
     index_path = data_dir / "index.json"
     index = load(index_path, {})
+    prior_exclusions_doc = load(data_dir / "excluded_date_appids.json", {}) or {}
+    prior_exclusions = {
+        int(item["appid"]): item
+        for item in (prior_exclusions_doc.get("games") or [])
+        if isinstance(item, dict) and item.get("appid") is not None
+    }
     months = index.get("months") or []
     if index.get("version") != 2 or not isinstance(months, list):
         raise RuntimeError("Invalid sharded Steam index")
@@ -186,6 +192,13 @@ def audit(
         row = dict(old)
         if day != old_day:
             corrected.append({"appid": appid, "from": old_day, "to": day})
+        verified_at = (
+            old.get("release_date_verified_at")
+            if old.get("release_display_precision") == "date_full"
+            and old_day == day
+            and old.get("release_date_verified_at")
+            else now.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+        )
         row.update({
             "release_raw": day,
             "release_start": day,
@@ -195,9 +208,10 @@ def audit(
             "release_display_provider": "Steam IStoreBrowseService/GetItems",
             "release_date_timezone": "Asia/Taipei",
             "release_date_basis": "steam_store_browse_verified_full_date",
-            "release_date_verified_at": now.replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            "release_date_verified_at": verified_at,
         })
         kept[appid] = row
+        prior_exclusions.pop(appid, None)
         exact += 1
 
     # Update/delete one-AppID files first.
@@ -287,13 +301,19 @@ def audit(
         "version": 2, "generated_at": now.isoformat(),
         "count": len(released), "appids": released,
     })
+    for item in excluded:
+        prior_exclusions[int(item["appid"])] = item
+    exclusion_rows = sorted(
+        prior_exclusions.values(),
+        key=lambda x: (str(x.get("previous_release_start") or "9999-12-31"), int(x["appid"])),
+    )
     write_if_changed(data_dir / "excluded_date_appids.json", {
         "version": 2,
         "policy": "Future games require Steam Store coming_soon_display=date_full.",
         "audited_at": now.isoformat(),
-        "count": len(excluded),
-        "appids": sorted(item["appid"] for item in excluded),
-        "games": sorted(excluded, key=lambda x: (x["previous_release_start"], x["appid"])),
+        "count": len(exclusion_rows),
+        "appids": sorted(int(item["appid"]) for item in exclusion_rows),
+        "games": exclusion_rows,
     })
 
     # Keep the legacy fallback aligned with the audited sharded catalogue.
@@ -329,6 +349,7 @@ def audit(
         "future_checked": len(future_ids),
         "future_exact_kept": exact,
         "future_uncertain_removed": len(excluded),
+        "date_exclusions_tracked": len(exclusion_rows),
         "historical_retained": historical,
         "published_after": len(kept),
         "date_corrections": corrected,

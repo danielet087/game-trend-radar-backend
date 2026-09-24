@@ -34,6 +34,21 @@ def add_traditional_display_names(game: dict) -> None:
         else:
             game.pop(target, None)
 
+    # Do not confuse a translated Store title with the game's actual
+    # supported_languages flags. Display names use the Store title only.
+    game["display_name"] = (
+        game.get("name_zh_tw_traditional")
+        or game.get("name_zh_cn_traditional")
+        or game.get("name_en")
+        or game.get("name")
+        or f"Steam App {game.get('appid')}"
+    )
+    game["display_name_source"] = (
+        "tchinese" if game.get("name_zh_tw_traditional")
+        else "schinese_converted" if game.get("name_zh_cn_traditional")
+        else "english"
+    )
+
 LOG = logging.getLogger(__name__)
 STORE_URL = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 HAN = re.compile(r"[\u3400-\u9fff]")

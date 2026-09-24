@@ -7,6 +7,8 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+from scripts.steam_localized_titles import add_traditional_display_names
+
 CORE_FIELDS = {
     "appid", "followers", "follower_checked_at",
     "release_raw", "release_start", "release_end", "release_precision",
@@ -69,6 +71,9 @@ def merge_game(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, 
         if value not in (None, ""):
             merged[key] = value
     merged["appid"] = int(incoming.get("appid", merged.get("appid")))
+    # Preserve Steam's original localized names and create separate
+    # Traditional-script presentation fields for every future shard update.
+    add_traditional_display_names(merged)
     merged["storage_version"] = 2
     return merged
 

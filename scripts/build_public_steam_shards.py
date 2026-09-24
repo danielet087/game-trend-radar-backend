@@ -96,17 +96,36 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
     lists_dir = frontend / "data" / "lists"
 
     blocked = excluded_appids()
+    index = load_json(frontend / "data" / "index.json", {})
+    audit_active = index.get("release_date_audited") is True
+    precision_exclusions = load_json(frontend / "data" / "excluded_date_appids.json", {})
+    unconfirmed_ids = {int(x) for x in precision_exclusions.get("appids", [])}
+    today_s = (datetime.now(timezone.utc) + timedelta(hours=8)).date().isoformat()
+
+    def publishable(game: dict[str, Any]) -> bool:
+        if not valid_record(game) or is_disallowed(game, blocked):
+            return False
+        if int(game["appid"]) in unconfirmed_ids:
+            return False
+        # A Query API timestamp is NOT a user-visible full-date announcement.
+        # Once the audited public catalogue is activated, every future record
+        # needs a separately verified Store display-date gate.
+        if audit_active and str(game["release_start"]) >= today_s:
+            return game.get("release_display_precision") == "date_full"
+        return True
+
     existing: dict[int, dict[str, Any]] = {}
     if games_dir.exists():
         for path in games_dir.glob("*.json"):
             row = load_json(path, None)
-            if valid_record(row) and not is_disallowed(row, blocked):
+            if isinstance(row, dict) and publishable(row):
                 existing[int(row["appid"])] = row
 
-    # Removed adult titles must not survive as stale independent AppID files.
+    # Removed/unconfirmed titles must not survive as stale independent
+    # AppID files after an audit. Historical released records remain.
     for path in games_dir.glob("*.json"):
         try:
-            if int(path.stem) in blocked:
+            if int(path.stem) in blocked | unconfirmed_ids:
                 path.unlink()
         except ValueError:
             continue
@@ -116,7 +135,21 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
         if not valid_record(row) or is_disallowed(row, blocked):
             continue
         appid = int(row["appid"])
-        merged = merge_game(existing.get(appid, {}), row)
+        if appid in unconfirmed_ids:
+            continue
+        prior = existing.get(appid, {})
+        merged = merge_game(prior, row)
+        # An outdated master Query timestamp must not overwrite a verified
+        # date (or silently borrow proof from a different release date).
+        if prior.get("release_date_verified_at") and row.get("release_display_precision") != "date_full":
+            if row.get("release_start") != prior.get("release_start"):
+                merged["release_start"] = prior["release_start"]
+                merged["release_end"] = prior.get("release_end", prior["release_start"])
+                merged["release_raw"] = prior.get("release_raw", prior["release_start"])
+            merged["release_display_precision"] = prior.get("release_display_precision")
+            merged["release_date_verified_at"] = prior["release_date_verified_at"]
+        if not publishable(merged):
+            continue
         existing[appid] = merged
         if write_if_changed(games_dir / f"{appid}.json", merged):
             changed_games += 1
@@ -210,6 +243,7 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
                 "released": "lists/released.json",
             },
             "legacy_fallback": "steam_upcoming.json",
+            "release_date_audited": audit_active,
         },
     )
     return {

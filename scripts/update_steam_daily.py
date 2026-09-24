@@ -60,18 +60,15 @@ def release_overlaps(game: dict[str, Any], start: date, end: date) -> bool:
 
 
 def prune_released(games: list[dict[str, Any]], today: date) -> list[dict[str, Any]]:
-    kept: list[dict[str, Any]] = []
-    for game in games:
-        release_end = game.get("release_end")
-        if not release_end:
-            continue
-        try:
-            if date.fromisoformat(str(release_end)) < today:
-                continue
-        except ValueError:
-            continue
-        kept.append(game)
-    return kept
+    """Keep qualified calendar history after release.
+
+    The function name is retained for compatibility with older callers, but
+    released titles must remain in the master/public release calendar. Daily
+    discovery is a rolling future window; it must never delete a title merely
+    because its release date is before today.
+    """
+    del today  # Compatibility parameter; release date is no longer a deletion gate.
+    return [game for game in games if isinstance(game, dict)]
 
 
 def merge_segment(
@@ -409,10 +406,11 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             window_start=window_start,
             window_end=window_end,
         )
+        # Always merge the rolling future scan into the persistent calendar.
+        # Replacing the master with only today's future window would erase
+        # already released titles from historical calendar dates.
         combined_games = merge_partial_segment(
             existing_games, latest.get("games", []), today=today,
-        ) if latest.get("collection", {}).get("paused_due_to_fresh_request_budget") else list(
-            latest.get("games", [])
         )
         mode = "maintenance"
 

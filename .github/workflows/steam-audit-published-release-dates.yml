@@ -1,0 +1,106 @@
+name: Audit published Steam release dates
+
+on:
+  push:
+    paths:
+      - ".github/workflows/steam-audit-published-release-dates.yml"
+      - "scripts/audit_published_release_dates.py"
+      - "tests/test_audit_published_release_dates.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: steam-audit-published-release-dates
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout backend audit code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Test exact-date audit rules
+        run: python -m pytest -q tests/test_audit_published_release_dates.py
+
+      - name: Clone public frontend
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FRONTEND_REPO_TOKEN:-}" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN is required."
+            exit 1
+          fi
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+
+      - name: Recheck every published future game against Steam Store display precision
+        run: |
+          set -euo pipefail
+          python -m scripts.audit_published_release_dates             --data-dir frontend/data             --batch-size 30             --interval 2
+
+      - name: Validate audited public calendar
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          data = Path("frontend/data")
+          index = json.loads((data / "index.json").read_text(encoding="utf-8"))
+          assert index.get("release_date_audited") is True
+          today = datetime.now(ZoneInfo("Asia/Taipei")).date().isoformat()
+          seen = set()
+          count = 0
+          for month in index["months"]:
+              doc = json.loads((data / "calendar" / f"{month}.json").read_text(encoding="utf-8"))
+              assert doc["count"] == len(doc["games"])
+              for game in doc["games"]:
+                  appid = int(game["appid"])
+                  assert appid not in seen
+                  seen.add(appid)
+                  count += 1
+                  if game["release_start"] >= today:
+                      assert game.get("release_display_precision") == "date_full", game
+                      assert game.get("release_date_verified_at"), game
+          assert count == index["game_count"]
+          excluded = json.loads((data / "excluded_date_appids.json").read_text(encoding="utf-8"))
+          assert 3956640 not in seen
+          legacy = json.loads((data / "steam_upcoming.json").read_text(encoding="utf-8"))
+          assert legacy["count"] == len(legacy["games"]) == count
+          print("RELEASE_DATE_AUDIT_VALID",
+                "published=", count,
+                "uncertain_removed=", excluded["count"])
+          PY
+
+      - name: Publish audited shards and fallback
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/index.json data/calendar data/games data/lists                   data/excluded_date_appids.json data/steam_upcoming.json
+          if git diff --cached --quiet; then
+            echo "RELEASE_DATE_AUDIT_NO_CHANGES"
+            exit 0
+          fi
+          git commit -m "data: audit future Steam release dates against Store display [skip ci]"
+          bash ../scripts/git_frontend_auth.sh pull --rebase origin main
+          bash ../scripts/git_frontend_auth.sh push origin HEAD:main
+          echo "RELEASE_DATE_AUDIT_PUBLISHED"

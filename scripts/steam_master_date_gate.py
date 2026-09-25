@@ -43,7 +43,10 @@ def parse_store_release_detail(item: dict[str, Any] | None, *, today: date) -> d
         "status": "date_full" if label == "date_full" else (
             "released_exact" if exact else str(label or "unknown")
         ),
+        # This timestamp-derived Taiwan day is diagnostic metadata only.
+        # Steam's visible TW Store full-date announcement remains the display-date authority.
         "release_start": tw_day.isoformat() if exact else None,
+        "release_timestamp_taipei_date": tw_day.isoformat() if exact else None,
         "release_time_utc": instant.isoformat().replace("+00:00", "Z") if exact else None,
         "release_display_precision": "date_full" if exact else None,
         "release_display_provider": STORE_DATE_PROVIDER if exact else None,
@@ -75,11 +78,32 @@ def apply_store_release_detail(row: dict[str, Any], detail: dict[str, Any]) -> d
     if detail.get("exact") is not True:
         raise RuntimeError("Cannot apply a non-exact Steam Store release date")
     result = dict(row)
-    day = detail["release_start"]
+    timestamp_day = detail["release_start"]
+    prior_day = str(row.get("release_start") or "")
+    # When the upstream TW Store candidate was already verified as date_full,
+    # keep that announced calendar day. The Store API timestamp can cross
+    # midnight in Taiwan and must not silently shift the user-visible date.
+    try:
+        date.fromisoformat(prior_day)
+        prior_exact = row.get("release_display_precision") == "date_full"
+    except (TypeError, ValueError):
+        prior_exact = False
+    day = prior_day if prior_exact else timestamp_day
     result["release_raw"] = day
     result["release_start"] = day
     result["release_end"] = day
     result["release_precision"] = "day"
+    result["release_timestamp_taipei_date"] = detail.get(
+        "release_timestamp_taipei_date", timestamp_day
+    )
+    if day != timestamp_day:
+        result["release_date_conflict"] = True
+        result["release_date_conflict_note"] = (
+            "TW Store announced full date preserved; API timestamp maps to a different Taiwan day"
+        )
+    else:
+        result.pop("release_date_conflict", None)
+        result.pop("release_date_conflict_note", None)
     for key in (
         "release_display_precision", "release_display_provider",
         "release_date_basis", "release_date_timezone", "release_time_utc",

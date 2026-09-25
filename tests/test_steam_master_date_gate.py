@@ -84,3 +84,11 @@ def test_duplicate_store_snapshot_appid_is_rejected():
             [], [eligible(1, "2026-10-14"), eligible(1, "2026-10-14")],
             today=TODAY,
         )
+
+
+def test_legacy_two_month_updater_cannot_reintroduce_unverified_dates():
+    from argparse import Namespace
+    from scripts.update_steam_daily import run
+
+    with pytest.raises(RuntimeError, match="cannot verify the displayed full Store release date"):
+        run(Namespace())

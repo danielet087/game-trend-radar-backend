@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: Checkout backend
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,12 +39,24 @@ jobs:
       - name: Run regression tests
         run: python -m pytest -q
 
+      - name: Restore the pre-clean 232-title master snapshot for a true recheck
+        run: |
+          git show b19d01dccf197cd4b345a898e09c7dda8ec3d4ae:data/steam_upcoming_master.json > /tmp/steam_master_before_132_cleanup.json
+          python - <<'PY'
+          import json
+          p="/tmp/steam_master_before_132_cleanup.json"
+          d=json.load(open(p,encoding="utf-8"))
+          assert len(d["games"])==232, len(d["games"])
+          print("PRECLEAN_MASTER_READY",len(d["games"]))
+          PY
+
       - name: Recheck qualified master against current Steam Store detail
-        run: >
-          python -m scripts.repair_steam_master_store_dates
-          --master data/steam_upcoming_master.json
-          --eligible data/steam_candidates_eligible.json
-          --report reports/steam_master_post_followers_date_recheck_20260925.json
+        run: |
+          python -m scripts.repair_steam_master_store_dates \
+            --master /tmp/steam_master_before_132_cleanup.json \
+            --eligible data/steam_candidates_eligible.json \
+            --report reports/steam_master_post_followers_date_recheck_20260925.json
+          cp /tmp/steam_master_before_132_cleanup.json data/steam_upcoming_master.json
 
       - name: Validate repaired master
         run: |

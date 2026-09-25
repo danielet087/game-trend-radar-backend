@@ -90,6 +90,32 @@ def test_store_date_full_converts_timestamp_to_taipei_day():
     assert row["post_followers_store_verified"] is True
 
 
+def test_verified_tw_store_day_is_preserved_when_timestamp_rolls_to_next_day():
+    detail = {
+        "exact": True,
+        "status": "date_full",
+        "release_start": "2026-10-24",
+        "release_timestamp_taipei_date": "2026-10-24",
+        "release_time_utc": "2026-10-23T16:00:00Z",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+    }
+    row = apply_store_release_detail(
+        {
+            "appid": 3960600,
+            "followers": 8664,
+            "release_start": "2026-10-23",
+            "release_display_precision": "date_full",
+        },
+        detail,
+    )
+    assert row["release_start"] == "2026-10-23"
+    assert row["release_timestamp_taipei_date"] == "2026-10-24"
+    assert row["release_date_conflict"] is True
+
+
 def test_month_quarter_year_are_rejected_after_followers():
     for label in ("date_month", "date_quarter", "date_year", "coming_soon"):
         detail = parse_store_release_detail(

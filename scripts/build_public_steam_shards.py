@@ -106,7 +106,7 @@ def build(
 
     blocked = excluded_appids()
     index = load_json(frontend / "data" / "index.json", {})
-    audit_active = index.get("release_date_audited") is True
+    audit_active = index.get("release_date_audited") is True or authoritative_future
     precision_exclusions = load_json(frontend / "data" / "excluded_date_appids.json", {})
     unconfirmed_ids = {int(x) for x in precision_exclusions.get("appids", [])}
     today_s = (datetime.now(timezone.utc) + timedelta(hours=8)).date().isoformat()

@@ -30,6 +30,7 @@ from scripts.screen_steam_candidates_before_followers import (
 )
 from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
+from scripts.steam_master_date_gate import filter_confirmed_master_games
 
 LOG = logging.getLogger(__name__)
 QUERY_URL = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -410,6 +411,12 @@ def run_follower_batch(
     pre = load_json(Path(args.prefilter_state), {"games": {}})
     if not prefilter_complete(pre, rows):
         raise RuntimeError("Step 2 has not screened every candidate; no official XML allowed")
+    today = taiwan_today()
+    # The old master may predate Store Browse date verification. Never carry
+    # unverified future timestamps into the next official Followers batch.
+    master["games"] = filter_confirmed_master_games(
+        master.get("games", []), rows, today=today,
+    )
     cache_data = load_json(Path(args.follower_cache), {"games": {}})
     cache = cache_data.get("games") or {}
     priority_rows = [
@@ -436,7 +443,6 @@ def run_follower_batch(
             "fresh_follower_requests": 0,
         }
         return dict(state["last_attempt"])
-    today = taiwan_today()
     budget = int(getattr(args, "max_fresh_requests_per_run", 50))
     if not 1 <= budget <= 50:
         raise ValueError("Official XML budget must be within 1..50")
@@ -465,10 +471,10 @@ def run_follower_batch(
             item[field] = source.get(field)
         enriched.append(item)
     blocked = excluded_appids()
-    master["games"] = [
-        row for row in merge_partial_segment(master.get("games", []), enriched, today=today)
-        if not is_disallowed(row, blocked)
-    ]
+    master["games"] = filter_confirmed_master_games(
+        merge_partial_segment(master.get("games", []), enriched, today=today),
+        rows, today=today,
+    )
     master["updated_at"] = datetime.now(timezone.utc).isoformat()
     after_cache = load_json(Path(args.follower_cache), {"games": {}}).get("games") or {}
     verified = sum(str(x["appid"]) in after_cache for x in priority_rows)
@@ -532,10 +538,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         if phase == "followers":
             save_json(master_file, master)
         blocked = excluded_appids()
-        original_games = [
-            row for row in master.get("games", [])
-            if not is_disallowed(row, blocked)
-        ]
+        original_games = filter_confirmed_master_games(
+            master.get("games", []), active_candidate_rows(catalog, state),
+            today=taiwan_today(),
+        )
         if state.get("date_precision_required"):
             # The daily eligible catalogue is a rolling FUTURE window. Keep
             # using it as the allow-list for future titles, but never let it
@@ -548,7 +554,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
                 if row.get("appid") in allowed
                 or (
                     isinstance(row.get("release_start"), str)
-                    and row["release_start"] < today_iso
+                    and row["release_start"] <= today_iso
                 )
             ]
         else:

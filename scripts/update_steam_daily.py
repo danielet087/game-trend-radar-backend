@@ -207,6 +207,13 @@ def build_public_payload(
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
+    # Retired: this two-month collector only receives Query timestamps and
+    # cannot prove Steam Store coming_soon_display == date_full. It must not
+    # recreate the 132 unannounced-date titles in the qualified master.
+    raise RuntimeError(
+        "Legacy Steam updater cannot verify the displayed full Store release date. "
+        "Use steam-two-phase.yml (Steam candidates then Followers) instead."
+    )
     today = taiwan_today()
     state_path = Path(args.state)
     master_path = Path(args.master)

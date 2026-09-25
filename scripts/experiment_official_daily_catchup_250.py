@@ -129,6 +129,8 @@ def upsert_qualified_master(master, result):
         "release_date_timezone": result.get("release_date_timezone") or "Asia/Taipei",
         "release_time_utc": result.get("release_time_utc"),
         "release_time_source": result.get("release_display_provider"),
+        "release_timestamp_taipei_date": result.get("release_timestamp_taipei_date"),
+        "release_date_conflict": result.get("release_date_conflict") is True,
         "release_date_verified_at": datetime.now(timezone.utc).isoformat(),
         "post_followers_store_verified": True,
         "post_followers_store_verified_at": datetime.now(timezone.utc).isoformat(),
@@ -269,7 +271,16 @@ def verify_store_date_for_result(result, session):
     result["store_date_exact"] = detail.get("exact") is True
     result["store_date_status"] = detail.get("status")
     if result["store_date_exact"]:
-        result["release_date"] = detail["release_start"]
+        announced_day = result.get("release_date")
+        timestamp_day = detail["release_start"]
+        # The candidate queue's release_date came from the verified TW Store
+        # full-date display. Store Browse's timestamp is secondary metadata and
+        # may map to the following Taiwan day.
+        result["release_date"] = announced_day if valid_date(announced_day) else timestamp_day
+        result["release_timestamp_taipei_date"] = detail.get(
+            "release_timestamp_taipei_date", timestamp_day
+        )
+        result["release_date_conflict"] = result["release_date"] != timestamp_day
         result["release_display_precision"] = "date_full"
         result["release_display_provider"] = detail.get("release_display_provider")
         result["release_date_basis"] = detail.get("release_date_basis")
@@ -313,7 +324,13 @@ def reverify_pending_store_dates(cp, master, limit=25):
         result["store_date_status"] = detail.get("status")
         if result["store_date_exact"]:
             exact_count += 1
-            result["release_date"] = detail["release_start"]
+            announced_day = result.get("release_date")
+            timestamp_day = detail["release_start"]
+            result["release_date"] = announced_day if valid_date(announced_day) else timestamp_day
+            result["release_timestamp_taipei_date"] = detail.get(
+                "release_timestamp_taipei_date", timestamp_day
+            )
+            result["release_date_conflict"] = result["release_date"] != timestamp_day
             result["release_display_precision"] = "date_full"
             result["release_display_provider"] = detail.get("release_display_provider")
             result["release_date_basis"] = detail.get("release_date_basis")

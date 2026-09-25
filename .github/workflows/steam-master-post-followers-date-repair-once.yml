@@ -2,10 +2,6 @@ name: Steam master post-Followers Store date repair
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/steam-master-date-repair-trigger.txt"
 
 permissions:
   contents: write

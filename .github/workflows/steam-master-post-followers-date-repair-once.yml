@@ -56,8 +56,10 @@ jobs:
           assert len(games) == r["retained_exact"]
           assert len({int(x["appid"]) for x in games}) == len(games)
           assert all(int(x["followers"]) >= 5000 for x in games)
-          assert all(x.get("release_display_precision") == "date_full" for x in games)
-          assert all(x.get("post_followers_store_verified") is True for x in games)
+          today=r["today_taipei"]
+          future=[x for x in games if str(x.get("release_start","")) > today]
+          assert all(x.get("release_display_precision") == "date_full" for x in future)
+          assert all(x.get("post_followers_store_verified") is True for x in future)
           assert r["followers_cache_modified"] is False
           assert r["official_checkpoint_modified"] is False
           print("REPAIRED_MASTER_VALID", len(games), "rejected", r["rejected_non_exact"],

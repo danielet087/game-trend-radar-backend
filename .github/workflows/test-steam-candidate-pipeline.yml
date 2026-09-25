@@ -2,6 +2,10 @@ name: Verify Steam two-phase candidate pipeline
 # Paused by request: automatic workflow triggers disabled.
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/steam-pipeline-test-trigger.txt"
 
 permissions:
   contents: read
@@ -20,3 +24,27 @@ jobs:
         run: python -m pip install -r requirements-dev.txt
       - name: Run complete Steam test suite
         run: python -m pytest -q
+
+      - name: Verify hourly sparse-checkout dependency set imports cleanly
+        run: |
+          git sparse-checkout init --no-cone
+          cat > /tmp/sparse-list <<'EOF'
+          scripts/experiment_official_daily_catchup_250.py
+          scripts/steam_master_date_gate.py
+          scripts/screen_steam_candidates_before_followers.py
+          scripts/steam_adult_exclusions.py
+          experiments/steam_official_nearfirst_20260922/
+          experiments/steam_official_followers_20260922/checkpoint.json
+          experiments/steam_official_daily_catchup/
+          data/steam_candidates_eligible.json
+          data/steam_prefilter_state.json
+          data/steam_followers_cache.json
+          data/steam_upcoming_master.json
+          data/steam_adult_exclusion.json
+          EOF
+          git sparse-checkout set --no-cone $(cat /tmp/sparse-list)
+          python - <<'PY'
+          import scripts.experiment_official_daily_catchup_250 as job
+          assert job.MASTER.name == "steam_upcoming_master.json"
+          print("HOURLY_SPARSE_IMPORT_OK")
+          PY

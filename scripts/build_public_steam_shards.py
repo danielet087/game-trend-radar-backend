@@ -254,6 +254,17 @@ def build(
         lists_dir / "released.json",
         {"version": 2, "generated_at": generated_at, "count": len(released), "appids": released},
     )
+    # Keep the legacy fallback authoritative too; otherwise a stale fallback
+    # can re-expose games that were removed from the sharded catalog.
+    write_if_changed(
+        frontend / "data" / "steam_upcoming.json",
+        {
+            "version": 2,
+            "generated_at": generated_at,
+            "count": len(rows),
+            "games": rows,
+        },
+    )
     write_if_changed(
         frontend / "data" / "index.json",
         {

@@ -38,11 +38,15 @@ def test_repeated_batch_updates_existing_appid_without_duplicates():
     assert [entry["appid"] for entry in result] == [3, 1, 2]
 
 
-def test_expired_games_are_pruned_without_replacing_unchecked_games():
+def test_released_history_is_retained_without_replacing_unchecked_games():
     today = date(2026, 9, 19)
     result = merge_partial_segment(
         [game(1, 7000, "2026-01-01"), game(2, 6000), game(3, 8000)],
         [game(4, 9000)],
         today=today,
     )
-    assert {entry["appid"] for entry in result} == {2, 3, 4}
+    # Released, already-qualified games stay in the historical calendar;
+    # a partial batch must also preserve games that have not been rechecked.
+    assert {entry["appid"] for entry in result} == {1, 2, 3, 4}
+    assert [entry["appid"] for entry in result] == [4, 3, 1, 2]
+    assert next(entry for entry in result if entry["appid"] == 1)["release_start"] == "2026-01-01"

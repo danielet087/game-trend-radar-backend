@@ -30,7 +30,10 @@ from scripts.screen_steam_candidates_before_followers import (
 )
 from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
-from scripts.steam_master_date_gate import filter_confirmed_master_games
+from scripts.steam_master_date_gate import (
+    apply_store_release_detail, fetch_store_release_details,
+    filter_confirmed_master_games,
+)
 
 LOG = logging.getLogger(__name__)
 QUERY_URL = "https://api.steampowered.com/IStoreQueryService/Query/v1/"
@@ -412,11 +415,6 @@ def run_follower_batch(
     if not prefilter_complete(pre, rows):
         raise RuntimeError("Step 2 has not screened every candidate; no official XML allowed")
     today = taiwan_today()
-    # The old master may predate Store Browse date verification. Never carry
-    # unverified future timestamps into the next official Followers batch.
-    master["games"] = filter_confirmed_master_games(
-        master.get("games", []), rows, today=today,
-    )
     cache_data = load_json(Path(args.follower_cache), {"games": {}})
     cache = cache_data.get("games") or {}
     priority_rows = [
@@ -455,21 +453,54 @@ def run_follower_batch(
         reuse_all_cached_during_initialization=True,
         max_fresh_requests_per_run=budget,
     )
-    qualified = collector.qualify(list(map(as_upcoming_game, remaining)))
+    fresh_qualified = collector.qualify(list(map(as_upcoming_game, remaining)))
     source_by_id = {x["appid"]: x for x in rows}
+
+    # A cached official >=5000 result is still official. Re-use it instead of
+    # wasting another Community XML request, but ALWAYS perform the same final
+    # Store-date verification before it can enter the qualified master.
+    qualified_items: dict[int, dict[str, Any]] = {}
+    for row in fresh_qualified:
+        qualified_items[row.appid] = vars(row).copy()
+    for source in priority_rows:
+        cached = cache.get(str(source["appid"]))
+        if not isinstance(cached, dict):
+            continue
+        try:
+            followers = int(cached.get("followers"))
+        except (TypeError, ValueError):
+            continue
+        if followers < 5000:
+            continue
+        qualified_items.setdefault(int(source["appid"]), {
+            **source,
+            "followers": followers,
+            "follower_checked_at": cached.get("checked_at"),
+        })
+
+    store_details = fetch_store_release_details(
+        requests.Session(), list(qualified_items), today=today,
+    )
     enriched = []
-    for row in qualified:
-        item = vars(row).copy()
-        source = source_by_id.get(row.appid, {})
+    store_date_rejected = 0
+    for appid, item in qualified_items.items():
+        source = source_by_id.get(appid, {})
         for field in ("name_en", "name_zh_tw", "name_zh_cn",
                       "name_zh_tw_traditional", "name_zh_cn_traditional",
                       "name_en_traditional", "language_support",
                       "release_date_timezone",
                       "release_date_basis", "release_time_utc",
                       "release_time_source", "discovered_by",
-                      "release_display_precision", "sexual_content_screened"):
-            item[field] = source.get(field)
-        enriched.append(item)
+                      "sexual_content_screened"):
+            if source.get(field) is not None:
+                item[field] = source.get(field)
+        detail = store_details.get(appid) or {"exact": False, "status": "unavailable"}
+        if detail.get("exact") is not True:
+            store_date_rejected += 1
+            LOG.info("POST_FOLLOWERS_STORE_DATE_REJECTED appid=%s status=%s",
+                     appid, detail.get("status"))
+            continue
+        enriched.append(apply_store_release_detail(item, detail))
     blocked = excluded_appids()
     master["games"] = filter_confirmed_master_games(
         merge_partial_segment(master.get("games", []), enriched, today=today),
@@ -495,6 +526,8 @@ def run_follower_batch(
         "failures": collector.follower_failures,
         "rate_limit_events": collector.follower_rate_limit_events,
         "qualified_this_batch": len(enriched),
+        "store_date_rechecked": len(qualified_items),
+        "store_date_rejected": store_date_rejected,
         "published_games_total": len(master["games"]),
         "prefilter_complete": True,
     }

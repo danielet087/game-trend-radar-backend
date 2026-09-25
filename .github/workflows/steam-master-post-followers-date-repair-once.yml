@@ -1,0 +1,119 @@
+name: Steam master post-Followers Store date repair
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/steam-master-date-repair-trigger.txt"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: steam-master-post-followers-date-repair
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout backend
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Run regression tests
+        run: python -m pytest -q
+
+      - name: Recheck qualified master against current Steam Store detail
+        run: >
+          python -m scripts.repair_steam_master_store_dates
+          --master data/steam_upcoming_master.json
+          --eligible data/steam_candidates_eligible.json
+          --report reports/steam_master_post_followers_date_recheck_20260925.json
+
+      - name: Validate repaired master
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("data/steam_upcoming_master.json").read_text(encoding="utf-8"))
+          r=json.loads(Path("reports/steam_master_post_followers_date_recheck_20260925.json").read_text(encoding="utf-8"))
+          games=m["games"]
+          assert r["stale_future_before"] == 132, r
+          assert len(games) == r["retained_exact"]
+          assert len({int(x["appid"]) for x in games}) == len(games)
+          assert all(int(x["followers"]) >= 5000 for x in games)
+          assert all(x.get("release_display_precision") == "date_full" for x in games)
+          assert all(x.get("post_followers_store_verified") is True for x in games)
+          assert r["followers_cache_modified"] is False
+          assert r["official_checkpoint_modified"] is False
+          print("REPAIRED_MASTER_VALID", len(games), "rejected", r["rejected_non_exact"],
+                "recovered", r["recovered_from_stale_set"])
+          PY
+
+      - name: Save repaired backend master and audit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/steam_upcoming_master.json reports/steam_master_post_followers_date_recheck_20260925.json
+          if git diff --cached --quiet; then
+            echo "No master changes."
+          else
+            git commit -m "data: recheck qualified Steam games against exact Store dates"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Dispatch newly recovered exact-date games for content enrichment
+        env:
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.request
+          from pathlib import Path
+          token=os.environ.get("CONTENT_BACKEND_TOKEN","").strip()
+          report=json.loads(Path("reports/steam_master_post_followers_date_recheck_20260925.json").read_text(encoding="utf-8"))
+          rows=report.get("recovered") or []
+          if not rows:
+              print("RECOVERED_CONTENT_DISPATCH selected=0")
+              raise SystemExit(0)
+          if not token:
+              print("::warning::CONTENT_BACKEND_TOKEN missing; recovered exact-date games were not dispatched")
+              raise SystemExit(0)
+          for n,row in enumerate(rows,1):
+              payload=json.dumps({
+                  "event_type":"steam_game_qualified",
+                  "client_payload":{
+                      "appid":row["appid"],
+                      "official_followers":row["followers"],
+                      "release_date":row["release_start"],
+                      "official_checked_at_taipei":row.get("follower_checked_at"),
+                      "source_repository":"danielet087/game-trend-radar-backend",
+                      "signature":f'{row["appid"]}:{row["followers"]}:{row["release_start"]}:store-v2-repair'
+                  }
+              }).encode()
+              req=urllib.request.Request(
+                  "https://api.github.com/repos/danielet087/game-trend-radar-content-backend/dispatches",
+                  data=payload, method="POST",
+                  headers={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json",
+                           "X-GitHub-Api-Version":"2022-11-28","Content-Type":"application/json",
+                           "User-Agent":"GameTrendRadarStoreDateRepair/1.0"})
+              with urllib.request.urlopen(req,timeout=30) as res:
+                  if res.status != 204:
+                      raise RuntimeError(f"dispatch HTTP {res.status}")
+              print("RECOVERED_CONTENT_DISPATCH",n,len(rows),row["appid"])
+              if n < len(rows): time.sleep(3)
+          PY

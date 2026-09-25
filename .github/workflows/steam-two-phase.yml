@@ -9,6 +9,12 @@ on:
     - cron: "0 0 * * *"
       timezone: "Asia/Taipei"
   workflow_dispatch:
+    inputs:
+      refresh_today:
+        description: "Run the full daily discovery and prescreen to recover a missed refresh"
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: write
 concurrency:
@@ -36,7 +42,7 @@ jobs:
         run: python -m pytest -q
 
       - name: Reset rolling 365-day discovery for today's scheduled refresh
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || inputs.refresh_today == true
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -56,7 +62,7 @@ jobs:
           print("DAILY_STEAM_REFRESH_RESET", taiwan_today().isoformat())
           PY
       - name: Daily midnight discovery through complete third-party prescreen
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || inputs.refresh_today == true
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,7 +97,7 @@ jobs:
           PY
 
       - name: Manual continuation of Steam two-phase pipeline
-        if: github.event_name != 'schedule'
+        if: github.event_name == 'workflow_dispatch' && inputs.refresh_today != true
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -113,7 +119,7 @@ jobs:
           --output output/steam_upcoming.json
 
       - name: Export today's exact-date non-adult candidate handoff
-        if: github.event_name == 'schedule'
+        if: github.event_name == 'schedule' || inputs.refresh_today == true
         run: |
           python - <<'PY'
           import json

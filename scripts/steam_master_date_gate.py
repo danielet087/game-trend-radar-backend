@@ -120,15 +120,18 @@ def filter_confirmed_master_games(
             continue
         if appid in seen or followers < 5000:
             continue
-        if row.get("release_display_precision") != "date_full":
-            continue
-        if day > today and row.get("post_followers_store_verified") is not True:
-            continue
-        # Future records also have to belong to today's exact-date candidate
-        # universe. Historical records are retained after their Store date was
-        # verified and the release actually occurred.
-        if day > today and appid not in eligible_ids:
-            continue
+        if day > today:
+            if row.get("release_display_precision") != "date_full":
+                continue
+            if row.get("post_followers_store_verified") is not True:
+                continue
+            # Future records must still belong to today's exact-date candidate
+            # universe. The post-Followers Store check is the final date source.
+            if appid not in eligible_ids:
+                continue
+        # Released history is retained. Once the game has actually released,
+        # it must not disappear merely because Store Browse stops exposing the
+        # old coming-soon display metadata.
         seen.add(appid)
         retained.append(row)
     return retained

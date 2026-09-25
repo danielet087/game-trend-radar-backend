@@ -24,6 +24,7 @@ from zoneinfo import ZoneInfo
 import requests
 
 from scripts.steam_master_date_gate import fetch_store_release_details
+from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 
 ROOT = Path("experiments/steam_official_daily_catchup")
 FROZEN = Path("experiments/steam_official_nearfirst_20260922")
@@ -33,6 +34,7 @@ OFFICIAL_CACHE = Path("data/steam_followers_cache.json")
 ORIGINAL_OFFICIAL = Path("experiments/steam_official_followers_20260922/checkpoint.json")
 OUT = Path("output/steam_official_daily_catchup")
 CHECKPOINT = ROOT / "checkpoint.json"
+MASTER = Path("data/steam_upcoming_master.json")
 TZ = ZoneInfo("Asia/Taipei")
 GROUP_BASE = 103582791429521408
 COHORT = "steam_official_daily_catchup_dynamic_v1"
@@ -100,6 +102,67 @@ def valid_date(value):
         return datetime.fromisoformat(value).date().isoformat() == value and len(value) == 10
     except ValueError:
         return False
+
+
+def upsert_qualified_master(master, result):
+    """Persist only official >=5000 + post-Followers Store-exact games."""
+    if (
+        not checked_numeric(result.get("official_followers"))
+        or result["official_followers"] < 5000
+        or result.get("store_date_exact") is not True
+        or result.get("release_display_precision") != "date_full"
+        or not valid_date(result.get("release_date"))
+    ):
+        return False
+    blocked = excluded_appids()
+    candidate = {
+        "appid": int(result["appid"]),
+        "name": result.get("name") or f"Steam App {int(result['appid'])}",
+        "name_en": result.get("name") or f"Steam App {int(result['appid'])}",
+        "release_raw": result["release_date"],
+        "release_start": result["release_date"],
+        "release_end": result["release_date"],
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": result.get("release_display_provider"),
+        "release_date_basis": result.get("release_date_basis"),
+        "release_date_timezone": result.get("release_date_timezone") or "Asia/Taipei",
+        "release_time_utc": result.get("release_time_utc"),
+        "release_time_source": result.get("release_display_provider"),
+        "release_date_verified_at": datetime.now(timezone.utc).isoformat(),
+        "post_followers_store_verified": True,
+        "post_followers_store_verified_at": datetime.now(timezone.utc).isoformat(),
+        "followers": int(result["official_followers"]),
+        "follower_checked_at": result.get("official_checked_at_taipei"),
+        "follower_source": result.get("official_source") or "Steam Community XML memberCount",
+        "official_ge5000": True,
+        "store_url": result.get("steam_url") or f"https://store.steampowered.com/app/{int(result['appid'])}/",
+    }
+    if is_disallowed(candidate, blocked):
+        return False
+    games = master.get("games")
+    if not isinstance(games, list):
+        games = []
+    by_id = {int(x["appid"]): dict(x) for x in games if isinstance(x, dict) and x.get("appid") is not None}
+    prior = by_id.get(candidate["appid"], {})
+    merged = dict(prior)
+    merged.update({k: v for k, v in candidate.items() if v is not None})
+    changed = merged != prior
+    by_id[candidate["appid"]] = merged
+    master["games"] = sorted(
+        by_id.values(),
+        key=lambda x: (
+            str(x.get("release_start") or "9999-12-31"),
+            -int(x.get("followers") or 0),
+            int(x.get("appid") or 0),
+        ),
+    )
+    if changed:
+        now = datetime.now(timezone.utc).isoformat()
+        master["updated_at"] = now
+        master["post_followers_store_gate_version"] = 1
+        master["post_followers_store_gate_checked_at"] = now
+    return changed
 
 
 def content_dispatch_signature(result):
@@ -215,7 +278,7 @@ def verify_store_date_for_result(result, session):
     return result["store_date_exact"]
 
 
-def reverify_pending_store_dates(cp, limit=25):
+def reverify_pending_store_dates(cp, master, limit=25):
     """Recheck already-official >=5000 games when Store date was not exact yet.
 
     This lets an unannounced game become publishable later without re-querying
@@ -256,6 +319,7 @@ def reverify_pending_store_dates(cp, limit=25):
             result["release_date_basis"] = detail.get("release_date_basis")
             result["release_date_timezone"] = detail.get("release_date_timezone")
             result["release_time_utc"] = detail.get("release_time_utc")
+            upsert_qualified_master(master, result)
             dispatch_content_event(cp, result)
     return len(selected)
 
@@ -284,7 +348,7 @@ def retry_pending_content_dispatches(cp, limit=25):
 def git_push():
     """Make each 10-success checkpoint durable before a runner interruption."""
     try:
-        subprocess.run(["git", "add", str(CHECKPOINT)], check=True, timeout=20,
+        subprocess.run(["git", "add", str(CHECKPOINT), str(MASTER)], check=True, timeout=20,
                        stdout=subprocess.DEVNULL)
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], timeout=20)
         if diff.returncode == 0:
@@ -469,10 +533,12 @@ def main():
             "created_at_taipei": clock().isoformat(),
         }
     cp.setdefault("content_dispatches", {})
-    store_rechecks = reverify_pending_store_dates(cp)
+    master = read(MASTER) if MASTER.exists() else {"version": 1, "games": []}
+    store_rechecks = reverify_pending_store_dates(cp, master)
     retried_dispatches = retry_pending_content_dispatches(cp)
     if store_rechecks or retried_dispatches:
         save(CHECKPOINT, cp)
+        save(MASTER, master)
 
     q, source_status = make_queue(
         cp, original, oldcp, oldgroups, eligible, prefilter,
@@ -569,6 +635,8 @@ def main():
                             event["store_date_status"] = official.get("store_date_status")
                             if exact:
                                 event["release_date"] = official["release_date"]
+                                upsert_qualified_master(master, official)
+                                save(MASTER, master)
                                 event["content_dispatch"] = dispatch_content_event(cp, official)
                             else:
                                 event["content_dispatch"] = "store_date_not_verified"
@@ -652,6 +720,7 @@ def main():
         cp["official_results"][aid]["official_followers"] >= 5000 for aid in ids
     )
     save(CHECKPOINT, cp)
+    save(MASTER, master)
     save(OUT / "report.json", report)
     save(OUT / "attempts.json", attempts)
     if not git_push():

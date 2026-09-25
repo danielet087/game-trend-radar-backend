@@ -225,7 +225,7 @@ jobs:
             exit 1
           fi
           git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
-          python -m scripts.build_public_steam_shards --input output/steam_upcoming.json --frontend frontend
+          python -m scripts.build_public_steam_shards --input output/steam_upcoming.json --frontend frontend --authoritative-future
           cd frontend
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

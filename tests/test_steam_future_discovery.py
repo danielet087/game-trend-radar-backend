@@ -1,8 +1,6 @@
 """Distant upcoming games must not disappear behind Steam's TBA sorting."""
 import argparse
-import json
 from datetime import date
-from unittest.mock import patch
 
 from collectors.steam_upcoming import SteamUpcomingCollector
 from scripts.update_steam_daily import run
@@ -59,54 +57,23 @@ def test_price_sort_discovers_2027_game_hidden_from_release_ascending(tmp_path):
     assert all(g.release_precision == "day" for g in result)
 
 
-def test_empty_distant_segment_is_not_declared_completed(tmp_path):
+def test_legacy_updater_refuses_to_overwrite_master_with_unverified_dates(tmp_path):
+    # The historical two-month collector cannot prove Store Browse date_full.
+    # Keep its pure discovery tests, but its master-writing entry point is retired.
     state = tmp_path / "state.json"
     master = tmp_path / "master.json"
     output = tmp_path / "public.json"
-    cached = {
-        "appid": 333, "name": "Already saved", "followers": 9000,
-        "release_raw": "15 Dec, 2026",
-        "release_start": "2026-12-15", "release_end": "2026-12-15",
-    }
-    state.write_text(json.dumps({
-        "version": 1,
-        "anchor_date": "2026-09-19",
-        "segment_months": 2,
-        "total_segments": 6,
-        "next_segment": 1,
-        "completed_segments": [{"segment": 0, "candidate_count": 892,
-                                "alternative_search_checked": True}],
-        "initial_complete": False,
-    }), encoding="utf-8")
-    master.write_text(json.dumps({"games": [cached]}), encoding="utf-8")
-    args = argparse.Namespace(
-        state=str(state), master=str(master), output=str(output),
-        follower_cache=str(tmp_path / "followers.json"),
-        checkpoint=str(tmp_path / "checkpoint.json"),
-        country="TW", days=365, min_followers=5000,
-        request_interval=0, search_interval=0, max_pages=1,
-        segment_months=2, total_segments=6, checkpoint_branch="steam-state",
-        checkpoint_every=5, max_fresh_requests=50,
-    )
-    empty = {
-        "candidate_count": 0, "games": [],
-        "source": {}, "collection": {
-            "follower_failures": 0,
-            "paused_due_to_fresh_request_budget": False,
-            "fresh_follower_requests": 0,
-        }
-    }
-    with (
-        patch("scripts.update_steam_daily.SteamUpcomingCollector") as cls,
-        patch("scripts.update_steam_daily.taiwan_today", return_value=date(2026, 9, 19)),
-        patch("scripts.update_steam_daily.fetch_store_browse_releases", return_value={}),
-    ):
-        cls.return_value.collect.return_value = empty
-        payload = run(args)
+    state.write_text('{"next_segment": 1}', encoding="utf-8")
+    master.write_text('{"games": [{"appid": 333, "release_start": "2026-12-15"}]}',
+                      encoding="utf-8")
+    before_state = state.read_bytes()
+    before_master = master.read_bytes()
+    args = argparse.Namespace(state=str(state), master=str(master), output=str(output))
 
-    init = payload["initialization"]
-    assert init["complete"] is False
-    assert init["next_segment"] == 1
-    assert len(init["completed_segments"]) == 1
-    assert init["last_attempt"]["status"] == "discovery_incomplete"
-    assert {g["appid"] for g in payload["games"]} == {333}
+    import pytest
+    with pytest.raises(RuntimeError, match="cannot verify the displayed full Store release date"):
+        run(args)
+
+    assert state.read_bytes() == before_state
+    assert master.read_bytes() == before_master
+    assert not output.exists()

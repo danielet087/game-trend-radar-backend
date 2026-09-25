@@ -26,12 +26,17 @@ jobs:
         with:
           sparse-checkout: |
             scripts/experiment_official_daily_catchup_250.py
+            scripts/steam_master_date_gate.py
+            scripts/screen_steam_candidates_before_followers.py
+            scripts/steam_adult_exclusions.py
             experiments/steam_official_nearfirst_20260922/
             experiments/steam_official_followers_20260922/checkpoint.json
             experiments/steam_official_daily_catchup/
             data/steam_candidates_eligible.json
             data/steam_prefilter_state.json
             data/steam_followers_cache.json
+            data/steam_upcoming_master.json
+            data/steam_adult_exclusion.json
           sparse-checkout-cone-mode: false
 
       - name: Python 3.12
@@ -84,7 +89,7 @@ jobs:
         if: always()
         run: |
           if [ -s experiments/steam_official_daily_catchup/checkpoint.json ]; then
-            git add experiments/steam_official_daily_catchup/checkpoint.json
+            git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json
             if ! git diff --cached --quiet; then
               git commit -m "experiment: save dynamic official Followers batch"
               git pull --rebase origin main

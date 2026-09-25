@@ -18,6 +18,8 @@ def games(*ids):
         {"appid": appid, "name": f"Game {appid}", "release_raw": "2026-10-01",
          "release_start": "2026-10-01", "release_end": "2026-10-01",
          "release_precision": "day", "capsule_image": None,
+         "release_display_precision": "date_full",
+         "sexual_content_screened": True,
          "store_url": f"https://store.steampowered.com/app/{appid}/"}
         for appid in ids
     ]

@@ -88,9 +88,18 @@ def merge_game(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, 
     return merged
 
 
-def build(input_path: Path, frontend: Path) -> dict[str, Any]:
+def build(
+    input_path: Path,
+    frontend: Path,
+    *,
+    authoritative_future: bool = False,
+) -> dict[str, Any]:
     incoming_payload = load_json(input_path, {"games": []})
     incoming_games = incoming_payload.get("games") or []
+    incoming_ids = {
+        int(row["appid"]) for row in incoming_games
+        if isinstance(row, dict) and row.get("appid") is not None
+    }
     games_dir = frontend / "data" / "games"
     calendar_dir = frontend / "data" / "calendar"
     lists_dir = frontend / "data" / "lists"
@@ -126,15 +135,24 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
 
     # Removed/unconfirmed titles must not survive as stale independent
     # AppID files after an audit. Historical released records remain.
+    removed_stale_future = 0
     for path in games_dir.glob("*.json"):
         try:
             appid = int(path.stem)
             row = load_json(path, {})
+            stale_future = (
+                authoritative_future
+                and str(row.get("release_start") or "") >= today_s
+                and appid not in incoming_ids
+            )
             if appid in blocked or (
                 appid in unconfirmed_ids
                 and row.get("release_display_precision") != "date_full"
-            ):
+            ) or stale_future:
+                existing.pop(appid, None)
                 path.unlink()
+                if stale_future:
+                    removed_stale_future += 1
         except ValueError:
             continue
 
@@ -262,6 +280,7 @@ def build(input_path: Path, frontend: Path) -> dict[str, Any]:
         "changed_months": changed_months,
         "upcoming": len(upcoming),
         "released": len(released),
+        "removed_stale_future": removed_stale_future,
     }
 
 
@@ -269,8 +288,17 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", default="output/steam_upcoming.json")
     parser.add_argument("--frontend", default="frontend")
+    parser.add_argument(
+        "--authoritative-future",
+        action="store_true",
+        help="Remove future frontend AppIDs that are absent from the input master.",
+    )
     args = parser.parse_args()
-    result = build(Path(args.input), Path(args.frontend))
+    result = build(
+        Path(args.input),
+        Path(args.frontend),
+        authoritative_future=args.authoritative_future,
+    )
     print("STEAM_SHARDS", json.dumps(result, ensure_ascii=False))
 
 

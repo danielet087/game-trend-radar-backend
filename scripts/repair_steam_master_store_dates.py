@@ -72,9 +72,11 @@ def main() -> None:
         detail = details.get(appid) or {"exact": False, "status": "unavailable"}
         if detail.get("exact") is not True:
             if old_day <= today.isoformat():
-                raise RuntimeError(
-                    f"Historical qualified AppID {appid} could not be reverified; refusing destructive repair"
-                )
+                # Historical released records are outside the user's 132-title
+                # future-date repair. Keep them when current Store Browse no
+                # longer exposes old coming-soon metadata.
+                retained.append(row)
+                continue
             rejected.append({
                 "appid": appid,
                 "name": row.get("name"),
@@ -113,6 +115,11 @@ def main() -> None:
     master["updated_at"] = stamp
     master["post_followers_store_gate_version"] = 1
     master["post_followers_store_gate_checked_at"] = stamp
+    historical_preserved_without_current_store_metadata = sum(
+        1 for row in retained
+        if str(row.get("release_start") or "") <= today.isoformat()
+        and row.get("post_followers_store_verified") is not True
+    )
     report = {
         "version": 1,
         "checked_at": stamp,
@@ -123,6 +130,7 @@ def main() -> None:
         "retained_exact": len(retained),
         "rejected_non_exact": len(rejected),
         "historical_verified": historical_verified,
+        "historical_preserved_without_current_store_metadata": historical_preserved_without_current_store_metadata,
         "recovered_from_stale_set": len(recovered_stale),
         "date_changed": len(changed_dates),
         "rejected": rejected,

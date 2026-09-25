@@ -2,10 +2,6 @@ name: Backfill dynamic official games into qualified master once
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - ".github/steam-backfill-dynamic-master-trigger.txt"
 
 permissions:
   contents: write

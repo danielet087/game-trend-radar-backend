@@ -35,24 +35,24 @@ jobs:
       - name: Run regression tests
         run: python -m pytest -q
 
-      - name: Restore the pre-clean 232-title master snapshot for a true recheck
+      - name: Prepare the current qualified master for a non-destructive recheck
         run: |
-          git show b19d01dccf197cd4b345a898e09c7dda8ec3d4ae:data/steam_upcoming_master.json > /tmp/steam_master_before_132_cleanup.json
+          cp data/steam_upcoming_master.json /tmp/steam_master_current.json
           python - <<'PY'
           import json
-          p="/tmp/steam_master_before_132_cleanup.json"
+          p="/tmp/steam_master_current.json"
           d=json.load(open(p,encoding="utf-8"))
-          assert len(d["games"])==232, len(d["games"])
-          print("PRECLEAN_MASTER_READY",len(d["games"]))
+          assert isinstance(d.get("games"), list) and d["games"], d
+          print("CURRENT_MASTER_READY",len(d["games"]))
           PY
 
       - name: Recheck qualified master against current Steam Store detail
         run: |
           python -m scripts.repair_steam_master_store_dates \
-            --master /tmp/steam_master_before_132_cleanup.json \
+            --master /tmp/steam_master_current.json \
             --eligible data/steam_candidates_eligible.json \
             --report reports/steam_master_post_followers_date_recheck_20260925.json
-          cp /tmp/steam_master_before_132_cleanup.json data/steam_upcoming_master.json
+          cp /tmp/steam_master_current.json data/steam_upcoming_master.json
 
       - name: Validate repaired master
         run: |
@@ -62,7 +62,7 @@ jobs:
           m=json.loads(Path("data/steam_upcoming_master.json").read_text(encoding="utf-8"))
           r=json.loads(Path("reports/steam_master_post_followers_date_recheck_20260925.json").read_text(encoding="utf-8"))
           games=m["games"]
-          assert r["stale_future_before"] == 132, r
+          assert r["before_master_count"] >= len(games) > 0, r
           assert len(games) == r["retained_exact"]
           assert len({int(x["appid"]) for x in games}) == len(games)
           assert all(int(x["followers"]) >= 5000 for x in games)

@@ -1,10 +1,6 @@
 name: Verify Steam two-phase candidate pipeline
 # Paused by request: automatic workflow triggers disabled.
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/steam-master-verify-trigger.txt"
   workflow_dispatch:
 
 permissions:

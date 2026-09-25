@@ -1,0 +1,58 @@
+name: Backfill dynamic official games into qualified master once
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/steam-backfill-dynamic-master-trigger.txt"
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependency
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Reverify dynamic official >=5000 records and persist exact-date master rows
+        env:
+          CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+        run: |
+          python - <<'PY'
+          from scripts.experiment_official_daily_catchup_250 import (
+              CHECKPOINT, MASTER, read, save, reverify_pending_store_dates,
+          )
+          cp=read(CHECKPOINT)
+          master=read(MASTER)
+          before_ids={str(x["appid"]) for x in master.get("games",[])}
+          ge=[x for x in cp.get("official_results",{}).values()
+              if isinstance(x.get("official_followers"),int) and x["official_followers"]>=5000]
+          missing=[x for x in ge if str(x["appid"]) not in before_ids]
+          assert len(ge)==4, len(ge)
+          assert len(missing)==4, [x["appid"] for x in missing]
+          checked=reverify_pending_store_dates(cp,master,limit=25)
+          after_ids={str(x["appid"]) for x in master.get("games",[])}
+          still=[x for x in ge if str(x["appid"]) not in after_ids]
+          assert checked==4, checked
+          assert not still, [x["appid"] for x in still]
+          assert len(master["games"])==104, len(master["games"])
+          save(CHECKPOINT,cp)
+          save(MASTER,master)
+          print("DYNAMIC_MASTER_BACKFILL_OK", "checked",checked,"master",len(master["games"]))
+          PY
+      - name: Commit exact-date backfill
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json
+          git commit -m "data: backfill Store-verified dynamic official games into master"
+          git pull --rebase origin main
+          git push origin HEAD:main

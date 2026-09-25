@@ -1,6 +1,9 @@
 name: Steam master post-Followers Store date repair
 
 on:
+  push:
+    paths:
+      - ".github/workflows/steam-master-post-followers-date-repair-once.yml"
   workflow_dispatch:
 
 permissions:

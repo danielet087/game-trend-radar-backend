@@ -85,7 +85,10 @@ def apply_store_release_detail(row: dict[str, Any], detail: dict[str, Any]) -> d
         "release_date_basis", "release_date_timezone", "release_time_utc",
     ):
         result[key] = detail.get(key)
-    result["release_date_verified_at"] = datetime.now(timezone.utc).isoformat()
+    verified_at = datetime.now(timezone.utc).isoformat()
+    result["release_date_verified_at"] = verified_at
+    result["post_followers_store_verified_at"] = verified_at
+    result["post_followers_store_verified"] = True
     return result
 
 
@@ -118,6 +121,8 @@ def filter_confirmed_master_games(
         if appid in seen or followers < 5000:
             continue
         if row.get("release_display_precision") != "date_full":
+            continue
+        if day > today and row.get("post_followers_store_verified") is not True:
             continue
         # Future records also have to belong to today's exact-date candidate
         # universe. Historical records are retained after their Store date was

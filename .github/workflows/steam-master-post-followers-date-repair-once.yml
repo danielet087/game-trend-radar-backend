@@ -89,6 +89,32 @@ jobs:
             git push origin HEAD:main
           fi
 
+      - name: Publish repaired authoritative master to frontend
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FRONTEND_REPO_TOKEN:-}" ]; then
+            echo "::error::FRONTEND_REPO_TOKEN is required"
+            exit 1
+          fi
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+          python -m scripts.build_public_steam_shards \
+            --input data/steam_upcoming_master.json \
+            --frontend frontend \
+            --authoritative-future
+          cd frontend
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/index.json data/calendar data/games data/lists data/steam_upcoming.json
+          if git diff --cached --quiet; then
+            echo "REPAIRED_FRONTEND_ALREADY_CURRENT"
+          else
+            git commit -m "data: publish Store-verified authoritative Steam catalog"
+            bash ../scripts/git_frontend_auth.sh pull --rebase origin main
+            bash ../scripts/git_frontend_auth.sh push origin HEAD:main
+          fi
+
       - name: Dispatch newly recovered exact-date games for content enrichment
         env:
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}

@@ -48,6 +48,7 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check requests
           python -m py_compile scripts/experiment_official_daily_catchup_250.py
+          python -c 'from scripts.steam_master_date_gate import fetch_store_release_details; from scripts.steam_adult_exclusions import excluded_appids, is_disallowed; import scripts.experiment_official_daily_catchup_250; print("FOLLOWERS_IMPORT_OK")'
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python - <<'PY'
@@ -79,7 +80,7 @@ jobs:
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
         run: >
-          python -u scripts/experiment_official_daily_catchup_250.py
+          python -u -m scripts.experiment_official_daily_catchup_250
           --max-requests 250
           --interval 8
           --max-seconds 3450

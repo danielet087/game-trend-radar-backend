@@ -8,6 +8,13 @@ on:
   schedule:
     - cron: "0 0 * * *"
       timezone: "Asia/Taipei"
+  # One-shot recovery after fixing the broken daily-launch test.
+  # Narrow path matching prevents commits of generated data from recursively
+  # restarting the 365-day scan.
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/steam-two-phase.yml"
   workflow_dispatch:
     inputs:
       refresh_today:
@@ -42,7 +49,7 @@ jobs:
         run: python -m pytest -q
 
       - name: Reset rolling 365-day discovery for today's scheduled refresh
-        if: github.event_name == 'schedule' || inputs.refresh_today == true
+        if: github.event_name == 'schedule' || github.event_name == 'push' || inputs.refresh_today == true
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -62,7 +69,7 @@ jobs:
           print("DAILY_STEAM_REFRESH_RESET", taiwan_today().isoformat())
           PY
       - name: Daily midnight discovery through complete third-party prescreen
-        if: github.event_name == 'schedule' || inputs.refresh_today == true
+        if: github.event_name == 'schedule' || github.event_name == 'push' || inputs.refresh_today == true
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -119,7 +126,7 @@ jobs:
           --output output/steam_upcoming.json
 
       - name: Export today's exact-date non-adult candidate handoff
-        if: github.event_name == 'schedule' || inputs.refresh_today == true
+        if: github.event_name == 'schedule' || github.event_name == 'push' || inputs.refresh_today == true
         run: |
           python - <<'PY'
           import json
@@ -229,7 +236,7 @@ jobs:
           cd frontend
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/index.json data/calendar data/games data/lists
+          git add data/index.json data/calendar data/games data/lists data/steam_upcoming.json
           if git diff --cached --quiet; then
             echo "Public JSON already matches."
             exit 0

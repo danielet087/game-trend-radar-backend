@@ -81,7 +81,13 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
             202: 3001, 303: 3000, 505: 4000,
         }[appid]) as fetch_follows,
         patch("scripts.publish_steam_preview.time.sleep"),
+        # This fixture models 2026-09-19. Keep the real first-week rule,
+        # but freeze observation time so the test remains valid after that week.
+        patch("scripts.publish_steam_preview.datetime", wraps=datetime) as preview_clock,
     ):
+        preview_clock.now.return_value = datetime(
+            2026, 9, 19, 12, tzinfo=timezone.utc,
+        )
         first = run(
             checkpoint_path=checkpoint, output_path=output, recent_state_path=state,
             today=date(2026, 9, 19), delay_seconds=0, follower_interval=0,

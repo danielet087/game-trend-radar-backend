@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from scripts.public_catalog import write_catalog_projection
 import logging
 import re
 import time
@@ -334,6 +335,7 @@ def audit(
         legacy["release_date_policy"] = "future_requires_store_date_full"
         write_if_changed(legacy_path, legacy)
 
+    projection = write_catalog_projection(data_dir, legacy["games"], now.isoformat())
     index.update({
         "generated_at": now.isoformat(),
         "game_count": len(kept),
@@ -341,6 +343,7 @@ def audit(
         "release_date_audited": True,
         "release_date_policy": "future_requires_store_date_full",
         "release_date_audited_at": now.isoformat(),
+        **projection,
     })
     write_if_changed(index_path, index)
 

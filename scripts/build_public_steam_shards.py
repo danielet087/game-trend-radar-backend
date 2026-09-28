@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.steam_localized_titles import add_traditional_display_names
+from scripts.public_catalog import write_catalog_projection
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 
 CORE_FIELDS = {
@@ -15,7 +16,9 @@ CORE_FIELDS = {
     "release_raw", "release_start", "release_end", "release_precision",
     "release_date_timezone", "release_date_basis", "release_time_utc",
     "release_time_source", "store_url", "community_url", "discovered_by",
-    "sexual_content_screened", "release_display_precision",
+    "sexual_content_screened", "release_display_precision", "release_display_provider",
+    "release_date_verified_at", "post_followers_store_verified_at", "post_followers_store_verified",
+    "release_date_conflict", "release_timestamp_taipei_date",
 }
 
 
@@ -56,6 +59,11 @@ def valid_record(row: Any) -> bool:
     except (TypeError, ValueError):
         return False
     day = row.get("release_start") or row.get("release_date")
+    try:
+        if date.fromisoformat(day).isoformat() != day:
+            return False
+    except (ValueError, TypeError):
+        return False
     return (
         appid > 0
         and followers >= 3000
@@ -94,8 +102,12 @@ def build(
     *,
     authoritative_future: bool = False,
 ) -> dict[str, Any]:
-    incoming_payload = load_json(input_path, {"games": []})
-    incoming_games = incoming_payload.get("games") or []
+    incoming_payload = load_json(input_path, None)
+    if not isinstance(incoming_payload, dict) or not isinstance(incoming_payload.get("games"), list):
+        raise ValueError("Invalid source catalog; refusing to replace published records")
+    incoming_games = incoming_payload["games"]
+    if authoritative_future and not incoming_games:
+        raise ValueError("Empty authoritative catalog; refusing mass removal")
     incoming_ids = {
         int(row["appid"]) for row in incoming_games
         if isinstance(row, dict) and row.get("appid") is not None
@@ -122,8 +134,11 @@ def build(
         # A Query API timestamp is NOT a user-visible full-date announcement.
         # Once the audited public catalogue is activated, every future record
         # needs a separately verified Store display-date gate.
-        if audit_active and str(game["release_start"]) >= today_s:
-            return game.get("release_display_precision") == "date_full"
+        if str(game["release_start"]) >= today_s:
+            if int(game["followers"]) < 5000:
+                return False
+            if audit_active:
+                return game.get("release_display_precision") == "date_full"
         return True
 
     existing: dict[int, dict[str, Any]] = {}
@@ -265,6 +280,7 @@ def build(
             "games": rows,
         },
     )
+    projection = write_catalog_projection(frontend / "data", rows, generated_at)
     write_if_changed(
         frontend / "data" / "index.json",
         {
@@ -281,6 +297,7 @@ def build(
             },
             "legacy_fallback": "steam_upcoming.json",
             "release_date_audited": audit_active,
+            **projection,
         },
     )
     return {

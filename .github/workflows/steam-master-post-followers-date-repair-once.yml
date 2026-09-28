@@ -106,7 +106,7 @@ jobs:
           cd frontend
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/index.json data/calendar data/games data/lists data/steam_upcoming.json
+          git add data/index.json data/calendar data/games data/lists data/steam_upcoming.json data/catalog.json
           if git diff --cached --quiet; then
             echo "REPAIRED_FRONTEND_ALREADY_CURRENT"
           else

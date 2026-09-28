@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from scripts.public_catalog import write_catalog_projection
 import logging
 import re
 import time
@@ -203,6 +204,19 @@ def refresh(
             assert doc["count"] == len(doc["games"])
             save_changed(data_dir / "calendar" / f"{month}.json", doc)
             changed_months.append(month)
+
+    rows = sorted(
+        [updated_games.get(appid, row) for appid, row in original_games.items()],
+        key=lambda row: (row["release_start"], -int(row["followers"]), int(row["appid"])),
+    )
+    now = datetime.now(timezone.utc).isoformat()
+    projection = write_catalog_projection(data_dir, rows, now)
+    save_changed(data_dir / "steam_upcoming.json", {
+        "version": 2, "generated_at": now, "count": len(rows), "games": rows,
+    })
+    index.update(projection)
+    index["generated_at"] = now
+    save_changed(data_dir / "index.json", index)
 
     stats = {
         "published_qualified": len(ids),

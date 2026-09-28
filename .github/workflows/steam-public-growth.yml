@@ -1,0 +1,67 @@
+name: Track accepted game growth through release plus 30 days
+
+on:
+  schedule:
+    - cron: '15 17 * * *' # 01:15 Taiwan; outside the hourly 03:00–23:00 catch-up window.
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/steam-growth-trigger.txt']
+
+permissions:
+  contents: read
+
+# Share the existing official-Followers lock; never run the two XML collectors together.
+concurrency:
+  group: isolated-official-nearfirst-frozen-20260922
+  cancel-in-progress: false
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check requests
+      - name: Validate boundary and throttling behavior
+        run: python -m unittest discover -s tests -p test_public_growth.py
+      - name: Read the published catalog
+        run: git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+      - name: Collect dated official measurements
+        run: python scripts/collect_public_growth.py --data-dir frontend/data --output output/public-growth.json --interval 30
+      - name: Publish against the latest accepted catalog
+        if: always() && !cancelled()
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -f output/public-growth.json || exit 0
+          test -n "$FRONTEND_REPO_TOKEN"
+          git -C frontend config user.name 'github-actions[bot]'
+          git -C frontend config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4 5; do
+            git -C frontend fetch origin main
+            git -C frontend reset --hard origin/main
+            python frontend/scripts/build_radar_insights.py --data-dir frontend/data --measurements output/public-growth.json
+            git -C frontend add data/insights-state.json data/activity.json data/growth.json
+            if git -C frontend diff --cached --quiet; then exit 0; fi
+            git -C frontend commit -m 'data: record official growth observations through release plus 30 days'
+            if bash scripts/git_frontend_auth.sh -C frontend push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
+      - name: Report measured coverage
+        if: always()
+        run: |
+          if [ -f output/public-growth.json ]; then
+            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          d=json.load(open('output/public-growth.json'))
+          print('### Steam 成長追蹤')
+          print(f"實際量測／重用：{len(d.get('measurements', []))} 筆")
+          print(f"本次請求：{d.get('requests', 'interrupted')}；結束原因：{d.get('reason', 'interrupted')}")
+          print('僅追蹤本站合格遊戲，至上市後第 30 天；缺值不補成 0。')
+          PY
+          fi

@@ -1,6 +1,6 @@
 # Game Trend Radar — 主後端
 
-本 Repo 負責 Steam 候選、資格與官方 Followers；內容補充由 `game-trend-radar-content-backend` 負責，網站位於 `game-trend-radar`。三個 Repo 均已公開。
+本 Repo 負責 Steam 候選、資格與官方 Followers；內容補充由 `game-trend-radar-content-backend` 負責，網站位於 `game-trend-radar`。直播收集器另拆為獨立 Repo。
 
 ## 現行流程
 
@@ -46,3 +46,10 @@ python -m pytest -q
 ```
 
 早期 CM、第三方來源與初次補漏實驗保留於 [歷史研究](docs/steam-research-history.md)，其中舊排程／私人 Repo 說明不代表現況。
+
+## 獨立直播後端
+
+- [YouTube 後端](https://github.com/danielet087/game-trend-radar-youtube-backend)：自己的程式、測試與 Secrets，只更新前端 `data/youtube_live.json`。
+- [Twitch 後端](https://github.com/danielet087/game-trend-radar-twitch-backend)：自己的程式、測試與 Secrets，只更新前端 `data/twitch_live.json`。
+
+兩者收集維持手動觸發，Secrets 由使用者之後設定。本 Repo 已移除直播收集器與對應 workflows，避免重複執行；既有 Git 歷史、Actions 紀錄及前端直播 JSON 保留。Steam 流程及 Secrets 維持原有設定。

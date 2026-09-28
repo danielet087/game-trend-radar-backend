@@ -6,6 +6,16 @@ from scripts.build_public_steam_shards import build, valid_record
 
 
 class PublicationTests(unittest.TestCase):
+    def test_localized_taxonomy_survives_catalog_projection(self):
+        from scripts.public_catalog import write_catalog_projection
+        with tempfile.TemporaryDirectory() as tmp:
+            data = Path(tmp)
+            row = {'appid':123, 'tags':['Capitalism'], 'genres':['RPG'],
+                   'tag_ids':{'Capitalism':4845}, 'tag_labels_zh_tw':{'Capitalism':'資本主義'},
+                   'genre_labels_zh_tw':{'RPG':'角色扮演'}}
+            write_catalog_projection(data, [row], 'now')
+            self.assertEqual(json.loads((data/'catalog.json').read_text())['games'][0], row)
+
     def test_bad_or_empty_authoritative_input_cannot_remove_public_records(self):
         for value in ['broken-json', '{}', '{"games":[]}']:
             with self.subTest(value=value), tempfile.TemporaryDirectory() as tmp:

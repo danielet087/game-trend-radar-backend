@@ -38,6 +38,7 @@ FIELDS = (
     'follower_checked_at', 'recent_source', 'first_week_qualified_at',
     'header_image', 'header_image_2x', 'main_capsule_image', 'main_capsule_image_2x',
     'small_capsule_image', 'capsule_image', 'tags', 'genres',
+    'tag_ids', 'tag_labels_zh_tw', 'genre_labels_zh_tw',
     'content_enriched_at', 'tags_fetch_status',
 )
 

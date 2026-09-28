@@ -21,6 +21,17 @@ class PublicationTests(unittest.TestCase):
         self.assertFalse(valid_record({'appid':123, 'followers':5000, 'release_start':'2027-02-30'}))
         self.assertTrue(valid_record({'appid':123, 'followers':5000, 'release_start':'2027-02-28'}))
 
+    def test_newer_public_date_audit_survives_older_master_snapshot(self):
+        from scripts.build_public_steam_shards import merge_game
+        current = {'appid': 123, 'followers': 6000, 'release_start': '2027-02-28',
+                   'release_display_precision': 'date_full', 'release_date_verified_at': '2026-09-28T00:00:00Z'}
+        incoming = {**current, 'followers': 7000, 'release_start': '2027-02-27',
+                    'release_date_verified_at': '2026-09-27T00:00:00Z'}
+        merged = merge_game(current, incoming)
+        self.assertEqual(merged['release_start'], current['release_start'])
+        self.assertEqual(merged['release_date_verified_at'], current['release_date_verified_at'])
+        self.assertEqual(merged['followers'], 7000)
+
     def test_same_count_metadata_changes_update_snapshot_revision_and_all_indexes(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp); frontend=root/'frontend'; source=root/'input.json'

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.steam_localized_titles import add_traditional_display_names
-from scripts.public_catalog import write_catalog_projection
+from scripts.public_catalog import keep_newer_release, write_catalog_projection
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 
 CORE_FIELDS = {
@@ -75,6 +75,7 @@ def valid_record(row: Any) -> bool:
 
 def merge_game(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
     """Preserve rich presentation metadata but trust backend core fields."""
+    incoming = keep_newer_release(existing, incoming)
     merged = dict(existing)
     for key, value in incoming.items():
         if value is None or value == "":

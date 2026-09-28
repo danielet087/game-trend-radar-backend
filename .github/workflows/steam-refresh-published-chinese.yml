@@ -1,10 +1,6 @@
 name: Refresh Chinese names for already followed Steam games
 
 on:
-  push:
-    paths:
-      - ".github/workflows/steam-refresh-published-chinese.yml"
-      - "scripts/refresh_published_chinese_titles.py"
   workflow_dispatch:
 
 permissions:

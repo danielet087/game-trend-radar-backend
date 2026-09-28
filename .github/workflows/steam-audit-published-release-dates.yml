@@ -1,13 +1,6 @@
 name: Audit published Steam release dates
 
-# Initial audit trigger after workflow exists.
-
 on:
-  push:
-    paths:
-      - ".github/workflows/steam-audit-published-release-dates.yml"
-      - "scripts/audit_published_release_dates.py"
-      - "tests/test_audit_published_release_dates.py"
   workflow_dispatch:
 
 permissions:

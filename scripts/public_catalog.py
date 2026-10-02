@@ -10,6 +10,7 @@ RELEASE_FIELDS = (
     'release_date_basis', 'release_date_verified_at', 'release_time_utc',
     'release_time_source', 'release_timestamp_taipei_date', 'release_date_conflict',
     'post_followers_store_verified', 'post_followers_store_verified_at',
+    'release_store_date', 'release_date_normalization',
 )
 
 
@@ -42,6 +43,7 @@ FIELDS = (
     'content_enriched_at', 'tags_fetch_status',
     'twitch_admission', 'steam_type', 'sexual_content_screened',
     'release_time_utc', 'release_timestamp_taipei_date', 'release_date_conflict',
+    'release_store_date', 'release_date_normalization',
 )
 
 

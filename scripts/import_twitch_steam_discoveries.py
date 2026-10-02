@@ -29,13 +29,14 @@ from scripts.steam_master_date_gate import parse_store_release_detail
 from scripts.twitch_steam_admission import (
     METHOD, aware_time, decimal_id, is_twitch_qualified,
     normalize_twitch_admission, preserve_twitch_admission, valid_enrollment, validate_twitch_snapshot,
+    resolve_store_release_day,
 )
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 STORE_BROWSE = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 APPDETAILS = "https://store.steampowered.com/api/appdetails"
 FOLLOWERS = "https://steamcommunity.com/games/{appid}/memberslistxml/"
-STATE_VALIDATION_VERSION = 2
+STATE_VALIDATION_VERSION = 3
 
 
 class RateLimited(RuntimeError):
@@ -190,11 +191,13 @@ def build_candidate(appid: int, proof: dict, item: dict, details: dict,
     visible = parse_release_window(visible_raw)
     if visible.precision != "day" or visible.start is None or visible.end != visible.start:
         return None, "uncertain_taiwan_store_date"
-    day = visible.start.isoformat()
-    if day != detail.get("release_timestamp_taipei_date"):
+    normalized = resolve_store_release_day(visible.start.isoformat(), detail.get("release_time_utc"))
+    if normalized is None:
         return None, "steam_date_conflict"
+    day = normalized["release_start"]
     today = now.astimezone(TAIPEI).date()
-    if not today - timedelta(days=30) <= visible.start <= today + timedelta(days=365):
+    taipei_day = datetime.fromisoformat(day).date()
+    if not today - timedelta(days=30) <= taipei_day <= today + timedelta(days=365):
         return None, "outside_new_game_window"
     if type(followers) is not int or followers < 0 or aware_time(checked_at) is None:
         return None, "official_followers_unavailable"
@@ -208,6 +211,8 @@ def build_candidate(appid: int, proof: dict, item: dict, details: dict,
         "release_date_timezone": "Asia/Taipei", "release_time_utc": detail["release_time_utc"],
         "release_time_source": detail["release_display_provider"],
         "release_timestamp_taipei_date": day, "release_date_conflict": False,
+        "release_store_date": normalized["release_store_date"],
+        "release_date_normalization": normalized["release_date_normalization"],
         "release_date_verified_at": stamp(now), "post_followers_store_verified": True,
         "post_followers_store_verified_at": stamp(now),
         "followers": followers, "follower_checked_at": checked_at,
@@ -335,7 +340,7 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
         retry_at = aware_time(prior.get("retry_at"))
         prior_proof = prior.get("twitch_admission")
         parser_migration = (prior.get("validation_version") != STATE_VALIDATION_VERSION
-                            and prior.get("reason") in {"uncertain_steam_date", "uncertain_taiwan_store_date"})
+                             and prior.get("reason") in {"uncertain_steam_date", "uncertain_taiwan_store_date", "steam_date_conflict"})
         if (not parser_migration and retry_at is not None and retry_at > now and isinstance(prior_proof, dict)
                 and identity_signature(prior_proof) == identity_signature(proof)):
             continue

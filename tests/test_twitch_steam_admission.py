@@ -288,7 +288,49 @@ def test_previous_parser_pending_retries_once_without_resetting_cached_followers
         output = collect(root, "b"*40, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
         assert output["records"][0]["followers"] == 13
         assert session.get.call_count == 2
-        assert output["state_updates"]["123"]["validation_version"] == 2
+        assert output["state_updates"]["123"]["validation_version"] == 3
+
+
+def test_official_utc_store_day_crosses_midnight_in_taipei():
+    item, details = steam()
+    item["release"]["steam_release_date"] = int(datetime(2026, 9, 8, 16, 2, 5, tzinfo=timezone.utc).timestamp())
+    details["release_date"] = {"date": "2026 年 9 月 8 日", "coming_soon": False}
+    candidate, status = build_candidate(123, proof(), item, details, 42, "2026-10-02T06:00:00Z", NOW, set())
+    assert status == "accepted"
+    assert candidate["release_start"] == candidate["release_end"] == "2026-09-09"
+    assert candidate["release_timestamp_taipei_date"] == "2026-09-09"
+    assert candidate["release_store_date"] == "2026-09-08"
+    assert candidate["release_date_normalization"] == "steam_utc_date_normalized_to_taipei"
+    assert is_twitch_qualified(candidate)
+    for bad_day in ["2026-09-07", "2026-09-10", "September 2026"]:
+        details["release_date"]["date"] = bad_day
+        bad, reason = build_candidate(123, proof(), item, details, 42, "2026-10-02T06:00:00Z", NOW, set())
+        assert bad is None
+        assert reason in {"steam_date_conflict", "uncertain_taiwan_store_date"}
+
+
+def test_date_conflict_migration_rechecks_metadata_with_cache_during_cooldown():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp); fake_frontend(root)
+        item, details = steam()
+        item["release"]["steam_release_date"] = int(datetime(2026, 9, 8, 16, tzinfo=timezone.utc).timestamp())
+        details["release_date"] = {"date": "2026-09-08", "coming_soon": False}
+        session = Mock(); a, b = Mock(status_code=200), Mock(status_code=200)
+        a.json.return_value = {"response": {"store_items": [item]}}
+        b.json.return_value = {"123": {"success": True, "data": details}}
+        session.get.side_effect = [a, b]
+        state = {"games": {"123": {"status": "pending", "reason": "steam_date_conflict",
+            "validation_version": 2, "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}},
+            "api_cooldowns": {"steam_community": {"retry_at": "2026-10-02T15:00:00Z"}}}
+        cache = {"games": {"123": {"followers": 13, "checked_at": "2026-10-02T06:00:00Z"}}}
+        output = collect(root, SHA, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
+        assert output["records"][0]["release_start"] == "2026-09-09"
+        assert output["records"][0]["followers"] == 13
+        assert session.get.call_count == 2
+        state = {"games": output["state_updates"], "api_cooldowns": state["api_cooldowns"]}
+        session.reset_mock()
+        again = collect(root, SHA, {"games": output["records"]}, state, session=session, now=NOW, caches=[cache], blocked=set())
+        assert not again["records"] and session.get.call_count == 0
 
 
 def test_rate_limit_stops_and_saves_pending_without_fake_followers():

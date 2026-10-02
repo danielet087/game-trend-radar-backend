@@ -7,7 +7,7 @@ Keep this module identical in the main and content backend repositories.
 from __future__ import annotations
 
 from copy import deepcopy
-from datetime import datetime
+from datetime import date, datetime, timedelta, timezone
 import re
 from zoneinfo import ZoneInfo
 
@@ -33,6 +33,29 @@ def aware_time(value: object) -> datetime | None:
         return result if result.tzinfo is not None else None
     except (ValueError, TypeError):
         return None
+
+
+def resolve_store_release_day(store_day: object, release_time_utc: object) -> dict | None:
+    """Normalize an exact Store day only when the official instant explains it."""
+    instant = aware_time(release_time_utc)
+    if instant is None or not isinstance(store_day, str):
+        return None
+    try:
+        announced = date.fromisoformat(store_day)
+    except ValueError:
+        return None
+    if announced.isoformat() != store_day:
+        return None
+    utc_day = instant.astimezone(timezone.utc).date()
+    taipei_day = instant.astimezone(TAIPEI).date()
+    if announced == taipei_day:
+        basis = "steam_store_date_matches_taipei"
+    elif announced == utc_day and taipei_day == utc_day + timedelta(days=1):
+        basis = "steam_utc_date_normalized_to_taipei"
+    else:
+        return None
+    return {"release_start": taipei_day.isoformat(), "release_store_date": store_day,
+            "release_date_normalization": basis}
 
 
 def valid_enrollment(value: object) -> bool:

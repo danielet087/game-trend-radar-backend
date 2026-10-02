@@ -3,7 +3,7 @@
   "games": {
     "892970": {
       "status": "pending",
-      "updated_at": "2026-10-02T10:14:27.239399Z",
+      "updated_at": "2026-10-02T14:52:48.667522Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -11,7 +11,7 @@
         "twitch_game_id": "508455",
         "igdb_id": "104967",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "3626a86cdf93ed3c45072b81f49e622f568ffdce",
+        "source_frontend_commit": "f459f4c13cdb9f6bb518dc717ae422c5ccc952da",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-09-29T14:28:32Z",
@@ -21,8 +21,22 @@
         }
       },
       "reason": "RateLimited",
-      "retry_at": "2026-10-02T16:14:27.239399Z",
-      "validation_version": 2
+      "retry_at": "2026-10-02T15:07:48.667522Z",
+      "validation_version": 3,
+      "observed_at": "2026-10-02T10:14:27.239399Z",
+      "retry_seconds": 3600,
+      "retry_source": "default_backoff",
+      "retry_migration": {
+        "policy_version": 1,
+        "original_retry_at": "2026-10-02T16:14:27.239399Z",
+        "original_updated_at": "2026-10-02T10:14:27.239399Z",
+        "original_failure_at": "2026-10-02T10:14:27.239399Z",
+        "migrated_at": "2026-10-02T14:52:46.686424Z"
+      },
+      "retry_attempts": 0,
+      "rate_limit_stage": "steam_community",
+      "rate_limit_attempts": 1,
+      "retry_after": null
     },
     "1488490": {
       "status": "accepted",
@@ -83,7 +97,7 @@
     },
     "1867240": {
       "status": "pending",
-      "updated_at": "2026-10-02T10:25:26.156356Z",
+      "updated_at": "2026-10-02T14:52:46.686424Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -91,7 +105,7 @@
         "twitch_game_id": "743893402",
         "igdb_id": "388285",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "3626a86cdf93ed3c45072b81f49e622f568ffdce",
+        "source_frontend_commit": "f459f4c13cdb9f6bb518dc717ae422c5ccc952da",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-09-29T14:28:32Z",
@@ -101,9 +115,22 @@
         }
       },
       "reason": "steam_community_cooldown",
-      "retry_at": "2026-10-02T16:14:27.239399Z",
-      "validation_version": 2,
-      "rate_limit_stage": "steam_community"
+      "retry_at": "2026-10-02T15:07:48.667522Z",
+      "validation_version": 3,
+      "rate_limit_stage": "steam_community",
+      "observed_at": "2026-10-02T10:14:27.239399Z",
+      "retry_seconds": 3600,
+      "retry_source": "default_backoff",
+      "retry_migration": {
+        "policy_version": 1,
+        "original_retry_at": "2026-10-02T16:14:27.239399Z",
+        "original_updated_at": "2026-10-02T10:25:26.156356Z",
+        "original_failure_at": "2026-10-02T10:14:27.239399Z",
+        "migrated_at": "2026-10-02T14:52:46.686424Z"
+      },
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 1
     },
     "1912410": {
       "status": "accepted",
@@ -198,7 +225,7 @@
     },
     "2776270": {
       "status": "pending",
-      "updated_at": "2026-10-02T11:42:45.064036Z",
+      "updated_at": "2026-10-02T14:52:46.686424Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -206,7 +233,7 @@
         "twitch_game_id": "958726331",
         "igdb_id": "347541",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "138196519ef2810aee21b1359a634c76b7e5ba39",
+        "source_frontend_commit": "f459f4c13cdb9f6bb518dc717ae422c5ccc952da",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-09-29T21:17:08Z",
@@ -216,9 +243,22 @@
         }
       },
       "reason": "steam_community_cooldown",
-      "retry_at": "2026-10-02T16:14:27.239399Z",
+      "retry_at": "2026-10-02T15:07:48.667522Z",
       "validation_version": 3,
-      "rate_limit_stage": "steam_community"
+      "rate_limit_stage": "steam_community",
+      "observed_at": "2026-10-02T10:14:27.239399Z",
+      "retry_seconds": 3600,
+      "retry_source": "default_backoff",
+      "retry_migration": {
+        "policy_version": 1,
+        "original_retry_at": "2026-10-02T16:14:27.239399Z",
+        "original_updated_at": "2026-10-02T11:42:45.064036Z",
+        "original_failure_at": "2026-10-02T10:14:27.239399Z",
+        "migrated_at": "2026-10-02T14:52:46.686424Z"
+      },
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 1
     },
     "3010850": {
       "status": "accepted",
@@ -255,7 +295,7 @@
     },
     "3219630": {
       "status": "pending",
-      "updated_at": "2026-10-02T11:42:45.064036Z",
+      "updated_at": "2026-10-02T14:52:46.686424Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -263,7 +303,7 @@
         "twitch_game_id": "902998079",
         "igdb_id": "362096",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "138196519ef2810aee21b1359a634c76b7e5ba39",
+        "source_frontend_commit": "f459f4c13cdb9f6bb518dc717ae422c5ccc952da",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-02T01:13:11Z",
@@ -272,9 +312,22 @@
         }
       },
       "reason": "steam_community_cooldown",
-      "retry_at": "2026-10-02T16:14:27.239399Z",
+      "retry_at": "2026-10-02T15:07:48.667522Z",
       "validation_version": 3,
-      "rate_limit_stage": "steam_community"
+      "rate_limit_stage": "steam_community",
+      "observed_at": "2026-10-02T10:14:27.239399Z",
+      "retry_seconds": 3600,
+      "retry_source": "default_backoff",
+      "retry_migration": {
+        "policy_version": 1,
+        "original_retry_at": "2026-10-02T16:14:27.239399Z",
+        "original_updated_at": "2026-10-02T11:42:45.064036Z",
+        "original_failure_at": "2026-10-02T10:14:27.239399Z",
+        "migrated_at": "2026-10-02T14:52:46.686424Z"
+      },
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 1
     },
     "3493540": {
       "status": "accepted",
@@ -312,7 +365,7 @@
     },
     "3560670": {
       "status": "pending",
-      "updated_at": "2026-10-02T10:25:26.156356Z",
+      "updated_at": "2026-10-02T14:52:46.686424Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -320,7 +373,7 @@
         "twitch_game_id": "1896092709",
         "igdb_id": "333095",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "3626a86cdf93ed3c45072b81f49e622f568ffdce",
+        "source_frontend_commit": "f459f4c13cdb9f6bb518dc717ae422c5ccc952da",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-09-30T21:14:58Z",
@@ -329,13 +382,26 @@
         }
       },
       "reason": "steam_community_cooldown",
-      "retry_at": "2026-10-02T16:14:27.239399Z",
-      "validation_version": 2,
-      "rate_limit_stage": "steam_community"
+      "retry_at": "2026-10-02T15:07:48.667522Z",
+      "validation_version": 3,
+      "rate_limit_stage": "steam_community",
+      "observed_at": "2026-10-02T10:14:27.239399Z",
+      "retry_seconds": 3600,
+      "retry_source": "default_backoff",
+      "retry_migration": {
+        "policy_version": 1,
+        "original_retry_at": "2026-10-02T16:14:27.239399Z",
+        "original_updated_at": "2026-10-02T10:25:26.156356Z",
+        "original_failure_at": "2026-10-02T10:14:27.239399Z",
+        "migrated_at": "2026-10-02T14:52:46.686424Z"
+      },
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 1
     },
     "3640200": {
       "status": "pending",
-      "updated_at": "2026-10-02T11:42:45.064036Z",
+      "updated_at": "2026-10-02T14:52:46.686424Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -343,7 +409,7 @@
         "twitch_game_id": "1217522406",
         "igdb_id": "408337",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "138196519ef2810aee21b1359a634c76b7e5ba39",
+        "source_frontend_commit": "f459f4c13cdb9f6bb518dc717ae422c5ccc952da",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-09-30T05:10:10Z",
@@ -353,9 +419,22 @@
         }
       },
       "reason": "steam_community_cooldown",
-      "retry_at": "2026-10-02T16:14:27.239399Z",
+      "retry_at": "2026-10-02T15:07:48.667522Z",
       "validation_version": 3,
-      "rate_limit_stage": "steam_community"
+      "rate_limit_stage": "steam_community",
+      "observed_at": "2026-10-02T10:14:27.239399Z",
+      "retry_seconds": 3600,
+      "retry_source": "default_backoff",
+      "retry_migration": {
+        "policy_version": 1,
+        "original_retry_at": "2026-10-02T16:14:27.239399Z",
+        "original_updated_at": "2026-10-02T11:42:45.064036Z",
+        "original_failure_at": "2026-10-02T10:14:27.239399Z",
+        "migrated_at": "2026-10-02T14:52:46.686424Z"
+      },
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 1
     },
     "3669570": {
       "status": "pending",
@@ -616,7 +695,7 @@
     },
     "4557380": {
       "status": "pending",
-      "updated_at": "2026-10-02T10:25:26.156356Z",
+      "updated_at": "2026-10-02T14:52:46.686424Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -624,7 +703,7 @@
         "twitch_game_id": "903469103",
         "igdb_id": "398645",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "3626a86cdf93ed3c45072b81f49e622f568ffdce",
+        "source_frontend_commit": "f459f4c13cdb9f6bb518dc717ae422c5ccc952da",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-09-29T21:17:08Z",
@@ -634,9 +713,22 @@
         }
       },
       "reason": "steam_community_cooldown",
-      "retry_at": "2026-10-02T16:14:27.239399Z",
-      "validation_version": 2,
-      "rate_limit_stage": "steam_community"
+      "retry_at": "2026-10-02T15:07:48.667522Z",
+      "validation_version": 3,
+      "rate_limit_stage": "steam_community",
+      "observed_at": "2026-10-02T10:14:27.239399Z",
+      "retry_seconds": 3600,
+      "retry_source": "default_backoff",
+      "retry_migration": {
+        "policy_version": 1,
+        "original_retry_at": "2026-10-02T16:14:27.239399Z",
+        "original_updated_at": "2026-10-02T10:25:26.156356Z",
+        "original_failure_at": "2026-10-02T10:14:27.239399Z",
+        "migrated_at": "2026-10-02T14:52:46.686424Z"
+      },
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 1
     },
     "4694270": {
       "status": "accepted",
@@ -672,11 +764,16 @@
       }
     }
   },
-  "updated_at": "2026-10-02T11:43:24.449003Z",
+  "updated_at": "2026-10-02T14:52:46.686424Z",
   "api_cooldowns": {
     "steam_community": {
-      "retry_at": "2026-10-02T16:14:27.239399Z",
-      "updated_at": "2026-10-02T11:42:45.064036Z"
+      "retry_at": "2026-10-02T15:07:48.667522Z",
+      "observed_at": "2026-10-02T14:52:48.667522Z",
+      "retry_seconds": 900,
+      "retry_source": "default_backoff",
+      "retry_after": null,
+      "attempts": 1,
+      "updated_at": "2026-10-02T14:52:48.667522Z"
     }
   }
 }

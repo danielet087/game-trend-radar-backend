@@ -17,6 +17,8 @@ Twitch 正式收錄的新作是獨立入口：Twitch ID → Helix 的 IGDB ID �
 
 `steam-import-twitch-discoveries.yml` 每小時第 37 分消費前端的 `data/twitch_steam_discovery.json`，與既有官方 Followers 工作共用限流鎖。先持久化主清單與 `data/twitch_steam_import_state.json`，再送 `steam_game_twitch_discovered` 內容事件；事件失敗保留重試。來源證據 `twitch_admission` 隨清單、內容、索引與成長紀錄保存，正常更新不能移除已接受的來源。Twitch 觀測持續沿用 Twitch ID 與圖片，Steam 入口不會反過來冒充 Twitch 新作。沿用既有 `CONTENT_BACKEND_TOKEN`，不新增 Secrets。
 
+Steam HTTP 429 優先遵守 `Retry-After` 的秒數或 HTTP 日期，不縮短伺服器指定的期限。缺少有效標頭時，Community 按 15／30／60 分鐘退避，商店 metadata 按 5／10／20／30 分鐘退避；一般網路或解析失敗按 5 分鐘開始、最長 1 小時逐次退避。期限只決定何時可再查，實際執行仍依排程與共用鎖。Community 冷卻期間可使用已取得的真實官方 Followers 快取完成其他核對，metadata 冷卻仍須等待。收據保存原因、標頭、次數與期限；成功收錄清除各款重試狀態。已證明是舊版固定六小時預設的紀錄及其衍生等待，安全遷移為原失敗起算一小時；無法辨識來源或更新的限流紀錄保留。日期衝突與資格排除仍每日核對。
+
 ## 資料責任
 
 | 資料 | 負責方 | 用途 |

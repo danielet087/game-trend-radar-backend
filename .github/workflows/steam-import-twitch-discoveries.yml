@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['scripts/import_twitch_steam_discoveries.py']
+    paths: ['scripts/import_twitch_steam_discoveries.py', 'scripts/steam_retry_policy.py']
 
 permissions:
   contents: write
@@ -118,6 +118,13 @@ jobs:
               for aid, row in doc['state_updates'].items():
                   receipt = row.get('content_dispatch') or {}
                   lines.append(f'- AppID {aid}：{row.get("status")}；{row.get("reason", "")}；內容 {receipt.get("status", "尚未派送")}')
+                  if row.get('retry_at'):
+                      lines.append(f'  - 可重查時間 {row["retry_at"]}；來源 {row.get("retry_source") or "既有冷卻／資格核對"}；Retry-After {row.get("retry_after")}')
+              migrations = doc.get('retry_migrations') or {}
+              if migrations:
+                  lines.append(f'- 舊六小時預設遷移：{len(migrations.get("games", {}))} 款，{len(migrations.get("cooldowns", {}))} 個全域冷卻')
+              for stage, cooldown in doc.get('cooldown_updates', {}).items():
+                  lines.append(f'- {stage}：可重查時間 {cooldown["retry_at"]}；來源 {cooldown.get("retry_source", "unknown")}；Retry-After {cooldown.get("retry_after")}')
           lines.append('Twitch 來源不套用 Steam Followers 門檻，仍核對正式遊戲、成人內容與確切台灣日期；查詢／派送失敗保留待重試，不宣稱前端已更新。')
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as out:
               out.write('\n'.join(lines) + '\n')

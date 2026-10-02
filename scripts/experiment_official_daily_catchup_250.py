@@ -27,6 +27,7 @@ from scripts.steam_master_date_gate import fetch_store_release_details
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.import_twitch_steam_discoveries import cached_follower
 from scripts.twitch_official_queue import is_twitch_queue_candidate
+from scripts.twitch_steam_admission import aware_time
 
 ROOT = Path("experiments/steam_official_daily_catchup")
 FROZEN = Path("experiments/steam_official_nearfirst_20260922")
@@ -522,8 +523,19 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
             continue
         cp.setdefault("unresolved_candidates", {}).pop(aid, None)
         pending.append(row)
+    # Rotate priority candidates after a bounded attempt. An unavailable XML
+    # endpoint must not always be first after the shared cooldown expires.
+    last_twitch_attempt = {}
+    for event in cp.get("attempt_events", []):
+        if not isinstance(event, dict) or event.get("queue_source") != "twitch_steam_discovery":
+            continue
+        attempted_at = aware_time(event.get("when_taipei"))
+        if attempted_at is not None and attempted_at <= clock():
+            aid = str(event.get("appid"))
+            last_twitch_attempt[aid] = max(last_twitch_attempt.get(aid, 0), attempted_at.timestamp())
     pending.sort(key=lambda r: (
         0 if r.get("queue_source") == "twitch_steam_discovery" else 1,
+        last_twitch_attempt.get(str(r["appid"]), 0) if r.get("queue_source") == "twitch_steam_discovery" else 0,
         r["release_date"] < today,
         r["release_date"] if r["release_date"] >= today
         else -datetime.fromisoformat(r["release_date"]).date().toordinal(),

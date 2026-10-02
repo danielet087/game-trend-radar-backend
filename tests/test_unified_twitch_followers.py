@@ -10,11 +10,17 @@ from scripts.twitch_official_queue import is_twitch_queue_candidate
 from tests.test_twitch_steam_admission import NOW, row
 
 
-def twitch_candidate(appid=123):
+def twitch_candidate(appid=123, release_day=None):
     metadata = row()
     metadata["appid"] = appid
     metadata["twitch_admission"]["appid"] = appid
     metadata["store_url"] = f"https://store.steampowered.com/app/{appid}/"
+    if release_day is not None:
+        for field in ("release_raw", "release_start", "release_end",
+                      "release_timestamp_taipei_date", "release_store_date"):
+            metadata[field] = release_day
+        metadata["release_time_utc"] = f"{release_day}T07:00:00Z"
+        metadata["release_date_normalization"] = "steam_store_date_matches_taipei"
     for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000"):
         metadata.pop(key, None)
     candidate = {
@@ -78,6 +84,36 @@ def test_completed_cohort_accepts_new_twitch_priority_without_duplicate_or_losin
     assert queue[0]["normal_candidate"]["queue_source"] != "twitch_steam_discovery"
     assert source["twitch_priority_pending"] == 1
     assert len(legacy["official_results"]) == 1317
+
+
+@pytest.mark.parametrize("untried_release", ["2026-09-09", "2026-09-04"])
+def test_twitch_rotation_gives_untried_and_older_attempts_a_turn_before_latest_failure(
+        monkeypatch, untried_release):
+    monkeypatch.setattr(worker, "clock", lambda: NOW.astimezone(worker.TZ))
+    failed = twitch_candidate(123, "2026-09-09")
+    untried = twitch_candidate(124, untried_release)
+    older_attempt = twitch_candidate(126, "2026-09-09")
+    later_normal = ordinary_candidate(127)
+    later_normal["release_date"] = "2026-10-04"
+    cp = checkpoint([failed, untried, older_attempt, later_normal, ordinary_candidate(125)])
+    cp["attempt_events"] = [
+        {"appid": 126, "queue_source": "twitch_steam_discovery",
+         "when_taipei": "2026-10-01T18:00:00+08:00", "http": 429, "status": "rate_limited"},
+        {"appid": 123, "queue_source": "twitch_steam_discovery",
+         "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 429, "status": "rate_limited"},
+        # An ordinary-source event must not falsely count as a Twitch attempt.
+        {"appid": 124, "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+         "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 429, "status": "rate_limited"},
+    ]
+    frozen, legacy, groups = queue_inputs()
+
+    queue, source = worker.make_queue(cp, frozen, legacy, groups, {"games": []}, {},
+                                     {"games": {}}, {"verified": {}})
+
+    assert [item["appid"] for item in queue] == [124, 126, 123, 125, 127]
+    assert source["twitch_priority_pending"] == 3
+    assert cp["official_results"] == {}
+    assert queue[2]["twitch_admission"] == failed["twitch_admission"]
 
 
 @pytest.mark.parametrize("count,checked,expected", [

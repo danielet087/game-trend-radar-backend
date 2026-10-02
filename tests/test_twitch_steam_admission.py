@@ -227,10 +227,51 @@ def test_collect_uses_true_cached_count_and_rerun_does_not_request():
 def test_retry_deadline_survives_hourly_frontend_commit():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp); fake_frontend(root)
-        state = {"games": {"123": {"status": "pending", "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}}}
+        state = {"games": {"123": {"status": "pending", "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof(), "validation_version": 2}}}
         session = Mock()
         output = collect(root, "b"*40, {"games": []}, state, session=session, now=NOW, blocked=set())
         assert output["records"] == [] and session.get.call_count == 0
+
+
+@pytest.mark.parametrize("mode,expected", [("released", "accepted"),
+    ("unverified_missing", "uncertain_steam_date"), ("coming_soon", "uncertain_steam_date"),
+    ("explicit_true", "uncertain_steam_date"), ("future_timestamp", "uncertain_steam_date"),
+    ("future_today_timestamp", "uncertain_steam_date"),
+    ("conflict", "steam_date_conflict")])
+def test_omitted_protobuf_false_requires_official_released_corroboration(mode, expected):
+    item, details = steam()
+    item["release"].pop("is_coming_soon")
+    item["release"].pop("coming_soon_display")
+    details["release_date"]["coming_soon"] = False
+    if mode == "unverified_missing": details["release_date"].pop("coming_soon")
+    elif mode == "coming_soon": details["release_date"]["coming_soon"] = True
+    elif mode == "explicit_true": item["release"]["is_coming_soon"] = True
+    elif mode == "future_timestamp":
+        item["release"]["steam_release_date"] = int((NOW + timedelta(days=1)).timestamp())
+    elif mode == "future_today_timestamp":
+        item["release"]["steam_release_date"] = int((NOW + timedelta(hours=1)).timestamp())
+    elif mode == "conflict": details["release_date"]["date"] = "2026-10-01"
+    candidate, status = build_candidate(123, proof(), item, details, 12, "2026-10-02T06:00:00Z", NOW, set())
+    assert status == expected
+    assert (candidate is not None) == (expected == "accepted")
+
+
+def test_previous_parser_pending_retries_once_without_resetting_cached_followers():
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp); fake_frontend(root)
+        item, details = steam(); item["release"].pop("is_coming_soon"); item["release"].pop("coming_soon_display")
+        details["release_date"]["coming_soon"] = False
+        session = Mock(); a, b = Mock(status_code=200), Mock(status_code=200)
+        a.json.return_value = {"response": {"store_items": [item]}}
+        b.json.return_value = {"123": {"success": True, "data": details}}
+        session.get.side_effect = [a, b]
+        state = {"games": {"123": {"status": "pending", "reason": "uncertain_steam_date",
+            "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}}}
+        cache = {"games": {"123": {"followers": 13, "checked_at": "2026-10-02T06:00:00Z"}}}
+        output = collect(root, "b"*40, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
+        assert output["records"][0]["followers"] == 13
+        assert session.get.call_count == 2
+        assert output["state_updates"]["123"]["validation_version"] == 2
 
 
 def test_rate_limit_stops_and_saves_pending_without_fake_followers():

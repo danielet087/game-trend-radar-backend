@@ -35,6 +35,7 @@ TAIPEI = ZoneInfo("Asia/Taipei")
 STORE_BROWSE = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 APPDETAILS = "https://store.steampowered.com/api/appdetails"
 FOLLOWERS = "https://steamcommunity.com/games/{appid}/memberslistxml/"
+STATE_VALIDATION_VERSION = 2
 
 
 class RateLimited(RuntimeError):
@@ -159,8 +160,23 @@ def build_candidate(appid: int, proof: dict, item: dict, details: dict,
         screening["tags"] = [{"tagid": tagid} for tagid in item["tagids"]]
     if is_disallowed(audited, blocked) or is_explicit_sex_game(screening):
         return None, "adult_content"
-    detail = parse_store_release_detail(item, today=now.astimezone(TAIPEI).date())
+    store_item = item
+    release = item.get("release")
+    visible_release = details.get("release_date")
+    # Store Browse omits protobuf's default false after a game has released.
+    # Never infer it from absence alone: corroborate with the same AppID's
+    # official TW appdetails, then still require a past timestamp and matching
+    # exact visible Taiwan date below. Future titles still require date_full.
+    if (isinstance(release, dict) and "is_coming_soon" not in release
+            and item.get("is_coming_soon") is not True
+            and isinstance(visible_release, dict) and visible_release.get("coming_soon") is False):
+        store_item = deepcopy(item)
+        store_item["release"]["is_coming_soon"] = False
+    detail = parse_store_release_detail(store_item, today=now.astimezone(TAIPEI).date())
     if detail.get("exact") is not True:
+        return None, "uncertain_steam_date"
+    if (isinstance(visible_release, dict) and visible_release.get("coming_soon") is False
+            and aware_time(detail.get("release_time_utc")) > now):
         return None, "uncertain_steam_date"
     if not isinstance(details.get("release_date"), dict):
         return None, "uncertain_taiwan_store_date"
@@ -275,16 +291,19 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
         if isinstance(record, dict) and is_twitch_qualified(record):
             batch["state_updates"][str(appid)] = {
                 "status": "accepted", "updated_at": stamp(now),
+                "validation_version": STATE_VALIDATION_VERSION,
                 "twitch_admission": record["twitch_admission"],
                 "content_signature": signature(record),
             }
             continue
         retry_at = aware_time(prior.get("retry_at"))
         prior_proof = prior.get("twitch_admission")
-        if (retry_at is not None and retry_at > now and isinstance(prior_proof, dict)
+        if (prior.get("validation_version") == STATE_VALIDATION_VERSION
+                and retry_at is not None and retry_at > now and isinstance(prior_proof, dict)
                 and identity_signature(prior_proof) == identity_signature(proof)):
             continue
-        state = {"status": "pending", "updated_at": stamp(now), "twitch_admission": proof}
+        state = {"status": "pending", "updated_at": stamp(now), "twitch_admission": proof,
+                 "validation_version": STATE_VALIDATION_VERSION}
         batch["state_updates"][str(appid)] = state
         try:
             payload = {"ids": [{"appid": appid}], "context": {

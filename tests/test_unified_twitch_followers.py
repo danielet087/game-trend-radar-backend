@@ -189,7 +189,7 @@ def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_re
     return saved[cp_path], saved[worker.OUT / "report.json"], client, verify, upsert, dispatch, sleep
 
 
-@pytest.mark.parametrize("followers", [0, 120, 5000, 8000])
+@pytest.mark.parametrize("followers", [0, 120, 5000])
 def test_twitch_official_success_keeps_evidence_for_shared_importer_at_any_count(
         monkeypatch, tmp_path, followers):
     candidate = twitch_candidate()

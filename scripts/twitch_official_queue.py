@@ -197,26 +197,3 @@ def sync_twitch_queue(checkpoint: dict, batch: dict, now: datetime) -> dict:
                 new["normal_candidate"] = deepcopy(prior)
         pending[aid] = new
     return result
-
-
-def sync_community_cooldown(checkpoint: dict, import_state: dict, now: datetime) -> dict:
-    """Transfer a later importer deadline to the single official queue worker."""
-    now = _now(now)
-    if not isinstance(checkpoint, dict) or not isinstance(import_state, dict):
-        raise ValueError("Checkpoint and importer state must be objects")
-    result = deepcopy(checkpoint)
-    cooldowns = import_state.get("api_cooldowns")
-    incoming = cooldowns.get("steam_community") if isinstance(cooldowns, dict) else None
-    if not isinstance(incoming, dict):
-        return result
-    deadline = aware_time(incoming.get("retry_at"))
-    if deadline is None or deadline <= now:
-        return result
-    current = result.get("community_cooldown")
-    existing = [aware_time(result.get("next_request_after_taipei")),
-                aware_time(current.get("retry_at")) if isinstance(current, dict) else None]
-    if any(value is not None and value >= deadline for value in existing):
-        return result
-    result["community_cooldown"] = deepcopy(incoming)
-    result["next_request_after_taipei"] = deadline.astimezone(TAIPEI).isoformat()
-    return result

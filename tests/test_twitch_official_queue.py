@@ -3,7 +3,7 @@ from copy import deepcopy
 import pytest
 
 from scripts.twitch_official_queue import (
-    is_twitch_queue_candidate, sync_community_cooldown, sync_twitch_queue,
+    is_twitch_queue_candidate, sync_twitch_queue,
 )
 from tests.test_twitch_steam_admission import NOW, proof, row
 
@@ -176,37 +176,6 @@ def test_invalid_current_candidate_restores_normal_before_remerge():
     assert result["pending_candidates"]["123"] == normal
 
 
-def test_cooldown_transfers_complete_provenance_and_taiwan_deadline():
-    cp = checkpoint()
-    cooldown = {"retry_at": "2026-10-02T18:00:00Z", "retry_source": "steam_retry_after",
-                "retry_after": "32400", "observed_at": "2026-10-02T09:00:00Z", "attempts": 3,
-                "retry_seconds": 32400, "custom_provenance": "retain"}
-    original = deepcopy(cp)
-    result = sync_community_cooldown(cp, {"api_cooldowns": {"steam_community": cooldown}}, NOW)
-    assert cp == original
-    assert result["community_cooldown"] == cooldown
-    assert result["next_request_after_taipei"] == "2026-10-03T02:00:00+08:00"
-    assert result["official_results"] == original["official_results"]
-
-
-@pytest.mark.parametrize("existing_kind", ["next_request", "community_cooldown", "equal"])
-def test_cooldown_never_shortens_existing_deadline(existing_kind):
-    cp = checkpoint()
-    cp["next_request_after_taipei"] = None
-    if existing_kind == "next_request": cp["next_request_after_taipei"] = "2026-10-03T02:00:00+08:00"
-    else: cp["community_cooldown"] = {"retry_at": "2026-10-02T18:00:00Z", "retry_source": "steam_retry_after"}
-    deadline = "2026-10-02T18:00:00Z" if existing_kind == "equal" else "2026-10-02T17:00:00Z"
-    incoming = {"api_cooldowns": {"steam_community": {"retry_at": deadline, "retry_source": "default_backoff"}}}
-    assert sync_community_cooldown(cp, incoming, NOW) == cp
-
-
-@pytest.mark.parametrize("deadline", [None, "broken", "2026-10-03T01:00:00", "2026-10-02T08:00:00Z"])
-def test_cooldown_ignores_invalid_naive_or_expired_input(deadline):
-    cp = checkpoint()
-    incoming = {"api_cooldowns": {"steam_community": {"retry_at": deadline}}}
-    assert sync_community_cooldown(cp, incoming, NOW) == cp
-
-
 def test_malformed_active_list_cannot_silently_withdraw_valid_queue():
     cp = sync_twitch_queue(checkpoint(), batch(), NOW)
     incoming = {"active_twitch_appids": [True], "follower_candidates": []}
@@ -218,5 +187,3 @@ def test_malformed_active_list_cannot_silently_withdraw_valid_queue():
 def test_naive_sync_time_is_rejected():
     with pytest.raises(ValueError):
         sync_twitch_queue(checkpoint(), batch(), NOW.replace(tzinfo=None))
-    with pytest.raises(ValueError):
-        sync_community_cooldown(checkpoint(), {}, NOW.replace(tzinfo=None))

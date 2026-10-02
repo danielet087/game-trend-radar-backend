@@ -13,7 +13,7 @@ from pathlib import Path
 from scripts.import_twitch_steam_discoveries import (
     apply_batch, collect, dispatch, read_json, write_json,
 )
-from scripts.twitch_official_queue import sync_community_cooldown, sync_twitch_queue
+from scripts.twitch_official_queue import sync_twitch_queue
 from scripts.twitch_steam_admission import aware_time
 
 
@@ -27,15 +27,6 @@ def apply_queue_batch(master: dict, state: dict, checkpoint: dict, batch: dict):
     now = aware_time(batch.get("generated_at"))
     if "follower_candidates" in batch:
         checkpoint = sync_twitch_queue(checkpoint, batch, now)
-        checkpoint = sync_community_cooldown(checkpoint, state, now)
-        cooldown = checkpoint.get("community_cooldown")
-        if isinstance(cooldown, dict):
-            state.setdefault("api_cooldowns", {})["steam_community"] = cooldown.copy()
-            if type(cooldown.get("attempts")) is int:
-                checkpoint["rate_limit_count"] = max(
-                    checkpoint.get("rate_limit_count", 0), cooldown["attempts"])
-        elif checkpoint.get("community_last_success_at"):
-            state.setdefault("api_cooldowns", {}).pop("steam_community", None)
     return master, state, checkpoint
 
 
@@ -59,7 +50,7 @@ def main():
                  Path("experiments/steam_official_nearfirst_20260922/checkpoint.json")]
         caches = [checkpoint, *(read_json(p) for p in paths if p.is_file())]
         batch = collect(args.frontend_path, args.frontend_commit, master, state,
-                        caches=caches, community_queue_only=True, max_seconds=args.max_seconds)
+                        caches=caches, max_seconds=args.max_seconds)
         write_json(args.batch, batch)
     elif args.phase == "dispatch":
         batch = dispatch(master, state, token=os.environ.get("CONTENT_BACKEND_TOKEN", ""),

@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 import pytest
 
 from scripts.import_twitch_steam_discoveries import (
-    APPDETAILS, FOLLOWERS, STORE_BROWSE, apply_batch, build_candidate, cached_follower,
+    APPDETAILS, STORE_BROWSE, apply_batch, build_candidate, cached_follower,
     collect, dispatch, validate_snapshot,
 )
 from scripts.twitch_steam_admission import (
@@ -309,7 +309,7 @@ def test_official_utc_store_day_crosses_midnight_in_taipei():
         assert reason in {"steam_date_conflict", "uncertain_taiwan_store_date"}
 
 
-def test_date_conflict_migration_rechecks_metadata_with_cache_during_cooldown():
+def test_date_conflict_migration_rechecks_metadata_with_official_cache():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp); fake_frontend(root)
         item, details = steam()
@@ -320,14 +320,13 @@ def test_date_conflict_migration_rechecks_metadata_with_cache_during_cooldown():
         b.json.return_value = {"123": {"success": True, "data": details}}
         session.get.side_effect = [a, b]
         state = {"games": {"123": {"status": "pending", "reason": "steam_date_conflict",
-            "validation_version": 2, "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}},
-            "api_cooldowns": {"steam_community": {"retry_at": "2026-10-02T15:00:00Z"}}}
+            "validation_version": 2, "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}}}
         cache = {"games": {"123": {"followers": 13, "checked_at": "2026-10-02T06:00:00Z"}}}
         output = collect(root, SHA, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
         assert output["records"][0]["release_start"] == "2026-09-09"
         assert output["records"][0]["followers"] == 13
         assert session.get.call_count == 2
-        state = {"games": output["state_updates"], "api_cooldowns": state["api_cooldowns"]}
+        state = {"games": output["state_updates"]}
         session.reset_mock()
         again = collect(root, SHA, {"games": output["records"]}, state, session=session, now=NOW, caches=[cache], blocked=set())
         assert not again["records"] and session.get.call_count == 0
@@ -343,43 +342,44 @@ def test_rate_limit_stops_and_saves_pending_without_fake_followers():
         assert "followers" not in output["state_updates"]["123"]
 
 
-def test_community_429_stops_xml_but_next_cached_game_can_be_admitted():
+def test_missing_followers_queues_while_next_cached_game_can_be_admitted():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp); fake_frontend(root); extend_frontend_appids(root, [123, 124])
-        session = Mock(); limited = Mock(status_code=429, headers={"Retry-After": "1800"})
-        session.get.side_effect = [*metadata_responses(123), limited, *metadata_responses(124)]
+        session = Mock()
+        session.get.side_effect = [*metadata_responses(123), *metadata_responses(124)]
         cache = {"games": {"124": {"followers": 88, "checked_at": "2026-10-02T06:00:00Z"}}}
         delays = []
         output = collect(root, SHA, {"games": []}, {}, session=session, now=NOW, caches=[cache],
                          blocked=set(), sleep=delays.append)
         assert [(row["appid"], row["followers"]) for row in output["records"]] == [(124, 88)]
-        assert output["state_updates"]["123"]["reason"] == "RateLimited"
-        assert output["state_updates"]["123"]["rate_limit_stage"] == "steam_community"
-        assert output["cooldown_updates"]["steam_community"]["retry_at"] == "2026-10-02T09:30:00Z"
-        assert sum(call.args[0].startswith("https://steamcommunity.com/") for call in session.get.call_args_list) == 1
+        assert output["state_updates"]["123"]["reason"] == "queued_official_followers"
+        assert output["state_updates"]["123"]["rate_limit_stage"] is None
+        assert [row["appid"] for row in output["follower_candidates"]] == [123]
+        assert output["cooldown_updates"] == {}
+        assert all(not call.args[0].startswith("https://steamcommunity.com/") for call in session.get.call_args_list)
         assert any(delay > 1 for delay in delays)
         master, saved = apply_batch({"games": []}, {}, output)
-        # A subsequent new uncached Steam AppID still validates metadata but
-        # cannot initiate another Community request during the global cooldown.
+        # Later uncached matches join the same queue; accepted rows do no work.
         extend_frontend_appids(root, [123, 124, 125])
-        session.reset_mock(); session.get.side_effect = list(metadata_responses(125))
+        session.reset_mock(); session.get.side_effect = [*metadata_responses(123), *metadata_responses(125)]
         again = collect(root, "b"*40, master, saved, session=session, now=NOW+timedelta(minutes=1),
                         blocked=set(), sleep=lambda _: None)
-        assert session.get.call_count == 2
-        assert again["state_updates"]["125"]["reason"] == "steam_community_cooldown"
-        assert again["state_updates"]["125"]["retry_at"] == "2026-10-02T09:30:00Z"
+        assert session.get.call_count == 4
+        assert again["state_updates"]["125"]["reason"] == "queued_official_followers"
+        assert again["state_updates"]["125"]["retry_at"] is None
+        assert [row["appid"] for row in again["follower_candidates"]] == [123, 125]
         assert not again["records"]
 
 
-def test_parser_migration_never_invalidates_legacy_rate_limit_deadline():
+def test_per_game_metadata_retry_is_not_rewritten_as_a_global_cooldown():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp); fake_frontend(root)
-        state = {"games": {"123": {"status": "pending", "reason": "RateLimited", "validation_version": 1,
+        state = {"games": {"123": {"status": "pending", "reason": "ConnectionError", "validation_version": 3,
             "retry_at": "2026-10-02T15:00:00Z", "twitch_admission": proof()}}}
         session = Mock()
         output = collect(root, "b"*40, {"games": []}, state, session=session, now=NOW, blocked=set())
         assert session.get.call_count == 0 and output["records"] == []
-        assert output["cooldown_updates"]["steam_community"]["retry_at"] == "2026-10-02T15:00:00Z"
+        assert output["cooldown_updates"] == {}
 
 
 def test_metadata_429_is_service_wide_cooldown_and_not_bypassed_on_new_appid():
@@ -397,8 +397,8 @@ def test_metadata_429_is_service_wide_cooldown_and_not_bypassed_on_new_appid():
 
 def test_stale_cooldown_batch_cannot_shorten_a_concurrent_retry_deadline():
     import_batch = {"schema_version": 1, "generated_at": "2026-10-02T09:00:00Z", "records": [], "state_updates": {},
-        "cooldown_updates": {"steam_community": {"retry_at": "2026-10-02T10:00:00Z", "updated_at": "2026-10-02T09:00:00Z"}}}
-    current = {"api_cooldowns": {"steam_community": {"retry_at": "2026-10-02T15:00:00Z", "updated_at": "2026-10-02T09:01:00Z"}}}
+        "cooldown_updates": {"steam_appdetails": {"retry_at": "2026-10-02T10:00:00Z", "updated_at": "2026-10-02T09:00:00Z"}}}
+    current = {"api_cooldowns": {"steam_appdetails": {"retry_at": "2026-10-02T15:00:00Z", "updated_at": "2026-10-02T09:01:00Z"}}}
     _, saved = apply_batch({"games": []}, current, import_batch)
     assert saved["api_cooldowns"] == current["api_cooldowns"]
 
@@ -407,23 +407,20 @@ def test_explicit_long_retry_after_is_never_shortened():
     from scripts.import_twitch_steam_discoveries import RateLimited, request
     session = Mock(); session.get.return_value = Mock(status_code=429, headers={"Retry-After": "86400"})
     with pytest.raises(RateLimited) as caught:
-        request(session, FOLLOWERS.format(appid=123), params={"xml": 1})
-    assert caught.value.stage == "steam_community" and caught.value.retry_seconds == 86400
+        request(session, APPDETAILS, params={"appids": 123})
+    assert caught.value.stage == "steam_appdetails" and caught.value.retry_seconds == 86400
 
 
-def test_invalid_follower_xml_is_pending_instead_of_zero_or_job_crash():
-    with tempfile.TemporaryDirectory() as tmp:
-        root = Path(tmp); fake_frontend(root)
-        item, details = steam(); session = Mock()
-        a, b, c = Mock(status_code=200), Mock(status_code=200), Mock(status_code=200)
-        a.json.return_value = {"response": {"store_items": [item]}}
-        b.json.return_value = {"123": {"success": True, "data": details}}
-        c.text = "<html>Unavailable"
-        session.get.side_effect = [a, b, c]
-        output = collect(root, SHA, {"games": []}, {}, session=session, now=NOW, blocked=set())
-        assert output["records"] == []
-        assert output["state_updates"]["123"]["reason"] == "ParseError"
-        assert "followers" not in output["state_updates"]["123"]
+@pytest.mark.parametrize("url", [
+    "https://steamcommunity.com/games/123/memberslistxml/", "http://steamcommunity.com/app/123/",
+    "https://WWW.STEAMCOMMUNITY.COM:443/games/123/",
+])
+def test_community_request_is_rejected_before_network_access(url):
+    from scripts.import_twitch_steam_discoveries import request
+    session = Mock()
+    with pytest.raises(RuntimeError, match="Community requests belong to the official Followers queue"):
+        request(session, url)
+    assert not session.get.called
 
 
 def test_dispatch_requires_persisted_master_and_deduplicates_receipt():

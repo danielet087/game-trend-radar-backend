@@ -9,14 +9,14 @@ import requests
 
 from scripts.import_twitch_steam_discoveries import apply_batch, collect, stamp
 from tests.test_twitch_steam_admission import (
-    NOW, SHA, extend_frontend_appids, fake_frontend, metadata_responses, proof,
+    NOW, SHA, extend_frontend_appids, fake_frontend, metadata_responses,
 )
 
 
 def run(root, state=None, *, master=None, session=None, **kwargs):
     return collect(root, SHA, master or {"games": []}, state or {}, now=NOW,
                    session=session or Mock(), sleep=lambda _: None, blocked=set(),
-                   community_queue_only=True, **kwargs)
+                   **kwargs)
 
 
 def seed(root, *appids):
@@ -27,18 +27,12 @@ def seed(root, *appids):
     return state
 
 
-@pytest.mark.parametrize("until", [NOW - timedelta(minutes=1), NOW + timedelta(hours=2)])
-def test_unknown_count_is_queued_without_community_even_after_cooldown(tmp_path, until):
-    # An unexpired per-game Community receipt must not postpone metadata queuing.
+def test_unknown_count_is_queued_without_community_request(tmp_path):
     fake_frontend(tmp_path)
-    prior = {"status": "pending", "reason": "RateLimited", "rate_limit_stage": "steam_community",
-             "retry_at": stamp(until), "retry_source": "steam_retry_after", "retry_after": "7200",
-             "rate_limit_attempts": 2, "updated_at": stamp(NOW - timedelta(minutes=5)),
-             "validation_version": 3, "twitch_admission": proof()}
     session = Mock()
     session.get.side_effect = list(metadata_responses(123))
 
-    batch = run(tmp_path, {"games": {"123": prior}}, session=session)
+    batch = run(tmp_path, session=session)
 
     assert session.get.call_count == 2
     assert all(not call.args[0].startswith("https://steamcommunity.com/") for call in session.get.call_args_list)

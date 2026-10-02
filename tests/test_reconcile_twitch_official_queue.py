@@ -62,7 +62,7 @@ def precollect(root, master=None, state=None, cp=None, *, now=NOW):
     session.get.side_effect = responses()
     batch = collect(root, SHA, master or {"games": []}, state or {}, session=session,
                     now=now, caches=[cp] if cp is not None else [], blocked=set(),
-                    community_queue_only=True, sleep=lambda _: None)
+                    sleep=lambda _: None)
     assert session.get.call_count == 2 * len(APPIDS)
     assert all(not call.args[0].startswith("https://steamcommunity.com/")
                for call in session.get.call_args_list)
@@ -148,31 +148,41 @@ def test_true_low_and_zero_counts_finalize_taiwan_dates_and_withdraw_overlay(tmp
     assert final_cp["cursor"] == original_cp["cursor"]
 
 
-@pytest.mark.parametrize("longer_checkpoint", [False, True])
-def test_apply_transfers_real_server_cooldown_and_protects_longer_checkpoint(tmp_path, longer_checkpoint):
+def test_prepare_and_finalize_preserve_worker_cooldown_and_rate_count(tmp_path):
     fake_frontend(tmp_path)
     extend_frontend_appids(tmp_path, APPIDS)
-    cooldown = {"retry_at": stamp(NOW + timedelta(hours=3)), "updated_at": stamp(NOW),
+    cooldown = {"retry_at": stamp(NOW + timedelta(hours=4)), "updated_at": stamp(NOW),
                 "observed_at": stamp(NOW), "retry_source": "steam_retry_after",
-                "retry_after": "10800", "retry_seconds": 10800, "attempts": 3}
-    state = {"games": {}, "api_cooldowns": {"steam_community": cooldown}}
+                "retry_after": "14400", "retry_seconds": 14400, "attempts": 5}
+    state = {"games": {}}
     cp = checkpoint()
-    if longer_checkpoint:
-        cp["community_cooldown"] = {**cooldown, "retry_at": stamp(NOW + timedelta(hours=4)),
-                                     "retry_after": "14400", "retry_seconds": 14400, "attempts": 5}
-        cp["next_request_after_taipei"] = "2026-10-02T21:00:00+08:00"
+    cp["community_cooldown"] = deepcopy(cooldown)
+    cp["next_request_after_taipei"] = "2026-10-02T21:00:00+08:00"
+    cp["rate_limit_count"] = 5
+    cp["community_last_success_at"] = "2026-10-02T08:00:00+08:00"
     original = deepcopy(cp)
     prepared = precollect(tmp_path, state=state, cp=cp)
     master, saved, final_cp = apply_queue_batch({"games": []}, state, cp, prepared)
-    expected = original["community_cooldown"] if longer_checkpoint else cooldown
-    assert final_cp["community_cooldown"] == expected
-    assert final_cp["next_request_after_taipei"] == (
-        "2026-10-02T21:00:00+08:00" if longer_checkpoint else "2026-10-02T20:00:00+08:00")
-    assert saved["api_cooldowns"]["steam_community"] == expected
-    assert final_cp["rate_limit_count"] == expected["attempts"]
-    assert final_cp["cursor"] == cp["cursor"]
-    assert final_cp["official_results"] == cp["official_results"]
+    assert len(prepared["follower_candidates"]) == 7
     assert master["games"] == []
+    for key in ("community_cooldown", "next_request_after_taipei", "rate_limit_count",
+                "community_last_success_at", "cursor", "official_results"):
+        assert final_cp[key] == original[key]
+    assert "steam_community" not in saved.get("api_cooldowns", {})
+
+    # A previously verified result can finalize even while the worker waits.
+    final_cp["official_results"]["123"] = {
+        "appid": 123, "official_followers": 120,
+        "official_checked_at_taipei": "2026-10-02T17:05:00+08:00",
+    }
+    post = precollect(tmp_path, master, saved, final_cp, now=NOW + timedelta(minutes=10))
+    accepted_master, accepted_state, accepted_cp = apply_queue_batch(master, saved, final_cp, post)
+    assert accepted_master["games"][0]["followers"] == 120
+    assert accepted_state["games"]["123"]["status"] == "accepted"
+    for key in ("community_cooldown", "next_request_after_taipei", "rate_limit_count",
+                "community_last_success_at", "cursor"):
+        assert accepted_cp[key] == original[key]
+    assert "steam_community" not in accepted_state.get("api_cooldowns", {})
 
 
 def test_dispatch_only_receipt_does_not_touch_or_withdraw_pending_queue(tmp_path):

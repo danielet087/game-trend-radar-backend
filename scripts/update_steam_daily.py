@@ -12,6 +12,7 @@ from typing import Any
 from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_window, taiwan_today, write_json
 from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
+from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 
 LOGGER = logging.getLogger(__name__)
 
@@ -83,7 +84,7 @@ def merge_segment(
     base = [
         game
         for game in prune_released(existing_games, today)
-        if not release_overlaps(game, window_start, window_end)
+        if not release_overlaps(game, window_start, window_end) or is_twitch_qualified(game)
     ]
 
     merged: dict[int, dict[str, Any]] = {}
@@ -95,7 +96,7 @@ def merge_segment(
             appid = int(game["appid"])
         except (KeyError, TypeError, ValueError):
             continue
-        merged[appid] = game
+        merged[appid] = preserve_twitch_admission(merged.get(appid, {}), game)
 
     return sorted(
         merged.values(),
@@ -128,7 +129,7 @@ def merge_partial_segment(
             appid = int(game["appid"])
         except (KeyError, ValueError, TypeError):
             continue
-        by_appid[appid] = game
+        by_appid[appid] = preserve_twitch_admission(by_appid.get(appid, {}), game)
     return sorted(
         by_appid.values(),
         key=lambda game: (

@@ -12,6 +12,11 @@ import time
 import xml.etree.ElementTree as ET
 import requests
 
+try:
+    from scripts.twitch_steam_admission import is_twitch_qualified
+except ModuleNotFoundError:  # Direct script invocation from the repository root.
+    from twitch_steam_admission import is_twitch_qualified
+
 TAIPEI = timezone(timedelta(hours=8))
 
 
@@ -33,7 +38,7 @@ def eligible(row, today):
         count, aid = row["followers"], row["appid"]
         return (isinstance(aid, int) and not isinstance(aid, bool) and aid > 0
                 and isinstance(count, int) and not isinstance(count, bool)
-                and (count >= 5000 or count > 3000 and row.get("recent_source") in {"tracked_release", "direct_release"})
+                and (is_twitch_qualified(row) or count >= 5000 or count > 3000 and row.get("recent_source") in {"tracked_release", "direct_release"})
                 and row.get("release_precision", "day") == "day"
                 and today - timedelta(days=30) <= released <= today + timedelta(days=365))
     except (KeyError, TypeError, ValueError):

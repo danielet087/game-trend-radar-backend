@@ -30,6 +30,7 @@ from scripts.screen_steam_candidates_before_followers import (
 )
 from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
+from scripts.twitch_steam_admission import is_twitch_qualified
 from scripts.steam_master_date_gate import (
     apply_store_release_detail, fetch_store_release_details,
     filter_confirmed_master_games,
@@ -585,6 +586,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             public_games = [
                 row for row in original_games
                 if row.get("appid") in allowed
+                or is_twitch_qualified(row)
                 or (
                     isinstance(row.get("release_start"), str)
                     and row["release_start"] <= today_iso

@@ -15,6 +15,7 @@ from scripts.steam_master_date_gate import (
     fetch_store_release_details,
 )
 from scripts.update_steam_daily import load_json, save_json
+from scripts.twitch_steam_admission import is_twitch_qualified
 
 
 def main() -> None:
@@ -45,7 +46,7 @@ def main() -> None:
         if not isinstance(row, dict) or is_disallowed(row, blocked):
             continue
         try:
-            if int(row["followers"]) >= 5000:
+            if int(row["followers"]) >= 5000 or is_twitch_qualified(row):
                 official.append(row)
         except (KeyError, TypeError, ValueError):
             continue
@@ -66,11 +67,19 @@ def main() -> None:
     changed_dates = []
     recovered_stale = []
     historical_verified = 0
+    deferred_twitch = []
     for row in official:
         appid = int(row["appid"])
         old_day = str(row.get("release_start") or "")
         detail = details.get(appid) or {"exact": False, "status": "unavailable"}
         if detail.get("exact") is not True:
+            if is_twitch_qualified(row) and detail.get("status") == "unavailable":
+                # A transport/missing response is not a changed release date.
+                # Keep the prior accepted source and its original verification
+                # times; do not invent a fresh Store check on an API outage.
+                retained.append(row)
+                deferred_twitch.append(appid)
+                continue
             if old_day <= today.isoformat():
                 # Historical released records are outside the user's 132-title
                 # future-date repair. Keep them when current Store Browse no
@@ -125,7 +134,9 @@ def main() -> None:
         "checked_at": stamp,
         "today_taipei": today.isoformat(),
         "before_master_count": len(games),
-        "official_ge5000_checked": len(official),
+        "official_ge5000_checked": sum(int(row["followers"]) >= 5000 for row in official),
+        "twitch_admission_checked": sum(is_twitch_qualified(row) for row in official),
+        "twitch_admission_deferred": deferred_twitch,
         "stale_future_before": len(stale_future_before),
         "retained_exact": len(retained),
         "rejected_non_exact": len(rejected),

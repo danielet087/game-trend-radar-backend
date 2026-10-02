@@ -10,6 +10,7 @@ from typing import Any
 from scripts.steam_localized_titles import add_traditional_display_names
 from scripts.public_catalog import keep_newer_release, write_catalog_projection
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
+from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 
 CORE_FIELDS = {
     "appid", "followers", "follower_checked_at",
@@ -19,6 +20,7 @@ CORE_FIELDS = {
     "sexual_content_screened", "release_display_precision", "release_display_provider",
     "release_date_verified_at", "post_followers_store_verified_at", "post_followers_store_verified",
     "release_date_conflict", "release_timestamp_taipei_date",
+    "twitch_admission", "steam_type", "content_descriptorids",
 }
 
 
@@ -66,7 +68,7 @@ def valid_record(row: Any) -> bool:
         return False
     return (
         appid > 0
-        and followers >= 3000
+        and (followers >= 3000 or is_twitch_qualified(row))
         and isinstance(day, str)
         and len(day) == 10
         and row.get("release_precision", "day") == "day"
@@ -76,6 +78,7 @@ def valid_record(row: Any) -> bool:
 def merge_game(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
     """Preserve rich presentation metadata but trust backend core fields."""
     incoming = keep_newer_release(existing, incoming)
+    incoming = preserve_twitch_admission(existing, incoming)
     merged = dict(existing)
     for key, value in incoming.items():
         if value is None or value == "":
@@ -136,7 +139,7 @@ def build(
         # Once the audited public catalogue is activated, every future record
         # needs a separately verified Store display-date gate.
         if str(game["release_start"]) >= today_s:
-            if int(game["followers"]) < 5000:
+            if int(game["followers"]) < 5000 and not is_twitch_qualified(game):
                 return False
             if audit_active:
                 return game.get("release_display_precision") == "date_full"
@@ -160,6 +163,7 @@ def build(
                 authoritative_future
                 and str(row.get("release_start") or "") >= today_s
                 and appid not in incoming_ids
+                and not is_twitch_qualified(row)
             )
             if appid in blocked or (
                 appid in unconfirmed_ids
@@ -248,13 +252,14 @@ def build(
     upcoming = [
         int(row["appid"]) for row in rows
         if str(row.get("release_start") or row.get("release_date")) >= today_s
-        and int(row.get("followers") or 0) >= 5000
+        and (int(row.get("followers") or 0) >= 5000 or is_twitch_qualified(row))
     ]
     released = [
         int(row["appid"]) for row in rows
         if released_from <= str(row.get("release_start") or row.get("release_date")) < today_s
         and (
             int(row.get("followers") or 0) >= 5000
+            or is_twitch_qualified(row)
             or (
                 int(row.get("followers") or 0) > 3000
                 and row.get("recent_source") in {"tracked_release", "direct_release"}

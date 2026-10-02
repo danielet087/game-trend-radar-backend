@@ -1,0 +1,132 @@
+name: Import Twitch discoveries with confirmed Steam versions
+
+on:
+  schedule:
+    - cron: '37 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['scripts/import_twitch_steam_discoveries.py']
+
+permissions:
+  contents: write
+
+# Use the existing official-Followers lock to avoid concurrent Steam XML calls.
+# The persistent discovery queue survives delayed or superseded scheduled runs.
+concurrency:
+  group: isolated-official-nearfirst-frozen-20260922
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - name: Install dependencies and validate admission tests
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-dev.txt
+          python -m pytest -q
+      - name: Configure backend publication and check content dispatch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "$CONTENT_BACKEND_TOKEN" || { echo '::error::Missing existing CONTENT_BACKEND_TOKEN'; exit 1; }
+          gh auth setup-git
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin main
+          git reset --hard origin/main
+      - name: Read immutable Twitch discovery and observation inputs
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend-input
+          echo "TWITCH_INPUT_SHA=$(git -C frontend-input rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Verify Steam versions and cache the bounded import batch
+        run: |
+          python -u -m scripts.import_twitch_steam_discoveries --phase collect \
+            --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
+            --batch output/twitch_steam_import_batch.json --max-seconds 900
+      - name: Merge accepted AppIDs and pending states into latest backend
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.import_twitch_steam_discoveries --phase apply --batch output/twitch_steam_import_batch.json
+            git add data/steam_upcoming_master.json data/twitch_steam_import_state.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'data: admit verified Twitch discoveries into Steam master'
+            if git push origin HEAD:main; then exit 0; fi
+            echo "::warning::Concurrent backend update; rebuilding AppID merge ($attempt/5)"
+            sleep $((attempt * 2))
+          done
+          echo '::error::Could not persist Twitch admission results'
+          exit 1
+      - name: Dispatch only persisted admissions for Steam content enrichment
+        env:
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+          CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
+        run: |
+          python -u -m scripts.import_twitch_steam_discoveries --phase dispatch \
+            --batch output/twitch_steam_dispatch_batch.json --max-seconds 300
+      - name: Persist dispatch receipts without overwriting concurrent master changes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.import_twitch_steam_discoveries --phase apply --batch output/twitch_steam_dispatch_batch.json
+            git add data/twitch_steam_import_state.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'data: save Twitch Steam content dispatch receipts'
+            if git push origin HEAD:main; then exit 0; fi
+            echo "::warning::Concurrent backend update; rebuilding receipt merge ($attempt/5)"
+            sleep $((attempt * 2))
+          done
+          echo '::error::Could not persist content dispatch receipts'
+          exit 1
+      - name: Report actual admission and dispatch outcomes
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os
+          from collections import Counter
+          from pathlib import Path
+          lines = ['## Twitch → Steam 收錄']
+          for filename, label in [('twitch_steam_import_batch.json', 'Steam 核對'), ('twitch_steam_dispatch_batch.json', '內容派送')]:
+              path = Path('output') / filename
+              if not path.exists():
+                  lines.append(f'- {label}：尚未產生結果')
+                  continue
+              doc = json.loads(path.read_text())
+              counts = dict(Counter(row.get('status', 'unknown') for row in doc['state_updates'].values()))
+              lines.append(f'- {label}：新增／更新 {len(doc["records"])} 筆；狀態 {counts}；結束 {doc.get("stop_reason", "complete")}')
+              for aid, row in doc['state_updates'].items():
+                  receipt = row.get('content_dispatch') or {}
+                  lines.append(f'- AppID {aid}：{row.get("status")}；{row.get("reason", "")}；內容 {receipt.get("status", "尚未派送")}')
+          lines.append('Twitch 來源不套用 Steam Followers 門檻，仍核對正式遊戲、成人內容與確切台灣日期；查詢／派送失敗保留待重試，不宣稱前端已更新。')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as out:
+              out.write('\n'.join(lines) + '\n')
+          PY
+      - name: Preserve import and dispatch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: twitch-steam-import
+          path: output/twitch_steam_*_batch.json
+          if-no-files-found: warn
+          retention-days: 7

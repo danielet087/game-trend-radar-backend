@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 from scripts.public_catalog import write_catalog_projection
+from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 import logging
 import re
 import time
@@ -152,7 +153,7 @@ def refresh(
 
     selected = {
         appid: row for appid, row in original_games.items()
-        if int(row.get("followers") or 0) >= 5000
+        if int(row.get("followers") or 0) >= 5000 or is_twitch_qualified(row)
     }
     ids = sorted(selected)
     if not ids:
@@ -184,7 +185,20 @@ def refresh(
         # Preserve richer game metadata already stored in per-AppID file.
         per_game = data_dir / "games" / f"{appid}.json"
         full = read(per_game) if per_game.exists() else dict(old)
-        merged = update_title(full, tw, cn)
+        # A richer detail shard may predate the separately verified Twitch
+        # admission. Name refreshes must retain that published source proof.
+        merged = update_title(preserve_twitch_admission(old, full), tw, cn)
+        if is_twitch_qualified(old):
+            # This command only refreshes names. An older detail shard cannot
+            # rewind the accepted Followers, date or Steam verification facts.
+            for field in ("followers", "follower_checked_at", "steam_type", "sexual_content_screened",
+                          "release_start", "release_end", "release_precision", "release_display_precision",
+                          "release_date_timezone", "release_time_utc", "release_timestamp_taipei_date",
+                          "release_date_conflict"):
+                if field in old:
+                    merged[field] = old[field]
+                else:
+                    merged.pop(field, None)
         # Preserve core backend values and don't rewrite unrelated fields.
         changed = merged != full or updated != old
         if changed:

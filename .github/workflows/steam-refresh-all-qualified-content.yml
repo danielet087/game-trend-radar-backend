@@ -1,4 +1,4 @@
-name: 重新更新所有 Followers >=5000 遊戲內容
+name: 重新更新所有已收錄遊戲內容
 
 on:
   workflow_dispatch:
@@ -26,13 +26,14 @@ jobs:
         with:
           sparse-checkout: |
             scripts/dispatch_content_refresh_events.py
+            scripts/twitch_steam_admission.py
           sparse-checkout-cone-mode: false
           persist-credentials: false
 
       - name: Validate dispatcher
         run: python -m py_compile scripts/dispatch_content_refresh_events.py
 
-      - name: Refresh every currently published official Followers >=5000 game
+      - name: Refresh currently published Steam and Twitch admissions
         env:
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
           INTERVAL_SECONDS: ${{ inputs.interval_seconds }}

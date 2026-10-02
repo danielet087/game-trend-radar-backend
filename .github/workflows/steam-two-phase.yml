@@ -158,6 +158,7 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
+          from scripts.twitch_steam_admission import is_twitch_qualified
 
           state = json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
           attempt = state.get("last_attempt") or {}
@@ -168,7 +169,7 @@ jobs:
               assert 0 <= int(state["prefilter_next_index"]) <= int(attempt["candidate_count"])
               payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
               assert payload["initialization"]["prefilter_next_index"] == state["prefilter_next_index"]
-              assert all(int(g["followers"]) >= 5000 for g in payload["games"])
+              assert all(int(g["followers"]) >= 5000 or is_twitch_qualified(g) for g in payload["games"])
               print(f"Third-party >=4000 prescreen: {state['prefilter_screened_count']} "
                     f"/{attempt['candidate_count']}; Steam XML queries: 0")
           elif attempt.get("phase") == "followers":
@@ -183,7 +184,7 @@ jobs:
               assert payload["initialization"]["verified_priority_count"] == end
               assert payload["initialization"]["days_scanned"] == 365
               assert payload["count"] == len(payload["games"])
-              assert all(int(g["followers"]) >= 5000 for g in payload["games"])
+              assert all(int(g["followers"]) >= 5000 or is_twitch_qualified(g) for g in payload["games"])
               print(f"Steam XML verification: {n} new, shortlisted {start}->{end}; "
                     f"officially qualified {payload['count']}")
           else:

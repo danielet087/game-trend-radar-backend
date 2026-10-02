@@ -11,12 +11,19 @@
 5. 內容後端每日 07:30／19:30 對帳：檢查已接受的主清單是否已發布，並補齊缺漏內容。每輪最多 60 款，保留未完成與失敗清單。
 6. 公開網站從精簡 `data/catalog.json` 讀清單；詳細頁先讀單款 `data/games/{appid}.json`，相似遊戲另外載入。
 
+### Twitch 新作補入 Steam
+
+Twitch 正式收錄的新作是獨立入口：Twitch ID → Helix 的 IGDB ID → IGDB 官方 Steam 外部 ID。找到原清單沒有的 AppID 後，不套用 5,000 Followers 門檻，仍查詢真實官方 Followers、Steam 台灣確切日期、正式遊戲類型與既有成人內容排除規則。資料不足保留待重試；IGDB 沒有 Steam 連結也只是尚未確認，每日重查。
+
+`steam-import-twitch-discoveries.yml` 每小時第 37 分消費前端的 `data/twitch_steam_discovery.json`，與既有官方 Followers 工作共用限流鎖。先持久化主清單與 `data/twitch_steam_import_state.json`，再送 `steam_game_twitch_discovered` 內容事件；事件失敗保留重試。來源證據 `twitch_admission` 隨清單、內容、索引與成長紀錄保存，正常更新不能移除已接受的來源。Twitch 觀測持續沿用 Twitch ID 與圖片，Steam 入口不會反過來冒充 Twitch 新作。沿用既有 `CONTENT_BACKEND_TOKEN`，不新增 Secrets。
+
 ## 資料責任
 
 | 資料 | 負責方 | 用途 |
 |---|---|---|
 | `steam_candidates*.json`、`steam_prefilter_state.json` | 主後端 | 候選、日期／內容篩選與第三方初篩進度 |
 | `steam_upcoming_master.json` | 主後端 | 已接受的官方 Followers 與日期 |
+| `twitch_steam_import_state.json` | 主後端 | Twitch 反查的收錄、待查與內容事件重試 |
 | `experiments/steam_official_daily_catchup/checkpoint.json` | 主後端 | 動態補漏、官方結果、事件送出與冷卻 |
 | 公開 `data/games/{appid}.json` | 發布器＋內容後端 | 可公開的單款完整紀錄，保留已上市歷史 |
 | 公開 `catalog.json`、月份檔、清單檔、舊格式檔 | 同次發布產生 | 同一份資料的各種讀取格式 |
@@ -50,6 +57,6 @@ python -m pytest -q
 ## 獨立直播後端
 
 - [YouTube 後端](https://github.com/danielet087/game-trend-radar-youtube-backend)：自己的程式、測試與 Secrets，只更新前端 `data/youtube_live.json`。
-- [Twitch 後端](https://github.com/danielet087/game-trend-radar-twitch-backend)：自己的程式、測試與 Secrets，只更新前端 `data/twitch_live.json`。
+- [Twitch 後端](https://github.com/danielet087/game-trend-radar-twitch-backend)：自己的程式、測試與 Secrets，每小時更新 Twitch 快照、追蹤、歷史、Steam 對照與反查佇列。
 
-兩者收集維持手動觸發，Secrets 由使用者之後設定。本 Repo 已移除直播收集器與對應 workflows，避免重複執行；既有 Git 歷史、Actions 紀錄及前端直播 JSON 保留。Steam 流程及 Secrets 維持原有設定。
+本 Repo 已移除直播收集器與對應 workflows，避免重複執行；既有 Git 歷史、Actions 紀錄及前端直播 JSON 保留。Steam 流程及 Secrets 維持原有設定。Twitch 每小時收集由獨立後端與 Cloudflare 排程負責。

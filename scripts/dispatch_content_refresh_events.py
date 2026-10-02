@@ -2,8 +2,8 @@
 
 This script deliberately reads the public frontend catalogue as the canonical
 "currently publishable" set. It never promotes historical Backend A rows that
-are no longer public. Every selected row must already have official Followers
->= 5000 and an exact release date.
+are no longer public. Every selected row must have the original Followers
+qualification or a verified Twitch admission, and an exact release date.
 
 Events are paced so Backend B has time to enrich and push the shared frontend
 JSON before the next refresh event arrives.
@@ -18,6 +18,11 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+
+try:
+    from scripts.twitch_steam_admission import is_twitch_qualified
+except ModuleNotFoundError:  # Keep the existing direct script entry point.
+    from twitch_steam_admission import is_twitch_qualified
 
 FRONTEND_JSON = (
     "https://raw.githubusercontent.com/"
@@ -65,7 +70,7 @@ def select_games(payload: dict, window_days: int | None) -> list[dict]:
         release = row.get("release_start") or row.get("release_date")
         if (
             appid <= 0
-            or followers < 5000
+            or (followers < 5000 and not is_twitch_qualified(row))
             or not valid_date(release)
             or row.get("release_precision") not in (None, "day")
             or row.get("release_display_precision") not in (None, "date_full")
@@ -84,6 +89,7 @@ def select_games(payload: dict, window_days: int | None) -> list[dict]:
                 "followers": followers,
                 "release_date": release,
                 "follower_checked_at": row.get("follower_checked_at"),
+                **({"twitch_admission": row["twitch_admission"]} if is_twitch_qualified(row) else {}),
             }
         )
 
@@ -103,6 +109,7 @@ def dispatch(token: str, row: dict, reason: str) -> None:
                 "GITHUB_REPOSITORY", "danielet087/game-trend-radar-backend"
             ),
             "refresh_reason": reason,
+            **({"twitch_admission": row["twitch_admission"]} if row.get("twitch_admission") else {}),
         },
     }
     data = json.dumps(payload).encode("utf-8")
@@ -173,7 +180,7 @@ def main() -> None:
     mode = (
         f"today_to_{args.window_days}_days"
         if args.window_days is not None
-        else "all_published_ge5000"
+        else "all_published_qualified"
     )
     print(
         "CONTENT_REFRESH_SELECTION",

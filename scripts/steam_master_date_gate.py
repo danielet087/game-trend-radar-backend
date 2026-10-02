@@ -14,6 +14,7 @@ import requests
 
 from scripts.screen_steam_candidates_before_followers import fetch_metadata
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
+from scripts.twitch_steam_admission import is_twitch_qualified
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 STORE_DATE_PROVIDER = "Steam IStoreBrowseService/GetItems"
@@ -142,7 +143,8 @@ def filter_confirmed_master_games(
             followers = int(row["followers"])
         except (KeyError, ValueError, TypeError):
             continue
-        if appid in seen or followers < 5000:
+        twitch_qualified = is_twitch_qualified(row)
+        if appid in seen or (followers < 5000 and not twitch_qualified):
             continue
         if day > today:
             if row.get("release_display_precision") != "date_full":
@@ -151,7 +153,7 @@ def filter_confirmed_master_games(
                 continue
             # Future records must still belong to today's exact-date candidate
             # universe. The post-Followers Store check is the final date source.
-            if appid not in eligible_ids:
+            if appid not in eligible_ids and not twitch_qualified:
                 continue
         # Released history is retained. Once the game has actually released,
         # it must not disappear merely because Store Browse stops exposing the

@@ -40,6 +40,8 @@ FIELDS = (
     'small_capsule_image', 'capsule_image', 'tags', 'genres',
     'tag_ids', 'tag_labels_zh_tw', 'genre_labels_zh_tw',
     'content_enriched_at', 'tags_fetch_status',
+    'twitch_admission', 'steam_type', 'sexual_content_screened',
+    'release_time_utc', 'release_timestamp_taipei_date', 'release_date_conflict',
 )
 
 

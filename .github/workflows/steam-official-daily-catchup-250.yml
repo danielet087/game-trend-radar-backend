@@ -1,12 +1,20 @@
 name: Steam official Followers - GitHub hourly auto 250
 
-# GitHub-only scheduler; no ChatGPT/marker-based triggers.
+# One scheduler and XML queue for ordinary candidates and Twitch discoveries.
 # Taiwan 03:00..23:00 hourly; GitHub can delay schedule start.
 on:
   schedule:
     - cron: "0 3-23 * * *"
       timezone: "Asia/Taipei"
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/experiment_official_daily_catchup_250.py
+      - scripts/import_twitch_steam_discoveries.py
+      - scripts/reconcile_twitch_official_queue.py
+      - scripts/twitch_official_queue.py
+      - .github/workflows/steam-official-daily-catchup-250.yml
 
 permissions:
   contents: write
@@ -19,37 +27,20 @@ concurrency:
 jobs:
   follower-catchup:
     runs-on: ubuntu-latest
-    timeout-minutes: 62
+    timeout-minutes: 80
     steps:
-      - name: Checkout only necessary sources (read production status, write isolated official outcomes)
+      - name: Checkout backend
         uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            scripts/experiment_official_daily_catchup_250.py
-            scripts/steam_master_date_gate.py
-            scripts/twitch_steam_admission.py
-            scripts/screen_steam_candidates_before_followers.py
-            scripts/steam_adult_exclusions.py
-            experiments/steam_official_nearfirst_20260922/
-            experiments/steam_official_followers_20260922/checkpoint.json
-            experiments/steam_official_daily_catchup/
-            data/steam_candidates_eligible.json
-            data/steam_prefilter_state.json
-            data/steam_followers_cache.json
-            data/steam_upcoming_master.json
-            data/steam_adult_exclusion.json
-          sparse-checkout-cone-mode: false
 
       - name: Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install dependency and validate syntax
+      - name: Install dependencies and validate queue/admission behavior
         run: |
-          python -m pip install --disable-pip-version-check requests
-          python -m py_compile scripts/experiment_official_daily_catchup_250.py
-          python -c 'from scripts.steam_master_date_gate import fetch_store_release_details; from scripts.steam_adult_exclusions import excluded_appids, is_disallowed; import scripts.experiment_official_daily_catchup_250; print("FOLLOWERS_IMPORT_OK")'
+          python -m pip install --disable-pip-version-check -r requirements-dev.txt
+          python -m pytest -q
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python - <<'PY'
@@ -75,14 +66,40 @@ jobs:
             echo "Scheduled run delayed to Taiwan hour $HOUR outside 03–23; no Steam requests." >> "$GITHUB_STEP_SUMMARY"
           fi
 
-      - name: Fetch up to 250 NEW official counts in date order with >=8s pacing
+      - name: Read immutable Twitch discovery inputs
+        if: steps.window.outputs.proceed == 'true'
+        run: |
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend-input
+          echo "TWITCH_INPUT_SHA=$(git -C frontend-input rev-parse HEAD)" >> "$GITHUB_ENV"
+
+      - name: Prepare Twitch priority candidates without Community requests
+        id: prepare
+        if: steps.window.outputs.proceed == 'true'
+        run: |
+          set -euo pipefail
+          python -u -m scripts.reconcile_twitch_official_queue --phase collect \
+            --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
+            --batch output/steam_official_daily_catchup/twitch_prepare.json --max-seconds 300
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.reconcile_twitch_official_queue --phase apply --batch output/steam_official_daily_catchup/twitch_prepare.json
+            git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json data/twitch_steam_import_state.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'data: merge Twitch priority discoveries into official Followers queue'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
+
+      - name: Fetch up to 250 official counts, Twitch first, with >=8s pacing
         if: steps.window.outputs.proceed == 'true'
         env:
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+          REQUEST_LIMIT: ${{ github.event_name == 'push' && '20' || '250' }}
         run: >
           python -u -m scripts.experiment_official_daily_catchup_250
-          --max-requests 250
+          --max-requests "$REQUEST_LIMIT"
           --interval 8
           --max-seconds 3450
           --save-every 10
@@ -98,6 +115,46 @@ jobs:
               git push origin HEAD:main
             fi
           fi
+
+      - name: Finalize Twitch admissions from persisted official counts
+        if: always() && steps.window.outputs.proceed == 'true' && steps.prepare.outcome == 'success'
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+          python -u -m scripts.reconcile_twitch_official_queue --phase collect \
+            --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
+            --batch output/steam_official_daily_catchup/twitch_finalize.json --max-seconds 300
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.reconcile_twitch_official_queue --phase apply --batch output/steam_official_daily_catchup/twitch_finalize.json
+            git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json data/twitch_steam_import_state.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'data: admit Twitch discoveries using unified official Followers results'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
+
+      - name: Dispatch persisted Twitch admissions and save receipts
+        if: always() && steps.window.outputs.proceed == 'true' && steps.prepare.outcome == 'success'
+        env:
+          CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+        run: |
+          set -euo pipefail
+          python -u -m scripts.reconcile_twitch_official_queue --phase dispatch \
+            --batch output/steam_official_daily_catchup/twitch_dispatch.json --max-seconds 300
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.reconcile_twitch_official_queue --phase apply --batch output/steam_official_daily_catchup/twitch_dispatch.json
+            git add data/twitch_steam_import_state.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'data: save unified queue Twitch content dispatch receipts'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
 
       - name: Publish actual per-batch result summary
         if: always()
@@ -115,9 +172,10 @@ jobs:
             f"- 目前待查：**{r['remaining_queue']}**",
             f"- 當日新來源狀態：**{r['source_status']['status']}**",
             f"- 今日新加入：**{r['source_status']['added_from_daily']}**",
+            f"- Twitch 優先待查：**{r.get('twitch_priority_pending', 0)}**；本輪官方成功：**{r.get('twitch_official_success_this_run', 0)}**",
             f"- 冷卻到：**{r.get('next_request_after_taipei') or '無'}**",
             f"- 實際耗時：**{r['elapsed_seconds']}秒**",
-            "Followers 工作不直接改前端；每筆官方 >=5000 會觸發獨立內容後端補資料並發布前端。",
+            "一般來源仍要求官方 Followers >=5000；Twitch 來源保留例外資格，仍核對真實官方數值、確切台灣日期及成人規則。公開月曆由內容後端發布。",
           ]
           with open(os.environ["GITHUB_STEP_SUMMARY"],"a",encoding="utf-8") as f:
             f.write("\n".join(lines)+"\n")

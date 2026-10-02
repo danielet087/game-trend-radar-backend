@@ -25,6 +25,8 @@ import requests
 
 from scripts.steam_master_date_gate import fetch_store_release_details
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
+from scripts.import_twitch_steam_discoveries import cached_follower
+from scripts.twitch_official_queue import is_twitch_queue_candidate
 
 ROOT = Path("experiments/steam_official_daily_catchup")
 FROZEN = Path("experiments/steam_official_nearfirst_20260922")
@@ -303,6 +305,8 @@ def reverify_pending_store_dates(cp, master, limit=25):
     ):
         if len(selected) >= limit:
             break
+        if result.get("queue_source") == "twitch_steam_discovery":
+            continue
         if not checked_numeric(result.get("official_followers")) or result["official_followers"] < 5000:
             continue
         checked = str(result.get("store_date_checked_at_taipei") or "")
@@ -350,6 +354,8 @@ def retry_pending_content_dispatches(cp, limit=25):
     ):
         if retried >= limit:
             break
+        if result.get("queue_source") == "twitch_steam_discovery":
+            continue
         if not checked_numeric(result.get("official_followers")) or result["official_followers"] < 5000:
             continue
         aid = str(int(result["appid"]))
@@ -470,7 +476,16 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
             }
             if aid not in cp["pending_candidates"]:
                 daily["added_from_daily"] += 1
-            cp["pending_candidates"][aid] = new
+            previous = cp["pending_candidates"].get(aid) or {}
+            if previous.get("queue_source") == "twitch_steam_discovery":
+                # Keep the verified Twitch admission and its higher priority;
+                # the ordinary row remains available when Twitch expires.
+                cp["pending_candidates"][aid] = {
+                    **previous, "normal_candidate": new,
+                    "group_id64": new["group_id64"] or previous.get("group_id64"),
+                }
+            else:
+                cp["pending_candidates"][aid] = new
         daily["status"] = (
             "current_day_prefilter_complete" if prefilter.get("complete")
             else "current_day_prefilter_incomplete"
@@ -489,7 +504,13 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
     }
     pending = []
     for aid, row in cp["pending_candidates"].items():
-        if aid in existing_official:
+        twitch = row.get("queue_source") == "twitch_steam_discovery"
+        if twitch:
+            if not is_twitch_queue_candidate(row, now=clock()):
+                continue
+            if cached_follower(int(aid), [cp, legacy_cp, official_cache, other_official], clock()) is not None:
+                continue
+        elif aid in existing_official:
             continue
         if aid in bad_missing_group and row.get("group_id64") is None:
             cp.setdefault("unresolved_candidates", {})[aid] = {
@@ -502,6 +523,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         cp.setdefault("unresolved_candidates", {}).pop(aid, None)
         pending.append(row)
     pending.sort(key=lambda r: (
+        0 if r.get("queue_source") == "twitch_steam_discovery" else 1,
         r["release_date"] < today,
         r["release_date"] if r["release_date"] >= today
         else -datetime.fromisoformat(r["release_date"]).date().toordinal(),
@@ -510,6 +532,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
     daily["combined_pending_now"] = len(pending)
     daily["completed_legacy"] = len(legacy_cp["official_results"])
     daily["completed_new"] = len(cp["official_results"])
+    daily["twitch_priority_pending"] = sum(r.get("queue_source") == "twitch_steam_discovery" for r in pending)
     return pending, daily
 
 
@@ -605,9 +628,19 @@ def main():
                     cp["rate_limit_count"] += 1
                     if response.headers.get("Retry-After"):
                         event["retry_after_header"] = response.headers["Retry-After"][:128]
-                    cp["next_request_after_taipei"] = steam_429_cooldown(
-                        response, cp["rate_limit_count"], clock()
-                    ).isoformat()
+                    observed = clock()
+                    until = steam_429_cooldown(response, cp["rate_limit_count"], observed)
+                    cp["next_request_after_taipei"] = until.isoformat()
+                    cp["community_cooldown"] = {
+                        "retry_at": until.astimezone(timezone.utc).isoformat(),
+                        "observed_at": observed.astimezone(timezone.utc).isoformat(),
+                        "updated_at": observed.astimezone(timezone.utc).isoformat(),
+                        "retry_seconds": int((until - observed).total_seconds()),
+                        "retry_after": response.headers.get("Retry-After"),
+                        "retry_source": ("steam_retry_after_with_default_minimum"
+                                         if response.headers.get("Retry-After") else "existing_queue_backoff"),
+                        "attempts": cp["rate_limit_count"],
+                    }
                     event["next_request_after_taipei"] = cp["next_request_after_taipei"]
                     stop = "first_http_429"
                 elif response.status_code in (401, 403) or response.status_code >= 500:
@@ -645,7 +678,9 @@ def main():
                             "official_checked_at_taipei": clock().isoformat(),
                             "official_source": "Steam Community XML memberCount",
                         }
-                        if count >= 5000:
+                        # Twitch admissions are finalized from this true count
+                        # by the same workflow's cache-only importer, even <5000.
+                        if count >= 5000 and row.get("queue_source") != "twitch_steam_discovery":
                             official = cp["official_results"][str(aid)]
                             exact = verify_store_date_for_result(official, client)
                             event["store_date_exact"] = exact
@@ -660,6 +695,8 @@ def main():
                         cp["rate_limit_count"] = 0
                         cp["temporary_error_count"] = 0
                         cp["next_request_after_taipei"] = None
+                        cp["community_cooldown"] = None
+                        cp["community_last_success_at"] = clock().isoformat()
             except (requests.RequestException, ET.ParseError) as exc:
                 event["status"] = "transport_or_xml_error"
                 event["error_type"] = type(exc).__name__
@@ -699,6 +736,13 @@ def main():
                 if not git_push():
                     stop = "git_checkpoint_failure"
                     break
+                # A clean rebase can merge another producer's AppIDs. Reload
+                # that merged state before the next in-memory save.
+                latest_checkpoint, latest_master = read(CHECKPOINT), read(MASTER)
+                cp.clear()
+                cp.update(latest_checkpoint)
+                master.clear()
+                master.update(latest_master)
             if event["status"] != "ok":
                 break
 
@@ -727,6 +771,9 @@ def main():
         "combined_official_completed": len(oldcp["official_results"]) + len(cp["official_results"]),
         "remaining_queue": pending_left,
         "http_429_this_run": sum(e["http"] == 429 for e in attempts),
+        "twitch_priority_pending": source_status.get("twitch_priority_pending", 0),
+        "twitch_official_success_this_run": sum(e.get("queue_source") == "twitch_steam_discovery"
+                                                and e["status"] == "ok" for e in attempts),
         "next_request_after_taipei": cp.get("next_request_after_taipei"),
         "production_cache_modified": False,
         "github_actions_hourly_schedule": "03:00-23:00 Asia/Taipei",

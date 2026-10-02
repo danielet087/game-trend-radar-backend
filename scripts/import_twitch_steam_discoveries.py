@@ -1,4 +1,4 @@
-"""Import confirmed Twitch discoveries without changing Steam's normal queue.
+"""Import confirmed Twitch discoveries and queue missing official Followers.
 
 Collect caches a bounded API batch. Apply merges that batch into latest main
 without network calls. Dispatch runs only after the accepted master is saved.
@@ -277,10 +277,65 @@ def identity_signature(proof: dict) -> str:
     return hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+def follower_candidate(probe: dict) -> dict:
+    """Store the metadata evidence without turning the probe's zero into a count."""
+    metadata = deepcopy(probe)
+    for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000"):
+        metadata.pop(key, None)
+    return {
+        "appid": metadata["appid"], "name": metadata["name"],
+        "release_date": metadata["release_start"], "steam_url": metadata["store_url"],
+        "group_id64": None, "queue_source": "twitch_steam_discovery",
+        "twitch_admission": deepcopy(metadata["twitch_admission"]),
+        "steam_candidate": metadata,
+    }
+
+
+def retained_follower_candidate(appid: int, proof: dict, prior: dict, now: datetime,
+                                blocked: set[int]) -> dict | None:
+    """Keep a verified pending row through temporary metadata failures only."""
+    candidate = prior.get("follower_candidate")
+    if (prior.get("status") == "excluded" or prior.get("reason") in {
+            "adult_content", "not_a_steam_game", "outside_new_game_window",
+            "uncertain_steam_date", "uncertain_taiwan_store_date", "steam_date_conflict",
+            "steam_identity_mismatch", "invalid_admission",
+        } or not isinstance(candidate, dict)
+            or candidate.get("queue_source") != "twitch_steam_discovery"
+            or decimal_id(candidate.get("appid")) != str(appid)
+            or not isinstance(candidate.get("steam_candidate"), dict)):
+        return None
+    metadata = deepcopy(candidate["steam_candidate"])
+    stored_proof = normalize_twitch_admission(candidate.get("twitch_admission"), appid)
+    metadata_proof = normalize_twitch_admission(metadata.get("twitch_admission"), appid)
+    if (stored_proof is None or metadata_proof is None
+            or identity_signature(stored_proof) != identity_signature(proof)
+            or identity_signature(metadata_proof) != identity_signature(proof)
+            or decimal_id(metadata.get("appid")) != str(appid)
+            or candidate.get("release_date") != metadata.get("release_start")
+            or candidate.get("steam_url") != f"https://store.steampowered.com/app/{appid}/"
+            or metadata.get("store_url") != candidate["steam_url"]
+            or is_disallowed(metadata, blocked)):
+        return None
+    verified_at = aware_time(metadata.get("release_date_verified_at"))
+    release_at = aware_time(metadata.get("release_time_utc"))
+    if verified_at is None or verified_at > now or release_at is None:
+        return None
+    day = release_at.astimezone(TAIPEI).date()
+    today = now.astimezone(TAIPEI).date()
+    if not today - timedelta(days=30) <= day <= today + timedelta(days=365):
+        return None
+    # Reuse the exact metadata gate, supplying a placeholder only in memory.
+    metadata.update(twitch_admission=proof, followers=0, follower_checked_at=stamp(verified_at))
+    if not is_twitch_qualified(metadata):
+        return None
+    return follower_candidate(metadata)
+
+
 def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
             session=None, now: datetime | None = None, max_seconds: int = 900,
             caches: list[dict] | None = None, monotonic=time.monotonic,
-            sleep=time.sleep, blocked: set[int] | None = None, clock=None) -> dict:
+            sleep=time.sleep, blocked: set[int] | None = None, clock=None,
+            community_queue_only: bool = False) -> dict:
     fixed_now = now
     clock = clock or (lambda: fixed_now if fixed_now is not None else datetime.now(timezone.utc))
     now = now or clock()
@@ -295,6 +350,17 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
     previous, migrations = legacy_retry_migrations(previous, now)
     batch = {"schema_version": 1, "generated_at": stamp(now), "source_frontend_commit": commit,
              "records": [], "state_updates": {}, "cooldown_updates": {}, "stop_reason": "complete"}
+    queued = {}
+    if community_queue_only:
+        batch["active_twitch_appids"] = [appid for appid, _ in candidates]
+        # Seed all active rows before bounded processing. A deadline or global
+        # metadata cooldown must not drop candidates that were already verified.
+        for appid, proof in candidates:
+            retained = retained_follower_candidate(
+                appid, proof, (previous.get("games") or {}).get(str(appid), {}), now, blocked,
+            )
+            if retained is not None:
+                queued[appid] = retained
     if any(migrations.values()):
         batch["retry_migrations"] = migrations
     cooldowns = deepcopy(previous.get("api_cooldowns") or {})
@@ -317,6 +383,8 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
     last_metadata_start = float("-inf")
     def get(url: str, *, params: dict):
         nonlocal last_metadata_start
+        if community_queue_only and url.startswith("https://steamcommunity.com/"):
+            raise RuntimeError("Community requests belong to the official Followers queue")
         if not url.startswith("https://steamcommunity.com/"):
             delay = max(0, 1.5 - (monotonic() - last_metadata_start))
             if delay:
@@ -347,13 +415,15 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
         # Persistent membership outlives Twitch expiry. No Steam fetch is needed
         # on every subsequent import; the normal content reconciler owns refresh.
         if isinstance(record, dict) and is_twitch_qualified(record):
+            queued.pop(appid, None)
             content_signature = signature(record)
             if (prior.get("status") == "accepted" and prior.get("retry_at") is None
                     and not prior.get("retry_attempts") and not prior.get("rate_limit_stage")
                     and not prior.get("rate_limit_attempts") and not prior.get("retry_source")
                     and prior.get("validation_version") == STATE_VALIDATION_VERSION
                     and prior.get("content_signature") == content_signature
-                    and prior.get("twitch_admission") == record["twitch_admission"]):
+                    and prior.get("twitch_admission") == record["twitch_admission"]
+                    and not prior.get("follower_candidate")):
                 continue
             batch["state_updates"][str(appid)] = {
                 "status": "accepted", "updated_at": stamp(now),
@@ -362,6 +432,7 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                 "content_signature": content_signature, "reason": "steam_verified",
                 "retry_at": None, "retry_attempts": 0, "rate_limit_attempts": 0,
                 "rate_limit_stage": None, "retry_source": None, "retry_after": None,
+                "follower_candidate": None,
             }
             continue
         count = cached_follower(appid, caches or [], now)
@@ -375,12 +446,17 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                              and prior.get("reason") in {"uncertain_steam_date", "uncertain_taiwan_store_date", "steam_date_conflict"})
         cached_community_retry = (count is not None and prior.get("rate_limit_stage") == "steam_community"
                                   and prior.get("reason") in {"RateLimited", "steam_community_cooldown"})
-        if (not parser_migration and not cached_community_retry
+        queue_community_retry = (community_queue_only and (
+            prior.get("rate_limit_stage") == "steam_community"
+            or prior.get("reason") == "steam_community_cooldown"))
+        if (not parser_migration and not cached_community_retry and not queue_community_retry
                 and retry_at is not None and retry_at > clock() and isinstance(prior_proof, dict)
                 and identity_signature(prior_proof) == identity_signature(proof)):
             continue
         state = {"status": "pending", "updated_at": stamp(now), "twitch_admission": proof,
                  "validation_version": STATE_VALIDATION_VERSION}
+        if community_queue_only:
+            state["follower_candidate"] = deepcopy(queued.get(appid))
         batch["state_updates"][str(appid)] = state
         metadata_blocked = next((stage for stage in ("steam_store_browse", "steam_appdetails")
             if aware_time((cooldowns.get(stage) or {}).get("retry_at")) is not None
@@ -413,8 +489,20 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                 } else {"retry_at": stamp(clock() + timedelta(hours=24))})
                 state.update(reason=reason, **retry, status="excluded" if excluded else "pending",
                              rate_limit_stage=None, rate_limit_attempts=0, retry_after=None)
+                if reason not in {"steam_store_unavailable", "steam_type_unavailable",
+                                  "steam_content_descriptors_unavailable"}:
+                    queued.pop(appid, None)
+                    if community_queue_only:
+                        state["follower_candidate"] = None
                 continue
             if count is None:
+                if community_queue_only:
+                    queued[appid] = follower_candidate(probe)
+                    state.update(reason="queued_official_followers", rate_limit_stage=None,
+                                 retry_at=None, retry_source=None, retry_after=None,
+                                 retry_attempts=0, rate_limit_attempts=0,
+                                 follower_candidate=deepcopy(queued[appid]))
+                    continue
                 if community_until is not None and community_until > clock():
                     cooldown = cooldowns.get("steam_community") or {}
                     state.update(reason="steam_community_cooldown", rate_limit_stage="steam_community",
@@ -439,10 +527,13 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                              rate_limit_stage=None, rate_limit_attempts=0, retry_after=None)
                 continue
             batch["records"].append(row)
+            queued.pop(appid, None)
             state.update(status="accepted", reason="steam_verified", content_signature=signature(row),
                          followers=row["followers"], follower_checked_at=row["follower_checked_at"],
                          retry_at=None, retry_attempts=0, rate_limit_attempts=0,
                          rate_limit_stage=None, retry_source=None, retry_after=None)
+            if community_queue_only:
+                state["follower_candidate"] = None
         except (requests.RequestException, ValueError, TypeError, RuntimeError, ET.ParseError) as exc:
             state.update(reason=type(exc).__name__, **transient_retry_policy(prior, clock()),
                          rate_limit_stage=None, rate_limit_attempts=0, retry_after=None)
@@ -462,6 +553,8 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                     continue
                 batch["stop_reason"] = "steam_rate_limited"
                 break
+    if community_queue_only:
+        batch["follower_candidates"] = [queued[appid] for appid in sorted(queued)]
     return batch
 
 
@@ -585,6 +678,8 @@ def main() -> None:
     parser.add_argument("--state", type=Path, default=Path("data/twitch_steam_import_state.json"))
     parser.add_argument("--batch", type=Path, default=Path("output/twitch_steam_import_batch.json"))
     parser.add_argument("--max-seconds", type=int, default=900)
+    parser.add_argument("--community-queue-only", action="store_true",
+                        help="Queue missing official Followers without querying Steam Community")
     args = parser.parse_args()
     if not 1 <= args.max_seconds <= 900:
         parser.error("max-seconds must be 1..900")
@@ -606,7 +701,8 @@ def main() -> None:
                       Path("experiments/steam_official_nearfirst_20260922/checkpoint.json")]
         caches = [read_json(path) for path in cache_paths if path.is_file()]
         batch = collect(args.frontend_path, args.frontend_commit, master, state,
-                        max_seconds=args.max_seconds, caches=caches)
+                        max_seconds=args.max_seconds, caches=caches,
+                        community_queue_only=args.community_queue_only)
         write_json(args.batch, batch)
     elif args.phase == "apply":
         batch = read_json(args.batch)

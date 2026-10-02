@@ -3,7 +3,7 @@
   "games": {
     "892970": {
       "status": "pending",
-      "updated_at": "2026-10-02T10:06:24.144456Z",
+      "updated_at": "2026-10-02T10:14:27.239399Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -11,7 +11,7 @@
         "twitch_game_id": "508455",
         "igdb_id": "104967",
         "checked_at": "2026-10-02T09:57:54Z",
-        "source_frontend_commit": "1552b84f0f00d2eaca4285885ea25ad0bead6e5d",
+        "source_frontend_commit": "3626a86cdf93ed3c45072b81f49e622f568ffdce",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-09-29T14:28:32Z",
@@ -20,8 +20,9 @@
           "kind": "history_recovery"
         }
       },
-      "reason": "uncertain_steam_date",
-      "retry_at": "2026-10-03T10:06:24.144456Z"
+      "reason": "RateLimited",
+      "retry_at": "2026-10-02T16:14:27.239399Z",
+      "validation_version": 2
     },
     "1488490": {
       "status": "pending",
@@ -534,5 +535,5 @@
       "retry_at": "2026-10-03T10:06:24.144456Z"
     }
   },
-  "updated_at": "2026-10-02T10:14:06.999726Z"
+  "updated_at": "2026-10-02T10:14:27.239399Z"
 }

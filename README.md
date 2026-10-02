@@ -15,13 +15,27 @@
 
 Twitch 正式收錄的新作是獨立入口：Twitch ID → Helix 的 IGDB ID → IGDB 官方 Steam 外部 ID。找到原清單沒有的 AppID 後，不套用 5,000 Followers 門檻，仍查詢真實官方 Followers、Steam 台灣確切日期、正式遊戲類型與既有成人內容排除規則。資料不足保留待重試；IGDB 沒有 Steam 連結也只是尚未確認，每日重查。
 
-Twitch 發現的 Steam 遊戲直接加入既有 `steam-official-daily-catchup-250.yml` 官方 Followers 佇列，不另設查詢排程。每輪先讀前端不可變快照的 `data/twitch_steam_discovery.json`，只查 Steam 商店 metadata 並重用有效官方快取；缺少官方數值者依 AppID 去重後寫入既有 checkpoint 的 `pending_candidates`，Twitch 候選優先於一般候選。Twitch 內先查尚未嘗試者，再依上次嘗試時間與日期排序，避免同一款反覆失敗阻塞其他候選；一般候選維持原日期排序。全部候選共用每輪最多 250 次、至少 8 秒間隔與同一個 Community 冷卻。有已取得的官方數值（包含低於 5,000）就不再查 Community。程式修改觸發的同工作驗證輪次最多查 20 款，正常排程仍為 250 款。
+Twitch 發現的 Steam 遊戲直接加入既有 `steam-official-daily-catchup-250.yml` 官方 Followers 佇列，不另設查詢排程。每輪先讀前端不可變快照的 `data/twitch_steam_discovery.json`，只查 Steam 商店 metadata 並重用有效官方快取；缺少官方數值者依 AppID 去重後寫入既有 checkpoint 的 `pending_candidates`，Twitch 候選優先於一般候選。Twitch 內先查尚未嘗試者，再依上次嘗試時間與日期排序，避免同一款反覆失敗阻塞其他候選；一般候選維持原日期排序。全部候選共用每輪最多 250 次、至少 8 秒間隔與同一個 Community 冷卻。有已取得的官方數值（包含低於 5,000）就不再查 Community。修改程式與 workflow 不會自行觸發真實 Steam 查詢。
 
 同一工作查完官方數值後，由只使用快取的 Twitch importer 再核對日期、成人規則與來源證據，先持久化主清單及 `data/twitch_steam_import_state.json`，再送 `steam_game_twitch_discovered` 內容事件；事件失敗保留重試。一般 Steam 來源仍維持 5,000 Followers 門檻。來源證據 `twitch_admission` 隨清單、內容、索引與成長紀錄保存，正常更新不能移除已接受的來源。Twitch 觀測持續沿用 Twitch ID 與圖片，Steam 入口不會反過來冒充 Twitch 新作。沿用既有 `CONTENT_BACKEND_TOKEN`，不新增 Secrets。
 
 既有官方 worker 的 Community 429 以 15 分鐘開始逐次退避，最長 24 小時，並遵守更長的 `Retry-After` 秒數或 HTTP 日期；唯一的 Community 冷卻保存在官方 worker checkpoint。Twitch importer 只查商店 metadata、讀官方快取及建立候選，不能自行查 Community，也不另存 Community 冷卻副本。商店 metadata 按 5／10／20／30 分鐘退避；一般 metadata 網路或解析失敗按 5 分鐘開始、最長 1 小時逐次退避。期限只決定何時可再查，實際執行仍依原排程與共用鎖。Community 冷卻期間仍可用真實官方 Followers 快取完成核對。日期衝突與資格排除仍每日核對；來源失效或不再合格的未收錄候選撤回 Twitch 優先資格，原一般候選恢復，不重設已查進度與官方結果。
 
 2026-10-02 已確認七筆舊六小時冷卻紀錄全部完成遷移，清除其失效欄位並移除持續執行的遷移程式及舊查詢模式。原始紀錄與遷移證據保留在 Git 歷史；現行測試只驗證仍使用的商店重試、官方佇列及收錄／發布行為。
+
+### 第三方定時觸發遷移準備
+
+目前仍保留原 GitHub `schedule`；尚未宣告第三方切換完成。確認第三方對本 Repo 的 Actions dispatch 權限及驗證外部觸發後，才移除原 cron，避免重複執行。
+
+| Workflow | 台灣定時工作 | 外部 `workflow_dispatch` 輸入 |
+|---|---|---|
+| `steam-two-phase.yml` | 每日 00:00 | `trigger_source=cloudflare`、`target_slot`、`refresh_today=true` |
+| `steam-official-daily-catchup-250.yml` | 03:00–23:00 每小時 | `trigger_source=cloudflare`、`target_slot` |
+| `steam-public-growth.yml` | 每日 01:15 | `trigger_source=cloudflare`、`target_slot` |
+
+`target_slot` 使用原訂分鐘的 UTC ISO timestamp，例如台灣 2026-10-03 03:00 是 `2026-10-02T19:00:00Z`。run-name 包含原樣的 `slot=`，讓觸發器查證同一時段是否已送出。Followers 定時工作若開始時已跨入下一個台灣小時，就跳過該舊時段；準備 Twitch 候選後、查詢 Community 前再檢查一次。daily discovery 與 growth 的外部時段必須仍屬本日，錯誤時段或缺少 timezone 會停止。
+
+每日重建在 collection 前持久化 `daily_refresh_slot` 與 `last_reset_date_taipei`，且核對候選 `anchor_date`。相同定時 slot 重送會沿用候選與初篩斷點；遷移當天已存在同日候選、但尚無 marker 時，只補 marker 並續跑，不清空斷點。人工 `refresh_today=true` 仍可強制重建。已落地的 pipeline 進度也在後續步驟失敗時保存。原 Followers 共用鎖、冷卻、Twitch 優先佇列與內容事件保持相同流程。
 
 ## 資料責任
 

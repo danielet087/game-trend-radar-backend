@@ -1,24 +1,28 @@
 name: Steam official Followers - GitHub hourly auto 250
+run-name: "Steam Followers | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 # One scheduler and XML queue for ordinary candidates and Twitch discoveries.
-# Taiwan 03:00..23:00 hourly; GitHub can delay schedule start.
+# Taiwan 03:00..23:00 hourly; original schedule remains during migration.
 on:
   schedule:
     - cron: "0 3-23 * * *"
       timezone: "Asia/Taipei"
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - scripts/experiment_official_daily_catchup_250.py
-      - scripts/import_twitch_steam_discoveries.py
-      - scripts/reconcile_twitch_official_queue.py
-      - scripts/twitch_official_queue.py
-      - .github/workflows/steam-official-daily-catchup-250.yml
+    inputs:
+      trigger_source:
+        description: Trigger origin; Cloudflare slots retain scheduled execution guards
+        required: false
+        default: manual
+        type: choice
+        options: [manual, cloudflare]
+      target_slot:
+        description: Original scheduled UTC minute (ISO 8601, e.g. 2026-10-02T19:00:00Z)
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: write
-  actions: read
 
 concurrency:
   group: isolated-official-nearfirst-frozen-20260922
@@ -37,7 +41,16 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Check original Taiwan execution slot before Steam requests
+        id: window
+        env:
+          SCHEDULE_EVENT: ${{ github.event_name }}
+          SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
+          SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
+        run: python -m scripts.external_schedule --workflow official-followers
+
       - name: Install dependencies and validate queue/admission behavior
+        if: steps.window.outputs.proceed == 'true'
         run: |
           python -m pip install --disable-pip-version-check -r requirements-dev.txt
           python -m pytest -q
@@ -52,19 +65,6 @@ jobs:
           assert d["cohort"]=="steam_fresh_20260922_post_adult_1317_near_release"
           print("CATCHUP_INPUT_OK original_cohort=1317 confirmed="+str(len(d["official_results"])))
           PY
-
-      - name: Check Taiwan execution window (exclude delayed schedules outside 03–23)
-        id: window
-        env:
-          EVENT: ${{ github.event_name }}
-        run: |
-          HOUR="$(TZ=Asia/Taipei date +%H)"
-          if [ "$EVENT" = "workflow_dispatch" ] || { [ "$HOUR" -ge 3 ] && [ "$HOUR" -le 23 ]; }; then
-            echo "proceed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "proceed=false" >> "$GITHUB_OUTPUT"
-            echo "Scheduled run delayed to Taiwan hour $HOUR outside 03–23; no Steam requests." >> "$GITHUB_STEP_SUMMARY"
-          fi
 
       - name: Read immutable Twitch discovery inputs
         if: steps.window.outputs.proceed == 'true'
@@ -91,12 +91,21 @@ jobs:
           done
           exit 1
 
-      - name: Fetch up to 250 official counts, Twitch first, with >=8s pacing
+      - name: Recheck the scheduled hour after Twitch preparation
+        id: query_window
         if: steps.window.outputs.proceed == 'true'
+        env:
+          SCHEDULE_EVENT: ${{ github.event_name }}
+          SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
+          SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
+        run: python -m scripts.external_schedule --workflow official-followers
+
+      - name: Fetch up to 250 official counts, Twitch first, with >=8s pacing
+        if: steps.query_window.outputs.proceed == 'true'
         env:
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
-          REQUEST_LIMIT: ${{ github.event_name == 'push' && '20' || '250' }}
+          REQUEST_LIMIT: "250"
         run: >
           python -u -m scripts.experiment_official_daily_catchup_250
           --max-requests "$REQUEST_LIMIT"
@@ -105,7 +114,7 @@ jobs:
           --save-every 10
 
       - name: Final checkpoint save, including error and cooldown
-        if: always()
+        if: always() && steps.window.outputs.proceed == 'true'
         run: |
           if [ -s experiments/steam_official_daily_catchup/checkpoint.json ]; then
             git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json
@@ -157,7 +166,7 @@ jobs:
           exit 1
 
       - name: Publish actual per-batch result summary
-        if: always()
+        if: always() && steps.query_window.outputs.proceed == 'true'
         run: |
           if [ -s output/steam_official_daily_catchup/report.json ]; then
             python - <<'PY'
@@ -185,7 +194,7 @@ jobs:
           fi
 
       - name: Upload attempt details and observed batch report
-        if: always()
+        if: always() && steps.query_window.outputs.proceed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: steam-official-dynamic-catchup-250

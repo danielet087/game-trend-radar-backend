@@ -1,4 +1,5 @@
 name: Steam candidates then Followers
+run-name: "Steam daily discovery | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 on:
   # Daily Taiwan midnight refresh: rebuild the rolling 365-day candidate set,
@@ -10,6 +11,17 @@ on:
       timezone: "Asia/Taipei"
   workflow_dispatch:
     inputs:
+      trigger_source:
+        description: Trigger origin; Cloudflare requires a daily UTC target_slot
+        required: false
+        default: manual
+        type: choice
+        options: [manual, cloudflare]
+      target_slot:
+        description: Original Taiwan midnight as an ISO UTC timestamp
+        required: false
+        default: ""
+        type: string
       refresh_today:
         description: "Run the full daily discovery and prescreen to recover a missed refresh"
         required: false
@@ -36,31 +48,71 @@ jobs:
           cache-dependency-path: |
             requirements.txt
             requirements-dev.txt
+      - name: Validate external daily slot before resetting discovery
+        id: schedule_guard
+        env:
+          SCHEDULE_EVENT: ${{ github.event_name }}
+          SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
+          SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
+          SCHEDULE_REFRESH_TODAY: ${{ inputs.refresh_today }}
+        run: python -m scripts.external_schedule --workflow daily-discovery --fail-on-skip
       - name: Install dependencies
+        id: install
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Run tests
         run: python -m pytest -q
 
-      - name: Reset rolling 365-day discovery for today's scheduled refresh
+      - name: Persist daily reset once, or resume the existing scheduled slot
+        id: daily_reset
         if: github.event_name == 'schedule' || inputs.refresh_today == true
+        env:
+          SCHEDULE_EVENT: ${{ github.event_name }}
+          SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
+          SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
+          SCHEDULE_REFRESH_TODAY: ${{ inputs.refresh_today }}
         run: |
-          python - <<'PY'
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.external_schedule --workflow daily-discovery --fail-on-skip
+            python - <<'PY'
+          import json
+          import os
           from pathlib import Path
           from scripts.steam_candidate_pipeline import fresh_state
           from collectors.steam_upcoming import taiwan_today
+          from scripts.external_schedule import daily_reset_required, daily_slot
           from scripts.update_steam_daily import save_json
 
-          save_json(Path("data/steam_candidate_state.json"), fresh_state(taiwan_today(), 365))
-          save_json(Path("data/steam_candidates.json"), {"games": []})
-          save_json(Path("data/steam_prefilter_state.json"), {
-              "version": 1,
-              "next_index": 0,
-              "head_next_index": 0,
-              "complete": False,
-              "games": {},
-          })
-          print("DAILY_STEAM_REFRESH_RESET", taiwan_today().isoformat())
+          today = taiwan_today()
+          path = Path("data/steam_candidate_state.json")
+          state = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+          force = (os.environ.get("SCHEDULE_EVENT") == "workflow_dispatch"
+                   and os.environ.get("SCHEDULE_TRIGGER_SOURCE") != "cloudflare")
+          if daily_reset_required(state, today, force=force):
+              state = fresh_state(today, 365)
+              state.update(daily_refresh_slot=daily_slot(today), last_reset_date_taipei=today.isoformat())
+              save_json(path, state)
+              save_json(Path("data/steam_candidates.json"), {"games": []})
+              save_json(Path("data/steam_prefilter_state.json"), {
+                  "version": 1, "next_index": 0, "head_next_index": 0,
+                  "complete": False, "games": {},
+              })
+              print("DAILY_STEAM_REFRESH_RESET", today.isoformat())
+          else:
+              state.update(daily_refresh_slot=daily_slot(today), last_reset_date_taipei=today.isoformat())
+              save_json(path, state)
+              print("DAILY_STEAM_REFRESH_RESUME", daily_slot(today), state.get("phase"))
           PY
+            git add data/steam_candidate_state.json data/steam_candidates.json data/steam_prefilter_state.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "data: persist daily Steam discovery reset before collection"
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
       - name: Daily midnight discovery through complete third-party prescreen
         if: github.event_name == 'schedule' || inputs.refresh_today == true
         env:
@@ -192,6 +244,7 @@ jobs:
 
           PY
       - name: Save private candidate catalog and checkpoint metadata
+        if: always() && steps.schedule_guard.outcome == 'success' && steps.install.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

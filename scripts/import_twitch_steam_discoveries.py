@@ -39,7 +39,10 @@ STATE_VALIDATION_VERSION = 2
 
 
 class RateLimited(RuntimeError):
-    pass
+    def __init__(self, stage: str, retry_seconds: int):
+        super().__init__("Steam HTTP 429")
+        self.stage = stage
+        self.retry_seconds = retry_seconds
 
 
 def stamp(now: datetime) -> str:
@@ -221,7 +224,18 @@ def build_candidate(appid: int, proof: dict, item: dict, details: dict,
 def request(session, url: str, *, params: dict | None = None, timeout: float = 25):
     response = session.get(url, params=params, timeout=timeout)
     if response.status_code == 429:
-        raise RateLimited("Steam HTTP 429")
+        stage = "steam_community" if url.startswith("https://steamcommunity.com/") else (
+            "steam_store_browse" if url == STORE_BROWSE else "steam_appdetails"
+        )
+        default = 3600 if stage == "steam_community" else 900
+        try:
+            retry_seconds = int(response.headers.get("Retry-After"))
+        except (ValueError, TypeError, AttributeError):
+            retry_seconds = default
+        if retry_seconds <= 0:
+            retry_seconds = default
+        # Do not shorten an explicit longer server cooldown.
+        raise RateLimited(stage, max(60, retry_seconds))
     response.raise_for_status()
     return response
 
@@ -272,9 +286,31 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
     by_id = {int(row["appid"]): row for row in master["games"]}
     blocked = excluded_appids() if blocked is None else blocked
     batch = {"schema_version": 1, "generated_at": stamp(now), "source_frontend_commit": commit,
-             "records": [], "state_updates": {}, "stop_reason": "complete"}
+             "records": [], "state_updates": {}, "cooldown_updates": {}, "stop_reason": "complete"}
+    cooldowns = deepcopy(previous.get("api_cooldowns") or {})
+    # Legacy receipts did not record which endpoint returned 429. Preserve
+    # their live retry deadline conservatively for XML while allowing normal
+    # metadata checks and candidates backed by a real Followers cache.
+    community_until = aware_time((cooldowns.get("steam_community") or {}).get("retry_at"))
+    for prior in (previous.get("games") or {}).values():
+        if not isinstance(prior, dict):
+            continue
+        retry = aware_time(prior.get("retry_at"))
+        if (prior.get("reason") == "RateLimited" and prior.get("rate_limit_stage") in (None, "steam_community")
+                and retry is not None and retry > now and (community_until is None or retry > community_until)):
+            community_until = retry
+    if community_until is not None and community_until > now:
+        cooldowns["steam_community"] = {"retry_at": stamp(community_until), "updated_at": stamp(now)}
+        batch["cooldown_updates"]["steam_community"] = cooldowns["steam_community"]
     deadline = monotonic() + max_seconds
+    last_metadata_start = float("-inf")
     def get(url: str, *, params: dict):
+        nonlocal last_metadata_start
+        if not url.startswith("https://steamcommunity.com/"):
+            delay = max(0, 1.5 - (monotonic() - last_metadata_start))
+            if delay:
+                sleep(min(delay, max(0, deadline - monotonic())))
+            last_metadata_start = monotonic()
         remaining = deadline - monotonic()
         if remaining <= 0:
             raise RuntimeError("deadline")
@@ -298,13 +334,22 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
             continue
         retry_at = aware_time(prior.get("retry_at"))
         prior_proof = prior.get("twitch_admission")
-        if (prior.get("validation_version") == STATE_VALIDATION_VERSION
-                and retry_at is not None and retry_at > now and isinstance(prior_proof, dict)
+        parser_migration = (prior.get("validation_version") != STATE_VALIDATION_VERSION
+                            and prior.get("reason") in {"uncertain_steam_date", "uncertain_taiwan_store_date"})
+        if (not parser_migration and retry_at is not None and retry_at > now and isinstance(prior_proof, dict)
                 and identity_signature(prior_proof) == identity_signature(proof)):
             continue
         state = {"status": "pending", "updated_at": stamp(now), "twitch_admission": proof,
                  "validation_version": STATE_VALIDATION_VERSION}
         batch["state_updates"][str(appid)] = state
+        metadata_blocked = next((stage for stage in ("steam_store_browse", "steam_appdetails")
+            if aware_time((cooldowns.get(stage) or {}).get("retry_at")) is not None
+            and aware_time(cooldowns[stage]["retry_at"]) > now), None)
+        if metadata_blocked is not None:
+            state.update(reason="metadata_cooldown", rate_limit_stage=metadata_blocked,
+                         retry_at=cooldowns[metadata_blocked]["retry_at"])
+            batch["stop_reason"] = "steam_metadata_cooldown"
+            break
         try:
             payload = {"ids": [{"appid": appid}], "context": {
                 "country_code": "TW", "language": "english", "steam_realm": 1,
@@ -328,6 +373,11 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                              status="excluded" if reason in {"adult_content", "not_a_steam_game", "outside_new_game_window"} else "pending")
                 continue
             if count is None:
+                if community_until is not None and community_until > now:
+                    state.update(reason="steam_community_cooldown", rate_limit_stage="steam_community",
+                                 retry_at=stamp(community_until))
+                    batch["stop_reason"] = "steam_community_cooldown"
+                    continue
                 delay = max(0, 8 - (monotonic() - last_follower_start))
                 if monotonic() + delay + 25 >= deadline:
                     state.update(reason="deadline_before_followers")
@@ -348,6 +398,15 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
         except (requests.RequestException, ValueError, TypeError, RuntimeError, ET.ParseError) as exc:
             state.update(reason=type(exc).__name__, retry_at=stamp(now + timedelta(hours=6)))
             if isinstance(exc, RateLimited):
+                until = now + timedelta(seconds=exc.retry_seconds)
+                state.update(rate_limit_stage=exc.stage, retry_at=stamp(until))
+                cooldown = {"retry_at": stamp(until), "updated_at": stamp(now)}
+                cooldowns[exc.stage] = cooldown
+                batch["cooldown_updates"][exc.stage] = cooldown
+                if exc.stage == "steam_community":
+                    community_until = until
+                    batch["stop_reason"] = "steam_community_rate_limited"
+                    continue
                 batch["stop_reason"] = "steam_rate_limited"
                 break
     return batch
@@ -398,6 +457,21 @@ def apply_batch(master: dict, state: dict, batch: dict) -> tuple[dict, dict]:
             merged.pop("content_dispatch", None)
         updates[aid] = merged
     merged_state["updated_at"] = batch["generated_at"]
+    for stage, cooldown in batch.get("cooldown_updates", {}).items():
+        if stage not in {"steam_store_browse", "steam_appdetails", "steam_community"}:
+            raise ValueError("Malformed Steam cooldown stage")
+        until, updated = aware_time(cooldown.get("retry_at")), aware_time(cooldown.get("updated_at"))
+        if until is None or updated is None:
+            raise ValueError("Malformed Steam cooldown deadline")
+        current = merged_state.setdefault("api_cooldowns", {}).get(stage, {})
+        previous_updated = aware_time(current.get("updated_at"))
+        if previous_updated is None or updated >= previous_updated:
+            # A concurrent longer cooldown must not be shortened by an older
+            # batch, even when both were measured within the same timestamp.
+            previous_until = aware_time(current.get("retry_at"))
+            if previous_until is not None and previous_until > until:
+                cooldown = {**cooldown, "retry_at": current["retry_at"]}
+            merged_state["api_cooldowns"][stage] = deepcopy(cooldown)
     return result, merged_state
 
 

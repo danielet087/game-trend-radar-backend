@@ -3,7 +3,7 @@
   "games": {
     "892970": {
       "status": "pending",
-      "updated_at": "2026-10-03T11:43:31.012001Z",
+      "updated_at": "2026-10-03T11:43:48.396936Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -69,9 +69,9 @@
           "release_date_conflict": false,
           "release_store_date": "2026-09-09",
           "release_date_normalization": "steam_store_date_matches_taipei",
-          "release_date_verified_at": "2026-10-03T11:43:31.012001Z",
+          "release_date_verified_at": "2026-10-03T11:43:48.396936Z",
           "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-03T11:43:31.012001Z",
+          "post_followers_store_verified_at": "2026-10-03T11:43:48.396936Z",
           "sexual_content_screened": true,
           "steam_type": "game",
           "content_descriptorids": [],
@@ -421,8 +421,8 @@
       }
     },
     "3219630": {
-      "status": "pending",
-      "updated_at": "2026-10-03T11:43:31.012001Z",
+      "status": "accepted",
+      "updated_at": "2026-10-03T11:43:48.396936Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -438,7 +438,7 @@
           "min_viewers": 7000
         }
       },
-      "reason": "queued_official_followers",
+      "reason": "steam_verified",
       "retry_at": null,
       "validation_version": 3,
       "rate_limit_stage": null,
@@ -446,75 +446,10 @@
       "retry_after": null,
       "retry_attempts": 0,
       "rate_limit_attempts": 0,
-      "follower_candidate": {
-        "appid": 3219630,
-        "name": "Halloween: The Game",
-        "release_date": "2026-09-09",
-        "steam_url": "https://store.steampowered.com/app/3219630/",
-        "group_id64": null,
-        "queue_source": "twitch_steam_discovery",
-        "twitch_admission": {
-          "schema_version": 1,
-          "method": "twitch_igdb_external_steam_v1",
-          "appid": 3219630,
-          "twitch_game_id": "902998079",
-          "igdb_id": "362096",
-          "checked_at": "2026-10-03T10:10:30Z",
-          "source_frontend_commit": "ae9d2b02f7b98de235dbffc1d693b969c1fb75ba",
-          "source_enrollment": {
-            "source": "igdb_first_release_date",
-            "observed_at": "2026-10-02T01:13:11Z",
-            "viewer_count": 7619,
-            "min_viewers": 7000
-          }
-        },
-        "steam_candidate": {
-          "appid": 3219630,
-          "name": "Halloween: The Game",
-          "name_en": "Halloween: The Game",
-          "release_raw": "2026-09-09",
-          "release_start": "2026-09-09",
-          "release_end": "2026-09-09",
-          "release_precision": "day",
-          "release_display_precision": "date_full",
-          "release_display_provider": "Steam IStoreBrowseService/GetItems",
-          "release_date_basis": "steam_store_browse_verified_full_date",
-          "release_date_timezone": "Asia/Taipei",
-          "release_time_utc": "2026-09-08T16:02:32Z",
-          "release_time_source": "Steam IStoreBrowseService/GetItems",
-          "release_timestamp_taipei_date": "2026-09-09",
-          "release_date_conflict": false,
-          "release_store_date": "2026-09-08",
-          "release_date_normalization": "steam_utc_date_normalized_to_taipei",
-          "release_date_verified_at": "2026-10-03T11:43:31.012001Z",
-          "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-03T11:43:31.012001Z",
-          "sexual_content_screened": true,
-          "steam_type": "game",
-          "content_descriptorids": [
-            1,
-            2,
-            5
-          ],
-          "store_url": "https://store.steampowered.com/app/3219630/",
-          "community_url": "https://steamcommunity.com/app/3219630/",
-          "twitch_admission": {
-            "schema_version": 1,
-            "method": "twitch_igdb_external_steam_v1",
-            "appid": 3219630,
-            "twitch_game_id": "902998079",
-            "igdb_id": "362096",
-            "checked_at": "2026-10-03T10:10:30Z",
-            "source_frontend_commit": "ae9d2b02f7b98de235dbffc1d693b969c1fb75ba",
-            "source_enrollment": {
-              "source": "igdb_first_release_date",
-              "observed_at": "2026-10-02T01:13:11Z",
-              "viewer_count": 7619,
-              "min_viewers": 7000
-            }
-          }
-        }
-      }
+      "follower_candidate": null,
+      "content_signature": "04f198953dfdb62eea1f2fadf059cb2d897141220543e095004bcc2801318269",
+      "followers": 50176,
+      "follower_checked_at": "2026-10-03T19:43:44.223178+08:00"
     },
     "3493540": {
       "status": "accepted",
@@ -1016,7 +951,7 @@
     },
     "2887580": {
       "status": "pending",
-      "updated_at": "2026-10-03T11:43:31.012001Z",
+      "updated_at": "2026-10-03T11:43:48.396936Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -1073,9 +1008,9 @@
           "release_date_conflict": false,
           "release_store_date": "2026-09-15",
           "release_date_normalization": "steam_store_date_matches_taipei",
-          "release_date_verified_at": "2026-10-03T11:43:31.012001Z",
+          "release_date_verified_at": "2026-10-03T11:43:48.396936Z",
           "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-03T11:43:31.012001Z",
+          "post_followers_store_verified_at": "2026-10-03T11:43:48.396936Z",
           "sexual_content_screened": true,
           "steam_type": "game",
           "content_descriptorids": [
@@ -1110,6 +1045,6 @@
       "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-03T11:43:31.012001Z",
+  "updated_at": "2026-10-03T11:43:48.396936Z",
   "api_cooldowns": {}
 }

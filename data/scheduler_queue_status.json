@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-03T12:11:49.864274Z",
+  "generated_at": "2026-10-03T12:47:18.177053Z",
   "today_taipei": "2026-10-03",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-03T12:11:36.422134Z",
-    "group_resolution_updated_at": "2026-10-03T11:02:40.289475Z",
+    "checkpoint_updated_at": "2026-10-03T12:44:45.207045Z",
+    "group_resolution_updated_at": "2026-10-03T12:41:13.986024Z",
     "candidate_state_updated_at": "2026-10-02T21:25:15.691702Z",
     "prefilter_updated_at": "2026-10-02T21:25:15.673055Z",
     "eligible_screened_at": "2026-10-02T21:25:16.315935Z",
-    "twitch_import_updated_at": "2026-10-03T12:11:48.350076Z",
+    "twitch_import_updated_at": "2026-10-03T12:39:30.931673Z",
     "last_official_success_at": "2026-10-03T12:11:36.386250Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -23,20 +23,20 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 0,
+    "combined_pending_now": 5,
     "completed_legacy": 384,
     "completed_new": 1667,
-    "twitch_priority_pending": 0
+    "twitch_priority_pending": 5
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 0,
+    "twitch_priority_pending": 5,
     "parked": 1,
-    "ready_pending": 0,
-    "followers_ready_pending": 0,
+    "ready_pending": 5,
+    "followers_ready_pending": 5,
     "awaiting_group_pending": 0,
-    "total_pending": 1,
-    "today_attempts": 80,
+    "total_pending": 6,
+    "today_attempts": 81,
     "today_successes": 76,
     "today_429": 4
   },
@@ -48,30 +48,134 @@
     "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "cooldown": {
-    "active": false,
-    "until": null,
-    "reason": null,
-    "next_eligible_slot": null,
+    "active": true,
+    "until": "2026-10-03T12:59:45.155396Z",
+    "reason": "transport_or_xml_error",
+    "next_eligible_slot": "2026-10-03T13:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-03T20:01:44.218959+08:00",
-    "last_updated_at": "2026-10-03T20:11:36.422134+08:00",
-    "finished_at": "2026-10-03T20:11:36.422134+08:00",
-    "stop_reason": "batch_request_limit",
-    "last_appid": 5140640,
-    "last_name": "Crown Bluff",
-    "requests_this_run": 75,
-    "official_new_this_run": 75,
+    "started_at": "2026-10-03T20:44:37.068486+08:00",
+    "last_updated_at": "2026-10-03T20:44:45.207045+08:00",
+    "finished_at": "2026-10-03T20:44:45.207045+08:00",
+    "stop_reason": "transport_or_xml_error",
+    "last_appid": 3070070,
+    "last_name": "TCG Card Shop Simulator",
+    "requests_this_run": 1,
+    "official_new_this_run": 0,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
-    "request_limit": 250,
-    "run_id": "37121514609",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
+    "request_limit": 5
   },
-  "queue": [],
+  "queue": [
+    {
+      "position": 1,
+      "appid": 4126040,
+      "name": "Aniimo",
+      "steam_url": "https://store.steampowered.com/app/4126040/",
+      "release_date": "2026-09-15",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "cooldown",
+      "group_id64": "103582791475413292",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T12:41:13.985508+00:00",
+        "source": "Steam Community official AppID hub",
+        "source_url": "https://steamcommunity.com/app/4126040/",
+        "attempted": true,
+        "http": 200
+      },
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    },
+    {
+      "position": 2,
+      "appid": 3669570,
+      "name": "Alchemy Factory",
+      "steam_url": "https://store.steampowered.com/app/3669570/",
+      "release_date": "2026-09-07",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "cooldown",
+      "group_id64": "103582791475114120",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T12:41:13.984789+00:00",
+        "source": "Steam Community official AppID hub",
+        "source_url": "https://steamcommunity.com/app/3669570/",
+        "attempted": true,
+        "http": 200
+      },
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    },
+    {
+      "position": 3,
+      "appid": 2638890,
+      "name": "Onimusha: Way of the Sword",
+      "steam_url": "https://store.steampowered.com/app/2638890/",
+      "release_date": "2026-09-03",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "cooldown",
+      "group_id64": "103582791474865040",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T12:36:38.990527+00:00",
+        "source": "Steam Community official AppID hub",
+        "source_url": "https://steamcommunity.com/app/2638890/",
+        "attempted": true,
+        "http": 200
+      },
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    },
+    {
+      "position": 4,
+      "appid": 4356430,
+      "name": "NBA 2K27",
+      "steam_url": "https://store.steampowered.com/app/4356430/",
+      "release_date": "2026-09-03",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "cooldown",
+      "group_id64": "103582791475745814",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T12:41:13.986024+00:00",
+        "source": "Steam Community official AppID hub",
+        "source_url": "https://steamcommunity.com/app/4356430/",
+        "attempted": true,
+        "http": 200
+      },
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    },
+    {
+      "position": 5,
+      "appid": 3070070,
+      "name": "TCG Card Shop Simulator",
+      "steam_url": "https://store.steampowered.com/app/3070070/",
+      "release_date": "2026-09-15",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "cooldown",
+      "group_id64": "103582791474602978",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T12:41:13.983657+00:00",
+        "source": "Steam Community official AppID hub",
+        "source_url": "https://steamcommunity.com/app/3070070/",
+        "attempted": true,
+        "http": 200
+      },
+      "last_attempt_at": "2026-10-03T12:44:37.144943Z",
+      "last_attempt_status": "transport_or_xml_error"
+    }
+  ],
   "parked": [
     {
       "appid": 4435490,
@@ -98,17 +202,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-02T02:11:32.790762Z",
-      "kind": "official_attempt",
-      "appid": 5274100,
-      "name": "Karesansui",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null
-    },
     {
       "at": "2026-10-02T02:11:40.790852Z",
       "kind": "official_attempt",
@@ -1352,6 +1445,18 @@
       "retry_at": null,
       "run_id": "37121514609",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
+    },
+    {
+      "at": "2026-10-03T12:44:37.144943Z",
+      "kind": "official_attempt",
+      "appid": 3070070,
+      "name": "TCG Card Shop Simulator",
+      "status": "transport_or_xml_error",
+      "http": null,
+      "source": "twitch_steam_discovery",
+      "official_followers": null,
+      "retry_at": "2026-10-03T12:59:45.155396Z",
+      "error_type": "ReadTimeout"
     }
   ],
   "events_limit": 100

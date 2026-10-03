@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-03T12:47:18.177053Z",
+  "generated_at": "2026-10-03T13:01:47.025560Z",
   "today_taipei": "2026-10-03",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,7 +10,7 @@
     "candidate_state_updated_at": "2026-10-02T21:25:15.691702Z",
     "prefilter_updated_at": "2026-10-02T21:25:15.673055Z",
     "eligible_screened_at": "2026-10-02T21:25:16.315935Z",
-    "twitch_import_updated_at": "2026-10-03T12:39:30.931673Z",
+    "twitch_import_updated_at": "2026-10-03T13:01:32.646509Z",
     "last_official_success_at": "2026-10-03T12:11:36.386250Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -48,10 +48,10 @@
     "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "cooldown": {
-    "active": true,
+    "active": false,
     "until": "2026-10-03T12:59:45.155396Z",
-    "reason": "transport_or_xml_error",
-    "next_eligible_slot": "2026-10-03T13:00:00Z",
+    "reason": null,
+    "next_eligible_slot": "2026-10-03T14:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -78,7 +78,7 @@
       "release_date": "2026-09-15",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "waiting",
       "group_id64": "103582791475413292",
       "group_resolution": {
         "status": "resolved",
@@ -99,7 +99,7 @@
       "release_date": "2026-09-07",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "waiting",
       "group_id64": "103582791475114120",
       "group_resolution": {
         "status": "resolved",
@@ -120,7 +120,7 @@
       "release_date": "2026-09-03",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "waiting",
       "group_id64": "103582791474865040",
       "group_resolution": {
         "status": "resolved",
@@ -141,7 +141,7 @@
       "release_date": "2026-09-03",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "waiting",
       "group_id64": "103582791475745814",
       "group_resolution": {
         "status": "resolved",
@@ -162,7 +162,7 @@
       "release_date": "2026-09-15",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "waiting",
       "group_id64": "103582791474602978",
       "group_resolution": {
         "status": "resolved",

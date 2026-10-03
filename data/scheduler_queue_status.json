@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-03T09:01:38.929130Z",
+  "generated_at": "2026-10-03T09:01:40.868140Z",
   "today_taipei": "2026-10-03",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-03T06:01:49.593013Z",
+    "checkpoint_updated_at": "2026-10-03T09:01:40.828236Z",
     "candidate_state_updated_at": "2026-10-02T21:25:15.691702Z",
     "prefilter_updated_at": "2026-10-02T21:25:15.673055Z",
     "eligible_screened_at": "2026-10-02T21:25:16.315935Z",
@@ -33,53 +33,65 @@
     "parked": 1,
     "ready_pending": 76,
     "total_pending": 77,
-    "today_attempts": 3,
+    "today_attempts": 4,
     "today_successes": 0,
-    "today_429": 3
+    "today_429": 4
   },
   "cooldown": {
-    "active": false,
-    "until": "2026-10-03T08:01:49.725937Z",
-    "reason": null,
-    "next_eligible_slot": "2026-10-03T10:00:00Z",
+    "active": true,
+    "until": "2026-10-03T13:01:40.828192Z",
+    "reason": "steam_http_429",
+    "next_eligible_slot": "2026-10-03T14:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
-  "batch": null,
+  "batch": {
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-10-03T17:01:40.605828+08:00",
+    "last_updated_at": "2026-10-03T17:01:40.828236+08:00",
+    "last_appid": 2887580,
+    "last_name": "Active Matter",
+    "requests_this_run": 1,
+    "official_new_this_run": 0,
+    "http_429_this_run": 1,
+    "run_id": "37111632690",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37111632690"
+  },
   "queue": [
     {
       "position": 1,
-      "appid": 2887580,
-      "name": "Active Matter",
-      "steam_url": "https://store.steampowered.com/app/2887580/",
-      "release_date": "2026-09-15",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "last_attempt_at": "2026-10-02T22:44:43.753625Z",
-      "last_attempt_status": "rate_limited"
-    },
-    {
-      "position": 2,
       "appid": 3219630,
       "name": "Halloween: The Game",
       "steam_url": "https://store.steampowered.com/app/3219630/",
       "release_date": "2026-09-09",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": "2026-10-03T01:37:38.830012Z",
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 3,
+      "position": 2,
       "appid": 892970,
       "name": "Valheim",
       "steam_url": "https://store.steampowered.com/app/892970/",
       "release_date": "2026-09-09",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": "2026-10-03T06:01:49.593013Z",
+      "last_attempt_status": "rate_limited"
+    },
+    {
+      "position": 3,
+      "appid": 2887580,
+      "name": "Active Matter",
+      "steam_url": "https://store.steampowered.com/app/2887580/",
+      "release_date": "2026-09-15",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "cooldown",
+      "last_attempt_at": "2026-10-03T09:01:40.700874Z",
       "last_attempt_status": "rate_limited"
     },
     {
@@ -90,7 +102,7 @@
       "release_date": "2026-10-03",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -102,7 +114,7 @@
       "release_date": "2026-10-06",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -114,7 +126,7 @@
       "release_date": "2026-10-09",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -126,7 +138,7 @@
       "release_date": "2026-10-12",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -138,7 +150,7 @@
       "release_date": "2026-10-12",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -150,7 +162,7 @@
       "release_date": "2026-10-12",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -162,7 +174,7 @@
       "release_date": "2026-10-12",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -174,7 +186,7 @@
       "release_date": "2026-10-12",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -186,7 +198,7 @@
       "release_date": "2026-10-12",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -198,7 +210,7 @@
       "release_date": "2026-10-13",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -210,7 +222,7 @@
       "release_date": "2026-10-14",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -222,7 +234,7 @@
       "release_date": "2026-10-14",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -234,7 +246,7 @@
       "release_date": "2026-10-15",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -246,7 +258,7 @@
       "release_date": "2026-10-16",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -258,7 +270,7 @@
       "release_date": "2026-10-16",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -270,7 +282,7 @@
       "release_date": "2026-10-16",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -282,7 +294,7 @@
       "release_date": "2026-10-17",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -294,7 +306,7 @@
       "release_date": "2026-10-19",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -306,7 +318,7 @@
       "release_date": "2026-10-20",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -318,7 +330,7 @@
       "release_date": "2026-10-20",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -330,7 +342,7 @@
       "release_date": "2026-10-20",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -342,7 +354,7 @@
       "release_date": "2026-10-21",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -354,7 +366,7 @@
       "release_date": "2026-10-22",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -366,7 +378,7 @@
       "release_date": "2026-10-22",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -378,7 +390,7 @@
       "release_date": "2026-10-22",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -390,7 +402,7 @@
       "release_date": "2026-10-22",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -402,7 +414,7 @@
       "release_date": "2026-10-23",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -414,7 +426,7 @@
       "release_date": "2026-10-23",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -426,7 +438,7 @@
       "release_date": "2026-10-26",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -438,7 +450,7 @@
       "release_date": "2026-10-27",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -450,7 +462,7 @@
       "release_date": "2026-10-27",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -462,7 +474,7 @@
       "release_date": "2026-10-28",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -474,7 +486,7 @@
       "release_date": "2026-10-28",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -486,7 +498,7 @@
       "release_date": "2026-10-29",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -498,7 +510,7 @@
       "release_date": "2026-10-30",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -510,7 +522,7 @@
       "release_date": "2026-10-30",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -522,7 +534,7 @@
       "release_date": "2026-10-31",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -534,7 +546,7 @@
       "release_date": "2026-10-31",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -546,7 +558,7 @@
       "release_date": "2026-10-31",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -558,7 +570,7 @@
       "release_date": "2026-10-31",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -570,7 +582,7 @@
       "release_date": "2026-11-02",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -582,7 +594,7 @@
       "release_date": "2026-11-02",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -594,7 +606,7 @@
       "release_date": "2026-11-03",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -606,7 +618,7 @@
       "release_date": "2026-11-03",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -618,7 +630,7 @@
       "release_date": "2026-11-03",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -630,7 +642,7 @@
       "release_date": "2026-11-04",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -642,7 +654,7 @@
       "release_date": "2026-11-04",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -654,7 +666,7 @@
       "release_date": "2026-11-05",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -666,7 +678,7 @@
       "release_date": "2026-11-05",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -678,7 +690,7 @@
       "release_date": "2026-11-06",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -690,7 +702,7 @@
       "release_date": "2026-11-07",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -702,7 +714,7 @@
       "release_date": "2026-11-10",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -714,7 +726,7 @@
       "release_date": "2026-11-13",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -726,7 +738,7 @@
       "release_date": "2026-11-19",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -738,7 +750,7 @@
       "release_date": "2026-11-19",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -750,7 +762,7 @@
       "release_date": "2026-11-30",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -762,7 +774,7 @@
       "release_date": "2026-12-02",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -774,7 +786,7 @@
       "release_date": "2026-12-03",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -786,7 +798,7 @@
       "release_date": "2026-12-04",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -798,7 +810,7 @@
       "release_date": "2026-12-07",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -810,7 +822,7 @@
       "release_date": "2026-12-11",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -822,7 +834,7 @@
       "release_date": "2026-12-16",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -834,7 +846,7 @@
       "release_date": "2026-12-17",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -846,7 +858,7 @@
       "release_date": "2026-12-20",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -858,7 +870,7 @@
       "release_date": "2027-01-04",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -870,7 +882,7 @@
       "release_date": "2027-01-19",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -882,7 +894,7 @@
       "release_date": "2027-02-01",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -894,7 +906,7 @@
       "release_date": "2027-03-09",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -906,7 +918,7 @@
       "release_date": "2027-03-16",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -918,7 +930,7 @@
       "release_date": "2027-03-26",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -930,7 +942,7 @@
       "release_date": "2027-03-31",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -942,7 +954,7 @@
       "release_date": "2027-04-16",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -954,7 +966,7 @@
       "release_date": "2027-04-17",
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
-      "state": "waiting",
+      "state": "cooldown",
       "last_attempt_at": null,
       "last_attempt_status": null
     }
@@ -975,17 +987,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-01T01:50:17.430530Z",
-      "kind": "official_attempt",
-      "appid": 5326080,
-      "name": "Tidy Up The Backrooms",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 7,
-      "retry_at": null
-    },
     {
       "at": "2026-10-01T01:50:25.430661Z",
       "kind": "official_attempt",
@@ -2074,6 +2075,19 @@
       "source": "twitch_steam_discovery",
       "official_followers": null,
       "retry_at": "2026-10-03T08:01:49.725937Z"
+    },
+    {
+      "at": "2026-10-03T09:01:40.700874Z",
+      "kind": "official_attempt",
+      "appid": 2887580,
+      "name": "Active Matter",
+      "status": "rate_limited",
+      "http": 429,
+      "source": "twitch_steam_discovery",
+      "official_followers": null,
+      "retry_at": "2026-10-03T13:01:40.828192Z",
+      "run_id": "37111632690",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37111632690"
     }
   ],
   "events_limit": 100

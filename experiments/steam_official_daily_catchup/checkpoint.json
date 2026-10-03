@@ -52062,10 +52062,20 @@
       "http": 429,
       "status": "rate_limited",
       "next_request_after_taipei": "2026-10-03T16:01:49.725937+08:00"
+    },
+    {
+      "appid": 2887580,
+      "when_taipei": "2026-10-03T17:01:40.700874+08:00",
+      "release_date": "2026-09-15",
+      "queue_source": "twitch_steam_discovery",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "37111632690",
+      "next_request_after_taipei": "2026-10-03T21:01:40.828192+08:00"
     }
   ],
-  "next_request_after_taipei": "2026-10-03T16:01:49.725937+08:00",
-  "rate_limit_count": 4,
+  "next_request_after_taipei": "2026-10-03T21:01:40.828192+08:00",
+  "rate_limit_count": 5,
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
@@ -52138,13 +52148,25 @@
     }
   },
   "community_cooldown": {
-    "retry_at": "2026-10-03T08:01:49.725937+00:00",
-    "observed_at": "2026-10-03T06:01:49.725937+00:00",
-    "updated_at": "2026-10-03T06:01:49.725937+00:00",
-    "retry_seconds": 7200,
+    "retry_at": "2026-10-03T13:01:40.828192+00:00",
+    "observed_at": "2026-10-03T09:01:40.828192+00:00",
+    "updated_at": "2026-10-03T09:01:40.828192+00:00",
+    "retry_seconds": 14400,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 4
+    "attempts": 5
   },
-  "community_last_success_at": "2026-10-02T23:24:10.323084+08:00"
+  "community_last_success_at": "2026-10-02T23:24:10.323084+08:00",
+  "scheduler_batch": {
+    "run_id": "37111632690",
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-10-03T17:01:40.605828+08:00",
+    "last_updated_at": "2026-10-03T17:01:40.828236+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 0,
+    "http_429_this_run": 1,
+    "last_appid": 2887580,
+    "last_name": "Active Matter"
+  }
 }

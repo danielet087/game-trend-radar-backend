@@ -74,7 +74,7 @@ jobs:
           inputs=events["workflow_dispatch"]["inputs"]
           assert inputs["trigger_source"]["options"]==["manual","cloudflare"],inputs
           assert inputs["target_slot"]["type"]=="string",inputs
-          assert "slot=${{ inputs.target_slot" in config["run-name"],config["run-name"]
+          assert ("slot=$" + "{{ inputs.target_slot") in config["run-name"],config["run-name"]
           assert config["concurrency"]["cancel-in-progress"]=="false"
           receiver=load(Path("content-backend/.github/workflows/steam-content-enrichment-dispatch.yml").read_text(encoding="utf-8"),Loader=BaseLoader)
           receiver_events=receiver["on"]

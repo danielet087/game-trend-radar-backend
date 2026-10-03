@@ -5,7 +5,7 @@
 ## 現行流程
 
 1. 台灣時間每日 00:00：`steam-two-phase.yml` 更新未來 365 天候選，檢查商店確切日期與成人內容，再做第三方初篩。
-2. 台灣時間 03:00–23:00 的每小時排程：`steam-official-daily-catchup-250.yml` 從持久化佇列查官方 Followers，最多 250 次、至少間隔 8 秒；遇限流停止並保存冷卻與斷點。GitHub 排程可能延遲。
+2. 台灣時間 03:00–23:00 的每小時排程：`steam-official-daily-catchup-250.yml` 從持久化佇列查官方 Followers，最多 250 次、至少間隔 8 秒；遇限流停止並保存冷卻與斷點。Cloudflare 觸發與 GitHub runner 開始執行仍可能延遲。
 3. 官方 Followers 達 5,000 後，再確認 Steam 商店的確切日期，寫入 `data/steam_upcoming_master.json` 並送內容事件。
 4. 內容後端取得正式大圖／2x 圖、語言、中文名稱、TAG，合併 AppID 檔與公開索引；事件送達不等於完成發布。
 5. 內容後端每日 07:30／19:30 對帳：檢查已接受的主清單是否已發布，並補齊缺漏內容。每輪最多 60 款，保留未完成與失敗清單。
@@ -23,9 +23,9 @@ Twitch 發現的 Steam 遊戲直接加入既有 `steam-official-daily-catchup-25
 
 2026-10-02 已確認七筆舊六小時冷卻紀錄全部完成遷移，清除其失效欄位並移除持續執行的遷移程式及舊查詢模式。原始紀錄與遷移證據保留在 Git 歷史；現行測試只驗證仍使用的商店重試、官方佇列及收錄／發布行為。
 
-### 第三方定時觸發遷移準備
+### Cloudflare 定時觸發
 
-目前仍保留原 GitHub `schedule`；尚未宣告第三方切換完成。確認第三方對本 Repo 的 Actions dispatch 權限及驗證外部觸發後，才移除原 cron，避免重複執行。
+2026-10-03 起，以下三項定時工作由既有 [Cloudflare 排程控制器](https://github.com/danielet087/game-trend-radar-twitch-backend/tree/main/scheduler/cloudflare) 透過 `workflow_dispatch` 觸發。原 GitHub `schedule` 已移除，保留手動與必要的 push/CI 入口；執行時間、共用鎖、冷卻和查詢流程維持原樣。Twitch 新作繼續進入既有官方 Followers 佇列，優先處理，不另設查詢排程。
 
 | Workflow | 台灣定時工作 | 外部 `workflow_dispatch` 輸入 |
 |---|---|---|

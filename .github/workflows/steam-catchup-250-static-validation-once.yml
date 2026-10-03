@@ -1,11 +1,7 @@
 name: Experiment - validate dynamic 250 Followers queue without Steam queries
-# Regression preflight after enforcing same-Taiwan-day eligible + prefilter sources.
+# Historical regression preflight; run manually, without Steam queries.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/steam-catchup-250-static-validation-once.yml
   workflow_dispatch:
 
 permissions:
@@ -74,18 +70,21 @@ jobs:
           from yaml import load, BaseLoader
           config=load(Path(".github/workflows/steam-official-daily-catchup-250.yml").read_text(encoding="utf-8"),Loader=BaseLoader)
           events=config["on"]
-          assert "push" not in events and "schedule" in events and "workflow_dispatch" in events
-          assert events["schedule"]==[{"cron":"0 3-23 * * *","timezone":"Asia/Taipei"}],events["schedule"]
+          assert "push" not in events and "schedule" not in events and "workflow_dispatch" in events
+          inputs=events["workflow_dispatch"]["inputs"]
+          assert inputs["trigger_source"]["options"]==["manual","cloudflare"],inputs
+          assert inputs["target_slot"]["type"]=="string",inputs
+          assert "slot=${{ inputs.target_slot" in config["run-name"],config["run-name"]
           assert config["concurrency"]["cancel-in-progress"]=="false"
           receiver=load(Path("content-backend/.github/workflows/steam-content-enrichment-dispatch.yml").read_text(encoding="utf-8"),Loader=BaseLoader)
           receiver_events=receiver["on"]
           assert "repository_dispatch" in receiver_events
           assert "steam_game_qualified" in receiver_events["repository_dispatch"]["types"]
           print("CONTENT_BACKEND_EVENT_VALIDATION_PASS",receiver_events["repository_dispatch"])
-          print("GITHUB_SELF_SCHEDULE_VALIDATION_PASS",events["schedule"])
+          print("CLOUDFLARE_DISPATCH_VALIDATION_PASS",inputs)
           print("CATCHUP_STATIC_VALIDATION_PASS",
                 json.dumps({"frozen":len(rows),"prior_verified":len(old["official_results"]),
                             "remaining_now":len(q),"source":source},ensure_ascii=False))
           PY
 # 2026-09-23 regression trigger: verify single missing-group HTML fallback is parked before resuming one-off.
-# 2026-09-23 validation trigger: 03-23 schedule plus event-driven content backend.
+# External Cloudflare dispatch retains the 03-23 window and event-driven content backend.

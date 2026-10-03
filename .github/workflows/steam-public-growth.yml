@@ -2,8 +2,6 @@ name: Track accepted game growth through release plus 30 days
 run-name: "Steam public growth | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 on:
-  schedule:
-    - cron: '15 17 * * *' # 01:15 Taiwan; outside the hourly 03:00–23:00 catch-up window.
   workflow_dispatch:
     inputs:
       trigger_source:

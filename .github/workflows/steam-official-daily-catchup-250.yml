@@ -1,12 +1,9 @@
-name: Steam official Followers - GitHub hourly auto 250
+name: Steam official Followers - hourly auto 250
 run-name: "Steam Followers | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 # One scheduler and XML queue for ordinary candidates and Twitch discoveries.
-# Taiwan 03:00..23:00 hourly; original schedule remains during migration.
+# Cloudflare dispatches Taiwan 03:00..23:00 hourly; no native GitHub cron.
 on:
-  schedule:
-    - cron: "0 3-23 * * *"
-      timezone: "Asia/Taipei"
   workflow_dispatch:
     inputs:
       trigger_source:

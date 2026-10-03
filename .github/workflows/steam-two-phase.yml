@@ -6,9 +6,6 @@ on:
   # verify exact Store date + non-adult eligibility, then finish third-party
   # Followers prescreen. Official XML verification is handed to the separate
   # 03:00-23:00 hourly catch-up workflow.
-  schedule:
-    - cron: "0 0 * * *"
-      timezone: "Asia/Taipei"
   workflow_dispatch:
     inputs:
       trigger_source:

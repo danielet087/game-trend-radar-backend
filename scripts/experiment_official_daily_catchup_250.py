@@ -64,6 +64,24 @@ def steam_429_cooldown(response, failure_count, now):
     return cooldown_until
 
 
+def manual_cooldown_override(requested):
+    """Only an explicitly manual dispatch may probe before a retry deadline."""
+    if not requested:
+        return False
+    if (os.environ.get("GITHUB_EVENT_NAME") != "workflow_dispatch"
+            or os.environ.get("SCHEDULE_TRIGGER_SOURCE") != "manual"):
+        raise ValueError("Skipping cooldown requires an explicit manual workflow dispatch")
+    return True
+
+
+def preserve_cooldown_deadline(until, *previous):
+    """An unsuccessful manual probe cannot shorten an existing retry deadline."""
+    for value in previous:
+        if (deadline := aware_time(value)) is not None:
+            until = max(until, deadline)
+    return until
+
+
 def clock():
     return datetime.now(TZ)
 
@@ -601,11 +619,16 @@ def main():
     parser.add_argument("--interval", type=float, default=8.0)
     parser.add_argument("--max-seconds", type=int, default=3450)
     parser.add_argument("--save-every", type=int, default=10)
+    parser.add_argument("--skip-cooldown", action="store_true",
+                        help="Explicit manual dispatch only: probe one queued game during cooldown")
     args = parser.parse_args()
     if not 1 <= args.max_requests <= 250 or args.interval < 8.0:
         raise ValueError("Max 250 single-file requests, min 8 seconds apart")
     if not 120 <= args.max_seconds <= 3500 or not 1 <= args.save_every <= 20:
         raise ValueError("Invalid duration/save interval")
+    skip_cooldown = manual_cooldown_override(args.skip_cooldown)
+    if skip_cooldown:
+        args.max_requests = 1
     started = time.monotonic()
     started_at_taipei = clock().isoformat()
     original = read(FROZEN / "source_queue.json")
@@ -653,6 +676,8 @@ def main():
     run_metadata = {"run_id": run_id} if run_id.isdecimal() else {}
     cp["scheduler_batch"] = {
         **run_metadata, "active": True, "status": "preparing",
+        "manual_cooldown_override": skip_cooldown,
+        "request_limit": args.max_requests,
         "started_at": started_at_taipei, "last_updated_at": clock().isoformat(),
         "requests_this_run": 0, "official_new_this_run": 0, "http_429_this_run": 0,
     }
@@ -661,13 +686,14 @@ def main():
     client = requests.Session()
     client.headers["User-Agent"] = "GameTrendRadarOfficialDailyCatchup/1.0"
     cooldown = cp.get("next_request_after_taipei")
+    legacy_cooldown = oldcp.get("next_request_after_taipei")
+    previous_deadlines = (cooldown, legacy_cooldown,
+                          (cp.get("community_cooldown") or {}).get("retry_at"))
     if not q:
         stop = "nothing_pending"
-    elif cooldown and clock() < datetime.fromisoformat(cooldown):
+    elif not skip_cooldown and cooldown and clock() < datetime.fromisoformat(cooldown):
         stop = "official_429_cooldown_no_request"
-    elif oldcp.get("next_request_after_taipei") and clock() < datetime.fromisoformat(
-        oldcp["next_request_after_taipei"]
-    ):
+    elif not skip_cooldown and legacy_cooldown and clock() < datetime.fromisoformat(legacy_cooldown):
         stop = "legacy_official_429_cooldown_no_request"
     elif not known_group_queue:
         stop = "awaiting_group_resolution_no_request"
@@ -692,6 +718,8 @@ def main():
             }
             if run_id.isdecimal():
                 event["github_run_id"] = run_id
+            if skip_cooldown:
+                event["manual_cooldown_override"] = True
             try:
                 response = client.get(url, timeout=(8, 24))
                 event["http"] = response.status_code
@@ -702,6 +730,9 @@ def main():
                         event["retry_after_header"] = response.headers["Retry-After"][:128]
                     observed = clock()
                     until = steam_429_cooldown(response, cp["rate_limit_count"], observed)
+                    calculated_until = until
+                    if skip_cooldown:
+                        until = preserve_cooldown_deadline(until, *previous_deadlines)
                     cp["next_request_after_taipei"] = until.isoformat()
                     cp["community_cooldown"] = {
                         "retry_at": until.astimezone(timezone.utc).isoformat(),
@@ -709,7 +740,8 @@ def main():
                         "updated_at": observed.astimezone(timezone.utc).isoformat(),
                         "retry_seconds": int((until - observed).total_seconds()),
                         "retry_after": response.headers.get("Retry-After"),
-                        "retry_source": ("steam_retry_after_with_default_minimum"
+                        "retry_source": ("existing_deadline_with_new_backoff" if until > calculated_until
+                                         else "steam_retry_after_with_default_minimum"
                                          if response.headers.get("Retry-After") else "existing_queue_backoff"),
                         "attempts": cp["rate_limit_count"],
                     }
@@ -717,9 +749,10 @@ def main():
                     stop = "first_http_429"
                 elif response.status_code in (401, 403) or response.status_code >= 500:
                     event["status"] = "access_or_server_error"
-                    cp["next_request_after_taipei"] = (
-                        clock() + timedelta(hours=24)
-                    ).isoformat()
+                    until = clock() + timedelta(hours=24)
+                    if skip_cooldown:
+                        until = preserve_cooldown_deadline(until, *previous_deadlines)
+                    cp["next_request_after_taipei"] = until.isoformat()
                     stop = "http_access_or_server_error"
                 elif response.status_code != 200:
                     event["status"] = "unexpected_http"
@@ -784,9 +817,10 @@ def main():
                 minutes = min(
                     24 * 60, 15 * (2 ** (cp["temporary_error_count"] - 1))
                 )
-                cp["next_request_after_taipei"] = (
-                    clock() + timedelta(minutes=minutes)
-                ).isoformat()
+                until = clock() + timedelta(minutes=minutes)
+                if skip_cooldown:
+                    until = preserve_cooldown_deadline(until, *previous_deadlines)
+                cp["next_request_after_taipei"] = until.isoformat()
                 event["next_request_after_taipei"] = cp["next_request_after_taipei"]
                 stop = "transport_or_xml_error"
             attempts.append(event)
@@ -833,6 +867,7 @@ def main():
         "stop_reason": stop,
         "elapsed_seconds": round(time.monotonic() - started, 2),
         "request_limit": args.max_requests,
+        "manual_cooldown_override": skip_cooldown,
         "request_interval_seconds": args.interval,
         "requests_this_run": len(attempts),
         "official_new_this_run": successful,

@@ -17,6 +17,11 @@ on:
         required: false
         default: ""
         type: string
+      skip_cooldown:
+        description: "僅限 manual：略過 Followers 冷卻，測試 1 款；遇 429 仍立即停止"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -127,12 +132,14 @@ jobs:
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
           REQUEST_LIMIT: "250"
-        run: >
-          python -u -m scripts.experiment_official_daily_catchup_250
-          --max-requests "$REQUEST_LIMIT"
-          --interval 8
-          --max-seconds 3450
-          --save-every 10
+          SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
+          SKIP_COOLDOWN: ${{ github.event_name == 'workflow_dispatch' && inputs.trigger_source == 'manual' && inputs.skip_cooldown || false }}
+        run: |
+          args=()
+          if [ "$SKIP_COOLDOWN" = "true" ]; then args+=(--skip-cooldown); fi
+          python -u -m scripts.experiment_official_daily_catchup_250 \
+            --max-requests "$REQUEST_LIMIT" --interval 8 --max-seconds 3450 \
+            --save-every 10 "${args[@]}"
 
       - name: Final checkpoint save, including error and cooldown
         if: always() && steps.window.outputs.proceed == 'true'
@@ -201,6 +208,7 @@ jobs:
             f"- 本輪結果：**{r['stop_reason']}**",
             f"- 本輪官方成功：**{r['official_new_this_run']} / {r['request_limit']}**",
             f"- 本輪請求：**{r['requests_this_run']}**；429：**{r['http_429_this_run']}**",
+            f"- 手動略過冷卻（單款測試）：**{'是' if r.get('manual_cooldown_override') else '否'}**",
             f"- 累計官方完成：**{r['combined_official_completed']}**",
             f"- 目前待查：**{r['remaining_queue']}**",
             f"- 當日新來源狀態：**{r['source_status']['status']}**",

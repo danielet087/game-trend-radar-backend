@@ -147,8 +147,10 @@ def known_group(candidate):
     return candidate
 
 
-def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_requests=250):
+def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_requests=250,
+               extra_args=(), initial_checkpoint=None, legacy_cooldown=None):
     cp = checkpoint(queue)
+    cp.update(deepcopy(initial_checkpoint or {}))
     cp["next_request_after_taipei"] = cooldown
     cp_path = tmp_path / "checkpoint.json"
     master_path = tmp_path / "master.json"
@@ -160,7 +162,8 @@ def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_re
     documents = {
         worker.FROZEN / "source_queue.json": [],
         worker.FROZEN / "source_unresolved.json": [],
-        worker.FROZEN / "checkpoint.json": {"official_results": {}},
+        worker.FROZEN / "checkpoint.json": {"official_results": {},
+                                           "next_request_after_taipei": legacy_cooldown},
         worker.ELIGIBLE: {"games": []}, worker.PREFILTER: {},
         worker.OFFICIAL_CACHE: {"games": {}}, worker.ORIGINAL_OFFICIAL: {},
         cp_path: cp, master_path: master,
@@ -188,7 +191,7 @@ def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_re
     monkeypatch.setattr(worker, "dispatch_content_event", dispatch)
     client = SimpleNamespace(headers={}, get=Mock(side_effect=responses))
     monkeypatch.setattr(worker.requests, "Session", lambda: client)
-    monkeypatch.setattr("sys.argv", ["followers", "--max-requests", str(max_requests)])
+    monkeypatch.setattr("sys.argv", ["followers", "--max-requests", str(max_requests), *extra_args])
 
     worker.main()
 

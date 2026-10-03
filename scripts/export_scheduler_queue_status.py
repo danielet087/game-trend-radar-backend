@@ -122,6 +122,8 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
         }
         if event.get("error_type"):
             item["error_type"] = event["error_type"]
+        if event.get("manual_cooldown_override") is True:
+            item["manual_cooldown_override"] = True
         events.append(item)
     summary = {
         "normal_pending": sum(not row["priority"] for row in queue),
@@ -148,6 +150,8 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
     batch = {key: last_batch.get(key) for key in (
         "active", "status", "started_at", "last_updated_at", "finished_at", "stop_reason",
         "last_appid", "last_name", "requests_this_run", "official_new_this_run", "http_429_this_run",
+        "manual_cooldown_override",
+        "request_limit",
     ) if key in last_batch}
     batch.update(public_run(last_batch))
     return {

@@ -182,13 +182,17 @@ def test_export_writes_only_destination_without_requests_or_git(monkeypatch, tmp
     forbidden.assert_not_called()
 
 
-def test_batch_reports_last_actual_attempt_without_claiming_current_processing(monkeypatch, tmp_path):
+@pytest.mark.parametrize("manual_probe", [False, True])
+def test_batch_reports_last_actual_attempt_without_claiming_current_processing(monkeypatch, tmp_path, manual_probe):
     first, later = known_group(twitch_candidate()), known_group(ordinary_candidate())
     make_queue = worker.make_queue
     monkeypatch.setenv("GITHUB_RUN_ID", "123456")
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "workflow_dispatch")
+    monkeypatch.setenv("SCHEDULE_TRIGGER_SOURCE", "manual")
     cp, _, client, *_ = run_worker(
         monkeypatch, tmp_path, [first, later],
         [SimpleNamespace(status_code=429, headers={})],
+        extra_args=("--skip-cooldown",) if manual_probe else (),
     )
     assert client.get.call_count == 1
     assert cp["scheduler_batch"]["last_appid"] == first["appid"]
@@ -203,6 +207,9 @@ def test_batch_reports_last_actual_attempt_without_claiming_current_processing(m
     assert status["batch"]["last_appid"] == first["appid"]
     assert status["batch"]["last_name"] == first["name"]
     assert status["batch"]["run_url"].endswith("/actions/runs/123456")
+    assert status["batch"]["manual_cooldown_override"] is manual_probe
+    assert status["batch"]["request_limit"] == (1 if manual_probe else 250)
+    assert status["events"][-1].get("manual_cooldown_override", False) is manual_probe
     assert "current_appid" not in status["batch"]
     assert "current_name" not in status["batch"]
 

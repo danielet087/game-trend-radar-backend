@@ -21,6 +21,8 @@ Twitch 發現的 Steam 遊戲直接加入既有 `steam-official-daily-catchup-25
 
 既有官方 worker 的 Community 429 以 15 分鐘開始逐次退避，最長 24 小時，並遵守更長的 `Retry-After` 秒數或 HTTP 日期；唯一的 Community 冷卻保存在官方 worker checkpoint。Twitch importer 只查商店 metadata、讀官方快取及建立候選，不能自行查 Community，也不另存 Community 冷卻副本。商店 metadata 按 5／10／20／30 分鐘退避；一般 metadata 網路或解析失敗按 5 分鐘開始、最長 1 小時逐次退避。期限只決定何時可再查，實際執行仍依原排程與共用鎖。Community 冷卻期間仍可用真實官方 Followers 快取完成核對。日期衝突與資格排除仍每日核對；來源失效或不再合格的未收錄候選撤回 Twitch 優先資格，原一般候選恢復，不重設已查進度與官方結果。
 
+手動測試可在 Actions → `Steam official Followers - hourly auto 250` → Run workflow，選 `main`、`trigger_source=manual`、`target_slot` 留空，勾選 `skip_cooldown`。此選項預設關閉，只略過這次 Followers 的冷卻檢查，依原佇列順序測試最多 1 款，Twitch 仍優先；群組 API 與商店 metadata 的重試不受影響。CLI 同時要求 `GITHUB_EVENT_NAME=workflow_dispatch` 與 `SCHEDULE_TRIGGER_SOURCE=manual`，Cloudflare／其他事件不能啟用。測試前不清除持久化冷卻；有效且群組吻合的 XML 成功才依原規則清除現行冷卻。若再次 429 或查詢失敗，立即停止，保存結果與退避，且不縮短原現行／舊佇列尚未到期的期限。這個選項只對本輪有效，不改自動排程或後續政策。
+
 官方 Followers 工作現在先準備群組 ID：沿用合法的既有 `group_id64`，缺少者透過 Steam 官方 `ResolveVanityURL`（`vanityurl=AppID`、`url_type=3`）解析。沿用既有 `STEAM_WEB_API_KEY` Secret，以 `x-webapi-key` header 傳送，不把 key 放進 URL、紀錄或狀態 JSON；禁止轉址。一般與 Twitch 共用既有工作，Twitch 優先，每輪至多 20 次、每次至少隔 1 秒、準備時間至多 120 秒，每個 AppID 不在同輪重試，不新增 Cron。API 回應 `success=42` 才代表本次無符合群組；Twitch 優先候選隔 3 小時再確認，一般候選隔 24 小時；缺 key、429、403、網路錯誤與格式錯誤各自記錄，不能宣稱遊戲沒有群組。群組 API 有獨立冷卻，準備可在 Community 冷卻期間執行，但不清除原 Community 冷卻、不取得或捏造 Followers。更新群組對應後，官方 XML 只查已解析的合法群組 ID；未知者保留待解析，不能改查 `/games/{appid}/memberslistxml` 迴避限制。apply 每次以最新正式候選來源重新核對，保留並行完成數值、已解析 ID 與較新解析紀錄，不從舊批次重建已撤回的 Twitch 候選。
 
 2026-10-02 已確認七筆舊六小時冷卻紀錄全部完成遷移，清除其失效欄位並移除持續執行的遷移程式及舊查詢模式。原始紀錄與遷移證據保留在 Git 歷史；現行測試只驗證仍使用的商店重試、官方佇列及收錄／發布行為。

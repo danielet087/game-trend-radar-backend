@@ -3,7 +3,7 @@
   "games": {
     "892970": {
       "status": "accepted",
-      "updated_at": "2026-10-03T12:11:41.209018Z",
+      "updated_at": "2026-10-03T12:11:48.350076Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -31,7 +31,15 @@
       "follower_candidate": null,
       "content_signature": "95864c9b82ca47a6e90508e27b0a1efc5058ad67a768e218892c7ac9ecea2cbb",
       "followers": 536496,
-      "follower_checked_at": "2026-10-03T20:01:44.592697+08:00"
+      "follower_checked_at": "2026-10-03T20:01:44.592697+08:00",
+      "content_dispatch": {
+        "status": "dispatched",
+        "signature": "95864c9b82ca47a6e90508e27b0a1efc5058ad67a768e218892c7ac9ecea2cbb",
+        "attempted_at": "2026-10-03T12:11:48.350076Z",
+        "target_repository": "danielet087/game-trend-radar-content-backend",
+        "event_type": "steam_game_twitch_discovered",
+        "http": 204
+      }
     },
     "1488490": {
       "status": "accepted",
@@ -896,7 +904,7 @@
     },
     "2887580": {
       "status": "accepted",
-      "updated_at": "2026-10-03T12:11:41.209018Z",
+      "updated_at": "2026-10-03T12:11:48.350076Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -923,9 +931,17 @@
       "rate_limit_attempts": 0,
       "content_signature": "830e3e48f0188d8f779f551b128601978bacad3c92b19adc96d873d6e5e53728",
       "followers": 49763,
-      "follower_checked_at": "2026-10-03T20:01:52.388968+08:00"
+      "follower_checked_at": "2026-10-03T20:01:52.388968+08:00",
+      "content_dispatch": {
+        "status": "dispatched",
+        "signature": "830e3e48f0188d8f779f551b128601978bacad3c92b19adc96d873d6e5e53728",
+        "attempted_at": "2026-10-03T12:11:48.350076Z",
+        "target_repository": "danielet087/game-trend-radar-content-backend",
+        "event_type": "steam_game_twitch_discovered",
+        "http": 204
+      }
     }
   },
-  "updated_at": "2026-10-03T12:11:41.209018Z",
+  "updated_at": "2026-10-03T12:11:48.350076Z",
   "api_cooldowns": {}
 }

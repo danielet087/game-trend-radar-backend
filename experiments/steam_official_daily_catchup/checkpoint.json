@@ -785,7 +785,16 @@
       "group_id64": null,
       "steam_url": "https://store.steampowered.com/app/4435490/",
       "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-10-02T21:25:15.673055+00:00"
+      "daily_source_updated_at": "2026-10-02T21:25:15.673055+00:00",
+      "group_resolution": {
+        "status": "not_found",
+        "checked_at": "2026-10-03T11:02:40.063235Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "retry_at": "2026-10-04T11:02:40.063235Z",
+        "api_result": 42
+      }
     },
     "4459220": {
       "appid": 4459220,
@@ -16691,7 +16700,7 @@
       "name": "Valheim",
       "release_date": "2026-09-09",
       "steam_url": "https://store.steampowered.com/app/892970/",
-      "group_id64": null,
+      "group_id64": "103582791463217109",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -16752,14 +16761,22 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T11:02:38.063074Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     },
     "3219630": {
       "appid": 3219630,
       "name": "Halloween: The Game",
       "release_date": "2026-09-09",
       "steam_url": "https://store.steampowered.com/app/3219630/",
-      "group_id64": null,
+      "group_id64": "103582791475269628",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -16822,14 +16839,22 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T11:02:37.062985Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     },
     "2887580": {
       "appid": 2887580,
       "name": "Active Matter",
       "release_date": "2026-09-15",
       "steam_url": "https://store.steampowered.com/app/2887580/",
-      "group_id64": null,
+      "group_id64": "103582791474797932",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -16891,7 +16916,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T11:02:39.063155Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     },
     "5158320": {
       "appid": 5158320,
@@ -52168,5 +52201,12 @@
     "http_429_this_run": 0,
     "finished_at": "2026-10-03T18:01:42.119784+08:00",
     "stop_reason": "official_429_cooldown_no_request"
+  },
+  "group_resolution_api_cooldown": {
+    "status": "available",
+    "retry_at": null,
+    "observed_at": "2026-10-03T11:02:40.289475Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   }
 }

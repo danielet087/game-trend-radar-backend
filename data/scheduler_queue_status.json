@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-03T11:02:35.551519Z",
+  "generated_at": "2026-10-03T11:02:41.036553Z",
   "today_taipei": "2026-10-03",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
     "checkpoint_updated_at": "2026-10-03T10:01:42.119784Z",
-    "group_resolution_updated_at": null,
+    "group_resolution_updated_at": "2026-10-03T11:02:40.289475Z",
     "candidate_state_updated_at": "2026-10-02T21:25:15.691702Z",
     "prefilter_updated_at": "2026-10-02T21:25:15.673055Z",
     "eligible_screened_at": "2026-10-02T21:25:16.315935Z",
@@ -33,14 +33,20 @@
     "twitch_priority_pending": 3,
     "parked": 1,
     "ready_pending": 76,
-    "followers_ready_pending": 73,
-    "awaiting_group_pending": 3,
+    "followers_ready_pending": 76,
+    "awaiting_group_pending": 0,
     "total_pending": 77,
     "today_attempts": 4,
     "today_successes": 0,
     "today_429": 4
   },
-  "group_resolution_api_cooldown": null,
+  "group_resolution_api_cooldown": {
+    "status": "available",
+    "retry_at": null,
+    "observed_at": "2026-10-03T11:02:40.289475Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
+  },
   "cooldown": {
     "active": true,
     "until": "2026-10-03T13:01:40.828192Z",
@@ -70,9 +76,16 @@
       "release_date": "2026-09-09",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "awaiting_group",
-      "group_id64": null,
-      "group_resolution": null,
+      "state": "cooldown",
+      "group_id64": "103582791475269628",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T11:02:37.062985Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
       "last_attempt_at": "2026-10-03T01:37:38.830012Z",
       "last_attempt_status": "rate_limited"
     },
@@ -84,9 +97,16 @@
       "release_date": "2026-09-09",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "awaiting_group",
-      "group_id64": null,
-      "group_resolution": null,
+      "state": "cooldown",
+      "group_id64": "103582791463217109",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T11:02:38.063074Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
       "last_attempt_at": "2026-10-03T06:01:49.593013Z",
       "last_attempt_status": "rate_limited"
     },
@@ -98,9 +118,16 @@
       "release_date": "2026-09-15",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "awaiting_group",
-      "group_id64": null,
-      "group_resolution": null,
+      "state": "cooldown",
+      "group_id64": "103582791474797932",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T11:02:39.063155Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
       "last_attempt_at": "2026-10-03T09:01:40.700874Z",
       "last_attempt_status": "rate_limited"
     },
@@ -1137,7 +1164,15 @@
       "priority": false,
       "state": "parked",
       "group_id64": null,
-      "group_resolution": null,
+      "group_resolution": {
+        "status": "not_found",
+        "checked_at": "2026-10-03T11:02:40.063235Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "retry_at": "2026-10-04T11:02:40.063235Z",
+        "api_result": 42
+      },
       "last_attempt_at": "2026-09-23T07:57:23.607757Z",
       "last_attempt_status": "transport_or_xml_error",
       "reason": "official_xml_fallback_returned_html",

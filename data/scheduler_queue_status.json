@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-03T21:00:54.228648Z",
+  "generated_at": "2026-10-03T21:00:55.812251Z",
   "today_taipei": "2026-10-04",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-03T21:00:54.186421Z",
+    "checkpoint_updated_at": "2026-10-03T21:00:55.771024Z",
     "group_resolution_updated_at": "2026-10-03T11:02:40.289475Z",
     "candidate_state_updated_at": "2026-10-03T17:02:31.844260Z",
     "prefilter_updated_at": "2026-10-03T17:02:31.825708Z",
@@ -55,10 +55,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-04T05:00:53.961827+08:00",
-    "last_updated_at": "2026-10-04T05:00:54.186421+08:00",
+    "last_updated_at": "2026-10-04T05:00:55.771024+08:00",
+    "finished_at": "2026-10-04T05:00:55.771024+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5235040,
     "last_name": "LUGANO BAY TYCOON",
     "requests_this_run": 1,

@@ -104,7 +104,8 @@ jobs:
               save_json(path, state)
               print("DAILY_STEAM_REFRESH_RESUME", daily_slot(today), state.get("phase"))
           PY
-            git add data/steam_candidate_state.json data/steam_candidates.json data/steam_prefilter_state.json
+            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
+            git add data/steam_candidate_state.json data/steam_candidates.json data/steam_prefilter_state.json data/scheduler_queue_status.json
             if git diff --cached --quiet; then exit 0; fi
             git commit -m "data: persist daily Steam discovery reset before collection"
             if git push origin HEAD:main; then exit 0; fi
@@ -255,11 +256,13 @@ jobs:
           if [ -f output/steam_upcoming.json ]; then
             git add data/steam_followers_cache.json data/steam_upcoming_master.json
           fi
+          python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
+          git add data/scheduler_queue_status.json
           if git diff --cached --quiet; then
             echo "No new candidate or follower progress."
           else
             git commit -m "data: advance private Steam two-stage initialization"
-            git pull --rebase origin main
+            python -c 'from scripts.experiment_official_daily_catchup_250 import rebase_checkpoint; rebase_checkpoint()'
             git push origin HEAD:main
           fi
       - name: Publish updated site JSON after EVERY Followers batch

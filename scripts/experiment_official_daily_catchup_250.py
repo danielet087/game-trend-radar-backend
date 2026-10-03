@@ -369,10 +369,40 @@ def retry_pending_content_dispatches(cp, limit=25):
     return retried
 
 
+def rebase_checkpoint():
+    """Regenerate only a dashboard-only conflict; never overwrite queue state."""
+    from scripts.export_scheduler_queue_status import OUTPUT, export_status
+    command = ["git", "pull", "--rebase", "origin", "main"]
+    for _ in range(5):
+        result = subprocess.run(command, timeout=45, stdout=subprocess.DEVNULL)
+        if result.returncode == 0:
+            return
+        conflicts = subprocess.check_output(
+            ["git", "diff", "--name-only", "--diff-filter=U"], text=True, timeout=20,
+        ).splitlines()
+        if conflicts != [str(OUTPUT)]:
+            raise subprocess.CalledProcessError(result.returncode, command)
+        export_status()
+        subprocess.run(["git", "add", str(OUTPUT)], check=True, timeout=20,
+                       stdout=subprocess.DEVNULL)
+        command = ["git", "-c", "core.editor=true", "rebase", "--continue"]
+    raise subprocess.CalledProcessError(1, command)
+
+
 def git_push():
     """Make each 10-success checkpoint durable before a runner interruption."""
+    # The status exporter is read-only. Its failure must never reset or block
+    # the established official queue; the previous snapshot stays visibly old.
+    from scripts.export_scheduler_queue_status import OUTPUT, export_status
     try:
-        subprocess.run(["git", "add", str(CHECKPOINT), str(MASTER)], check=True, timeout=20,
+        export_status()
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        print("SCHEDULER_QUEUE_STATUS_EXPORT_FAILED", type(exc).__name__, flush=True)
+    try:
+        files = [str(CHECKPOINT), str(MASTER)]
+        if OUTPUT.is_file():
+            files.append(str(OUTPUT))
+        subprocess.run(["git", "add", *files], check=True, timeout=20,
                        stdout=subprocess.DEVNULL)
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], timeout=20)
         if diff.returncode == 0:
@@ -380,8 +410,7 @@ def git_push():
         subprocess.run(["git", "commit", "-m",
                         "experiment: checkpoint dynamically queued official Followers"],
                        check=True, timeout=25, stdout=subprocess.DEVNULL)
-        subprocess.run(["git", "pull", "--rebase", "origin", "main"],
-                       check=True, timeout=45, stdout=subprocess.DEVNULL)
+        rebase_checkpoint()
         subprocess.run(["git", "push", "origin", "HEAD:main"],
                        check=True, timeout=50, stdout=subprocess.DEVNULL)
         print("DAILY_CATCHUP_GIT_CHECKPOINT_OK", flush=True)
@@ -392,7 +421,8 @@ def git_push():
         return False
 
 
-def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, official_cache, other_official):
+def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, official_cache, other_official, *, now=None):
+    observed = (now or clock()).astimezone(TZ)
     if len(frozen_rows) != 1317 or len(old_group_rows) != 1358:
         raise ValueError("Frozen original input changed")
     if legacy_cp.get("cohort") != "steam_fresh_20260922_post_adult_1317_near_release":
@@ -432,8 +462,9 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         "eligible_screened_at": eligible.get("screened_at"),
         "added_from_daily": 0,
         "eligible_count": len(eligible.get("games", [])),
+        "parked_group_xml_appids": [],
     }
-    today = clock().date().isoformat()
+    today = observed.date().isoformat()
     if (utc_date_as_taipei(prefilter.get("updated_at")) == today
             and utc_date_as_taipei(eligible.get("screened_at")) == today):
         rows = eligible.get("games")
@@ -507,9 +538,9 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
     for aid, row in cp["pending_candidates"].items():
         twitch = row.get("queue_source") == "twitch_steam_discovery"
         if twitch:
-            if not is_twitch_queue_candidate(row, now=clock()):
+            if not is_twitch_queue_candidate(row, now=observed):
                 continue
-            if cached_follower(int(aid), [cp, legacy_cp, official_cache, other_official], clock()) is not None:
+            if cached_follower(int(aid), [cp, legacy_cp, official_cache, other_official], observed) is not None:
                 continue
         elif aid in existing_official:
             continue
@@ -520,6 +551,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 "resolution": "retry when a valid official group ID is available",
                 "official_followers": None,
             }
+            daily["parked_group_xml_appids"].append(aid)
             continue
         cp.setdefault("unresolved_candidates", {}).pop(aid, None)
         pending.append(row)
@@ -530,7 +562,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         if not isinstance(event, dict) or event.get("queue_source") != "twitch_steam_discovery":
             continue
         attempted_at = aware_time(event.get("when_taipei"))
-        if attempted_at is not None and attempted_at <= clock():
+        if attempted_at is not None and attempted_at <= observed:
             aid = str(event.get("appid"))
             last_twitch_attempt[aid] = max(last_twitch_attempt.get(aid, 0), attempted_at.timestamp())
     pending.sort(key=lambda r: (
@@ -598,6 +630,13 @@ def main():
     )
     start_count = len(cp["official_results"])
     attempts = []
+    run_id = os.environ.get("GITHUB_RUN_ID", "")
+    run_metadata = {"run_id": run_id} if run_id.isdecimal() else {}
+    cp["scheduler_batch"] = {
+        **run_metadata, "active": True, "status": "preparing",
+        "started_at": started_at_taipei, "last_updated_at": clock().isoformat(),
+        "requests_this_run": 0, "official_new_this_run": 0, "http_429_this_run": 0,
+    }
     stop = "nothing_pending" if not q else "time_budget"
     last_start = None
     client = requests.Session()
@@ -632,6 +671,8 @@ def main():
                 "queue_source": row["queue_source"], "http": None,
                 "status": "request_started",
             }
+            if run_id.isdecimal():
+                event["github_run_id"] = run_id
             try:
                 response = client.get(url, timeout=(8, 24))
                 event["http"] = response.status_code
@@ -732,6 +773,12 @@ def main():
             attempts.append(event)
             cp["attempt_events"].append(event)
             success_count = len(cp["official_results"]) - start_count
+            cp["scheduler_batch"].update(
+                status="querying", last_updated_at=clock().isoformat(),
+                last_appid=aid, last_name=row.get("name") or f"Steam App {aid}",
+                requests_this_run=len(attempts), official_new_this_run=success_count,
+                http_429_this_run=sum(item.get("http") == 429 for item in attempts),
+            )
             if len(cp["attempt_events"]) > 2000:
                 cp["attempt_events"] = cp["attempt_events"][-1500:]
             if len(attempts) <= 4 or len(attempts) % 10 == 0 or event["status"] != "ok":
@@ -794,6 +841,12 @@ def main():
     ids = {str(e["appid"]) for e in attempts if e["status"] == "ok"}
     report["new_ge5000_this_run"] = sum(
         cp["official_results"][aid]["official_followers"] >= 5000 for aid in ids
+    )
+    cp["scheduler_batch"].update(
+        active=False, status="finished", last_updated_at=report["finish_taipei"],
+        finished_at=report["finish_taipei"], stop_reason=stop,
+        requests_this_run=len(attempts), official_new_this_run=successful,
+        http_429_this_run=report["http_429_this_run"],
     )
     save(CHECKPOINT, cp)
     save(MASTER, master)

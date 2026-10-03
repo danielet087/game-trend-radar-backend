@@ -37,6 +37,12 @@ Twitch 發現的 Steam 遊戲直接加入既有 `steam-official-daily-catchup-25
 
 每日重建在 collection 前持久化 `daily_refresh_slot` 與 `last_reset_date_taipei`，且核對候選 `anchor_date`。相同定時 slot 重送會沿用候選與初篩斷點；遷移當天已存在同日候選、但尚無 marker 時，只補 marker 並續跑，不清空斷點。人工 `refresh_today=true` 仍可強制重建。已落地的 pipeline 進度也在後續步驟失敗時保存。原 Followers 共用鎖、冷卻、Twitch 優先佇列與內容事件保持相同流程。
 
+### 排程與佇列狀態快照
+
+`python -m scripts.export_scheduler_queue_status` 只讀正式來源並產生 `data/scheduler_queue_status.json`，不發任何查詢、不消耗佇列、不改 checkpoint 或快取。剩餘數量與排序沿用官方 collector 的 `make_queue()`：已取得數值者剔除，Twitch 保留優先輪替，缺少群組 ID 且 XML 回傳 HTML 者另列暫停。JSON 同時保留官方請求時間軸、來源更新時間、今日官方佇列成功／429 次數、冷卻與下一個可嘗試的排程時段；時段只代表機會，不保證觸發或查詢成功。昨日初篩不能標成今日完成。
+
+狀態隨既有 hourly 工作的 Twitch 準備／收錄、每 10 筆成功或中斷 checkpoint，以及每日 discovery 重建／結束儲存；沒有新增 Cron 或 Steam 查詢。新的 batch／attempt 會記錄執行 ID，舊資料沒有 ID 時不臆造連結。`generated_at` 是狀態快照產生時間，來源各自的時間列於 `source`。前端須搭配 GitHub Actions 真實狀態判斷被取消或強制中斷的執行，不能將舊 `active` 快照當成仍在查詢。若每日與 hourly 同時寫快照，僅快照衝突可從合併後來源重新產生；checkpoint／主清單衝突仍停下，不能為了顯示狀態覆蓋進度。
+
 ## 資料責任
 
 | 資料 | 負責方 | 用途 |
@@ -45,6 +51,7 @@ Twitch 發現的 Steam 遊戲直接加入既有 `steam-official-daily-catchup-25
 | `steam_upcoming_master.json` | 主後端 | 已接受的官方 Followers 與日期 |
 | `twitch_steam_import_state.json` | 主後端 | Twitch 反查的收錄、待查與內容事件重試 |
 | `experiments/steam_official_daily_catchup/checkpoint.json` | 主後端 | 動態補漏、官方結果、事件送出與冷卻 |
+| `scheduler_queue_status.json` | 主後端唯讀匯出器 | 官方佇列排序、暫停原因、時間軸與來源新鮮度 |
 | 公開 `data/games/{appid}.json` | 發布器＋內容後端 | 可公開的單款完整紀錄，保留已上市歷史 |
 | 公開 `catalog.json`、月份檔、清單檔、舊格式檔 | 同次發布產生 | 同一份資料的各種讀取格式 |
 | 公開 `content_refresh_status.json` | 內容後端 | 補齊完成數、待補欄位、失敗與重試時間 |

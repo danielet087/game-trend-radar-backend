@@ -13,7 +13,7 @@ from scripts.screen_steam_candidates_before_followers import is_explicit_sex_gam
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.twitch_steam_admission import (
     aware_time, decimal_id, is_twitch_qualified, normalize_twitch_admission,
-    resolve_store_release_day,
+    resolve_store_release_day, has_taiwan_store_date_authority,
 )
 
 
@@ -85,7 +85,7 @@ def is_twitch_queue_candidate(row: object, now: datetime | None = None) -> bool:
         inner = normalize_twitch_admission(metadata["twitch_admission"], aid)
         if inner is None or inner != proof:
             return False
-    if metadata.get("release_store_date") is not None:
+    if metadata.get("release_store_date") is not None and not has_taiwan_store_date_authority(metadata):
         normalized = resolve_store_release_day(metadata["release_store_date"],
                                                metadata.get("release_time_utc"))
         if (normalized is None or normalized["release_start"] != day.isoformat()

@@ -14,7 +14,7 @@ import requests
 
 from scripts.screen_steam_candidates_before_followers import fetch_metadata
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
-from scripts.twitch_steam_admission import is_twitch_qualified
+from scripts.twitch_steam_admission import is_twitch_qualified, has_taiwan_store_date_authority
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 STORE_DATE_PROVIDER = "Steam IStoreBrowseService/GetItems"
@@ -79,6 +79,7 @@ def apply_store_release_detail(row: dict[str, Any], detail: dict[str, Any]) -> d
     if detail.get("exact") is not True:
         raise RuntimeError("Cannot apply a non-exact Steam Store release date")
     result = dict(row)
+    store_authority = has_taiwan_store_date_authority(row)
     timestamp_day = detail["release_start"]
     prior_day = str(row.get("release_start") or "")
     # When the upstream TW Store candidate was already verified as date_full,
@@ -102,6 +103,9 @@ def apply_store_release_detail(row: dict[str, Any], detail: dict[str, Any]) -> d
         result["release_date_conflict_note"] = (
             "TW Store announced full date preserved; API timestamp maps to a different Taiwan day"
         )
+    elif store_authority:
+        result["release_date_conflict"] = False
+        result.pop("release_date_conflict_note", None)
     else:
         result.pop("release_date_conflict", None)
         result.pop("release_date_conflict_note", None)
@@ -109,9 +113,12 @@ def apply_store_release_detail(row: dict[str, Any], detail: dict[str, Any]) -> d
         "release_display_precision", "release_display_provider",
         "release_date_basis", "release_date_timezone", "release_time_utc",
     ):
+        if store_authority and key == "release_display_provider":
+            continue
         result[key] = detail.get(key)
     verified_at = datetime.now(timezone.utc).isoformat()
-    result["release_date_verified_at"] = verified_at
+    if not store_authority:
+        result["release_date_verified_at"] = verified_at
     result["post_followers_store_verified_at"] = verified_at
     result["post_followers_store_verified"] = True
     return result

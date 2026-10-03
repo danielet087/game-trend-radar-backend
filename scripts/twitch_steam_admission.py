@@ -16,6 +16,8 @@ EVIDENCE_SOURCES = frozenset({
     "igdb_first_release_date", "twitch_original_release_date", "twitch_directory_dom",
 })
 TAIPEI = ZoneInfo("Asia/Taipei")
+TW_STORE_DATE_AUTHORITY = "steam_taiwan_store_date_authoritative"
+TW_STORE_DATE_PROVIDER = "Steam Store appdetails cc=TW l=tchinese"
 
 
 def decimal_id(value: object) -> str | None:
@@ -35,8 +37,9 @@ def aware_time(value: object) -> datetime | None:
         return None
 
 
-def resolve_store_release_day(store_day: object, release_time_utc: object) -> dict | None:
-    """Normalize an exact Store day only when the official instant explains it."""
+def resolve_store_release_day(store_day: object, release_time_utc: object, *,
+                              allow_taiwan_store_authority: bool = False) -> dict | None:
+    """Keep a verified TW display day when the two official date sources differ."""
     instant = aware_time(release_time_utc)
     if instant is None or not isinstance(store_day, str):
         return None
@@ -52,10 +55,40 @@ def resolve_store_release_day(store_day: object, release_time_utc: object) -> di
         basis = "steam_store_date_matches_taipei"
     elif announced == utc_day and taipei_day == utc_day + timedelta(days=1):
         basis = "steam_utc_date_normalized_to_taipei"
+    elif allow_taiwan_store_authority:
+        return {"release_start": store_day, "release_store_date": store_day,
+                "release_date_normalization": TW_STORE_DATE_AUTHORITY}
     else:
         return None
     return {"release_start": taipei_day.isoformat(), "release_store_date": store_day,
             "release_date_normalization": basis}
+
+
+def has_taiwan_store_date_authority(row: object) -> bool:
+    """Require the Twitch identity and a self-consistent official TW date audit."""
+    if not has_twitch_admission(row):
+        return False
+    instant = aware_time(row.get("release_time_utc"))
+    day = row.get("release_store_date")
+    try:
+        exact_day = isinstance(day, str) and date.fromisoformat(day).isoformat() == day
+    except ValueError:
+        return False
+    if instant is None or not exact_day:
+        return False
+    timestamp_day = instant.astimezone(TAIPEI).date().isoformat()
+    return (
+        row.get("release_date_normalization") == TW_STORE_DATE_AUTHORITY
+        and row.get("release_display_provider") == TW_STORE_DATE_PROVIDER
+        and aware_time(row.get("release_date_verified_at")) is not None
+        and row.get("release_start") == row.get("release_end") == day
+        and row.get("release_precision") == "day"
+        and row.get("release_display_precision") == "date_full"
+        and row.get("release_date_timezone") == "Asia/Taipei"
+        and row.get("release_timestamp_taipei_date") == timestamp_day
+        and type(row.get("release_date_conflict")) is bool
+        and row["release_date_conflict"] == (day != timestamp_day)
+    )
 
 
 def valid_enrollment(value: object) -> bool:
@@ -167,17 +200,20 @@ def is_twitch_qualified(row: object) -> bool:
         return False
     instant = aware_time(row.get("release_time_utc"))
     day = row.get("release_start")
+    consistent_timestamp_day = (
+        row.get("release_date_conflict") is not True
+        and instant is not None
+        and instant.astimezone(TAIPEI).date().isoformat() == day
+        and row.get("release_timestamp_taipei_date", day) == day
+    )
     return (
         row.get("steam_type") == "game"
         and row.get("sexual_content_screened") is True
         and row.get("release_precision") == "day"
         and row.get("release_display_precision") == "date_full"
         and row.get("release_date_timezone") == "Asia/Taipei"
-        and row.get("release_date_conflict") is not True
-        and instant is not None
-        and instant.astimezone(TAIPEI).date().isoformat() == day
+        and (consistent_timestamp_day or has_taiwan_store_date_authority(row))
         and row.get("release_end") == day
-        and row.get("release_timestamp_taipei_date", day) == day
         and type(row.get("followers")) is int
         and row["followers"] >= 0
         and aware_time(row.get("follower_checked_at")) is not None

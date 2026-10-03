@@ -30,13 +30,13 @@ from scripts.steam_retry_policy import rate_limit_policy, transient_retry_policy
 from scripts.twitch_steam_admission import (
     METHOD, aware_time, decimal_id, is_twitch_qualified,
     normalize_twitch_admission, preserve_twitch_admission, valid_enrollment, validate_twitch_snapshot,
-    resolve_store_release_day,
+    resolve_store_release_day, TW_STORE_DATE_AUTHORITY, TW_STORE_DATE_PROVIDER,
 )
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 STORE_BROWSE = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 APPDETAILS = "https://store.steampowered.com/api/appdetails"
-STATE_VALIDATION_VERSION = 3
+STATE_VALIDATION_VERSION = 4
 
 
 class RateLimited(RuntimeError):
@@ -170,19 +170,14 @@ def build_candidate(appid: int, proof: dict, item: dict, details: dict,
     visible_release = details.get("release_date")
     # Store Browse omits protobuf's default false after a game has released.
     # Never infer it from absence alone: corroborate with the same AppID's
-    # official TW appdetails, then still require a past timestamp and matching
-    # exact visible Taiwan date below. Future titles still require date_full.
+    # official TW appdetails and its exact visible Taiwan date below.
+    # Future titles still require Store Browse's date_full.
     if (isinstance(release, dict) and "is_coming_soon" not in release
             and item.get("is_coming_soon") is not True
             and isinstance(visible_release, dict) and visible_release.get("coming_soon") is False):
         store_item = deepcopy(item)
         store_item["release"]["is_coming_soon"] = False
     detail = parse_store_release_detail(store_item, today=now.astimezone(TAIPEI).date())
-    if detail.get("exact") is not True:
-        return None, "uncertain_steam_date"
-    if (isinstance(visible_release, dict) and visible_release.get("coming_soon") is False
-            and aware_time(detail.get("release_time_utc")) > now):
-        return None, "uncertain_steam_date"
     if not isinstance(details.get("release_date"), dict):
         return None, "uncertain_taiwan_store_date"
     visible_raw = str(details["release_date"].get("date") or "").strip()
@@ -192,10 +187,29 @@ def build_candidate(appid: int, proof: dict, item: dict, details: dict,
     visible = parse_release_window(visible_raw)
     if visible.precision != "day" or visible.start is None or visible.end != visible.start:
         return None, "uncertain_taiwan_store_date"
-    normalized = resolve_store_release_day(visible.start.isoformat(), detail.get("release_time_utc"))
+    if detail.get("exact") is not True:
+        # A released TW listing with an exact day can disagree with Browse's
+        # future instant. Keep the genuine instant; never invent date_full in
+        # the Browse response or replace the timestamp with the display day.
+        raw_stamp = release.get("steam_release_date") if isinstance(release, dict) else None
+        if (not isinstance(visible_release, dict) or visible_release.get("coming_soon") is not False
+                or visible.start > now.astimezone(TAIPEI).date()
+                or isinstance(raw_stamp, bool) or not isinstance(raw_stamp, (int, float, str))):
+            return None, "uncertain_steam_date"
+        try:
+            instant = datetime.fromtimestamp(int(raw_stamp), timezone.utc)
+        except (ValueError, TypeError, OverflowError, OSError):
+            return None, "uncertain_steam_date"
+        detail = {"release_time_utc": stamp(instant),
+                  "release_display_provider": "Steam IStoreBrowseService/GetItems",
+                  "release_date_basis": "steam_store_browse_release_timestamp"}
+    normalized = resolve_store_release_day(visible.start.isoformat(), detail.get("release_time_utc"),
+                                          allow_taiwan_store_authority=True)
     if normalized is None:
         return None, "steam_date_conflict"
     day = normalized["release_start"]
+    timestamp_day = aware_time(detail["release_time_utc"]).astimezone(TAIPEI).date().isoformat()
+    store_authority = normalized["release_date_normalization"] == TW_STORE_DATE_AUTHORITY
     today = now.astimezone(TAIPEI).date()
     taipei_day = datetime.fromisoformat(day).date()
     if not today - timedelta(days=30) <= taipei_day <= today + timedelta(days=365):
@@ -207,11 +221,11 @@ def build_candidate(appid: int, proof: dict, item: dict, details: dict,
         "name_en": item.get("name") or details.get("name") or f"Steam App {appid}",
         "release_raw": day, "release_start": day, "release_end": day,
         "release_precision": "day", "release_display_precision": "date_full",
-        "release_display_provider": detail["release_display_provider"],
+        "release_display_provider": TW_STORE_DATE_PROVIDER if store_authority else detail["release_display_provider"],
         "release_date_basis": detail["release_date_basis"],
         "release_date_timezone": "Asia/Taipei", "release_time_utc": detail["release_time_utc"],
         "release_time_source": detail["release_display_provider"],
-        "release_timestamp_taipei_date": day, "release_date_conflict": False,
+        "release_timestamp_taipei_date": timestamp_day, "release_date_conflict": day != timestamp_day,
         "release_store_date": normalized["release_store_date"],
         "release_date_normalization": normalized["release_date_normalization"],
         "release_date_verified_at": stamp(now), "post_followers_store_verified": True,
@@ -317,7 +331,10 @@ def retained_follower_candidate(appid: int, proof: dict, prior: dict, now: datet
     release_at = aware_time(metadata.get("release_time_utc"))
     if verified_at is None or verified_at > now or release_at is None:
         return None
-    day = release_at.astimezone(TAIPEI).date()
+    try:
+        day = datetime.fromisoformat(metadata["release_start"]).date()
+    except (KeyError, TypeError, ValueError):
+        return None
     today = now.astimezone(TAIPEI).date()
     if not today - timedelta(days=30) <= day <= today + timedelta(days=365):
         return None

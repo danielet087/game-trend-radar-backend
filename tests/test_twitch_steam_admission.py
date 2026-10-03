@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 from unittest.mock import Mock, patch
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -121,7 +122,7 @@ def test_low_followers_is_independent_admission_not_changed_steam_threshold():
 @pytest.mark.parametrize("mutation,reason", [("DLC", "not_a_steam_game"),
     ("descriptor", "adult_content"), ("ledger", "adult_content"),
     ("strong_rule", "adult_content"), ("uncertain", "uncertain_steam_date"),
-    ("conflict", "steam_date_conflict"), ("wrong_app", "steam_identity_mismatch"),
+    ("wrong_app", "steam_identity_mismatch"),
     ("missing_type", "steam_type_unavailable")])
 def test_steam_official_gates(mutation, reason):
     item, details = steam(); blocked = set()
@@ -132,7 +133,6 @@ def test_steam_official_gates(mutation, reason):
         item["tagids"] = [12095, 9130]
         item["basic_info"]["short_description"] = "An explicit sexual game."
     elif mutation == "uncertain": item["release"]["coming_soon_display"] = "date_quarter"; item["release"]["is_coming_soon"] = True
-    elif mutation == "conflict": details["release_date"]["date"] = "2026-10-01"
     elif mutation == "wrong_app": details["steam_appid"] = 999
     else: details = {}
     candidate, status = build_candidate(123, proof(), item, details, 40, "2026-10-02T06:00:00Z", NOW, blocked)
@@ -252,9 +252,9 @@ def test_retry_deadline_survives_hourly_frontend_commit():
 
 @pytest.mark.parametrize("mode,expected", [("released", "accepted"),
     ("unverified_missing", "uncertain_steam_date"), ("coming_soon", "uncertain_steam_date"),
-    ("explicit_true", "uncertain_steam_date"), ("future_timestamp", "uncertain_steam_date"),
-    ("future_today_timestamp", "uncertain_steam_date"),
-    ("conflict", "steam_date_conflict")])
+    ("explicit_true", "accepted"), ("future_timestamp", "accepted"),
+    ("future_today_timestamp", "accepted"),
+    ("conflict", "accepted")])
 def test_omitted_protobuf_false_requires_official_released_corroboration(mode, expected):
     item, details = steam()
     item["release"].pop("is_coming_soon")
@@ -271,6 +271,15 @@ def test_omitted_protobuf_false_requires_official_released_corroboration(mode, e
     candidate, status = build_candidate(123, proof(), item, details, 12, "2026-10-02T06:00:00Z", NOW, set())
     assert status == expected
     assert (candidate is not None) == (expected == "accepted")
+    if candidate is not None:
+        instant = datetime.fromtimestamp(item["release"]["steam_release_date"], timezone.utc)
+        assert candidate["release_time_utc"] == instant.isoformat().replace("+00:00", "Z")
+        timestamp_day = instant.astimezone(ZoneInfo("Asia/Taipei")).date().isoformat()
+        assert candidate["release_timestamp_taipei_date"] == timestamp_day
+        assert candidate["release_date_conflict"] == (candidate["release_start"] != timestamp_day)
+        if candidate["release_date_conflict"]:
+            assert candidate["release_date_normalization"] == "steam_taiwan_store_date_authoritative"
+            assert candidate["release_display_provider"] == "Steam Store appdetails cc=TW l=tchinese"
 
 
 def test_previous_parser_pending_retries_once_without_resetting_cached_followers():
@@ -288,7 +297,7 @@ def test_previous_parser_pending_retries_once_without_resetting_cached_followers
         output = collect(root, "b"*40, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
         assert output["records"][0]["followers"] == 13
         assert session.get.call_count == 2
-        assert output["state_updates"]["123"]["validation_version"] == 3
+        assert output["state_updates"]["123"]["validation_version"] == 4
 
 
 def test_official_utc_store_day_crosses_midnight_in_taipei():
@@ -302,28 +311,31 @@ def test_official_utc_store_day_crosses_midnight_in_taipei():
     assert candidate["release_store_date"] == "2026-09-08"
     assert candidate["release_date_normalization"] == "steam_utc_date_normalized_to_taipei"
     assert is_twitch_qualified(candidate)
-    for bad_day in ["2026-09-07", "2026-09-10", "September 2026"]:
+    for bad_day in ["September 2026", "2026"]:
         details["release_date"]["date"] = bad_day
         bad, reason = build_candidate(123, proof(), item, details, 42, "2026-10-02T06:00:00Z", NOW, set())
         assert bad is None
-        assert reason in {"steam_date_conflict", "uncertain_taiwan_store_date"}
+        assert reason == "uncertain_taiwan_store_date"
 
 
 def test_date_conflict_migration_rechecks_metadata_with_official_cache():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp); fake_frontend(root)
         item, details = steam()
-        item["release"]["steam_release_date"] = int(datetime(2026, 9, 8, 16, tzinfo=timezone.utc).timestamp())
-        details["release_date"] = {"date": "2026-09-08", "coming_soon": False}
+        item["release"]["steam_release_date"] = int(datetime(2026, 9, 4, 4, 2, 14, tzinfo=timezone.utc).timestamp())
+        details["release_date"] = {"date": "2026-09-03", "coming_soon": False}
         session = Mock(); a, b = Mock(status_code=200), Mock(status_code=200)
         a.json.return_value = {"response": {"store_items": [item]}}
         b.json.return_value = {"123": {"success": True, "data": details}}
         session.get.side_effect = [a, b]
         state = {"games": {"123": {"status": "pending", "reason": "steam_date_conflict",
-            "validation_version": 2, "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}}}
+            "validation_version": 3, "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}}}
         cache = {"games": {"123": {"followers": 13, "checked_at": "2026-10-02T06:00:00Z"}}}
         output = collect(root, SHA, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
-        assert output["records"][0]["release_start"] == "2026-09-09"
+        assert output["records"][0]["release_start"] == "2026-09-03"
+        assert output["records"][0]["release_timestamp_taipei_date"] == "2026-09-04"
+        assert output["records"][0]["release_date_conflict"] is True
+        assert output["state_updates"]["123"]["validation_version"] == 4
         assert output["records"][0]["followers"] == 13
         assert session.get.call_count == 2
         state = {"games": output["state_updates"]}

@@ -20,6 +20,7 @@ CORE_FIELDS = {
     "sexual_content_screened", "release_display_precision", "release_display_provider",
     "release_date_verified_at", "post_followers_store_verified_at", "post_followers_store_verified",
     "release_date_conflict", "release_timestamp_taipei_date",
+    "release_store_date", "release_date_normalization",
     "twitch_admission", "steam_type", "content_descriptorids",
 }
 

@@ -194,7 +194,8 @@ def refresh(
             for field in ("followers", "follower_checked_at", "steam_type", "sexual_content_screened",
                           "release_start", "release_end", "release_precision", "release_display_precision",
                           "release_date_timezone", "release_time_utc", "release_timestamp_taipei_date",
-                          "release_date_conflict"):
+                          "release_date_conflict", "release_store_date", "release_date_normalization",
+                          "release_display_provider", "release_date_verified_at"):
                 if field in old:
                     merged[field] = old[field]
                 else:

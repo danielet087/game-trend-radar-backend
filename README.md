@@ -15,6 +15,8 @@
 
 Twitch 正式收錄的新作是獨立入口：Twitch ID → Helix 的 IGDB ID → IGDB 官方 Steam 外部 ID。找到原清單沒有的 AppID 後，不套用 5,000 Followers 門檻，仍查詢真實官方 Followers、Steam 台灣確切日期、正式遊戲類型與既有成人內容排除規則。資料不足保留待重試；IGDB 沒有 Steam 連結也只是尚未確認，每日重查。
 
+若 Steam 台灣商店的完整上市日與 Store Browse 時間戳日期不同，已驗證 Twitch 身分的遊戲可採用同 AppID 的 `appdetails cc=TW l=tchinese` 完整日期進月曆。保存日期來源、查證時間與 `steam_taiwan_store_date_authoritative` 政策，同時保留真實 UTC、換算後台灣日期及衝突診斷；不改寫原始時間戳。一般 Steam 來源、遊戲類型、成人內容與真實 Followers 檢查維持原規則。舊日期衝突候選透過匯入器驗證版本遷移，在既有工作重新核對，不增加排程或清空佇列。
+
 Twitch 發現的 Steam 遊戲直接加入既有 `steam-official-daily-catchup-250.yml` 官方 Followers 佇列，不另設查詢排程。每輪先讀前端不可變快照的 `data/twitch_steam_discovery.json`，只查 Steam 商店 metadata 並重用有效官方快取；缺少官方數值者依 AppID 去重後寫入既有 checkpoint 的 `pending_candidates`，Twitch 候選優先於一般候選。Twitch 內先查尚未嘗試者，再依上次嘗試時間與日期排序，避免同一款反覆失敗阻塞其他候選；一般候選維持原日期排序。全部候選共用每輪最多 250 次、至少 8 秒間隔與同一個 Community 冷卻。有已取得的官方數值（包含低於 5,000）就不再查 Community。修改程式與 workflow 不會自行觸發真實 Steam 查詢。
 
 同一工作查完官方數值後，由只使用快取的 Twitch importer 再核對日期、成人規則與來源證據，先持久化主清單及 `data/twitch_steam_import_state.json`，再送 `steam_game_twitch_discovered` 內容事件；事件失敗保留重試。一般 Steam 來源仍維持 5,000 Followers 門檻。來源證據 `twitch_admission` 隨清單、內容、索引與成長紀錄保存，正常更新不能移除已接受的來源。Twitch 觀測持續沿用 Twitch ID 與圖片，Steam 入口不會反過來冒充 Twitch 新作。沿用既有 `CONTENT_BACKEND_TOKEN`，不新增 Secrets。

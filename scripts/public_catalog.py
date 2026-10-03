@@ -44,6 +44,7 @@ FIELDS = (
     'twitch_admission', 'steam_type', 'sexual_content_screened',
     'release_time_utc', 'release_timestamp_taipei_date', 'release_date_conflict',
     'release_store_date', 'release_date_normalization',
+    'release_display_provider', 'release_date_verified_at',
 )
 
 

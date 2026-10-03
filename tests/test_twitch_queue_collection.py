@@ -78,7 +78,7 @@ def test_official_checkpoint_cache_publishes_true_count_and_removes_queue(tmp_pa
 
 @pytest.mark.parametrize("mutation,reason", [
     ("adult", "adult_content"), ("dlc", "not_a_steam_game"),
-    ("date_conflict", "steam_date_conflict"), ("date_uncertain", "uncertain_steam_date"),
+    ("date_uncertain", "uncertain_steam_date"),
 ])
 def test_metadata_disqualification_removes_previously_queued_candidate(tmp_path, mutation, reason):
     fake_frontend(tmp_path)
@@ -90,8 +90,6 @@ def test_metadata_disqualification_removes_previously_queued_candidate(tmp_path,
         details["content_descriptors"]["ids"] = [3]
     elif mutation == "dlc":
         details["type"] = "dlc"
-    elif mutation == "date_conflict":
-        details["release_date"]["date"] = "2026-10-01"
     else:
         item["release"].update(is_coming_soon=True, coming_soon_display="date_quarter")
     session = Mock()
@@ -102,6 +100,29 @@ def test_metadata_disqualification_removes_previously_queued_candidate(tmp_path,
     assert batch["records"] == [] and batch["follower_candidates"] == []
     assert batch["state_updates"]["123"]["reason"] == reason
     assert batch["state_updates"]["123"]["follower_candidate"] is None
+
+
+def test_confirmed_taiwan_date_change_replaces_pending_date_with_its_official_audit(tmp_path):
+    fake_frontend(tmp_path)
+    state = seed(tmp_path, 123)
+    responses = list(metadata_responses(123))
+    details = responses[1].json.return_value["123"]["data"]
+    details["release_date"] = {"date": "2026-10-01", "coming_soon": False}
+    session = Mock()
+    session.get.side_effect = responses
+
+    batch = run(tmp_path, state, session=session)
+
+    candidate, = batch["follower_candidates"]
+    assert candidate["release_date"] == "2026-10-01"
+    metadata = candidate["steam_candidate"]
+    assert metadata["release_date_normalization"] == "steam_taiwan_store_date_authoritative"
+    assert metadata["release_timestamp_taipei_date"] == "2026-10-02"
+    assert metadata["release_date_conflict"] is True
+    assert batch["records"] == []
+    assert batch["state_updates"]["123"]["reason"] == "queued_official_followers"
+    assert batch["state_updates"]["123"]["follower_candidate"] == candidate
+    assert session.get.call_count == 2
 
 
 @pytest.mark.parametrize("failure", ["request", "descriptors", "global_cooldown", "per_game_retry", "deadline"])

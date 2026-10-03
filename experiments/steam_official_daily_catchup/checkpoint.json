@@ -37663,6 +37663,88 @@
       "official_ge5000": true,
       "official_checked_at_taipei": "2026-10-02T23:24:10.323063+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "3219630": {
+      "appid": 3219630,
+      "name": "Halloween: The Game",
+      "release_date": "2026-09-09",
+      "steam_url": "https://store.steampowered.com/app/3219630/",
+      "group_id64": "103582791475269628",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 3219630,
+        "twitch_game_id": "902998079",
+        "igdb_id": "362096",
+        "checked_at": "2026-10-03T10:10:30Z",
+        "source_frontend_commit": "ae9d2b02f7b98de235dbffc1d693b969c1fb75ba",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-02T01:13:11Z",
+          "viewer_count": 7619,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 3219630,
+        "name": "Halloween: The Game",
+        "name_en": "Halloween: The Game",
+        "release_raw": "2026-09-09",
+        "release_start": "2026-09-09",
+        "release_end": "2026-09-09",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-09-08T16:02:32Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-09-09",
+        "release_date_conflict": false,
+        "release_store_date": "2026-09-08",
+        "release_date_normalization": "steam_utc_date_normalized_to_taipei",
+        "release_date_verified_at": "2026-10-03T11:43:31.012001Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-03T11:43:31.012001Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [
+          1,
+          2,
+          5
+        ],
+        "store_url": "https://store.steampowered.com/app/3219630/",
+        "community_url": "https://steamcommunity.com/app/3219630/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 3219630,
+          "twitch_game_id": "902998079",
+          "igdb_id": "362096",
+          "checked_at": "2026-10-03T10:10:30Z",
+          "source_frontend_commit": "ae9d2b02f7b98de235dbffc1d693b969c1fb75ba",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-02T01:13:11Z",
+            "viewer_count": 7619,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-03T11:02:37.062985Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 50176,
+      "official_ge5000": true,
+      "official_checked_at_taipei": "2026-10-03T19:43:44.223178+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -52105,10 +52187,21 @@
       "status": "rate_limited",
       "github_run_id": "37111632690",
       "next_request_after_taipei": "2026-10-03T21:01:40.828192+08:00"
+    },
+    {
+      "appid": 3219630,
+      "when_taipei": "2026-10-03T19:43:43.813322+08:00",
+      "release_date": "2026-09-09",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37120554601",
+      "manual_cooldown_override": true,
+      "official_followers": 50176
     }
   ],
-  "next_request_after_taipei": "2026-10-03T21:01:40.828192+08:00",
-  "rate_limit_count": 5,
+  "next_request_after_taipei": null,
+  "rate_limit_count": 0,
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
@@ -52189,27 +52282,23 @@
       "dispatched_at_taipei": "2026-10-02T10:09:41.075287+08:00"
     }
   },
-  "community_cooldown": {
-    "retry_at": "2026-10-03T13:01:40.828192+00:00",
-    "observed_at": "2026-10-03T09:01:40.828192+00:00",
-    "updated_at": "2026-10-03T09:01:40.828192+00:00",
-    "retry_seconds": 14400,
-    "retry_after": null,
-    "retry_source": "existing_queue_backoff",
-    "attempts": 5
-  },
-  "community_last_success_at": "2026-10-02T23:24:10.323084+08:00",
+  "community_cooldown": null,
+  "community_last_success_at": "2026-10-03T19:43:44.223207+08:00",
   "scheduler_batch": {
-    "run_id": "37118307134",
+    "run_id": "37120554601",
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-03T19:11:34.401193+08:00",
-    "last_updated_at": "2026-10-03T19:11:34.497234+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "manual_cooldown_override": true,
+    "request_limit": 1,
+    "started_at": "2026-10-03T19:43:43.724062+08:00",
+    "last_updated_at": "2026-10-03T19:43:44.264335+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "finished_at": "2026-10-03T19:11:34.497234+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "last_appid": 3219630,
+    "last_name": "Halloween: The Game",
+    "finished_at": "2026-10-03T19:43:44.264335+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

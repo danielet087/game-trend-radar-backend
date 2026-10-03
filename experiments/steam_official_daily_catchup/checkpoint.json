@@ -54829,10 +54829,20 @@
       "status": "rate_limited",
       "github_run_id": "37153563352",
       "next_request_after_taipei": "2026-10-04T06:00:54.186377+08:00"
+    },
+    {
+      "appid": 5235040,
+      "when_taipei": "2026-10-04T07:00:53.591549+08:00",
+      "release_date": "2026-10-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "37160330903",
+      "next_request_after_taipei": "2026-10-04T09:00:53.753999+08:00"
     }
   ],
-  "next_request_after_taipei": "2026-10-04T06:00:54.186377+08:00",
-  "rate_limit_count": 3,
+  "next_request_after_taipei": "2026-10-04T09:00:53.753999+08:00",
+  "rate_limit_count": 4,
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
@@ -54914,28 +54924,28 @@
     }
   },
   "community_cooldown": {
-    "retry_at": "2026-10-03T22:00:54.186377+00:00",
-    "observed_at": "2026-10-03T21:00:54.186377+00:00",
-    "updated_at": "2026-10-03T21:00:54.186377+00:00",
-    "retry_seconds": 3600,
+    "retry_at": "2026-10-04T01:00:53.753999+00:00",
+    "observed_at": "2026-10-03T23:00:53.753999+00:00",
+    "updated_at": "2026-10-03T23:00:53.753999+00:00",
+    "retry_seconds": 7200,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 3
+    "attempts": 4
   },
   "community_last_success_at": "2026-10-03T21:02:23.427646+08:00",
   "scheduler_batch": {
-    "run_id": "37156977126",
-    "active": false,
-    "status": "finished",
+    "run_id": "37160330903",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-04T06:00:53.805199+08:00",
-    "last_updated_at": "2026-10-04T06:00:53.875104+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-10-04T07:00:53.523250+08:00",
+    "last_updated_at": "2026-10-04T07:00:53.754044+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-10-04T06:00:53.875104+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 5235040,
+    "last_name": "LUGANO BAY TYCOON"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

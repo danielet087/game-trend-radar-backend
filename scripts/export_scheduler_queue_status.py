@@ -93,12 +93,15 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
             "steam_url": f"https://store.steampowered.com/app/{aid}/",
             "release_date": row.get("release_date"), "source": row.get("queue_source"),
             "priority": row.get("queue_source") == TWITCH_SOURCE, "state": state,
+            "group_id64": worker.valid_group_id64(row.get("group_id64")),
+            "group_resolution": deepcopy(row.get("group_resolution")) if isinstance(row.get("group_resolution"), dict) else None,
             "last_attempt_at": utc(attempt.get("when_taipei")),
             "last_attempt_status": attempt.get("status"),
         }
         return result
 
-    queue = [{"position": index, **game(row, state="cooldown" if active_cooldown else "waiting")}
+    queue = [{"position": index, **game(row, state=("awaiting_group" if worker.valid_group_id64(row.get("group_id64")) is None
+                                                  else "cooldown" if active_cooldown else "waiting"))}
              for index, row in enumerate(pending, start=1)]
     parked = []
     for aid in source_status.get("parked_group_xml_appids", []):
@@ -124,6 +127,8 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
         "normal_pending": sum(not row["priority"] for row in queue),
         "twitch_priority_pending": sum(row["priority"] for row in queue),
         "parked": len(parked), "ready_pending": len(queue),
+        "followers_ready_pending": sum(row["group_id64"] is not None for row in queue),
+        "awaiting_group_pending": sum(row["group_id64"] is None for row in queue),
         "total_pending": len(queue) + len(parked),
         "today_attempts": len(today_events),
         "today_successes": sum(event.get("status") == "ok" for event in today_events),
@@ -132,6 +137,14 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
     source_update_values = [checkpoint.get("created_at_taipei"),
                             *(event.get("when_taipei") for event in valid_events),
                             last_batch.get("last_updated_at")]
+    group_update_values = [
+        row["group_resolution"].get("checked_at")
+        for row in checkpoint.get("pending_candidates", {}).values()
+        if isinstance(row, dict) and isinstance(row.get("group_resolution"), dict)
+    ]
+    api_cooldown = checkpoint.get("group_resolution_api_cooldown")
+    if isinstance(api_cooldown, dict):
+        group_update_values.append(api_cooldown.get("observed_at"))
     batch = {key: last_batch.get(key) for key in (
         "active", "status", "started_at", "last_updated_at", "finished_at", "stop_reason",
         "last_appid", "last_name", "requests_this_run", "official_new_this_run", "http_429_this_run",
@@ -143,6 +156,7 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
             "repository": REPOSITORY,
             "checkpoint_path": str(worker.CHECKPOINT),
             "checkpoint_updated_at": latest_time(source_update_values),
+            "group_resolution_updated_at": latest_time(group_update_values),
             "candidate_state_updated_at": utc((candidate_state or {}).get("updated_at")),
             "prefilter_updated_at": utc(prefilter.get("updated_at")),
             "eligible_screened_at": utc(eligible.get("screened_at")),
@@ -151,6 +165,7 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
             "queue_projection": "official_collector_make_queue",
         },
         "source_status": source_status, "summary": summary,
+        "group_resolution_api_cooldown": deepcopy(checkpoint.get("group_resolution_api_cooldown")),
         "cooldown": {
             "active": active_cooldown, "until": cooldown_until,
             "reason": ("steam_http_429" if last_event.get("http") == 429

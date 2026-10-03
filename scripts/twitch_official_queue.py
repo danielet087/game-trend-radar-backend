@@ -125,6 +125,10 @@ def _restore_normal(pending: dict, aid: str, row: dict) -> None:
     if (isinstance(normal, dict) and decimal_id(normal.get("appid")) == aid
             and normal.get("queue_source") != TWITCH_QUEUE_SOURCE):
         pending[aid] = deepcopy(normal)
+        if decimal_id(row.get("group_id64")) is not None:
+            pending[aid]["group_id64"] = row["group_id64"]
+        if isinstance(row.get("group_resolution"), dict):
+            pending[aid]["group_resolution"] = deepcopy(row["group_resolution"])
     else:
         pending.pop(aid, None)
 
@@ -189,6 +193,8 @@ def sync_twitch_queue(checkpoint: dict, batch: dict, now: datetime) -> dict:
         if isinstance(prior, dict) and decimal_id(prior.get("appid")) == aid:
             if decimal_id(prior.get("group_id64")) is not None:
                 new["group_id64"] = prior["group_id64"]
+            if isinstance(prior.get("group_resolution"), dict):
+                new["group_resolution"] = deepcopy(prior["group_resolution"])
             if prior.get("queue_source") == TWITCH_QUEUE_SOURCE:
                 normal = prior.get("normal_candidate")
                 if isinstance(normal, dict):

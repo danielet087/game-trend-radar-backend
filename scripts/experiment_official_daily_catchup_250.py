@@ -98,6 +98,17 @@ def group_to_gid(short):
     return str(GROUP_BASE + short)
 
 
+def valid_group_id64(value):
+    """Accept public Steam clan IDs, never a user ID or a fabricated zero."""
+    if isinstance(value, bool) or not isinstance(value, (int, str)):
+        return None
+    text = str(value)
+    if not text.isascii() or not text.isdigit():
+        return None
+    parsed = int(text)
+    return str(parsed) if GROUP_BASE < parsed <= GROUP_BASE + (2 ** 32 - 1) else None
+
+
 def valid_date(value):
     if not isinstance(value, str):
         return False
@@ -509,6 +520,10 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
             if aid not in cp["pending_candidates"]:
                 daily["added_from_daily"] += 1
             previous = cp["pending_candidates"].get(aid) or {}
+            # Daily metadata refresh must retain a separately resolved group.
+            new["group_id64"] = valid_group_id64(new["group_id64"]) or valid_group_id64(previous.get("group_id64"))
+            if isinstance(previous.get("group_resolution"), dict):
+                new["group_resolution"] = previous["group_resolution"]
             if previous.get("queue_source") == "twitch_steam_discovery":
                 # Keep the verified Twitch admission and its higher priority;
                 # the ordinary row remains available when Twitch expires.
@@ -544,7 +559,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 continue
         elif aid in existing_official:
             continue
-        if aid in bad_missing_group and row.get("group_id64") is None:
+        if aid in bad_missing_group and valid_group_id64(row.get("group_id64")) is None:
             cp.setdefault("unresolved_candidates", {})[aid] = {
                 **row,
                 "status": "official_xml_fallback_returned_html",
@@ -629,6 +644,10 @@ def main():
         official_cache, other_official
     )
     start_count = len(cp["official_results"])
+    # Missing group IDs stay in the same queue. Resolve them in the existing
+    # workflow before using Community XML; they must not consume XML attempts.
+    known_group_queue = [{**row, "group_id64": gid} for row in q
+                         if (gid := valid_group_id64(row.get("group_id64"))) is not None]
     attempts = []
     run_id = os.environ.get("GITHUB_RUN_ID", "")
     run_metadata = {"run_id": run_id} if run_id.isdecimal() else {}
@@ -650,9 +669,11 @@ def main():
         oldcp["next_request_after_taipei"]
     ):
         stop = "legacy_official_429_cooldown_no_request"
+    elif not known_group_queue:
+        stop = "awaiting_group_resolution_no_request"
     else:
         stop = "batch_request_limit"
-        for row in q[:args.max_requests]:
+        for row in known_group_queue[:args.max_requests]:
             if time.monotonic() - started >= args.max_seconds - 40:
                 stop = "hour_time_budget"
                 break
@@ -662,9 +683,7 @@ def main():
                     time.sleep(delay)
             last_start = time.monotonic()
             aid = row["appid"]
-            url = (f'https://steamcommunity.com/gid/{row["group_id64"]}/memberslistxml/?xml=1'
-                   if row["group_id64"] is not None
-                   else f"https://steamcommunity.com/games/{aid}/memberslistxml/?xml=1")
+            url = f'https://steamcommunity.com/gid/{row["group_id64"]}/memberslistxml/?xml=1'
             event = {
                 "appid": aid, "when_taipei": clock().isoformat(),
                 "release_date": row["release_date"],
@@ -829,6 +848,7 @@ def main():
         "completed_dynamic": len(cp["official_results"]),
         "combined_official_completed": len(oldcp["official_results"]) + len(cp["official_results"]),
         "remaining_queue": pending_left,
+        "awaiting_group_resolution": len(q) - len(known_group_queue),
         "http_429_this_run": sum(e["http"] == 429 for e in attempts),
         "twitch_priority_pending": source_status.get("twitch_priority_pending", 0),
         "twitch_official_success_this_run": sum(e.get("queue_source") == "twitch_steam_discovery"

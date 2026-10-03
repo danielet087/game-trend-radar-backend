@@ -1,11 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-03T10:01:56.896080Z",
+  "generated_at": "2026-10-03T10:58:32.118730Z",
   "today_taipei": "2026-10-03",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
     "checkpoint_updated_at": "2026-10-03T10:01:42.119784Z",
+    "group_resolution_updated_at": null,
     "candidate_state_updated_at": "2026-10-02T21:25:15.691702Z",
     "prefilter_updated_at": "2026-10-02T21:25:15.673055Z",
     "eligible_screened_at": "2026-10-02T21:25:16.315935Z",
@@ -32,11 +33,14 @@
     "twitch_priority_pending": 3,
     "parked": 1,
     "ready_pending": 76,
+    "followers_ready_pending": 73,
+    "awaiting_group_pending": 3,
     "total_pending": 77,
     "today_attempts": 4,
     "today_successes": 0,
     "today_429": 4
   },
+  "group_resolution_api_cooldown": null,
   "cooldown": {
     "active": true,
     "until": "2026-10-03T13:01:40.828192Z",
@@ -66,7 +70,9 @@
       "release_date": "2026-09-09",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
       "last_attempt_at": "2026-10-03T01:37:38.830012Z",
       "last_attempt_status": "rate_limited"
     },
@@ -78,7 +84,9 @@
       "release_date": "2026-09-09",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
       "last_attempt_at": "2026-10-03T06:01:49.593013Z",
       "last_attempt_status": "rate_limited"
     },
@@ -90,7 +98,9 @@
       "release_date": "2026-09-15",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
       "last_attempt_at": "2026-10-03T09:01:40.700874Z",
       "last_attempt_status": "rate_limited"
     },
@@ -103,6 +113,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475811451",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -115,6 +127,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475834777",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -127,6 +141,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476018531",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -139,6 +155,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475813792",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -151,6 +169,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476019795",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -163,6 +183,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475992458",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -175,6 +197,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476018335",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -187,6 +211,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476021018",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -199,6 +225,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476022987",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -211,6 +239,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476020301",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -223,6 +253,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476022928",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -235,6 +267,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476019828",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -247,6 +281,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476008205",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -259,6 +295,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476024256",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -271,6 +309,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476023856",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -283,6 +323,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476023296",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -295,6 +337,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017722",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -307,6 +351,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476024294",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -319,6 +365,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476020778",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -331,6 +379,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017049",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -343,6 +393,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476019661",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -355,6 +407,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476020676",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -367,6 +421,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475812209",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -379,6 +435,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017406",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -391,6 +449,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476010154",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -403,6 +463,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017700",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -415,6 +477,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476022875",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -427,6 +491,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475831941",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -439,6 +505,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476021737",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -451,6 +519,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017316",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -463,6 +533,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017051",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -475,6 +547,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475981052",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -487,6 +561,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475829110",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -499,6 +575,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476019316",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -511,6 +589,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476019719",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -523,6 +603,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476020382",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -535,6 +617,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475783305",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -547,6 +631,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475753654",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -559,6 +645,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476021799",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -571,6 +659,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476022460",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -583,6 +673,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017107",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -595,6 +687,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476024559",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -607,6 +701,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476020792",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -619,6 +715,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017055",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -631,6 +729,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476018361",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -643,6 +743,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475965699",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -655,6 +757,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476018096",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -667,6 +771,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017878",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -679,6 +785,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476018402",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -691,6 +799,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475766228",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -703,6 +813,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476022117",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -715,6 +827,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475794033",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -727,6 +841,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475934094",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -739,6 +855,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476016368",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -751,6 +869,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475799500",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -763,6 +883,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017970",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -775,6 +897,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475808594",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -787,6 +911,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475881585",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -799,6 +925,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476021031",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -811,6 +939,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476016021",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -823,6 +953,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475825102",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -835,6 +967,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017804",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -847,6 +981,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476024477",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -859,6 +995,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476017948",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -871,6 +1009,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475998174",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -883,6 +1023,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475768712",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -895,6 +1037,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476024179",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -907,6 +1051,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475767837",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -919,6 +1065,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476021921",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -931,6 +1079,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475830954",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -943,6 +1093,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475830060",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -955,6 +1107,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791476023517",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -967,6 +1121,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "cooldown",
+      "group_id64": "103582791475817714",
+      "group_resolution": null,
       "last_attempt_at": null,
       "last_attempt_status": null
     }
@@ -980,6 +1136,8 @@
       "source": "fresh_daily_prefilter_unresolved",
       "priority": false,
       "state": "parked",
+      "group_id64": null,
+      "group_resolution": null,
       "last_attempt_at": "2026-09-23T07:57:23.607757Z",
       "last_attempt_status": "transport_or_xml_error",
       "reason": "official_xml_fallback_returned_html",

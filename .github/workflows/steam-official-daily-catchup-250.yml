@@ -89,7 +89,30 @@ jobs:
           done
           exit 1
 
-      - name: Recheck the scheduled hour after Twitch preparation
+      - name: Resolve missing official group IDs before Followers XML requests
+        id: groups
+        if: steps.window.outputs.proceed == 'true'
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
+        run: |
+          set -euo pipefail
+          python -u -m scripts.resolve_official_group_ids --phase collect \
+            --batch output/steam_official_daily_catchup/group_resolution.json \
+            --max-requests 20 --max-seconds 120
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.resolve_official_group_ids --phase apply \
+              --batch output/steam_official_daily_catchup/group_resolution.json
+            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
+            git add experiments/steam_official_daily_catchup/checkpoint.json data/scheduler_queue_status.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m 'data: resolve official groups ahead of Followers queue'
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          exit 1
+
+      - name: Recheck the scheduled hour after Twitch and group preparation
         id: query_window
         if: steps.window.outputs.proceed == 'true'
         env:

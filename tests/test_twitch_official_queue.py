@@ -92,6 +92,25 @@ def test_transient_metadata_failure_keeps_prior_valid_queue_candidate():
     assert sync_twitch_queue(cp, incoming, NOW) == cp
 
 
+def test_group_lookup_evidence_survives_hourly_merge_and_twitch_withdrawal():
+    cp = checkpoint()
+    cp["pending_candidates"]["123"] = {
+        "appid": 123, "queue_source": "normal", "group_id64": None,
+        "release_date": "2026-10-10",
+    }
+    prepared = sync_twitch_queue(cp, batch(), NOW)
+    group = {"status": "resolved", "checked_at": NOW.isoformat(),
+             "source": "Steam ISteamUser/ResolveVanityURL"}
+    prepared["pending_candidates"]["123"].update(
+        group_id64="103582791429999999", group_resolution=deepcopy(group))
+    merged = sync_twitch_queue(prepared, batch(), NOW)
+    assert merged["pending_candidates"]["123"]["group_resolution"] == group
+    restored = sync_twitch_queue(merged, {"active_twitch_appids": [], "follower_candidates": []}, NOW)
+    assert restored["pending_candidates"]["123"]["queue_source"] == "normal"
+    assert restored["pending_candidates"]["123"]["group_id64"] == "103582791429999999"
+    assert restored["pending_candidates"]["123"]["group_resolution"] == group
+
+
 def test_authoritative_queue_removes_active_candidate_missing_from_batch():
     cp = sync_twitch_queue(checkpoint(), batch(), NOW)
     result = sync_twitch_queue(cp, {"active_twitch_appids": [123], "follower_candidates": []}, NOW)

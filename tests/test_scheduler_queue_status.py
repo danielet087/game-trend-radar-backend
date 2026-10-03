@@ -14,7 +14,7 @@ from scripts import experiment_official_daily_catchup_250 as worker
 from scripts import export_scheduler_queue_status as exporter
 from tests.test_twitch_steam_admission import NOW
 from tests.test_unified_twitch_followers import (
-    checkpoint, current_daily, ordinary_candidate, queue_inputs, run_worker, twitch_candidate,
+    checkpoint, current_daily, known_group, ordinary_candidate, queue_inputs, run_worker, twitch_candidate,
 )
 
 
@@ -51,7 +51,10 @@ def test_projection_matches_official_order_without_mutating_source_inputs():
     assert [row["appid"] for row in status["queue"]] == [row["appid"] for row in official]
     assert [row["appid"] for row in status["queue"]] == [124, 126, 123, 127, 128]
     assert [row["position"] for row in status["queue"]] == [1, 2, 3, 4, 5]
-    assert all(row["state"] == "waiting" for row in status["queue"])
+    assert {row["appid"]: row["state"] for row in status["queue"]} == {
+        124: "awaiting_group", 126: "awaiting_group", 123: "waiting",
+        127: "awaiting_group", 128: "waiting",
+    }
     assert source == original
 
 
@@ -73,12 +76,14 @@ def test_daily_counts_and_cooldown_change_with_actual_official_results():
     assert status["summary"] == {
         "normal_pending": 73, "twitch_priority_pending": 3, "parked": 1,
         "ready_pending": 76, "total_pending": 77,
+        "followers_ready_pending": 73, "awaiting_group_pending": 3,
         "today_attempts": 3, "today_successes": 0, "today_429": 3,
     }
     assert status["cooldown"]["active"] is True
     assert status["cooldown"]["reason"] == "steam_http_429"
     assert status["cooldown"]["next_eligible_slot"] == "2026-10-02T11:00:00Z"
-    assert all(row["state"] == "cooldown" for row in status["queue"])
+    assert all(row["state"] == ("awaiting_group" if row["priority"] else "cooldown")
+               for row in status["queue"])
     assert status["parked"][0]["reason"] == "official_xml_fallback_returned_html"
 
     # A true zero count still completes official lookup; it must not stay queued.
@@ -178,7 +183,7 @@ def test_export_writes_only_destination_without_requests_or_git(monkeypatch, tmp
 
 
 def test_batch_reports_last_actual_attempt_without_claiming_current_processing(monkeypatch, tmp_path):
-    first, later = twitch_candidate(), ordinary_candidate()
+    first, later = known_group(twitch_candidate()), known_group(ordinary_candidate())
     make_queue = worker.make_queue
     monkeypatch.setenv("GITHUB_RUN_ID", "123456")
     cp, _, client, *_ = run_worker(

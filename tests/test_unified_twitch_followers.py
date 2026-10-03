@@ -141,6 +141,12 @@ def xml_response(count, gid="103582791429521531"):
                            content=body.encode(), text=body)
 
 
+def known_group(candidate):
+    candidate = deepcopy(candidate)
+    candidate["group_id64"] = worker.group_to_gid(candidate["appid"])
+    return candidate
+
+
 def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_requests=250):
     cp = checkpoint(queue)
     cp["next_request_after_taipei"] = cooldown
@@ -192,7 +198,7 @@ def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_re
 @pytest.mark.parametrize("followers", [0, 120, 5000])
 def test_twitch_official_success_keeps_evidence_for_shared_importer_at_any_count(
         monkeypatch, tmp_path, followers):
-    candidate = twitch_candidate()
+    candidate = known_group(twitch_candidate())
     cp, report, client, verify, upsert, dispatch, _ = run_worker(
         monkeypatch, tmp_path, [candidate], [xml_response(followers)])
 
@@ -211,7 +217,8 @@ def test_twitch_official_success_keeps_evidence_for_shared_importer_at_any_count
 
 def test_ordinary_qualified_game_keeps_existing_store_gate_and_dispatch(monkeypatch, tmp_path):
     cp, report, client, verify, upsert, dispatch, _ = run_worker(
-        monkeypatch, tmp_path, [ordinary_candidate()], [xml_response(6000)])
+        monkeypatch, tmp_path, [known_group(ordinary_candidate())],
+        [xml_response(6000, worker.group_to_gid(124))])
 
     assert cp["official_results"]["124"]["official_followers"] == 6000
     assert report["official_new_this_run"] == 1
@@ -249,12 +256,12 @@ def test_next_run_leaves_saved_high_follower_twitch_results_to_shared_importer(m
 
 def test_shared_loop_stops_after_first_429_and_preserves_all_pending_work(monkeypatch, tmp_path):
     response = SimpleNamespace(status_code=429, headers={"Retry-After": "7200"})
-    first, later = twitch_candidate(), ordinary_candidate()
+    first, later = known_group(twitch_candidate()), known_group(ordinary_candidate())
     cp, report, client, verify, upsert, dispatch, _ = run_worker(
         monkeypatch, tmp_path, [first, later], [response])
 
     assert client.get.call_count == 1
-    assert "games/123/" in client.get.call_args.args[0]
+    assert f"gid/{worker.group_to_gid(123)}/" in client.get.call_args.args[0]
     assert cp["official_results"] == {}
     assert set(cp["pending_candidates"]) == {"123", "124"}
     assert cp["next_request_after_taipei"] == "2026-10-02T19:00:00+08:00"
@@ -280,12 +287,50 @@ def test_shared_cooldown_blocks_twitch_and_normal_xml_queries(monkeypatch, tmp_p
 
 def test_priority_and_normal_share_request_budget_and_pacing(monkeypatch, tmp_path):
     cp, report, client, _, _, _, sleep = run_worker(
-        monkeypatch, tmp_path, [twitch_candidate(), ordinary_candidate(), ordinary_candidate(125)],
-        [xml_response(30), xml_response(100)], max_requests=2)
+        monkeypatch, tmp_path, [known_group(twitch_candidate()), known_group(ordinary_candidate()), known_group(ordinary_candidate(125))],
+        [xml_response(30), xml_response(100, worker.group_to_gid(124))], max_requests=2)
 
-    assert [call.args[0].split("/games/")[1].split("/")[0]
-            for call in client.get.call_args_list] == ["123", "124"]
+    assert [call.args[0].split("/gid/")[1].split("/")[0]
+            for call in client.get.call_args_list] == [worker.group_to_gid(123), worker.group_to_gid(124)]
     assert set(cp["official_results"]) == {"123", "124"}
     assert report["requests_this_run"] == 2
     assert report["remaining_queue"] == 1
     sleep.assert_called_once_with(8.0)
+
+
+def test_unknown_priority_id_waits_for_resolution_without_blocking_known_normal(monkeypatch, tmp_path):
+    unknown, ready = twitch_candidate(), known_group(ordinary_candidate())
+    cp, report, client, *_ = run_worker(
+        monkeypatch, tmp_path, [unknown, ready], [xml_response(20, worker.group_to_gid(124))])
+    assert client.get.call_count == 1
+    assert f"/gid/{ready['group_id64']}/" in client.get.call_args.args[0]
+    assert cp["pending_candidates"]["123"]["group_id64"] is None
+    assert report["awaiting_group_resolution"] == 1
+    assert report["remaining_queue"] == 1
+    assert [event["appid"] for event in cp["attempt_events"]] == [124]
+
+
+@pytest.mark.parametrize("gid", [None, True, "76561198000000001", worker.GROUP_BASE])
+def test_unknown_or_invalid_group_never_uses_community_fallback(monkeypatch, tmp_path, gid):
+    candidate = twitch_candidate()
+    candidate["group_id64"] = gid
+    cp, report, client, *_ = run_worker(monkeypatch, tmp_path, [candidate], [])
+    client.get.assert_not_called()
+    assert report["stop_reason"] == "awaiting_group_resolution_no_request"
+    assert report["remaining_queue"] == 1
+    assert cp["attempt_events"] == []
+    assert cp["rate_limit_count"] == 0
+
+
+def test_daily_refresh_preserves_resolved_group_and_lookup_evidence(monkeypatch):
+    monkeypatch.setattr(worker, "clock", lambda: NOW.astimezone(worker.TZ))
+    candidate = known_group(ordinary_candidate())
+    candidate["group_resolution"] = {"status": "resolved", "checked_at": NOW.isoformat()}
+    cp = checkpoint([candidate])
+    frozen, legacy, groups = queue_inputs()
+    eligible, prefilter = current_daily(124)
+    prefilter["games"]["124"]["group_short_id"] = None
+    queue, _ = worker.make_queue(cp, frozen, legacy, groups, eligible, prefilter,
+                                 {"games": {}}, {"verified": {}})
+    assert queue[0]["group_id64"] == candidate["group_id64"]
+    assert queue[0]["group_resolution"] == candidate["group_resolution"]

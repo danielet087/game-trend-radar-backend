@@ -1152,15 +1152,15 @@
     },
     "5160800": {
       "status": "pending",
-      "updated_at": "2026-10-03T19:00:46.902209Z",
+      "updated_at": "2026-10-04T19:00:47.300144Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 5160800,
         "twitch_game_id": "1458901309",
         "igdb_id": "415859",
-        "checked_at": "2026-10-03T16:12:05Z",
-        "source_frontend_commit": "cccde5d932713c8bed422df82c45af3ad21323c1",
+        "checked_at": "2026-10-04T17:14:24Z",
+        "source_frontend_commit": "30748c6f0b6b6d3c8007353c1b26796cc224d45d",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-03T16:12:05Z",
@@ -1171,7 +1171,7 @@
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-04T19:00:48.665294Z",
+      "retry_at": "2026-10-05T19:00:51.885816Z",
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
@@ -1292,8 +1292,100 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "3195440": {
+      "status": "pending",
+      "updated_at": "2026-10-04T19:00:47.300144Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 3195440,
+        "twitch_game_id": "866287127",
+        "igdb_id": "319629",
+        "checked_at": "2026-10-04T17:14:24Z",
+        "source_frontend_commit": "30748c6f0b6b6d3c8007353c1b26796cc224d45d",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-04T17:14:24Z",
+          "viewer_count": 8213,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": {
+        "appid": 3195440,
+        "name": "Welcome to Elderfield",
+        "release_date": "2026-09-10",
+        "steam_url": "https://store.steampowered.com/app/3195440/",
+        "group_id64": null,
+        "queue_source": "twitch_steam_discovery",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 3195440,
+          "twitch_game_id": "866287127",
+          "igdb_id": "319629",
+          "checked_at": "2026-10-04T17:14:24Z",
+          "source_frontend_commit": "30748c6f0b6b6d3c8007353c1b26796cc224d45d",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-04T17:14:24Z",
+            "viewer_count": 8213,
+            "min_viewers": 7000
+          }
+        },
+        "steam_candidate": {
+          "appid": 3195440,
+          "name": "Welcome to Elderfield",
+          "name_en": "Welcome to Elderfield",
+          "release_raw": "2026-09-10",
+          "release_start": "2026-09-10",
+          "release_end": "2026-09-10",
+          "release_precision": "day",
+          "release_display_precision": "date_full",
+          "release_display_provider": "Steam IStoreBrowseService/GetItems",
+          "release_date_basis": "steam_store_browse_verified_full_date",
+          "release_date_timezone": "Asia/Taipei",
+          "release_time_utc": "2026-09-10T14:49:43Z",
+          "release_time_source": "Steam IStoreBrowseService/GetItems",
+          "release_timestamp_taipei_date": "2026-09-10",
+          "release_date_conflict": false,
+          "release_store_date": "2026-09-10",
+          "release_date_normalization": "steam_store_date_matches_taipei",
+          "release_date_verified_at": "2026-10-04T19:00:47.300144Z",
+          "post_followers_store_verified": true,
+          "post_followers_store_verified_at": "2026-10-04T19:00:47.300144Z",
+          "sexual_content_screened": true,
+          "steam_type": "game",
+          "content_descriptorids": [],
+          "store_url": "https://store.steampowered.com/app/3195440/",
+          "community_url": "https://steamcommunity.com/app/3195440/",
+          "twitch_admission": {
+            "schema_version": 1,
+            "method": "twitch_igdb_external_steam_v1",
+            "appid": 3195440,
+            "twitch_game_id": "866287127",
+            "igdb_id": "319629",
+            "checked_at": "2026-10-04T17:14:24Z",
+            "source_frontend_commit": "30748c6f0b6b6d3c8007353c1b26796cc224d45d",
+            "source_enrollment": {
+              "source": "igdb_first_release_date",
+              "observed_at": "2026-10-04T17:14:24Z",
+              "viewer_count": 8213,
+              "min_viewers": 7000
+            }
+          }
+        }
+      },
+      "reason": "queued_official_followers",
+      "rate_limit_stage": null,
+      "retry_at": null,
+      "retry_source": null,
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-04T12:00:52.069179Z",
+  "updated_at": "2026-10-04T19:00:47.300144Z",
   "api_cooldowns": {}
 }

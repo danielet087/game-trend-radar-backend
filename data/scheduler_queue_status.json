@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-04T02:08:40.262805Z",
+  "generated_at": "2026-10-04T03:00:46.337416Z",
   "today_taipei": "2026-10-04",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,7 +10,7 @@
     "candidate_state_updated_at": "2026-10-03T17:02:31.844260Z",
     "prefilter_updated_at": "2026-10-03T17:02:31.825708Z",
     "eligible_screened_at": "2026-10-03T17:02:32.473946Z",
-    "twitch_import_updated_at": "2026-10-04T02:08:39.452159Z",
+    "twitch_import_updated_at": "2026-10-04T03:00:43.993139Z",
     "last_official_success_at": "2026-10-04T02:08:31.341754Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -23,19 +23,19 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 0,
+    "combined_pending_now": 1,
     "completed_legacy": 384,
     "completed_new": 1730,
-    "twitch_priority_pending": 0
+    "twitch_priority_pending": 1
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 0,
+    "twitch_priority_pending": 1,
     "parked": 1,
-    "ready_pending": 0,
+    "ready_pending": 1,
     "followers_ready_pending": 0,
-    "awaiting_group_pending": 0,
-    "total_pending": 1,
+    "awaiting_group_pending": 1,
+    "total_pending": 2,
     "today_attempts": 62,
     "today_successes": 58,
     "today_429": 4
@@ -51,7 +51,7 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": null,
+    "next_eligible_slot": "2026-10-04T04:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -71,7 +71,22 @@
     "run_id": "37169714198",
     "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
   },
-  "queue": [],
+  "queue": [
+    {
+      "position": 1,
+      "appid": 4182430,
+      "name": "DEATH PENALTY",
+      "steam_url": "https://store.steampowered.com/app/4182430/",
+      "release_date": "2026-09-16",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    }
+  ],
   "parked": [
     {
       "appid": 4435490,

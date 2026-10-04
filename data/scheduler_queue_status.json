@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-04T19:00:52.759396Z",
+  "generated_at": "2026-10-04T19:00:55.592621Z",
   "today_taipei": "2026-10-05",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
     "checkpoint_updated_at": "2026-10-04T15:00:53.776986Z",
-    "group_resolution_updated_at": "2026-10-04T12:00:56.658696Z",
+    "group_resolution_updated_at": "2026-10-04T19:00:54.787670Z",
     "candidate_state_updated_at": "2026-10-04T16:59:33.365456Z",
     "prefilter_updated_at": "2026-10-04T16:59:33.349892Z",
     "eligible_screened_at": "2026-10-04T16:59:33.880595Z",
@@ -18,7 +18,7 @@
     "status": "current_day_prefilter_complete",
     "daily_prefilter_updated_at": "2026-10-04T16:59:33.349892+00:00",
     "eligible_screened_at": "2026-10-04T16:59:33.880595+00:00",
-    "added_from_daily": 52,
+    "added_from_daily": 0,
     "eligible_count": 3575,
     "parked_group_xml_appids": [
       "4435490"
@@ -33,8 +33,8 @@
     "twitch_priority_pending": 1,
     "parked": 1,
     "ready_pending": 53,
-    "followers_ready_pending": 52,
-    "awaiting_group_pending": 1,
+    "followers_ready_pending": 53,
+    "awaiting_group_pending": 0,
     "total_pending": 54,
     "today_attempts": 0,
     "today_successes": 0,
@@ -43,7 +43,7 @@
   "group_resolution_api_cooldown": {
     "status": "available",
     "retry_at": null,
-    "observed_at": "2026-10-04T12:00:56.658696Z",
+    "observed_at": "2026-10-04T19:00:54.787670Z",
     "attempts": 0,
     "source": "Steam ISteamUser/ResolveVanityURL"
   },
@@ -78,9 +78,16 @@
       "release_date": "2026-09-10",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "awaiting_group",
-      "group_id64": null,
-      "group_resolution": null,
+      "state": "waiting",
+      "group_id64": "103582791474728398",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-04T19:00:54.520473Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
       "last_attempt_at": null,
       "last_attempt_status": null
     },

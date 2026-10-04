@@ -40432,6 +40432,87 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-04T10:08:31.341744+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4182430": {
+      "appid": 4182430,
+      "name": "DEATH PENALTY",
+      "release_date": "2026-09-16",
+      "steam_url": "https://store.steampowered.com/app/4182430/",
+      "group_id64": "103582791475644369",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4182430,
+        "twitch_game_id": "1919304985",
+        "igdb_id": "401555",
+        "checked_at": "2026-10-04T02:10:36Z",
+        "source_frontend_commit": "93a1383465105a26b30d508be0483d61968a19dd",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-04T02:10:36Z",
+          "viewer_count": 13557,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 4182430,
+        "name": "DEATH PENALTY",
+        "name_en": "DEATH PENALTY",
+        "release_raw": "2026-09-16",
+        "release_start": "2026-09-16",
+        "release_end": "2026-09-16",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-09-15T23:29:17Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-09-16",
+        "release_date_conflict": false,
+        "release_store_date": "2026-09-15",
+        "release_date_normalization": "steam_utc_date_normalized_to_taipei",
+        "release_date_verified_at": "2026-10-04T03:00:43.993139Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-04T03:00:43.993139Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [
+          2,
+          5
+        ],
+        "store_url": "https://store.steampowered.com/app/4182430/",
+        "community_url": "https://steamcommunity.com/app/4182430/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4182430,
+          "twitch_game_id": "1919304985",
+          "igdb_id": "401555",
+          "checked_at": "2026-10-04T02:10:36Z",
+          "source_frontend_commit": "93a1383465105a26b30d508be0483d61968a19dd",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-04T02:10:36Z",
+            "viewer_count": 13557,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-04T03:00:47.904358Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 751,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-04T11:00:50.744972+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -56315,6 +56396,16 @@
       "status": "ok",
       "github_run_id": "37169714198",
       "official_followers": 26
+    },
+    {
+      "appid": 4182430,
+      "when_taipei": "2026-10-04T11:00:50.569380+08:00",
+      "release_date": "2026-09-16",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37172770692",
+      "official_followers": 751
     }
   ],
   "next_request_after_taipei": null,
@@ -56400,21 +56491,21 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-04T10:08:31.341754+08:00",
+  "community_last_success_at": "2026-10-04T11:00:50.744981+08:00",
   "scheduler_batch": {
-    "run_id": "37169714198",
+    "run_id": "37172770692",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-04T10:00:55.175942+08:00",
-    "last_updated_at": "2026-10-04T10:08:31.364071+08:00",
-    "requests_this_run": 58,
-    "official_new_this_run": 58,
+    "started_at": "2026-10-04T11:00:50.521452+08:00",
+    "last_updated_at": "2026-10-04T11:00:50.768170+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "last_appid": 5205360,
-    "last_name": "Sonucido: Dreams of the Gray God by Daniel da Silva",
-    "finished_at": "2026-10-04T10:08:31.364071+08:00",
+    "last_appid": 4182430,
+    "last_name": "DEATH PENALTY",
+    "finished_at": "2026-10-04T11:00:50.768170+08:00",
     "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-04T03:00:48.915338Z",
+  "generated_at": "2026-10-04T03:00:50.793248Z",
   "today_taipei": "2026-10-04",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-04T02:08:31.364071Z",
+    "checkpoint_updated_at": "2026-10-04T03:00:50.768170Z",
     "group_resolution_updated_at": "2026-10-04T03:00:48.157826Z",
     "candidate_state_updated_at": "2026-10-03T17:02:31.844260Z",
     "prefilter_updated_at": "2026-10-03T17:02:31.825708Z",
     "eligible_screened_at": "2026-10-03T17:02:32.473946Z",
     "twitch_import_updated_at": "2026-10-04T03:00:43.993139Z",
-    "last_official_success_at": "2026-10-04T02:08:31.341754Z",
+    "last_official_success_at": "2026-10-04T03:00:50.744981Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 1,
+    "combined_pending_now": 0,
     "completed_legacy": 384,
-    "completed_new": 1730,
-    "twitch_priority_pending": 1
+    "completed_new": 1731,
+    "twitch_priority_pending": 0
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 1,
+    "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 1,
-    "followers_ready_pending": 1,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 2,
-    "today_attempts": 62,
-    "today_successes": 58,
+    "total_pending": 1,
+    "today_attempts": 63,
+    "today_successes": 59,
     "today_429": 4
   },
   "group_resolution_api_cooldown": {
@@ -51,49 +51,27 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-04T04:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-04T10:00:55.175942+08:00",
-    "last_updated_at": "2026-10-04T10:08:31.364071+08:00",
-    "finished_at": "2026-10-04T10:08:31.364071+08:00",
+    "started_at": "2026-10-04T11:00:50.521452+08:00",
+    "last_updated_at": "2026-10-04T11:00:50.768170+08:00",
+    "finished_at": "2026-10-04T11:00:50.768170+08:00",
     "stop_reason": "batch_request_limit",
-    "last_appid": 5205360,
-    "last_name": "Sonucido: Dreams of the Gray God by Daniel da Silva",
-    "requests_this_run": 58,
-    "official_new_this_run": 58,
+    "last_appid": 4182430,
+    "last_name": "DEATH PENALTY",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "37169714198",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    "run_id": "37172770692",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37172770692"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 4182430,
-      "name": "DEATH PENALTY",
-      "steam_url": "https://store.steampowered.com/app/4182430/",
-      "release_date": "2026-09-16",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475644369",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-04T03:00:47.904358Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    }
-  ],
+  "queue": [],
   "parked": [
     {
       "appid": 4435490,
@@ -120,19 +98,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-03T12:07:28.307669Z",
-      "kind": "official_attempt",
-      "appid": 5329940,
-      "name": "SCROLLS: Tidy up the Library of Olympus!",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
     {
       "at": "2026-10-03T12:07:36.307796Z",
       "kind": "official_attempt",
@@ -1418,6 +1383,19 @@
       "retry_at": null,
       "run_id": "37169714198",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T03:00:50.569380Z",
+      "kind": "official_attempt",
+      "appid": 4182430,
+      "name": "DEATH PENALTY",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 751,
+      "retry_at": null,
+      "run_id": "37172770692",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37172770692"
     }
   ],
   "events_limit": 100

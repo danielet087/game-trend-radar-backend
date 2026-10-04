@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-04T02:04:47.354067Z",
+  "generated_at": "2026-10-04T02:06:07.361132Z",
   "today_taipei": "2026-10-04",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-04T02:04:47.332381Z",
+    "checkpoint_updated_at": "2026-10-04T02:06:07.339142Z",
     "group_resolution_updated_at": "2026-10-04T02:00:53.033272Z",
     "candidate_state_updated_at": "2026-10-03T17:02:31.844260Z",
     "prefilter_updated_at": "2026-10-03T17:02:31.825708Z",
     "eligible_screened_at": "2026-10-03T17:02:32.473946Z",
     "twitch_import_updated_at": "2026-10-04T02:00:48.615227Z",
-    "last_official_success_at": "2026-10-04T02:04:47.332378Z",
+    "last_official_success_at": "2026-10-04T02:06:07.339139Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 28,
+    "combined_pending_now": 18,
     "completed_legacy": 384,
-    "completed_new": 1702,
+    "completed_new": 1712,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 28,
+    "normal_pending": 18,
     "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 28,
-    "followers_ready_pending": 28,
+    "ready_pending": 18,
+    "followers_ready_pending": 18,
     "awaiting_group_pending": 0,
-    "total_pending": 29,
-    "today_attempts": 34,
-    "today_successes": 30,
+    "total_pending": 19,
+    "today_attempts": 44,
+    "today_successes": 40,
     "today_429": 4
   },
   "group_resolution_api_cooldown": {
@@ -58,11 +58,11 @@
     "active": true,
     "status": "querying",
     "started_at": "2026-10-04T10:00:55.175942+08:00",
-    "last_updated_at": "2026-10-04T10:04:47.332381+08:00",
-    "last_appid": 4258970,
-    "last_name": "Crawling Desktop Pet",
-    "requests_this_run": 30,
-    "official_new_this_run": 30,
+    "last_updated_at": "2026-10-04T10:06:07.339142+08:00",
+    "last_appid": 5183430,
+    "last_name": "Artifact Tracer",
+    "requests_this_run": 40,
+    "official_new_this_run": 40,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
@@ -72,146 +72,6 @@
   "queue": [
     {
       "position": 1,
-      "appid": 4955980,
-      "name": "Dairy Empire: Production Simulator",
-      "steam_url": "https://store.steampowered.com/app/4955980/",
-      "release_date": "2026-10-28",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475833157",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5072430,
-      "name": "Ghost in the SQL Data",
-      "steam_url": "https://store.steampowered.com/app/5072430/",
-      "release_date": "2026-10-29",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475792396",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 4779470,
-      "name": "Walkers",
-      "steam_url": "https://store.steampowered.com/app/4779470/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476011719",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5216700,
-      "name": "I Feel Great",
-      "steam_url": "https://store.steampowered.com/app/5216700/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475826756",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5262700,
-      "name": "Tales of the Immortal Path",
-      "steam_url": "https://store.steampowered.com/app/5262700/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476029998",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5330840,
-      "name": "Recess of the Dead",
-      "steam_url": "https://store.steampowered.com/app/5330840/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476029359",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5345570,
-      "name": "Zakuzaku Rogue",
-      "steam_url": "https://store.steampowered.com/app/5345570/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476025621",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5012600,
-      "name": "Ticker & Trade",
-      "steam_url": "https://store.steampowered.com/app/5012600/",
-      "release_date": "2026-10-31",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475775732",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5058380,
-      "name": "MMO Simulator: ASCENSIONS",
-      "steam_url": "https://store.steampowered.com/app/5058380/",
-      "release_date": "2026-11-02",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475780543",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 5183430,
-      "name": "Artifact Tracer",
-      "steam_url": "https://store.steampowered.com/app/5183430/",
-      "release_date": "2026-11-04",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475812767",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 5343850,
       "name": "I Hate Scalpers",
       "steam_url": "https://store.steampowered.com/app/5343850/",
@@ -225,7 +85,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 2,
       "appid": 5167220,
       "name": "Another Cat`s Tale",
       "steam_url": "https://store.steampowered.com/app/5167220/",
@@ -239,7 +99,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 5324510,
       "name": "The Crane Files: A Detective Mystery",
       "steam_url": "https://store.steampowered.com/app/5324510/",
@@ -253,7 +113,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 5035250,
       "name": "Card Slay",
       "steam_url": "https://store.steampowered.com/app/5035250/",
@@ -267,7 +127,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 4229040,
       "name": "Zero To South",
       "steam_url": "https://store.steampowered.com/app/4229040/",
@@ -281,7 +141,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 4764290,
       "name": "Necrogen",
       "steam_url": "https://store.steampowered.com/app/4764290/",
@@ -295,7 +155,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 4988110,
       "name": "Shuttle Hearts - Academy Smash",
       "steam_url": "https://store.steampowered.com/app/4988110/",
@@ -309,7 +169,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 5082570,
       "name": "TowerCard: Digital Edition",
       "steam_url": "https://store.steampowered.com/app/5082570/",
@@ -323,7 +183,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5202110,
       "name": "Kabakura",
       "steam_url": "https://store.steampowered.com/app/5202110/",
@@ -337,7 +197,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5093710,
       "name": "Illusion Remix",
       "steam_url": "https://store.steampowered.com/app/5093710/",
@@ -351,7 +211,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5220190,
       "name": "The Airline Century",
       "steam_url": "https://store.steampowered.com/app/5220190/",
@@ -365,7 +225,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 5354080,
       "name": "ARIA - Origin Paradox",
       "steam_url": "https://store.steampowered.com/app/5354080/",
@@ -379,7 +239,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 5344670,
       "name": "Woollings",
       "steam_url": "https://store.steampowered.com/app/5344670/",
@@ -393,7 +253,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 4850830,
       "name": "Dodgeball Rush",
       "steam_url": "https://store.steampowered.com/app/4850830/",
@@ -407,7 +267,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 5342070,
       "name": "Ashes of Animara",
       "steam_url": "https://store.steampowered.com/app/5342070/",
@@ -421,7 +281,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 5325890,
       "name": "それでも僕らは廻っている。",
       "steam_url": "https://store.steampowered.com/app/5325890/",
@@ -435,7 +295,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 5323900,
       "name": "Rift Fighter",
       "steam_url": "https://store.steampowered.com/app/5323900/",
@@ -449,7 +309,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 28,
+      "position": 18,
       "appid": 5205360,
       "name": "Sonucido: Dreams of the Gray God by Daniel da Silva",
       "steam_url": "https://store.steampowered.com/app/5205360/",
@@ -489,136 +349,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-03T12:03:44.303426Z",
-      "kind": "official_attempt",
-      "appid": 5182980,
-      "name": "Auto Ball",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:03:52.303538Z",
-      "kind": "official_attempt",
-      "appid": 5221700,
-      "name": "Bone Idle",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:00.303624Z",
-      "kind": "official_attempt",
-      "appid": 5352520,
-      "name": "Doomlander",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:08.303842Z",
-      "kind": "official_attempt",
-      "appid": 5342270,
-      "name": "Sketch Defense",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:16.303934Z",
-      "kind": "official_attempt",
-      "appid": 5321580,
-      "name": "Trolley Problem Is Not Problem",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:24.304164Z",
-      "kind": "official_attempt",
-      "appid": 4769150,
-      "name": "Anomaly Jobs : Death Row",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:32.304250Z",
-      "kind": "official_attempt",
-      "appid": 5324790,
-      "name": "Superpower Rally: Home Guard",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:40.304334Z",
-      "kind": "official_attempt",
-      "appid": 5348250,
-      "name": "Tidy Up Frat House",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 6,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:48.304451Z",
-      "kind": "official_attempt",
-      "appid": 5324810,
-      "name": "Hippocratic Chaos",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:04:56.304528Z",
-      "kind": "official_attempt",
-      "appid": 3596870,
-      "name": "Sakura Hime 7",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 15,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
     {
       "at": "2026-10-03T12:05:04.304694Z",
       "kind": "official_attempt",
@@ -1784,6 +1514,136 @@
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",
       "official_followers": 7,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:04:55.231947Z",
+      "kind": "official_attempt",
+      "appid": 4955980,
+      "name": "Dairy Empire: Production Simulator",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 30,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:03.232040Z",
+      "kind": "official_attempt",
+      "appid": 5072430,
+      "name": "Ghost in the SQL Data",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1438,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:11.232124Z",
+      "kind": "official_attempt",
+      "appid": 4779470,
+      "name": "Walkers",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 13,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:19.232213Z",
+      "kind": "official_attempt",
+      "appid": 5216700,
+      "name": "I Feel Great",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:27.232302Z",
+      "kind": "official_attempt",
+      "appid": 5262700,
+      "name": "Tales of the Immortal Path",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:35.232388Z",
+      "kind": "official_attempt",
+      "appid": 5330840,
+      "name": "Recess of the Dead",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:43.232478Z",
+      "kind": "official_attempt",
+      "appid": 5345570,
+      "name": "Zakuzaku Rogue",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:51.232566Z",
+      "kind": "official_attempt",
+      "appid": 5012600,
+      "name": "Ticker & Trade",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:05:59.232654Z",
+      "kind": "official_attempt",
+      "appid": 5058380,
+      "name": "MMO Simulator: ASCENSIONS",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 7,
+      "retry_at": null,
+      "run_id": "37169714198",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
+    },
+    {
+      "at": "2026-10-04T02:06:07.232741Z",
+      "kind": "official_attempt",
+      "appid": 5183430,
+      "name": "Artifact Tracer",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 13,
       "retry_at": null,
       "run_id": "37169714198",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"

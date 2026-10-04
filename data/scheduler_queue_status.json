@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-04T21:03:29.263205Z",
+  "generated_at": "2026-10-04T21:04:49.214101Z",
   "today_taipei": "2026-10-05",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-04T21:03:29.198558Z",
+    "checkpoint_updated_at": "2026-10-04T21:04:49.181329Z",
     "group_resolution_updated_at": "2026-10-04T19:00:54.787670Z",
     "candidate_state_updated_at": "2026-10-04T16:59:33.365456Z",
     "prefilter_updated_at": "2026-10-04T16:59:33.349892Z",
     "eligible_screened_at": "2026-10-04T16:59:33.880595Z",
     "twitch_import_updated_at": "2026-10-04T21:00:47.781144Z",
-    "last_official_success_at": "2026-10-04T21:03:29.198554Z",
+    "last_official_success_at": "2026-10-04T21:04:49.181325Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 33,
+    "combined_pending_now": 23,
     "completed_legacy": 384,
-    "completed_new": 1751,
+    "completed_new": 1761,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 33,
+    "normal_pending": 23,
     "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 33,
-    "followers_ready_pending": 33,
+    "ready_pending": 23,
+    "followers_ready_pending": 23,
     "awaiting_group_pending": 0,
-    "total_pending": 34,
-    "today_attempts": 22,
-    "today_successes": 20,
+    "total_pending": 24,
+    "today_attempts": 32,
+    "today_successes": 30,
     "today_429": 2
   },
   "group_resolution_api_cooldown": {
@@ -58,11 +58,11 @@
     "active": true,
     "status": "querying",
     "started_at": "2026-10-05T05:00:57.001256+08:00",
-    "last_updated_at": "2026-10-05T05:03:29.198558+08:00",
-    "last_appid": 5348770,
-    "last_name": "Woolwater",
-    "requests_this_run": 20,
-    "official_new_this_run": 20,
+    "last_updated_at": "2026-10-05T05:04:49.181329+08:00",
+    "last_appid": 4926160,
+    "last_name": "Dice Sort Together: Arcane Hall",
+    "requests_this_run": 30,
+    "official_new_this_run": 30,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
@@ -72,146 +72,6 @@
   "queue": [
     {
       "position": 1,
-      "appid": 5318000,
-      "name": "Rally: Village Defense",
-      "steam_url": "https://store.steampowered.com/app/5318000/",
-      "release_date": "2026-10-22",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475989950",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5194410,
-      "name": "Liberation Through Hearing",
-      "steam_url": "https://store.steampowered.com/app/5194410/",
-      "release_date": "2026-10-23",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476032850",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5300960,
-      "name": "KEEP IT ON HER",
-      "steam_url": "https://store.steampowered.com/app/5300960/",
-      "release_date": "2026-10-24",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475905271",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5284880,
-      "name": "Star Imperium",
-      "steam_url": "https://store.steampowered.com/app/5284880/",
-      "release_date": "2026-10-26",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476032643",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5121070,
-      "name": "Circle to another motion",
-      "steam_url": "https://store.steampowered.com/app/5121070/",
-      "release_date": "2026-10-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475812442",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5322360,
-      "name": "Between Empires",
-      "steam_url": "https://store.steampowered.com/app/5322360/",
-      "release_date": "2026-10-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475996190",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5336080,
-      "name": "Gacha Chaos Tidy Up Together",
-      "steam_url": "https://store.steampowered.com/app/5336080/",
-      "release_date": "2026-10-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476036990",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5336190,
-      "name": "Wild Heroes: Fight Together",
-      "steam_url": "https://store.steampowered.com/app/5336190/",
-      "release_date": "2026-10-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476037015",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5342450,
-      "name": "VPet Sort Together: Cozy Tidy Up",
-      "steam_url": "https://store.steampowered.com/app/5342450/",
-      "release_date": "2026-10-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476036994",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 4926160,
-      "name": "Dice Sort Together: Arcane Hall",
-      "steam_url": "https://store.steampowered.com/app/4926160/",
-      "release_date": "2026-10-28",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476036986",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 5327390,
       "name": "Retro Chaos: Together Tidy Up",
       "steam_url": "https://store.steampowered.com/app/5327390/",
@@ -225,7 +85,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 2,
       "appid": 5318010,
       "name": "Apoc Tank: Rush Forward",
       "steam_url": "https://store.steampowered.com/app/5318010/",
@@ -239,7 +99,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 5178140,
       "name": "GARITO",
       "steam_url": "https://store.steampowered.com/app/5178140/",
@@ -253,7 +113,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 5133900,
       "name": "Can 'Em All",
       "steam_url": "https://store.steampowered.com/app/5133900/",
@@ -267,7 +127,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 5357970,
       "name": "Frontier Tavern",
       "steam_url": "https://store.steampowered.com/app/5357970/",
@@ -281,7 +141,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 5091340,
       "name": "Reveria: Act 1",
       "steam_url": "https://store.steampowered.com/app/5091340/",
@@ -295,7 +155,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 5005570,
       "name": "Dynamic Breach",
       "steam_url": "https://store.steampowered.com/app/5005570/",
@@ -309,7 +169,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 5100020,
       "name": "Horde Up Ahead: Survivors TD",
       "steam_url": "https://store.steampowered.com/app/5100020/",
@@ -323,7 +183,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5345750,
       "name": "Deadlight: A Zombie Chronicle",
       "steam_url": "https://store.steampowered.com/app/5345750/",
@@ -337,7 +197,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5356210,
       "name": "Merry Nightmares",
       "steam_url": "https://store.steampowered.com/app/5356210/",
@@ -351,7 +211,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5301070,
       "name": "Trivia Mayhem",
       "steam_url": "https://store.steampowered.com/app/5301070/",
@@ -365,7 +225,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 4662100,
       "name": "Rocket.io",
       "steam_url": "https://store.steampowered.com/app/4662100/",
@@ -379,7 +239,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 4984400,
       "name": "Towers of Babble",
       "steam_url": "https://store.steampowered.com/app/4984400/",
@@ -393,7 +253,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 5061060,
       "name": "Plum",
       "steam_url": "https://store.steampowered.com/app/5061060/",
@@ -407,7 +267,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 4877810,
       "name": "Heroswarm",
       "steam_url": "https://store.steampowered.com/app/4877810/",
@@ -421,7 +281,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 5155970,
       "name": "Flippy the Spider",
       "steam_url": "https://store.steampowered.com/app/5155970/",
@@ -435,7 +295,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 5016240,
       "name": "Classroom in Sora",
       "steam_url": "https://store.steampowered.com/app/5016240/",
@@ -449,7 +309,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 28,
+      "position": 18,
       "appid": 5127590,
       "name": "Dear Gardener",
       "steam_url": "https://store.steampowered.com/app/5127590/",
@@ -463,7 +323,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 29,
+      "position": 19,
       "appid": 5275380,
       "name": "Pico32: The Lost Pages",
       "steam_url": "https://store.steampowered.com/app/5275380/",
@@ -477,7 +337,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 30,
+      "position": 20,
       "appid": 5282000,
       "name": "Match & Ruin",
       "steam_url": "https://store.steampowered.com/app/5282000/",
@@ -491,7 +351,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 31,
+      "position": 21,
       "appid": 4610060,
       "name": "SYSTEM 21",
       "steam_url": "https://store.steampowered.com/app/4610060/",
@@ -505,7 +365,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 32,
+      "position": 22,
       "appid": 5319960,
       "name": "Prototype",
       "steam_url": "https://store.steampowered.com/app/5319960/",
@@ -519,7 +379,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 33,
+      "position": 23,
       "appid": 5294620,
       "name": "Barbe-Yeux",
       "steam_url": "https://store.steampowered.com/app/5294620/",
@@ -559,135 +419,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-03T12:10:32.311220Z",
-      "kind": "official_attempt",
-      "appid": 5314270,
-      "name": "Oceans - Survival",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:10:40.311308Z",
-      "kind": "official_attempt",
-      "appid": 3688500,
-      "name": "Merchant Miles",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:10:48.311481Z",
-      "kind": "official_attempt",
-      "appid": 5343300,
-      "name": "The Last Curator",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:10:56.311602Z",
-      "kind": "official_attempt",
-      "appid": 5038440,
-      "name": "The Gentleman's Rise",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 9,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:11:04.311872Z",
-      "kind": "official_attempt",
-      "appid": 5300990,
-      "name": "Entangled Logic",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:11:12.312069Z",
-      "kind": "official_attempt",
-      "appid": 5145340,
-      "name": "Sam, We Talked About This",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 20,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:11:20.312209Z",
-      "kind": "official_attempt",
-      "appid": 5205660,
-      "name": "Raid Haven",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 49,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:11:28.312383Z",
-      "kind": "official_attempt",
-      "appid": 5231910,
-      "name": "Siegehand",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:11:36.312836Z",
-      "kind": "official_attempt",
-      "appid": 5140640,
-      "name": "Crown Bluff",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 6,
-      "retry_at": null,
-      "run_id": "37121514609",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37121514609"
-    },
-    {
-      "at": "2026-10-03T12:44:37.144943Z",
-      "kind": "official_attempt",
-      "appid": 3070070,
-      "name": "TCG Card Shop Simulator",
-      "status": "transport_or_xml_error",
-      "http": null,
-      "source": "twitch_steam_discovery",
-      "official_followers": null,
-      "retry_at": "2026-10-03T12:59:45.155396Z",
-      "error_type": "ReadTimeout"
-    },
     {
       "at": "2026-10-03T13:01:51.310239Z",
       "kind": "official_attempt",
@@ -1854,6 +1585,136 @@
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",
       "official_followers": 2,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:03:37.077598Z",
+      "kind": "official_attempt",
+      "appid": 5318000,
+      "name": "Rally: Village Defense",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:03:45.077717Z",
+      "kind": "official_attempt",
+      "appid": 5194410,
+      "name": "Liberation Through Hearing",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:03:53.077825Z",
+      "kind": "official_attempt",
+      "appid": 5300960,
+      "name": "KEEP IT ON HER",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:04:01.077939Z",
+      "kind": "official_attempt",
+      "appid": 5284880,
+      "name": "Star Imperium",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:04:09.078048Z",
+      "kind": "official_attempt",
+      "appid": 5121070,
+      "name": "Circle to another motion",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:04:17.078160Z",
+      "kind": "official_attempt",
+      "appid": 5322360,
+      "name": "Between Empires",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 19,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:04:25.078291Z",
+      "kind": "official_attempt",
+      "appid": 5336080,
+      "name": "Gacha Chaos Tidy Up Together",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:04:33.078416Z",
+      "kind": "official_attempt",
+      "appid": 5336190,
+      "name": "Wild Heroes: Fight Together",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:04:41.078540Z",
+      "kind": "official_attempt",
+      "appid": 5342450,
+      "name": "VPet Sort Together: Cozy Tidy Up",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:04:49.078667Z",
+      "kind": "official_attempt",
+      "appid": 4926160,
+      "name": "Dice Sort Together: Arcane Hall",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
       "retry_at": null,
       "run_id": "37234301755",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"

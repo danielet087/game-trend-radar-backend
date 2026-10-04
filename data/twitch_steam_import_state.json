@@ -1175,8 +1175,100 @@
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
+    },
+    "2920220": {
+      "status": "pending",
+      "updated_at": "2026-10-04T02:00:48.615227Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 2920220,
+        "twitch_game_id": "1870528958",
+        "igdb_id": "296564",
+        "checked_at": "2026-10-04T01:11:05Z",
+        "source_frontend_commit": "9a7b7eb73829117d9aa420f050deffa21a6825d1",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-04T01:11:05Z",
+          "viewer_count": 14114,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": {
+        "appid": 2920220,
+        "name": "Terrible Lizards",
+        "release_date": "2026-10-30",
+        "steam_url": "https://store.steampowered.com/app/2920220/",
+        "group_id64": null,
+        "queue_source": "twitch_steam_discovery",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 2920220,
+          "twitch_game_id": "1870528958",
+          "igdb_id": "296564",
+          "checked_at": "2026-10-04T01:11:05Z",
+          "source_frontend_commit": "9a7b7eb73829117d9aa420f050deffa21a6825d1",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-04T01:11:05Z",
+            "viewer_count": 14114,
+            "min_viewers": 7000
+          }
+        },
+        "steam_candidate": {
+          "appid": 2920220,
+          "name": "Terrible Lizards",
+          "name_en": "Terrible Lizards",
+          "release_raw": "2026-10-30",
+          "release_start": "2026-10-30",
+          "release_end": "2026-10-30",
+          "release_precision": "day",
+          "release_display_precision": "date_full",
+          "release_display_provider": "Steam IStoreBrowseService/GetItems",
+          "release_date_basis": "steam_store_browse_verified_full_date",
+          "release_date_timezone": "Asia/Taipei",
+          "release_time_utc": "2026-10-29T17:00:00Z",
+          "release_time_source": "Steam IStoreBrowseService/GetItems",
+          "release_timestamp_taipei_date": "2026-10-30",
+          "release_date_conflict": false,
+          "release_store_date": "2026-10-29",
+          "release_date_normalization": "steam_utc_date_normalized_to_taipei",
+          "release_date_verified_at": "2026-10-04T02:00:48.615227Z",
+          "post_followers_store_verified": true,
+          "post_followers_store_verified_at": "2026-10-04T02:00:48.615227Z",
+          "sexual_content_screened": true,
+          "steam_type": "game",
+          "content_descriptorids": [],
+          "store_url": "https://store.steampowered.com/app/2920220/",
+          "community_url": "https://steamcommunity.com/app/2920220/",
+          "twitch_admission": {
+            "schema_version": 1,
+            "method": "twitch_igdb_external_steam_v1",
+            "appid": 2920220,
+            "twitch_game_id": "1870528958",
+            "igdb_id": "296564",
+            "checked_at": "2026-10-04T01:11:05Z",
+            "source_frontend_commit": "9a7b7eb73829117d9aa420f050deffa21a6825d1",
+            "source_enrollment": {
+              "source": "igdb_first_release_date",
+              "observed_at": "2026-10-04T01:11:05Z",
+              "viewer_count": 14114,
+              "min_viewers": 7000
+            }
+          }
+        }
+      },
+      "reason": "queued_official_followers",
+      "rate_limit_stage": null,
+      "retry_at": null,
+      "retry_source": null,
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-03T19:00:46.902209Z",
+  "updated_at": "2026-10-04T02:00:48.615227Z",
   "api_cooldowns": {}
 }

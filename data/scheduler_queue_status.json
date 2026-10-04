@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-04T21:07:29.257545Z",
+  "generated_at": "2026-10-04T21:07:53.254522Z",
   "today_taipei": "2026-10-05",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-04T21:07:29.224344Z",
+    "checkpoint_updated_at": "2026-10-04T21:07:53.213550Z",
     "group_resolution_updated_at": "2026-10-04T19:00:54.787670Z",
     "candidate_state_updated_at": "2026-10-04T16:59:33.365456Z",
     "prefilter_updated_at": "2026-10-04T16:59:33.349892Z",
     "eligible_screened_at": "2026-10-04T16:59:33.880595Z",
     "twitch_import_updated_at": "2026-10-04T21:00:47.781144Z",
-    "last_official_success_at": "2026-10-04T21:07:29.224341Z",
+    "last_official_success_at": "2026-10-04T21:07:53.179562Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 3,
+    "combined_pending_now": 0,
     "completed_legacy": 384,
-    "completed_new": 1781,
+    "completed_new": 1784,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 3,
+    "normal_pending": 0,
     "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 3,
-    "followers_ready_pending": 3,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 4,
-    "today_attempts": 52,
-    "today_successes": 50,
+    "total_pending": 1,
+    "today_attempts": 55,
+    "today_successes": 53,
     "today_429": 2
   },
   "group_resolution_api_cooldown": {
@@ -51,68 +51,27 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-04T22:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-05T05:00:57.001256+08:00",
-    "last_updated_at": "2026-10-05T05:07:29.224344+08:00",
-    "last_appid": 5282000,
-    "last_name": "Match & Ruin",
-    "requests_this_run": 50,
-    "official_new_this_run": 50,
+    "last_updated_at": "2026-10-05T05:07:53.213550+08:00",
+    "finished_at": "2026-10-05T05:07:53.213550+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 5294620,
+    "last_name": "Barbe-Yeux",
+    "requests_this_run": 53,
+    "official_new_this_run": 53,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
     "run_id": "37234301755",
     "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 4610060,
-      "name": "SYSTEM 21",
-      "steam_url": "https://store.steampowered.com/app/4610060/",
-      "release_date": "2026-12-02",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475801850",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5319960,
-      "name": "Prototype",
-      "steam_url": "https://store.steampowered.com/app/5319960/",
-      "release_date": "2026-12-16",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476038292",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5294620,
-      "name": "Barbe-Yeux",
-      "steam_url": "https://store.steampowered.com/app/5294620/",
-      "release_date": "2027-03-05",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475846581",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    }
-  ],
+  "queue": [],
   "parked": [
     {
       "appid": 4435490,
@@ -139,45 +98,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-04T02:02:23.230275Z",
-      "kind": "official_attempt",
-      "appid": 5357150,
-      "name": "The Debt We Sow",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "37169714198",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
-    },
-    {
-      "at": "2026-10-04T02:02:31.230367Z",
-      "kind": "official_attempt",
-      "appid": 5194790,
-      "name": "FIBS",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "37169714198",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
-    },
-    {
-      "at": "2026-10-04T02:02:39.230463Z",
-      "kind": "official_attempt",
-      "appid": 5240340,
-      "name": "Cat Omni: Card Cats",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "37169714198",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
-    },
     {
       "at": "2026-10-04T02:02:47.230551Z",
       "kind": "official_attempt",
@@ -1435,6 +1355,45 @@
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",
       "official_followers": 4,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:07:37.081175Z",
+      "kind": "official_attempt",
+      "appid": 4610060,
+      "name": "SYSTEM 21",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:07:45.081289Z",
+      "kind": "official_attempt",
+      "appid": 5319960,
+      "name": "Prototype",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "37234301755",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-04T21:07:53.081399Z",
+      "kind": "official_attempt",
+      "appid": 5294620,
+      "name": "Barbe-Yeux",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
       "retry_at": null,
       "run_id": "37234301755",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"

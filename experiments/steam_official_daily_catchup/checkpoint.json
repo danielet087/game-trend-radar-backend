@@ -41693,6 +41693,45 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-05T05:07:29.224320+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4610060": {
+      "appid": 4610060,
+      "name": "SYSTEM 21",
+      "release_date": "2026-12-02",
+      "group_id64": "103582791475801850",
+      "steam_url": "https://store.steampowered.com/app/4610060/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-04T16:59:33.349892+00:00",
+      "official_followers": 4,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-05T05:07:37.189771+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5319960": {
+      "appid": 5319960,
+      "name": "Prototype",
+      "release_date": "2026-12-16",
+      "group_id64": "103582791476038292",
+      "steam_url": "https://store.steampowered.com/app/5319960/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-04T16:59:33.349892+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-05T05:07:45.209882+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5294620": {
+      "appid": 5294620,
+      "name": "Barbe-Yeux",
+      "release_date": "2027-03-05",
+      "group_id64": "103582791475846581",
+      "steam_url": "https://store.steampowered.com/app/5294620/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-04T16:59:33.349892+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-05T05:07:53.179543+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -58106,6 +58145,36 @@
       "status": "ok",
       "github_run_id": "37234301755",
       "official_followers": 4
+    },
+    {
+      "appid": 4610060,
+      "when_taipei": "2026-10-05T05:07:37.081175+08:00",
+      "release_date": "2026-12-02",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37234301755",
+      "official_followers": 4
+    },
+    {
+      "appid": 5319960,
+      "when_taipei": "2026-10-05T05:07:45.081289+08:00",
+      "release_date": "2026-12-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37234301755",
+      "official_followers": 2
+    },
+    {
+      "appid": 5294620,
+      "when_taipei": "2026-10-05T05:07:53.081399+08:00",
+      "release_date": "2027-03-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37234301755",
+      "official_followers": 3
     }
   ],
   "next_request_after_taipei": null,
@@ -58191,20 +58260,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-05T05:07:29.224341+08:00",
+  "community_last_success_at": "2026-10-05T05:07:53.179562+08:00",
   "scheduler_batch": {
     "run_id": "37234301755",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
     "started_at": "2026-10-05T05:00:57.001256+08:00",
-    "last_updated_at": "2026-10-05T05:07:29.224344+08:00",
-    "requests_this_run": 50,
-    "official_new_this_run": 50,
+    "last_updated_at": "2026-10-05T05:07:53.213550+08:00",
+    "requests_this_run": 53,
+    "official_new_this_run": 53,
     "http_429_this_run": 0,
-    "last_appid": 5282000,
-    "last_name": "Match & Ruin"
+    "last_appid": 5294620,
+    "last_name": "Barbe-Yeux",
+    "finished_at": "2026-10-05T05:07:53.213550+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

@@ -1295,7 +1295,7 @@
     },
     "3195440": {
       "status": "accepted",
-      "updated_at": "2026-10-04T21:07:56.600820Z",
+      "updated_at": "2026-10-04T21:08:00.168093Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -1322,11 +1322,19 @@
       "rate_limit_attempts": 0,
       "content_signature": "46739f5dc1bbf9eae58df6ea4993ce551ca7ca5a141364c139dc218a509c44f1",
       "followers": 24229,
-      "follower_checked_at": "2026-10-05T05:00:57.234566+08:00"
+      "follower_checked_at": "2026-10-05T05:00:57.234566+08:00",
+      "content_dispatch": {
+        "status": "dispatched",
+        "signature": "46739f5dc1bbf9eae58df6ea4993ce551ca7ca5a141364c139dc218a509c44f1",
+        "attempted_at": "2026-10-04T21:08:00.168093Z",
+        "target_repository": "danielet087/game-trend-radar-content-backend",
+        "event_type": "steam_game_twitch_discovered",
+        "http": 204
+      }
     },
     "2659410": {
       "status": "accepted",
-      "updated_at": "2026-10-04T21:00:47.781144Z",
+      "updated_at": "2026-10-04T21:08:00.168093Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -1353,9 +1361,17 @@
       "rate_limit_attempts": 0,
       "rate_limit_stage": null,
       "retry_source": null,
-      "retry_after": null
+      "retry_after": null,
+      "content_dispatch": {
+        "status": "dispatched",
+        "signature": "dd9f2be586566a1bfc4ae3e84f1e7ebd91bf6f943d7e7ee15244c53e66c512f8",
+        "attempted_at": "2026-10-04T21:08:00.168093Z",
+        "target_repository": "danielet087/game-trend-radar-content-backend",
+        "event_type": "steam_game_twitch_discovered",
+        "http": 204
+      }
     }
   },
-  "updated_at": "2026-10-04T21:07:56.600820Z",
+  "updated_at": "2026-10-04T21:08:00.168093Z",
   "api_cooldowns": {}
 }

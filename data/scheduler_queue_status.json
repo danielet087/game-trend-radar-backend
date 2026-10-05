@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-05T04:00:59.642479Z",
+  "generated_at": "2026-10-05T05:00:50.291342Z",
   "today_taipei": "2026-10-05",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,7 +10,7 @@
     "candidate_state_updated_at": "2026-10-04T16:59:33.365456Z",
     "prefilter_updated_at": "2026-10-04T16:59:33.349892Z",
     "eligible_screened_at": "2026-10-04T16:59:33.880595Z",
-    "twitch_import_updated_at": "2026-10-04T22:00:59.761488Z",
+    "twitch_import_updated_at": "2026-10-05T05:00:47.524444Z",
     "last_official_success_at": "2026-10-04T21:07:53.179562Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -23,19 +23,19 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 0,
+    "combined_pending_now": 1,
     "completed_legacy": 384,
     "completed_new": 1784,
-    "twitch_priority_pending": 0
+    "twitch_priority_pending": 1
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 0,
+    "twitch_priority_pending": 1,
     "parked": 1,
-    "ready_pending": 0,
+    "ready_pending": 1,
     "followers_ready_pending": 0,
-    "awaiting_group_pending": 0,
-    "total_pending": 1,
+    "awaiting_group_pending": 1,
+    "total_pending": 2,
     "today_attempts": 55,
     "today_successes": 53,
     "today_429": 2
@@ -51,7 +51,7 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": null,
+    "next_eligible_slot": "2026-10-05T06:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -69,7 +69,22 @@
     "run_id": "37261670402",
     "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37261670402"
   },
-  "queue": [],
+  "queue": [
+    {
+      "position": 1,
+      "appid": 3195580,
+      "name": "lily's world XD",
+      "steam_url": "https://store.steampowered.com/app/3195580/",
+      "release_date": "2026-09-17",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    }
+  ],
   "parked": [
     {
       "appid": 4435490,

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-05T23:00:54.767489Z",
+  "generated_at": "2026-10-05T23:00:56.707218Z",
   "today_taipei": "2026-10-06",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-05T22:01:04.892393Z",
+    "checkpoint_updated_at": "2026-10-05T23:00:56.680362Z",
     "group_resolution_updated_at": "2026-10-05T22:00:58.698657Z",
     "candidate_state_updated_at": "2026-10-05T17:04:37.723493Z",
     "prefilter_updated_at": "2026-10-05T17:04:37.711885Z",
@@ -36,9 +36,9 @@
     "followers_ready_pending": 2,
     "awaiting_group_pending": 0,
     "total_pending": 3,
-    "today_attempts": 73,
+    "today_attempts": 74,
     "today_successes": 72,
-    "today_429": 1
+    "today_429": 2
   },
   "group_resolution_api_cooldown": {
     "status": "available",
@@ -48,60 +48,37 @@
     "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "cooldown": {
-    "active": false,
-    "until": "2026-10-05T22:16:02.450189Z",
-    "reason": null,
+    "active": true,
+    "until": "2026-10-05T23:30:56.680320Z",
+    "reason": "steam_http_429",
     "next_eligible_slot": "2026-10-06T00:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": false,
-    "status": "finished",
-    "started_at": "2026-10-06T06:01:01.962094+08:00",
-    "last_updated_at": "2026-10-06T06:01:04.892393+08:00",
-    "finished_at": "2026-10-06T06:01:04.892393+08:00",
-    "stop_reason": "first_http_429",
-    "last_appid": 2543830,
-    "last_name": "Way of the Hunter 2",
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-10-06T07:00:56.391762+08:00",
+    "last_updated_at": "2026-10-06T07:00:56.680362+08:00",
+    "last_appid": 4140530,
+    "last_name": "The Plant Shop",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "37379635712",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37379635712"
+    "run_id": "37385961842",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37385961842"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 4140530,
-      "name": "The Plant Shop",
-      "steam_url": "https://store.steampowered.com/app/4140530/",
-      "release_date": "2026-09-17",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475409958",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-05T22:00:58.493377Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
       "appid": 2543830,
       "name": "Way of the Hunter 2",
       "steam_url": "https://store.steampowered.com/app/2543830/",
       "release_date": "2026-09-29",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "waiting",
+      "state": "cooldown",
       "group_id64": "103582791475420281",
       "group_resolution": {
         "status": "resolved",
@@ -112,6 +89,27 @@
         "api_result": 1
       },
       "last_attempt_at": "2026-10-05T22:01:02.035024Z",
+      "last_attempt_status": "rate_limited"
+    },
+    {
+      "position": 2,
+      "appid": 4140530,
+      "name": "The Plant Shop",
+      "steam_url": "https://store.steampowered.com/app/4140530/",
+      "release_date": "2026-09-17",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "cooldown",
+      "group_id64": "103582791475409958",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-05T22:00:58.493377Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "last_attempt_at": "2026-10-05T23:00:56.444921Z",
       "last_attempt_status": "rate_limited"
     }
   ],
@@ -141,19 +139,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-04T21:04:33.078416Z",
-      "kind": "official_attempt",
-      "appid": 5336190,
-      "name": "Wild Heroes: Fight Together",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37234301755",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
-    },
     {
       "at": "2026-10-04T21:04:41.078540Z",
       "kind": "official_attempt",
@@ -1440,6 +1425,19 @@
       "retry_at": "2026-10-05T22:16:02.450189Z",
       "run_id": "37379635712",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37379635712"
+    },
+    {
+      "at": "2026-10-05T23:00:56.444921Z",
+      "kind": "official_attempt",
+      "appid": 4140530,
+      "name": "The Plant Shop",
+      "status": "rate_limited",
+      "http": 429,
+      "source": "twitch_steam_discovery",
+      "official_followers": null,
+      "retry_at": "2026-10-05T23:30:56.680320Z",
+      "run_id": "37385961842",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37385961842"
     }
   ],
   "events_limit": 100

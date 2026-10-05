@@ -12,6 +12,7 @@ import requests
 
 from scripts.steam_release_dates import fetch_store_browse_releases, resolved_store_date
 from scripts.steam_localized_titles import add_traditional_display_names
+from scripts.public_catalog import preserve_player_categories
 from collectors.steam_upcoming import (
     STEAM_FOLLOWERS_URL, STEAM_SEARCH_URL, parse_follower_xml,
     parse_release_window, parse_search_results_html, taiwan_today, write_json,
@@ -84,7 +85,7 @@ def normalized_metadata(
     release = resolved_store_date(appid, release_details.get("date"), browse_release, fallback_detail=release_details)
     if release["release_precision"] != "day" or not release["release_start"]:
         return None
-    return {
+    game = {
         "appid": appid,
         "name": str(details.get("name") or f"Steam App {appid}"),
         "name_en": str(details.get("name") or f"Steam App {appid}"),
@@ -96,6 +97,21 @@ def normalized_metadata(
         "header_image": details.get("header_image"),
         "store_url": f"https://store.steampowered.com/app/{appid}/",
     }
+    # Categories are already present in the existing full appdetails request.
+    # An absent/malformed list is unknown, rather than proof of single-player.
+    if (
+        details.get('type') == 'game'
+        and isinstance(details.get('steam_appid'), int)
+        and not isinstance(details['steam_appid'], bool)
+        and details['steam_appid'] == appid
+        and isinstance(details.get('categories'), list)
+    ):
+        game.update({
+            'categories': details['categories'],
+            'categories_source': 'Steam Store appdetails cc=TW categories',
+            'categories_checked_at': datetime.now(timezone.utc).isoformat(),
+        })
+    return preserve_player_categories({}, game)
 
 
 RECENT_DAYS = 30
@@ -335,7 +351,9 @@ def run(
             game["confirmed_released_at"] = now.replace(
                 microsecond=0
             ).isoformat().replace("+00:00", "Z")
-            recently_released[str(appid)] = game
+            recently_released[str(appid)] = preserve_player_categories(
+                recently_released.get(str(appid), {}), game,
+            )
             processed_tracked.add(appid)
         elif day >= today and day <= today + timedelta(days=365) and coming_soon is True:
             add_traditional_name(session, appid, game, details, delay_seconds=delay_seconds)

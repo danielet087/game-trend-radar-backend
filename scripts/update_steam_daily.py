@@ -13,6 +13,7 @@ from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_wind
 from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
+from scripts.public_catalog import preserve_player_categories
 
 LOGGER = logging.getLogger(__name__)
 
@@ -87,6 +88,10 @@ def merge_segment(
         if not release_overlaps(game, window_start, window_end) or is_twitch_qualified(game)
     ]
 
+    prior_by_id = {
+        int(game['appid']): game for game in existing_games
+        if isinstance(game, dict) and str(game.get('appid', '')).isdigit()
+    }
     merged: dict[int, dict[str, Any]] = {}
     blocked = excluded_appids()
     for game in base + segment_games:
@@ -96,7 +101,11 @@ def merge_segment(
             appid = int(game["appid"])
         except (KeyError, TypeError, ValueError):
             continue
-        merged[appid] = preserve_twitch_admission(merged.get(appid, {}), game)
+        prior = merged.get(appid, {})
+        merged[appid] = preserve_player_categories(
+            merged.get(appid, prior_by_id.get(appid, {})),
+            preserve_twitch_admission(prior, game),
+        )
 
     return sorted(
         merged.values(),
@@ -129,7 +138,10 @@ def merge_partial_segment(
             appid = int(game["appid"])
         except (KeyError, ValueError, TypeError):
             continue
-        by_appid[appid] = preserve_twitch_admission(by_appid.get(appid, {}), game)
+        prior = by_appid.get(appid, {})
+        by_appid[appid] = preserve_player_categories(
+            prior, preserve_twitch_admission(prior, game),
+        )
     return sorted(
         by_appid.values(),
         key=lambda game: (

@@ -11,6 +11,26 @@ def test_add_months_clamps_end_of_month() -> None:
     assert add_months(date(2026, 11, 30), 3) == date(2027, 2, 28)
 
 
+def test_followers_refresh_preserves_official_player_modes_in_both_merge_paths() -> None:
+    current = {
+        'appid': 10, 'followers': 6000, 'release_raw': '2026-10-18',
+        'release_start': '2026-10-18', 'release_end': '2026-10-18',
+        'categories': [{'id': 1, 'description': 'Multi-player'}],
+        'categories_source': 'Steam IStoreBrowseService/GetItems supported_player_categoryids',
+        'categories_checked_at': '2026-10-05T01:00:00Z',
+    }
+    incoming = {key: value for key, value in current.items() if not key.startswith('categories')}
+    incoming['followers'] = 7000
+    partial = merge_partial_segment([current], [incoming], today=date(2026, 10, 5))
+    full = merge_segment([current], [incoming], window_start=date(2026, 10, 1),
+                         window_end=date(2026, 11, 1), today=date(2026, 10, 5))
+    for result in (partial, full):
+        assert len(result) == 1
+        assert result[0]['followers'] == 7000
+        assert result[0]['categories'] == current['categories']
+        assert result[0]['categories_checked_at'] == current['categories_checked_at']
+
+
 def test_merge_segment_replaces_current_window() -> None:
     existing = [
         {

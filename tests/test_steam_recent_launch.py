@@ -6,10 +6,27 @@ from scripts.publish_steam_preview import (
     checked_followers,
     fetch_new_release_appids,
     first_week_release,
+    normalized_metadata,
     release_from_store,
     recent_release,
     run,
 )
+
+
+def test_existing_appdetails_response_supplies_official_player_categories():
+    details = {'name': 'Game', 'type': 'game', 'steam_appid': 101,
+               'release_date': {'date': '19 Sep, 2026'},
+               'categories': [{'id': 1, 'description': 'Multi-player'}]}
+    row = normalized_metadata(101, details, 6000, '2026-09-18T00:00:00Z')
+    assert row['categories'] == details['categories']
+    assert row['categories_source'] == 'Steam Store appdetails cc=TW categories'
+    checked = datetime.fromisoformat(row['categories_checked_at'])
+    assert checked.tzinfo is not None and checked.utcoffset().total_seconds() == 0
+    unknown = normalized_metadata(101, {key: value for key, value in details.items()
+                                       if key != 'categories'}, 6000, None)
+    assert 'categories' not in unknown
+    wrong_app = normalized_metadata(101, {**details, 'steam_appid': 102}, 6000, None)
+    assert 'categories' not in wrong_app
 
 
 def test_recent_release_requires_real_follower_count_and_verified_source():
@@ -68,8 +85,9 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
             return None
         coming_soon = appid == 505
         return {
-            "type": "game", "name": "Game " + str(appid),
+            "type": "game", "steam_appid": appid, "name": "Game " + str(appid),
             "release_date": {"date": "19 Sep, 2026", "coming_soon": coming_soon},
+            "categories": [{"id": 1, "description": "Multi-player"}],
         }
 
     with (
@@ -98,6 +116,8 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
         101: "tracked_release", 202: "direct_release"
     }
     assert all(game["followers"] > 3000 for game in first["recent_games"])
+    observed_categories = {game['appid']: game['categories'] for game in first['recent_games']}
+    assert observed_categories[101] == [{'id': 1, 'description': 'Multi-player'}]
     # Only the two truly released candidates need Followers queries.
     # Coming-soon app 505 is rejected before spending a Community request.
     assert fetch_follows.call_count == 2
@@ -106,8 +126,12 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
 
     # Even if the title drops off Steam's new-releases page, it remains visible
     # until 30 days after its confirmed release.
+    def details_without_categories(*args, **kwargs):
+        result = details(*args, **kwargs)
+        return {key: value for key, value in result.items() if key != 'categories'} if result else result
+
     with (
-        patch("scripts.publish_steam_preview.app_details", side_effect=details),
+        patch("scripts.publish_steam_preview.app_details", side_effect=details_without_categories),
         patch("scripts.publish_steam_preview.add_traditional_name"),
         patch("scripts.publish_steam_preview.fetch_store_browse_releases", return_value={}),
         patch("scripts.publish_steam_preview.fetch_new_release_appids", return_value=[]),
@@ -117,6 +141,7 @@ def test_only_real_launches_above_3000_are_in_recent_games(tmp_path):
             today=date(2026, 9, 20), delay_seconds=0, follower_interval=0,
         )
     assert {game["appid"] for game in followup["recent_games"]} == {101, 202}
+    assert {game['appid']: game['categories'] for game in followup['recent_games']} == observed_categories
 
 
 def test_first_week_includes_release_day_and_day_seven_but_not_day_eight():

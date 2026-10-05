@@ -6,6 +6,53 @@ from scripts.build_public_steam_shards import build, valid_record
 
 
 class PublicationTests(unittest.TestCase):
+    def test_player_categories_survive_followers_publication_and_new_empty_observation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); frontend = root / 'frontend'; source = root / 'input.json'
+            row = {'appid': 123, 'followers': 5000, 'release_start': '2027-02-28',
+                   'release_precision': 'day', 'release_display_precision': 'date_full',
+                   'categories': [{'id': 1, 'description': 'Multi-player'}],
+                   'categories_source': 'Steam Store appdetails cc=TW categories',
+                   'categories_checked_at': '2026-10-05T01:00:00Z'}
+            source.write_text(json.dumps({'games': [row]}))
+            build(source, frontend, authoritative_future=True)
+            follower_only = {key: value for key, value in row.items() if not key.startswith('categories')}
+            source.write_text(json.dumps({'games': [{**follower_only, 'followers': 6000}]}))
+            build(source, frontend, authoritative_future=True)
+            for path in ('catalog.json', 'calendar/2027-02.json', 'steam_upcoming.json'):
+                public = json.loads((frontend / 'data' / path).read_text())['games'][0]
+                self.assertEqual(public['categories'], row['categories'])
+                self.assertEqual(public['categories_checked_at'], row['categories_checked_at'])
+                self.assertEqual(public['followers'], 6000)
+            source.write_text(json.dumps({'games': [{**row, 'categories': [],
+                               'categories_checked_at': '2026-10-05T02:00:00Z'}]}))
+            build(source, frontend, authoritative_future=True)
+            for path in ('catalog.json', 'calendar/2027-02.json', 'steam_upcoming.json'):
+                public = json.loads((frontend / 'data' / path).read_text())['games'][0]
+                self.assertEqual(public['categories'], [])
+                self.assertEqual(public['categories_checked_at'], '2026-10-05T02:00:00Z')
+            self.assertEqual(json.loads((frontend / 'data/games/123.json').read_text())['categories'], [])
+
+    def test_untrusted_or_older_player_modes_cannot_erase_latest_official_categories(self):
+        from scripts.build_public_steam_shards import merge_game
+        current = {'appid': 123, 'categories': [{'id': 1, 'description': 'Multi-player'}],
+                   'categories_source': 'Steam Store appdetails cc=TW categories',
+                   'categories_checked_at': '2026-10-05T01:00:00Z'}
+        for override in (
+            {'categories_checked_at': '2026-10-04T01:00:00Z'},
+            {'categories_checked_at': '2026-10-05T02:00:00'},
+            {'categories_checked_at': '9999-12-31T01:00:00Z'},
+            {'categories_source': 'community tag guess'},
+            {'categories': [{'id': True, 'description': 'Multi-player'}]},
+        ):
+            with self.subTest(override=override):
+                incoming = {**current, 'categories': [], 'followers': 7000,
+                            'categories_checked_at': '2026-10-05T02:00:00Z', **override}
+                merged = merge_game(current, incoming)
+                for key in ('categories', 'categories_source', 'categories_checked_at'):
+                    self.assertEqual(merged[key], current[key])
+                self.assertEqual(merged['followers'], 7000)
+
     def test_localized_taxonomy_survives_catalog_projection(self):
         from scripts.public_catalog import write_catalog_projection
         with tempfile.TemporaryDirectory() as tmp:

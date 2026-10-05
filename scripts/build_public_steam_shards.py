@@ -8,7 +8,10 @@ from pathlib import Path
 from typing import Any
 
 from scripts.steam_localized_titles import add_traditional_display_names
-from scripts.public_catalog import keep_newer_release, write_catalog_projection
+from scripts.public_catalog import (
+    PLAYER_CATEGORY_FIELDS, keep_newer_release, preserve_player_categories,
+    write_catalog_projection,
+)
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 
@@ -80,8 +83,11 @@ def merge_game(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, 
     """Preserve rich presentation metadata but trust backend core fields."""
     incoming = keep_newer_release(existing, incoming)
     incoming = preserve_twitch_admission(existing, incoming)
+    incoming = preserve_player_categories(existing, incoming)
     merged = dict(existing)
     for key, value in incoming.items():
+        if key in PLAYER_CATEGORY_FIELDS:
+            continue
         if value is None or value == "":
             continue
         if isinstance(value, list) and not value:
@@ -93,6 +99,11 @@ def merge_game(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, 
         value = incoming.get(key)
         if value not in (None, ""):
             merged[key] = value
+    for key in PLAYER_CATEGORY_FIELDS:
+        if key in incoming:
+            merged[key] = incoming[key]
+        else:
+            merged.pop(key, None)
     merged["appid"] = int(incoming.get("appid", merged.get("appid")))
     # Preserve Steam's original localized names and create separate
     # Traditional-script presentation fields for every future shard update.

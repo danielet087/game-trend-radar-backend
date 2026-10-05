@@ -1,7 +1,7 @@
 """Small browser projection, derived exclusively from accepted AppID records."""
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 RELEASE_FIELDS = (
@@ -12,6 +12,49 @@ RELEASE_FIELDS = (
     'post_followers_store_verified', 'post_followers_store_verified_at',
     'release_store_date', 'release_date_normalization',
 )
+
+PLAYER_CATEGORY_FIELDS = ('categories', 'categories_source', 'categories_checked_at')
+PLAYER_CATEGORY_SOURCES = {
+    'Steam IStoreBrowseService/GetItems supported_player_categoryids',
+    'Steam Store appdetails cc=TW categories',
+}
+
+
+def player_category_snapshot(row: dict) -> tuple[datetime, dict] | None:
+    """Accept explicit official Store categories, including an observed empty list."""
+    if row.get('categories_source') not in PLAYER_CATEGORY_SOURCES:
+        return None
+    categories = row.get('categories')
+    if not isinstance(categories, list) or any(
+        not isinstance(item, dict)
+        or not isinstance(item.get('id'), int) or isinstance(item.get('id'), bool)
+        or item['id'] <= 0 or not isinstance(item.get('description'), str)
+        for item in categories
+    ):
+        return None
+    try:
+        checked = datetime.fromisoformat(str(row.get('categories_checked_at')).replace('Z', '+00:00'))
+        if checked.tzinfo is None or checked.utcoffset() != timedelta(0):
+            return None
+        if checked > datetime.now(timezone.utc) + timedelta(minutes=5):
+            return None
+    except (ValueError, TypeError):
+        return None
+    return checked, {key: row[key] for key in PLAYER_CATEGORY_FIELDS}
+
+
+def preserve_player_categories(existing: dict, incoming: dict) -> dict:
+    """Followers-only snapshots cannot erase or replace newer official player modes."""
+    result = dict(incoming)
+    for key in PLAYER_CATEGORY_FIELDS:
+        result.pop(key, None)
+    observed = player_category_snapshot(incoming)
+    prior = player_category_snapshot(existing) if existing.get('appid') == incoming.get('appid') else None
+    if prior is not None and (observed is None or prior[0] > observed[0]):
+        observed = prior
+    if observed is not None:
+        result.update(observed[1])
+    return result
 
 
 def keep_newer_release(existing: dict, incoming: dict) -> dict:
@@ -41,6 +84,7 @@ FIELDS = (
     'small_capsule_image', 'capsule_image', 'tags', 'genres',
     'tag_ids', 'tag_labels_zh_tw', 'genre_labels_zh_tw',
     'content_enriched_at', 'tags_fetch_status',
+    *PLAYER_CATEGORY_FIELDS,
     'twitch_admission', 'steam_type', 'sexual_content_screened',
     'release_time_utc', 'release_timestamp_taipei_date', 'release_date_conflict',
     'release_store_date', 'release_date_normalization',

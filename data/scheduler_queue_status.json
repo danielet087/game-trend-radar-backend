@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-05T22:01:02.545690Z",
+  "generated_at": "2026-10-05T22:01:04.929712Z",
   "today_taipei": "2026-10-06",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-05T22:01:02.450230Z",
+    "checkpoint_updated_at": "2026-10-05T22:01:04.892393Z",
     "group_resolution_updated_at": "2026-10-05T22:00:58.698657Z",
     "candidate_state_updated_at": "2026-10-05T17:04:37.723493Z",
     "prefilter_updated_at": "2026-10-05T17:04:37.711885Z",
@@ -55,10 +55,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-06T06:01:01.962094+08:00",
-    "last_updated_at": "2026-10-06T06:01:02.450230+08:00",
+    "last_updated_at": "2026-10-06T06:01:04.892393+08:00",
+    "finished_at": "2026-10-06T06:01:04.892393+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 2543830,
     "last_name": "Way of the Hunter 2",
     "requests_this_run": 1,

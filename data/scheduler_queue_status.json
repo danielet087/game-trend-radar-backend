@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-05T05:00:53.152905Z",
+  "generated_at": "2026-10-05T05:00:55.143502Z",
   "today_taipei": "2026-10-05",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-05T04:00:52.869697Z",
+    "checkpoint_updated_at": "2026-10-05T05:00:55.093785Z",
     "group_resolution_updated_at": "2026-10-05T05:00:52.250864Z",
     "candidate_state_updated_at": "2026-10-04T16:59:33.365456Z",
     "prefilter_updated_at": "2026-10-04T16:59:33.349892Z",
     "eligible_screened_at": "2026-10-04T16:59:33.880595Z",
     "twitch_import_updated_at": "2026-10-05T05:00:47.524444Z",
-    "last_official_success_at": "2026-10-04T21:07:53.179562Z",
+    "last_official_success_at": "2026-10-05T05:00:55.048315Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 1,
+    "combined_pending_now": 0,
     "completed_legacy": 384,
-    "completed_new": 1784,
-    "twitch_priority_pending": 1
+    "completed_new": 1785,
+    "twitch_priority_pending": 0
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 1,
+    "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 1,
-    "followers_ready_pending": 1,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 2,
-    "today_attempts": 55,
-    "today_successes": 53,
+    "total_pending": 1,
+    "today_attempts": 56,
+    "today_successes": 54,
     "today_429": 2
   },
   "group_resolution_api_cooldown": {
@@ -51,47 +51,27 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-05T06:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-05T12:00:52.776401+08:00",
-    "last_updated_at": "2026-10-05T12:00:52.869697+08:00",
-    "finished_at": "2026-10-05T12:00:52.869697+08:00",
-    "stop_reason": "nothing_pending",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-05T13:00:54.781599+08:00",
+    "last_updated_at": "2026-10-05T13:00:55.093785+08:00",
+    "finished_at": "2026-10-05T13:00:55.093785+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 3195580,
+    "last_name": "lily's world XD",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "37261670402",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37261670402"
+    "run_id": "37265894729",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37265894729"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 3195580,
-      "name": "lily's world XD",
-      "steam_url": "https://store.steampowered.com/app/3195580/",
-      "release_date": "2026-09-17",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791474753791",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-05T05:00:52.040010Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    }
-  ],
+  "queue": [],
   "parked": [
     {
       "appid": 4435490,
@@ -118,19 +98,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-04T02:02:47.230551Z",
-      "kind": "official_attempt",
-      "appid": 5269080,
-      "name": "Birds Go Fishing",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "37169714198",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37169714198"
-    },
     {
       "at": "2026-10-04T02:02:55.230637Z",
       "kind": "official_attempt",
@@ -1417,6 +1384,19 @@
       "retry_at": null,
       "run_id": "37234301755",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
+    },
+    {
+      "at": "2026-10-05T05:00:54.879371Z",
+      "kind": "official_attempt",
+      "appid": 3195580,
+      "name": "lily's world XD",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 6395,
+      "retry_at": null,
+      "run_id": "37265894729",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37265894729"
     }
   ],
   "events_limit": 100

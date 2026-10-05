@@ -43296,6 +43296,32 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-06T03:10:24.883362+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4742310": {
+      "appid": 4742310,
+      "name": "Wands & Whiskers",
+      "release_date": "2027-03-09",
+      "group_id64": "103582791476048542",
+      "steam_url": "https://store.steampowered.com/app/4742310/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-05T17:04:37.711885+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-06T03:10:32.911684+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5312180": {
+      "appid": 5312180,
+      "name": "Slide or Fry",
+      "release_date": "2027-03-26",
+      "group_id64": "103582791476046680",
+      "steam_url": "https://store.steampowered.com/app/5312180/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-05T17:04:37.711885+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-06T03:10:40.905450+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -60449,6 +60475,26 @@
       "status": "ok",
       "github_run_id": "37360236954",
       "official_followers": 1
+    },
+    {
+      "appid": 4742310,
+      "when_taipei": "2026-10-06T03:10:32.784319+08:00",
+      "release_date": "2027-03-09",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37360236954",
+      "official_followers": 1
+    },
+    {
+      "appid": 5312180,
+      "when_taipei": "2026-10-06T03:10:40.784458+08:00",
+      "release_date": "2027-03-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37360236954",
+      "official_followers": 1
     }
   ],
   "next_request_after_taipei": null,
@@ -60534,20 +60580,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-06T03:10:24.883383+08:00",
+  "community_last_success_at": "2026-10-06T03:10:40.905471+08:00",
   "scheduler_batch": {
     "run_id": "37360236954",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
     "started_at": "2026-10-06T03:01:12.694580+08:00",
-    "last_updated_at": "2026-10-06T03:10:24.883386+08:00",
-    "requests_this_run": 70,
-    "official_new_this_run": 70,
+    "last_updated_at": "2026-10-06T03:10:40.944815+08:00",
+    "requests_this_run": 72,
+    "official_new_this_run": 72,
     "http_429_this_run": 0,
-    "last_appid": 5238900,
-    "last_name": "Shiverin' Shillelagh"
+    "last_appid": 5312180,
+    "last_name": "Slide or Fry",
+    "finished_at": "2026-10-06T03:10:40.944815+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

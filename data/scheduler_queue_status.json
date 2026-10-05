@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-05T19:10:24.924865Z",
+  "generated_at": "2026-10-05T19:10:40.993427Z",
   "today_taipei": "2026-10-06",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-05T19:10:24.883386Z",
+    "checkpoint_updated_at": "2026-10-05T19:10:40.944815Z",
     "group_resolution_updated_at": "2026-10-05T13:00:53.632959Z",
     "candidate_state_updated_at": "2026-10-05T17:04:37.723493Z",
     "prefilter_updated_at": "2026-10-05T17:04:37.711885Z",
     "eligible_screened_at": "2026-10-05T17:04:38.137914Z",
     "twitch_import_updated_at": "2026-10-05T19:01:04.979623Z",
-    "last_official_success_at": "2026-10-05T19:10:24.883383Z",
+    "last_official_success_at": "2026-10-05T19:10:40.905471Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 2,
+    "combined_pending_now": 0,
     "completed_legacy": 384,
-    "completed_new": 1855,
+    "completed_new": 1857,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 2,
+    "normal_pending": 0,
     "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 2,
-    "followers_ready_pending": 2,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 3,
-    "today_attempts": 70,
-    "today_successes": 70,
+    "total_pending": 1,
+    "today_attempts": 72,
+    "today_successes": 72,
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
@@ -51,54 +51,27 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-05T20:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-06T03:01:12.694580+08:00",
-    "last_updated_at": "2026-10-06T03:10:24.883386+08:00",
-    "last_appid": 5238900,
-    "last_name": "Shiverin' Shillelagh",
-    "requests_this_run": 70,
-    "official_new_this_run": 70,
+    "last_updated_at": "2026-10-06T03:10:40.944815+08:00",
+    "finished_at": "2026-10-06T03:10:40.944815+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 5312180,
+    "last_name": "Slide or Fry",
+    "requests_this_run": 72,
+    "official_new_this_run": 72,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
     "run_id": "37360236954",
     "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37360236954"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 4742310,
-      "name": "Wands & Whiskers",
-      "steam_url": "https://store.steampowered.com/app/4742310/",
-      "release_date": "2027-03-09",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476048542",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5312180,
-      "name": "Slide or Fry",
-      "steam_url": "https://store.steampowered.com/app/5312180/",
-      "release_date": "2027-03-26",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476046680",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    }
-  ],
+  "queue": [],
   "parked": [
     {
       "appid": 4435490,
@@ -125,32 +98,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-04T21:04:09.078048Z",
-      "kind": "official_attempt",
-      "appid": 5121070,
-      "name": "Circle to another motion",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "37234301755",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
-    },
-    {
-      "at": "2026-10-04T21:04:17.078160Z",
-      "kind": "official_attempt",
-      "appid": 5322360,
-      "name": "Between Empires",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 19,
-      "retry_at": null,
-      "run_id": "37234301755",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
-    },
     {
       "at": "2026-10-04T21:04:25.078291Z",
       "kind": "official_attempt",
@@ -1417,6 +1364,32 @@
       "kind": "official_attempt",
       "appid": 5238900,
       "name": "Shiverin' Shillelagh",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37360236954",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37360236954"
+    },
+    {
+      "at": "2026-10-05T19:10:32.784319Z",
+      "kind": "official_attempt",
+      "appid": 4742310,
+      "name": "Wands & Whiskers",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37360236954",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37360236954"
+    },
+    {
+      "at": "2026-10-05T19:10:40.784458Z",
+      "kind": "official_attempt",
+      "appid": 5312180,
+      "name": "Slide or Fry",
       "status": "ok",
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",

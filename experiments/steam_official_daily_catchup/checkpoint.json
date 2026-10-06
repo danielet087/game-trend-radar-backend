@@ -61711,17 +61711,19 @@
   "community_last_success_at": "2026-10-06T14:00:59.960717+08:00",
   "scheduler_batch": {
     "run_id": "37515672847",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
     "started_at": "2026-10-07T03:01:03.549500+08:00",
-    "last_updated_at": "2026-10-07T03:01:03.828261+08:00",
+    "last_updated_at": "2026-10-07T03:01:09.180954+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 4047270,
-    "last_name": "Orc Incremental"
+    "last_name": "Orc Incremental",
+    "finished_at": "2026-10-07T03:01:09.180954+08:00",
+    "stop_reason": "first_http_429"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

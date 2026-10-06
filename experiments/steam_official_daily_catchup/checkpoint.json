@@ -45347,6 +45347,45 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-07T04:10:53.374141+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5347110": {
+      "appid": 5347110,
+      "name": "Dust & Dig",
+      "release_date": "2027-03-03",
+      "group_id64": "103582791476018172",
+      "steam_url": "https://store.steampowered.com/app/5347110/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-06T16:59:29.856268+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-07T04:11:01.366760+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5354550": {
+      "appid": 5354550,
+      "name": "Keep Making Games",
+      "release_date": "2027-03-05",
+      "group_id64": "103582791476048762",
+      "steam_url": "https://store.steampowered.com/app/5354550/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-06T16:59:29.856268+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-07T04:11:09.385806+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5108020": {
+      "appid": 5108020,
+      "name": "Brute Tusk : Feral",
+      "release_date": "2027-04-01",
+      "group_id64": "103582791476051871",
+      "steam_url": "https://store.steampowered.com/app/5108020/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-06T16:59:29.856268+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-07T04:11:17.462778+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -63303,6 +63342,36 @@
       "status": "ok",
       "github_run_id": "37523259453",
       "official_followers": 1
+    },
+    {
+      "appid": 5347110,
+      "when_taipei": "2026-10-07T04:11:01.265462+08:00",
+      "release_date": "2027-03-03",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37523259453",
+      "official_followers": 1
+    },
+    {
+      "appid": 5354550,
+      "when_taipei": "2026-10-07T04:11:09.265550+08:00",
+      "release_date": "2027-03-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37523259453",
+      "official_followers": 2
+    },
+    {
+      "appid": 5108020,
+      "when_taipei": "2026-10-07T04:11:17.265666+08:00",
+      "release_date": "2027-04-01",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37523259453",
+      "official_followers": 1
     }
   ],
   "next_request_after_taipei": null,
@@ -63395,20 +63464,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-07T04:10:53.374164+08:00",
+  "community_last_success_at": "2026-10-07T04:11:17.462800+08:00",
   "scheduler_batch": {
     "run_id": "37523259453",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
     "started_at": "2026-10-07T04:01:41.177758+08:00",
-    "last_updated_at": "2026-10-07T04:10:53.374167+08:00",
-    "requests_this_run": 70,
-    "official_new_this_run": 70,
+    "last_updated_at": "2026-10-07T04:11:17.499558+08:00",
+    "requests_this_run": 73,
+    "official_new_this_run": 73,
     "http_429_this_run": 0,
-    "last_appid": 5366980,
-    "last_name": "추 : 그날의 악몽"
+    "last_appid": 5108020,
+    "last_name": "Brute Tusk : Feral",
+    "finished_at": "2026-10-07T04:11:17.499558+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

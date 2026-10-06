@@ -1645,8 +1645,8 @@
       }
     },
     "4047270": {
-      "status": "pending",
-      "updated_at": "2026-10-06T20:01:34.065719Z",
+      "status": "accepted",
+      "updated_at": "2026-10-06T20:11:23.265454Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -1663,80 +1663,19 @@
         }
       },
       "validation_version": 4,
-      "follower_candidate": {
-        "appid": 4047270,
-        "name": "Orc Incremental",
-        "release_date": "2026-09-08",
-        "steam_url": "https://store.steampowered.com/app/4047270/",
-        "group_id64": null,
-        "queue_source": "twitch_steam_discovery",
-        "twitch_admission": {
-          "schema_version": 1,
-          "method": "twitch_igdb_external_steam_v1",
-          "appid": 4047270,
-          "twitch_game_id": "332076082",
-          "igdb_id": "399030",
-          "checked_at": "2026-10-06T18:16:09Z",
-          "source_frontend_commit": "8633eac537c7759399e10431fef3dadebbf8b348",
-          "source_enrollment": {
-            "source": "igdb_first_release_date",
-            "observed_at": "2026-10-06T18:16:09Z",
-            "viewer_count": 8344,
-            "min_viewers": 7000
-          }
-        },
-        "steam_candidate": {
-          "appid": 4047270,
-          "name": "Orc Incremental",
-          "name_en": "Orc Incremental",
-          "release_raw": "2026-09-08",
-          "release_start": "2026-09-08",
-          "release_end": "2026-09-08",
-          "release_precision": "day",
-          "release_display_precision": "date_full",
-          "release_display_provider": "Steam IStoreBrowseService/GetItems",
-          "release_date_basis": "steam_store_browse_verified_full_date",
-          "release_date_timezone": "Asia/Taipei",
-          "release_time_utc": "2026-09-08T12:04:54Z",
-          "release_time_source": "Steam IStoreBrowseService/GetItems",
-          "release_timestamp_taipei_date": "2026-09-08",
-          "release_date_conflict": false,
-          "release_store_date": "2026-09-08",
-          "release_date_normalization": "steam_store_date_matches_taipei",
-          "release_date_verified_at": "2026-10-06T20:01:34.065719Z",
-          "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-06T20:01:34.065719Z",
-          "sexual_content_screened": true,
-          "steam_type": "game",
-          "content_descriptorids": [],
-          "store_url": "https://store.steampowered.com/app/4047270/",
-          "community_url": "https://steamcommunity.com/app/4047270/",
-          "twitch_admission": {
-            "schema_version": 1,
-            "method": "twitch_igdb_external_steam_v1",
-            "appid": 4047270,
-            "twitch_game_id": "332076082",
-            "igdb_id": "399030",
-            "checked_at": "2026-10-06T18:16:09Z",
-            "source_frontend_commit": "8633eac537c7759399e10431fef3dadebbf8b348",
-            "source_enrollment": {
-              "source": "igdb_first_release_date",
-              "observed_at": "2026-10-06T18:16:09Z",
-              "viewer_count": 8344,
-              "min_viewers": 7000
-            }
-          }
-        }
-      },
-      "reason": "queued_official_followers",
+      "follower_candidate": null,
+      "reason": "steam_verified",
       "rate_limit_stage": null,
       "retry_at": null,
       "retry_source": null,
       "retry_after": null,
       "retry_attempts": 0,
-      "rate_limit_attempts": 0
+      "rate_limit_attempts": 0,
+      "content_signature": "ae8e0fb49f70480cd6e1fe1d5d1480957ce73c7e53baea4fc8bd0c97c9b9d0f9",
+      "followers": 3859,
+      "follower_checked_at": "2026-10-07T04:01:41.499356+08:00"
     }
   },
-  "updated_at": "2026-10-06T20:01:34.065719Z",
+  "updated_at": "2026-10-06T20:11:23.265454Z",
   "api_cooldowns": {}
 }

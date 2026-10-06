@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-06T02:00:57.412426Z",
+  "generated_at": "2026-10-06T02:01:07.034967Z",
   "today_taipei": "2026-10-06",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-06T01:00:59.944544Z",
+    "checkpoint_updated_at": "2026-10-06T02:01:06.984914Z",
     "group_resolution_updated_at": "2026-10-05T22:00:58.698657Z",
     "candidate_state_updated_at": "2026-10-05T17:04:37.723493Z",
     "prefilter_updated_at": "2026-10-05T17:04:37.711885Z",
     "eligible_screened_at": "2026-10-05T17:04:38.137914Z",
     "twitch_import_updated_at": "2026-10-06T02:00:49.260589Z",
-    "last_official_success_at": "2026-10-05T19:10:40.905471Z",
+    "last_official_success_at": "2026-10-06T02:01:06.938695Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 2,
+    "combined_pending_now": 0,
     "completed_legacy": 384,
-    "completed_new": 1857,
-    "twitch_priority_pending": 2
+    "completed_new": 1859,
+    "twitch_priority_pending": 0
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 2,
+    "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 2,
-    "followers_ready_pending": 2,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 3,
-    "today_attempts": 75,
-    "today_successes": 72,
+    "total_pending": 1,
+    "today_attempts": 77,
+    "today_successes": 74,
     "today_429": 3
   },
   "group_resolution_api_cooldown": {
@@ -49,70 +49,29 @@
   },
   "cooldown": {
     "active": false,
-    "until": "2026-10-06T01:01:03.516276Z",
+    "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-06T03:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-06T09:00:59.841810+08:00",
-    "last_updated_at": "2026-10-06T09:00:59.944544+08:00",
-    "finished_at": "2026-10-06T09:00:59.944544+08:00",
-    "stop_reason": "official_429_cooldown_no_request",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-06T10:00:58.732543+08:00",
+    "last_updated_at": "2026-10-06T10:01:06.984914+08:00",
+    "finished_at": "2026-10-06T10:01:06.984914+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 2543830,
+    "last_name": "Way of the Hunter 2",
+    "requests_this_run": 2,
+    "official_new_this_run": 2,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "37396952610",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37396952610"
+    "run_id": "37402005341",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37402005341"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 4140530,
-      "name": "The Plant Shop",
-      "steam_url": "https://store.steampowered.com/app/4140530/",
-      "release_date": "2026-09-17",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475409958",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-05T22:00:58.493377Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": "2026-10-05T23:00:56.444921Z",
-      "last_attempt_status": "rate_limited"
-    },
-    {
-      "position": 2,
-      "appid": 2543830,
-      "name": "Way of the Hunter 2",
-      "steam_url": "https://store.steampowered.com/app/2543830/",
-      "release_date": "2026-09-29",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475420281",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-05T22:00:57.493241Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": "2026-10-06T00:01:03.382827Z",
-      "last_attempt_status": "rate_limited"
-    }
-  ],
+  "queue": [],
   "parked": [
     {
       "appid": 4435490,
@@ -139,32 +98,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-04T21:04:49.078667Z",
-      "kind": "official_attempt",
-      "appid": 4926160,
-      "name": "Dice Sort Together: Arcane Hall",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "37234301755",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
-    },
-    {
-      "at": "2026-10-04T21:04:57.078788Z",
-      "kind": "official_attempt",
-      "appid": 5327390,
-      "name": "Retro Chaos: Together Tidy Up",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "37234301755",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37234301755"
-    },
     {
       "at": "2026-10-04T21:05:05.078900Z",
       "kind": "official_attempt",
@@ -1438,6 +1371,32 @@
       "retry_at": "2026-10-06T01:01:03.516276Z",
       "run_id": "37391638177",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37391638177"
+    },
+    {
+      "at": "2026-10-06T02:00:58.835224Z",
+      "kind": "official_attempt",
+      "appid": 4140530,
+      "name": "The Plant Shop",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 831,
+      "retry_at": null,
+      "run_id": "37402005341",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37402005341"
+    },
+    {
+      "at": "2026-10-06T02:01:06.835398Z",
+      "kind": "official_attempt",
+      "appid": 2543830,
+      "name": "Way of the Hunter 2",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 14412,
+      "retry_at": null,
+      "run_id": "37402005341",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37402005341"
     }
   ],
   "events_limit": 100

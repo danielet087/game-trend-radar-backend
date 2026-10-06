@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-06T01:01:02.463996Z",
+  "generated_at": "2026-10-06T01:01:10.456995Z",
   "today_taipei": "2026-10-06",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,7 +10,7 @@
     "candidate_state_updated_at": "2026-10-05T17:04:37.723493Z",
     "prefilter_updated_at": "2026-10-05T17:04:37.711885Z",
     "eligible_screened_at": "2026-10-05T17:04:38.137914Z",
-    "twitch_import_updated_at": "2026-10-06T01:00:50.197033Z",
+    "twitch_import_updated_at": "2026-10-06T01:01:04.810375Z",
     "last_official_success_at": "2026-10-05T19:10:40.905471Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -48,9 +48,9 @@
     "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "cooldown": {
-    "active": true,
+    "active": false,
     "until": "2026-10-06T01:01:03.516276Z",
-    "reason": "steam_http_429",
+    "reason": null,
     "next_eligible_slot": "2026-10-06T02:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
@@ -78,7 +78,7 @@
       "release_date": "2026-09-17",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "waiting",
       "group_id64": "103582791475409958",
       "group_resolution": {
         "status": "resolved",
@@ -99,7 +99,7 @@
       "release_date": "2026-09-29",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "cooldown",
+      "state": "waiting",
       "group_id64": "103582791475420281",
       "group_resolution": {
         "status": "resolved",

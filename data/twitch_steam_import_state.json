@@ -1152,15 +1152,15 @@
     },
     "5160800": {
       "status": "pending",
-      "updated_at": "2026-10-05T19:01:04.979623Z",
+      "updated_at": "2026-10-06T19:00:50.038441Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 5160800,
         "twitch_game_id": "1458901309",
         "igdb_id": "415859",
-        "checked_at": "2026-10-05T18:14:56Z",
-        "source_frontend_commit": "9d900d6195ef7386456bae7c599250e3e47e3c19",
+        "checked_at": "2026-10-06T18:16:09Z",
+        "source_frontend_commit": "0da76371385d4845a080fc3b047298e1e506aa47",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-03T16:12:05Z",
@@ -1171,7 +1171,7 @@
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-06T19:01:06.685741Z",
+      "retry_at": "2026-10-07T19:00:54.655754Z",
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
@@ -1643,8 +1643,100 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "4047270": {
+      "status": "pending",
+      "updated_at": "2026-10-06T19:00:50.038441Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4047270,
+        "twitch_game_id": "332076082",
+        "igdb_id": "399030",
+        "checked_at": "2026-10-06T18:16:09Z",
+        "source_frontend_commit": "0da76371385d4845a080fc3b047298e1e506aa47",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-06T18:16:09Z",
+          "viewer_count": 8344,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": {
+        "appid": 4047270,
+        "name": "Orc Incremental",
+        "release_date": "2026-09-08",
+        "steam_url": "https://store.steampowered.com/app/4047270/",
+        "group_id64": null,
+        "queue_source": "twitch_steam_discovery",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4047270,
+          "twitch_game_id": "332076082",
+          "igdb_id": "399030",
+          "checked_at": "2026-10-06T18:16:09Z",
+          "source_frontend_commit": "0da76371385d4845a080fc3b047298e1e506aa47",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-06T18:16:09Z",
+            "viewer_count": 8344,
+            "min_viewers": 7000
+          }
+        },
+        "steam_candidate": {
+          "appid": 4047270,
+          "name": "Orc Incremental",
+          "name_en": "Orc Incremental",
+          "release_raw": "2026-09-08",
+          "release_start": "2026-09-08",
+          "release_end": "2026-09-08",
+          "release_precision": "day",
+          "release_display_precision": "date_full",
+          "release_display_provider": "Steam IStoreBrowseService/GetItems",
+          "release_date_basis": "steam_store_browse_verified_full_date",
+          "release_date_timezone": "Asia/Taipei",
+          "release_time_utc": "2026-09-08T12:04:54Z",
+          "release_time_source": "Steam IStoreBrowseService/GetItems",
+          "release_timestamp_taipei_date": "2026-09-08",
+          "release_date_conflict": false,
+          "release_store_date": "2026-09-08",
+          "release_date_normalization": "steam_store_date_matches_taipei",
+          "release_date_verified_at": "2026-10-06T19:00:50.038441Z",
+          "post_followers_store_verified": true,
+          "post_followers_store_verified_at": "2026-10-06T19:00:50.038441Z",
+          "sexual_content_screened": true,
+          "steam_type": "game",
+          "content_descriptorids": [],
+          "store_url": "https://store.steampowered.com/app/4047270/",
+          "community_url": "https://steamcommunity.com/app/4047270/",
+          "twitch_admission": {
+            "schema_version": 1,
+            "method": "twitch_igdb_external_steam_v1",
+            "appid": 4047270,
+            "twitch_game_id": "332076082",
+            "igdb_id": "399030",
+            "checked_at": "2026-10-06T18:16:09Z",
+            "source_frontend_commit": "0da76371385d4845a080fc3b047298e1e506aa47",
+            "source_enrollment": {
+              "source": "igdb_first_release_date",
+              "observed_at": "2026-10-06T18:16:09Z",
+              "viewer_count": 8344,
+              "min_viewers": 7000
+            }
+          }
+        }
+      },
+      "reason": "queued_official_followers",
+      "rate_limit_stage": null,
+      "retry_at": null,
+      "retry_source": null,
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-06T14:00:53.765605Z",
+  "updated_at": "2026-10-06T19:00:50.038441Z",
   "api_cooldowns": {}
 }

@@ -43558,6 +43558,86 @@
       "official_ge5000": true,
       "official_checked_at_taipei": "2026-10-06T10:01:06.938673+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "2938460": {
+      "appid": 2938460,
+      "name": "Police Chief Simulator",
+      "release_date": "2026-09-17",
+      "steam_url": "https://store.steampowered.com/app/2938460/",
+      "group_id64": "103582791475392979",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 2938460,
+        "twitch_game_id": "1378292380",
+        "igdb_id": "398226",
+        "checked_at": "2026-10-06T04:09:46Z",
+        "source_frontend_commit": "dc793847fe2d8a5f3d4eef3982c61d7dd2b31d03",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-06T04:09:46Z",
+          "viewer_count": 53438,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 2938460,
+        "name": "Police Chief Simulator",
+        "name_en": "Police Chief Simulator",
+        "release_raw": "2026-09-17",
+        "release_start": "2026-09-17",
+        "release_end": "2026-09-17",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-09-17T14:55:50Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-09-17",
+        "release_date_conflict": false,
+        "release_store_date": "2026-09-17",
+        "release_date_normalization": "steam_store_date_matches_taipei",
+        "release_date_verified_at": "2026-10-06T05:00:47.681489Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-06T05:00:47.681489Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [
+          5
+        ],
+        "store_url": "https://store.steampowered.com/app/2938460/",
+        "community_url": "https://steamcommunity.com/app/2938460/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 2938460,
+          "twitch_game_id": "1378292380",
+          "igdb_id": "398226",
+          "checked_at": "2026-10-06T04:09:46Z",
+          "source_frontend_commit": "dc793847fe2d8a5f3d4eef3982c61d7dd2b31d03",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-06T04:09:46Z",
+            "viewer_count": 53438,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-06T05:00:51.922570Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 7233,
+      "official_ge5000": true,
+      "official_checked_at_taipei": "2026-10-06T13:00:54.648695+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -60781,6 +60861,16 @@
       "status": "ok",
       "github_run_id": "37402005341",
       "official_followers": 14412
+    },
+    {
+      "appid": 2938460,
+      "when_taipei": "2026-10-06T13:00:54.504910+08:00",
+      "release_date": "2026-09-17",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37416397355",
+      "official_followers": 7233
     }
   ],
   "next_request_after_taipei": null,
@@ -60866,20 +60956,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-06T10:01:06.938695+08:00",
+  "community_last_success_at": "2026-10-06T13:00:54.648718+08:00",
   "scheduler_batch": {
-    "run_id": "37411646093",
+    "run_id": "37416397355",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-06T12:00:51.473082+08:00",
-    "last_updated_at": "2026-10-06T12:00:51.567183+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-06T13:00:54.378874+08:00",
+    "last_updated_at": "2026-10-06T13:00:54.695243+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "finished_at": "2026-10-06T12:00:51.567183+08:00",
-    "stop_reason": "nothing_pending"
+    "last_appid": 2938460,
+    "last_name": "Police Chief Simulator",
+    "finished_at": "2026-10-06T13:00:54.695243+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

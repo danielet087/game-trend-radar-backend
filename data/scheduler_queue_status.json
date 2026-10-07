@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-07T22:01:45.516162Z",
+  "generated_at": "2026-10-07T22:01:47.544172Z",
   "today_taipei": "2026-10-08",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-07T21:01:44.823668Z",
+    "checkpoint_updated_at": "2026-10-07T22:01:47.511946Z",
     "group_resolution_updated_at": "2026-10-07T22:01:44.736963Z",
     "candidate_state_updated_at": null,
     "prefilter_updated_at": null,
     "eligible_screened_at": "2026-10-06T16:59:30.492132Z",
     "twitch_import_updated_at": "2026-10-07T22:01:39.976415Z",
-    "last_official_success_at": "2026-10-07T21:01:44.746307Z",
+    "last_official_success_at": "2026-10-07T22:01:47.480323Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 1,
+    "combined_pending_now": 0,
     "completed_legacy": 384,
-    "completed_new": 1936,
-    "twitch_priority_pending": 1
+    "completed_new": 1937,
+    "twitch_priority_pending": 0
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 1,
+    "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 1,
-    "followers_ready_pending": 1,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 2,
-    "today_attempts": 2,
-    "today_successes": 2,
+    "total_pending": 1,
+    "today_attempts": 3,
+    "today_successes": 3,
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
@@ -51,49 +51,27 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-07T23:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-08T05:01:44.508582+08:00",
-    "last_updated_at": "2026-10-08T05:01:44.823668+08:00",
-    "finished_at": "2026-10-08T05:01:44.823668+08:00",
+    "started_at": "2026-10-08T06:01:47.146197+08:00",
+    "last_updated_at": "2026-10-08T06:01:47.511946+08:00",
+    "finished_at": "2026-10-08T06:01:47.511946+08:00",
     "stop_reason": "batch_request_limit",
-    "last_appid": 4538140,
-    "last_name": "Rehaunted",
+    "last_appid": 4412320,
+    "last_name": "Dumb Ways to Build",
     "requests_this_run": 1,
     "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "37686369221",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37686369221"
+    "run_id": "37693410668",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37693410668"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 4412320,
-      "name": "Dumb Ways to Build",
-      "steam_url": "https://store.steampowered.com/app/4412320/",
-      "release_date": "2026-09-10",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475758962",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-07T22:01:44.507883Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    }
-  ],
+  "queue": [],
   "parked": [
     {
       "appid": 4435490,
@@ -120,19 +98,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-05T19:08:32.782717Z",
-      "kind": "official_attempt",
-      "appid": 5106240,
-      "name": "Prospect",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 6,
-      "retry_at": null,
-      "run_id": "37360236954",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37360236954"
-    },
     {
       "at": "2026-10-05T19:08:40.782836Z",
       "kind": "official_attempt",
@@ -1419,6 +1384,19 @@
       "retry_at": null,
       "run_id": "37686369221",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37686369221"
+    },
+    {
+      "at": "2026-10-07T22:01:47.208595Z",
+      "kind": "official_attempt",
+      "appid": 4412320,
+      "name": "Dumb Ways to Build",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 4528,
+      "retry_at": null,
+      "run_id": "37693410668",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37693410668"
     }
   ],
   "events_limit": 100

@@ -19634,7 +19634,7 @@
       "name": "Rehaunted",
       "release_date": "2026-09-14",
       "steam_url": "https://store.steampowered.com/app/4538140/",
-      "group_id64": null,
+      "group_id64": "103582791475742887",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -19693,7 +19693,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-07T21:01:40.865056Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     }
   },
   "official_results": {
@@ -63562,7 +63570,7 @@
   "group_resolution_api_cooldown": {
     "status": "available",
     "retry_at": null,
-    "observed_at": "2026-10-07T19:01:52.810831Z",
+    "observed_at": "2026-10-07T21:01:40.969867Z",
     "attempts": 0,
     "source": "Steam ISteamUser/ResolveVanityURL"
   }

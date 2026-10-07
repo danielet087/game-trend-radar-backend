@@ -1684,8 +1684,8 @@
       }
     },
     "2902720": {
-      "status": "pending",
-      "updated_at": "2026-10-07T19:01:44.838650Z",
+      "status": "accepted",
+      "updated_at": "2026-10-07T19:02:00.693947Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -1702,80 +1702,19 @@
         }
       },
       "validation_version": 4,
-      "follower_candidate": {
-        "appid": 2902720,
-        "name": "SPAM",
-        "release_date": "2026-10-08",
-        "steam_url": "https://store.steampowered.com/app/2902720/",
-        "group_id64": null,
-        "queue_source": "twitch_steam_discovery",
-        "twitch_admission": {
-          "schema_version": 1,
-          "method": "twitch_igdb_external_steam_v1",
-          "appid": 2902720,
-          "twitch_game_id": "1168459646",
-          "igdb_id": "315689",
-          "checked_at": "2026-10-07T17:14:53Z",
-          "source_frontend_commit": "a1477b84c37dfc1d4cb6f3590b771a04f242c6cc",
-          "source_enrollment": {
-            "source": "igdb_first_release_date",
-            "observed_at": "2026-10-07T17:14:53Z",
-            "viewer_count": 14970,
-            "min_viewers": 7000
-          }
-        },
-        "steam_candidate": {
-          "appid": 2902720,
-          "name": "SPAM",
-          "name_en": "SPAM",
-          "release_raw": "2026-10-08",
-          "release_start": "2026-10-08",
-          "release_end": "2026-10-08",
-          "release_precision": "day",
-          "release_display_precision": "date_full",
-          "release_display_provider": "Steam IStoreBrowseService/GetItems",
-          "release_date_basis": "steam_store_browse_verified_full_date",
-          "release_date_timezone": "Asia/Taipei",
-          "release_time_utc": "2026-10-07T16:58:22Z",
-          "release_time_source": "Steam IStoreBrowseService/GetItems",
-          "release_timestamp_taipei_date": "2026-10-08",
-          "release_date_conflict": false,
-          "release_store_date": "2026-10-07",
-          "release_date_normalization": "steam_utc_date_normalized_to_taipei",
-          "release_date_verified_at": "2026-10-07T19:01:44.838650Z",
-          "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-07T19:01:44.838650Z",
-          "sexual_content_screened": true,
-          "steam_type": "game",
-          "content_descriptorids": [],
-          "store_url": "https://store.steampowered.com/app/2902720/",
-          "community_url": "https://steamcommunity.com/app/2902720/",
-          "twitch_admission": {
-            "schema_version": 1,
-            "method": "twitch_igdb_external_steam_v1",
-            "appid": 2902720,
-            "twitch_game_id": "1168459646",
-            "igdb_id": "315689",
-            "checked_at": "2026-10-07T17:14:53Z",
-            "source_frontend_commit": "a1477b84c37dfc1d4cb6f3590b771a04f242c6cc",
-            "source_enrollment": {
-              "source": "igdb_first_release_date",
-              "observed_at": "2026-10-07T17:14:53Z",
-              "viewer_count": 14970,
-              "min_viewers": 7000
-            }
-          }
-        }
-      },
-      "reason": "queued_official_followers",
+      "follower_candidate": null,
+      "reason": "steam_verified",
       "rate_limit_stage": null,
       "retry_at": null,
       "retry_source": null,
       "retry_after": null,
       "retry_attempts": 0,
-      "rate_limit_attempts": 0
+      "rate_limit_attempts": 0,
+      "content_signature": "795e4e24ce0295a0c0820737682cfb868a17b472ff86d7e928e2e21611d0acd8",
+      "followers": 4338,
+      "follower_checked_at": "2026-10-08T03:01:55.754516+08:00"
     }
   },
-  "updated_at": "2026-10-07T19:01:44.838650Z",
+  "updated_at": "2026-10-07T19:02:00.693947Z",
   "api_cooldowns": {}
 }

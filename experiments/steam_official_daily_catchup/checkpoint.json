@@ -45386,6 +45386,84 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-07T04:11:17.462778+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "2902720": {
+      "appid": 2902720,
+      "name": "SPAM",
+      "release_date": "2026-10-08",
+      "steam_url": "https://store.steampowered.com/app/2902720/",
+      "group_id64": "103582791474727070",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 2902720,
+        "twitch_game_id": "1168459646",
+        "igdb_id": "315689",
+        "checked_at": "2026-10-07T17:14:53Z",
+        "source_frontend_commit": "a1477b84c37dfc1d4cb6f3590b771a04f242c6cc",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-07T17:14:53Z",
+          "viewer_count": 14970,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 2902720,
+        "name": "SPAM",
+        "name_en": "SPAM",
+        "release_raw": "2026-10-08",
+        "release_start": "2026-10-08",
+        "release_end": "2026-10-08",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-10-07T16:58:22Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-10-08",
+        "release_date_conflict": false,
+        "release_store_date": "2026-10-07",
+        "release_date_normalization": "steam_utc_date_normalized_to_taipei",
+        "release_date_verified_at": "2026-10-07T19:01:44.838650Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-07T19:01:44.838650Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [],
+        "store_url": "https://store.steampowered.com/app/2902720/",
+        "community_url": "https://steamcommunity.com/app/2902720/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 2902720,
+          "twitch_game_id": "1168459646",
+          "igdb_id": "315689",
+          "checked_at": "2026-10-07T17:14:53Z",
+          "source_frontend_commit": "a1477b84c37dfc1d4cb6f3590b771a04f242c6cc",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-07T17:14:53Z",
+            "viewer_count": 14970,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-07T19:01:52.621767Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 4338,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-08T03:01:55.754516+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -63372,6 +63450,16 @@
       "status": "ok",
       "github_run_id": "37523259453",
       "official_followers": 1
+    },
+    {
+      "appid": 2902720,
+      "when_taipei": "2026-10-08T03:01:55.525364+08:00",
+      "release_date": "2026-10-08",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37671304145",
+      "official_followers": 4338
     }
   ],
   "next_request_after_taipei": null,
@@ -63464,20 +63552,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-07T04:11:17.462800+08:00",
+  "community_last_success_at": "2026-10-08T03:01:55.754536+08:00",
   "scheduler_batch": {
-    "run_id": "37641626530",
+    "run_id": "37671304145",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-07T23:02:13.562246+08:00",
-    "last_updated_at": "2026-10-07T23:02:13.634019+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-08T03:01:55.431696+08:00",
+    "last_updated_at": "2026-10-08T03:01:55.803318+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "finished_at": "2026-10-07T23:02:13.634019+08:00",
-    "stop_reason": "nothing_pending"
+    "last_appid": 2902720,
+    "last_name": "SPAM",
+    "finished_at": "2026-10-08T03:01:55.803318+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-07T21:01:41.900762Z",
+  "generated_at": "2026-10-07T21:01:44.936225Z",
   "today_taipei": "2026-10-08",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-07T20:01:58.261073Z",
+    "checkpoint_updated_at": "2026-10-07T21:01:44.823668Z",
     "group_resolution_updated_at": "2026-10-07T21:01:40.969867Z",
     "candidate_state_updated_at": null,
     "prefilter_updated_at": null,
     "eligible_screened_at": "2026-10-06T16:59:30.492132Z",
     "twitch_import_updated_at": "2026-10-07T21:01:32.655612Z",
-    "last_official_success_at": "2026-10-07T19:01:55.754536Z",
+    "last_official_success_at": "2026-10-07T21:01:44.746307Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,21 +23,21 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 1,
+    "combined_pending_now": 0,
     "completed_legacy": 384,
-    "completed_new": 1935,
-    "twitch_priority_pending": 1
+    "completed_new": 1936,
+    "twitch_priority_pending": 0
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 1,
+    "twitch_priority_pending": 0,
     "parked": 1,
-    "ready_pending": 1,
-    "followers_ready_pending": 1,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 2,
-    "today_attempts": 1,
-    "today_successes": 1,
+    "total_pending": 1,
+    "today_attempts": 2,
+    "today_successes": 2,
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
@@ -51,47 +51,27 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-07T22:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-08T04:01:58.195613+08:00",
-    "last_updated_at": "2026-10-08T04:01:58.261073+08:00",
-    "finished_at": "2026-10-08T04:01:58.261073+08:00",
-    "stop_reason": "nothing_pending",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-08T05:01:44.508582+08:00",
+    "last_updated_at": "2026-10-08T05:01:44.823668+08:00",
+    "finished_at": "2026-10-08T05:01:44.823668+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 4538140,
+    "last_name": "Rehaunted",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "37678884678",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37678884678"
+    "run_id": "37686369221",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37686369221"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 4538140,
-      "name": "Rehaunted",
-      "steam_url": "https://store.steampowered.com/app/4538140/",
-      "release_date": "2026-09-14",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475742887",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-07T21:01:40.865056Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    }
-  ],
+  "queue": [],
   "parked": [
     {
       "appid": 4435490,
@@ -118,19 +98,6 @@
     }
   ],
   "events": [
-    {
-      "at": "2026-10-05T19:08:24.782607Z",
-      "kind": "official_attempt",
-      "appid": 5333690,
-      "name": "Magic Dragon Fantasy: Story",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "37360236954",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37360236954"
-    },
     {
       "at": "2026-10-05T19:08:32.782717Z",
       "kind": "official_attempt",
@@ -1417,6 +1384,19 @@
       "retry_at": null,
       "run_id": "37671304145",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37671304145"
+    },
+    {
+      "at": "2026-10-07T21:01:44.564337Z",
+      "kind": "official_attempt",
+      "appid": 4538140,
+      "name": "Rehaunted",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 3413,
+      "retry_at": null,
+      "run_id": "37686369221",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37686369221"
     }
   ],
   "events_limit": 100

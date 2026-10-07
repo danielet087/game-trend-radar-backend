@@ -45464,6 +45464,84 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-08T03:01:55.754516+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4538140": {
+      "appid": 4538140,
+      "name": "Rehaunted",
+      "release_date": "2026-09-14",
+      "steam_url": "https://store.steampowered.com/app/4538140/",
+      "group_id64": "103582791475742887",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4538140,
+        "twitch_game_id": "1661671460",
+        "igdb_id": "410924",
+        "checked_at": "2026-10-07T20:12:43Z",
+        "source_frontend_commit": "2a35794c5bbaed9b39eb8a808af0d81aec8e7cf5",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-07T20:12:43Z",
+          "viewer_count": 14753,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 4538140,
+        "name": "Rehaunted",
+        "name_en": "Rehaunted",
+        "release_raw": "2026-09-14",
+        "release_start": "2026-09-14",
+        "release_end": "2026-09-14",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-09-14T15:59:55Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-09-14",
+        "release_date_conflict": false,
+        "release_store_date": "2026-09-14",
+        "release_date_normalization": "steam_store_date_matches_taipei",
+        "release_date_verified_at": "2026-10-07T21:01:32.655612Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-07T21:01:32.655612Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [],
+        "store_url": "https://store.steampowered.com/app/4538140/",
+        "community_url": "https://steamcommunity.com/app/4538140/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4538140,
+          "twitch_game_id": "1661671460",
+          "igdb_id": "410924",
+          "checked_at": "2026-10-07T20:12:43Z",
+          "source_frontend_commit": "2a35794c5bbaed9b39eb8a808af0d81aec8e7cf5",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-07T20:12:43Z",
+            "viewer_count": 14753,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-07T21:01:40.865056Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 3413,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-08T05:01:44.746290+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -63460,6 +63538,16 @@
       "status": "ok",
       "github_run_id": "37671304145",
       "official_followers": 4338
+    },
+    {
+      "appid": 4538140,
+      "when_taipei": "2026-10-08T05:01:44.564337+08:00",
+      "release_date": "2026-09-14",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37686369221",
+      "official_followers": 3413
     }
   ],
   "next_request_after_taipei": null,
@@ -63552,20 +63640,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-08T03:01:55.754536+08:00",
+  "community_last_success_at": "2026-10-08T05:01:44.746307+08:00",
   "scheduler_batch": {
-    "run_id": "37678884678",
+    "run_id": "37686369221",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-08T04:01:58.195613+08:00",
-    "last_updated_at": "2026-10-08T04:01:58.261073+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-08T05:01:44.508582+08:00",
+    "last_updated_at": "2026-10-08T05:01:44.823668+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "finished_at": "2026-10-08T04:01:58.261073+08:00",
-    "stop_reason": "nothing_pending"
+    "last_appid": 4538140,
+    "last_name": "Rehaunted",
+    "finished_at": "2026-10-08T05:01:44.823668+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

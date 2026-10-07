@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-07T16:04:30.080738Z",
+  "generated_at": "2026-10-07T19:01:50.373422Z",
   "today_taipei": "2026-10-08",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,7 +10,7 @@
     "candidate_state_updated_at": null,
     "prefilter_updated_at": null,
     "eligible_screened_at": "2026-10-06T16:59:30.492132Z",
-    "twitch_import_updated_at": "2026-10-07T14:02:01.368140Z",
+    "twitch_import_updated_at": "2026-10-07T19:01:44.838650Z",
     "last_official_success_at": "2026-10-06T20:11:17.462800Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -23,19 +23,19 @@
     "parked_group_xml_appids": [
       "4435490"
     ],
-    "combined_pending_now": 0,
+    "combined_pending_now": 1,
     "completed_legacy": 384,
     "completed_new": 1934,
-    "twitch_priority_pending": 0
+    "twitch_priority_pending": 1
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 0,
+    "twitch_priority_pending": 1,
     "parked": 1,
-    "ready_pending": 0,
+    "ready_pending": 1,
     "followers_ready_pending": 0,
-    "awaiting_group_pending": 0,
-    "total_pending": 1,
+    "awaiting_group_pending": 1,
+    "total_pending": 2,
     "today_attempts": 0,
     "today_successes": 0,
     "today_429": 0
@@ -51,7 +51,7 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": null,
+    "next_eligible_slot": "2026-10-07T20:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -69,7 +69,22 @@
     "run_id": "37641626530",
     "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37641626530"
   },
-  "queue": [],
+  "queue": [
+    {
+      "position": 1,
+      "appid": 2902720,
+      "name": "SPAM",
+      "steam_url": "https://store.steampowered.com/app/2902720/",
+      "release_date": "2026-10-08",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    }
+  ],
   "parked": [
     {
       "appid": 4435490,

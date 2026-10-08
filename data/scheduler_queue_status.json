@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-08T19:01:58.759791Z",
+  "generated_at": "2026-10-08T19:03:13.808819Z",
   "today_taipei": "2026-10-09",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-08T15:02:16.295268Z",
+    "checkpoint_updated_at": "2026-10-08T19:03:13.764395Z",
     "group_resolution_updated_at": "2026-10-08T14:01:51.599818Z",
     "candidate_state_updated_at": "2026-10-08T17:06:41.953520Z",
     "prefilter_updated_at": "2026-10-08T17:06:41.933575Z",
     "eligible_screened_at": "2026-10-08T17:06:42.585018Z",
     "twitch_import_updated_at": "2026-10-08T19:01:53.174971Z",
-    "last_official_success_at": "2026-10-08T12:21:02.958934Z",
+    "last_official_success_at": "2026-10-08T19:03:13.764391Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -21,21 +21,21 @@
     "added_from_daily": 0,
     "eligible_count": 3813,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 25,
+    "combined_pending_now": 15,
     "completed_legacy": 384,
-    "completed_new": 2080,
+    "completed_new": 2090,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 25,
+    "normal_pending": 15,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 25,
-    "followers_ready_pending": 24,
+    "ready_pending": 15,
+    "followers_ready_pending": 14,
     "awaiting_group_pending": 1,
-    "total_pending": 25,
-    "today_attempts": 0,
-    "today_successes": 0,
+    "total_pending": 15,
+    "today_attempts": 10,
+    "today_successes": 10,
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
@@ -53,51 +53,23 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": false,
-    "status": "finished",
-    "started_at": "2026-10-08T23:02:16.164982+08:00",
-    "last_updated_at": "2026-10-08T23:02:16.295268+08:00",
-    "finished_at": "2026-10-08T23:02:16.295268+08:00",
-    "stop_reason": "awaiting_group_resolution_no_request",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-10-09T03:02:01.574115+08:00",
+    "last_updated_at": "2026-10-09T03:03:13.764395+08:00",
+    "last_appid": 5053750,
+    "last_name": "AshSpire",
+    "requests_this_run": 10,
+    "official_new_this_run": 10,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "37797324374",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37797324374"
+    "run_id": "37828795746",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 5300160,
-      "name": "Stellarite Miner",
-      "steam_url": "https://store.steampowered.com/app/5300160/",
-      "release_date": "2026-10-14",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475934704",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5347940,
-      "name": "PALJA Survivors",
-      "steam_url": "https://store.steampowered.com/app/5347940/",
-      "release_date": "2026-10-15",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476068548",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
       "appid": 4435490,
       "name": "Call of Duty®: Modern Warfare® 4",
       "steam_url": "https://store.steampowered.com/app/4435490/",
@@ -119,119 +91,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 4,
-      "appid": 5380090,
-      "name": "Escape The Zoo",
-      "steam_url": "https://store.steampowered.com/app/5380090/",
-      "release_date": "2026-10-23",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476067695",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5383020,
-      "name": "CHAPA CHAPA Munchkin Mafia",
-      "steam_url": "https://store.steampowered.com/app/5383020/",
-      "release_date": "2026-10-23",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476068753",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5383030,
-      "name": "Police Activity: Cardboardman",
-      "steam_url": "https://store.steampowered.com/app/5383030/",
-      "release_date": "2026-10-23",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476068760",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5354560,
-      "name": "Adventurer Guild Master",
-      "steam_url": "https://store.steampowered.com/app/5354560/",
-      "release_date": "2026-10-26",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476023315",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5361370,
-      "name": "The Theory of Humanity",
-      "steam_url": "https://store.steampowered.com/app/5361370/",
-      "release_date": "2026-10-28",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476067942",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 4191210,
-      "name": "Tavern Farkle GB",
-      "steam_url": "https://store.steampowered.com/app/4191210/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475819324",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 4919750,
-      "name": "Sea of Silence",
-      "steam_url": "https://store.steampowered.com/app/4919750/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476067324",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
-      "appid": 5053750,
-      "name": "AshSpire",
-      "steam_url": "https://store.steampowered.com/app/5053750/",
-      "release_date": "2026-10-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476067842",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 12,
+      "position": 2,
       "appid": 5382480,
       "name": "Mining Days",
       "steam_url": "https://store.steampowered.com/app/5382480/",
@@ -245,7 +105,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 5180770,
       "name": "GhostLine - Origin Zero",
       "steam_url": "https://store.steampowered.com/app/5180770/",
@@ -259,7 +119,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 4926560,
       "name": "Path to Power",
       "steam_url": "https://store.steampowered.com/app/4926560/",
@@ -273,7 +133,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 5376970,
       "name": "Farm Business Simulator",
       "steam_url": "https://store.steampowered.com/app/5376970/",
@@ -287,7 +147,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 4993610,
       "name": "Imperionis",
       "steam_url": "https://store.steampowered.com/app/4993610/",
@@ -301,7 +161,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 4916260,
       "name": "Lost Ball: Homeward Bound",
       "steam_url": "https://store.steampowered.com/app/4916260/",
@@ -315,7 +175,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 4679490,
       "name": "Mirrorbane",
       "steam_url": "https://store.steampowered.com/app/4679490/",
@@ -329,7 +189,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5231500,
       "name": "Axiom of Stars",
       "steam_url": "https://store.steampowered.com/app/5231500/",
@@ -343,7 +203,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5344130,
       "name": "LEARN CHINESE WITH 1000 PRINCES",
       "steam_url": "https://store.steampowered.com/app/5344130/",
@@ -357,7 +217,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5378740,
       "name": "科伊的逃亡",
       "steam_url": "https://store.steampowered.com/app/5378740/",
@@ -371,7 +231,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 5058570,
       "name": "Matchday: Player Career",
       "steam_url": "https://store.steampowered.com/app/5058570/",
@@ -385,7 +245,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 5348420,
       "name": "Tennis & Padel Shop Simulator",
       "steam_url": "https://store.steampowered.com/app/5348420/",
@@ -399,7 +259,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 2849490,
       "name": "Outward 2",
       "steam_url": "https://store.steampowered.com/app/2849490/",
@@ -413,7 +273,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 3295000,
       "name": "ReVamp",
       "steam_url": "https://store.steampowered.com/app/3295000/",
@@ -429,136 +289,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-10-08T12:07:50.886512Z",
-      "kind": "official_attempt",
-      "appid": 5284710,
-      "name": "SHAME",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:07:58.886630Z",
-      "kind": "official_attempt",
-      "appid": 5316540,
-      "name": "Tidy Up the Halloween Shop",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 38,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:08:06.886762Z",
-      "kind": "official_attempt",
-      "appid": 5317740,
-      "name": "Something in the Rows",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:08:14.886883Z",
-      "kind": "official_attempt",
-      "appid": 5342920,
-      "name": "SpellWeave",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:08:22.887012Z",
-      "kind": "official_attempt",
-      "appid": 5372560,
-      "name": "Zattrick Manager",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 6,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:08:30.887140Z",
-      "kind": "official_attempt",
-      "appid": 4926310,
-      "name": "Berserk Heroes Online",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 244,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:08:38.887271Z",
-      "kind": "official_attempt",
-      "appid": 5107320,
-      "name": "WHAT LURKS BELOW",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:08:46.887404Z",
-      "kind": "official_attempt",
-      "appid": 5204860,
-      "name": "Advancing Fronts",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:08:54.887532Z",
-      "kind": "official_attempt",
-      "appid": 5362280,
-      "name": "Fungal Field",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
-    {
-      "at": "2026-10-08T12:09:02.887651Z",
-      "kind": "official_attempt",
-      "appid": 4985770,
-      "name": "Dive Log: A Focus Voyage",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 9,
-      "retry_at": null,
-      "run_id": "37773993704",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
-    },
     {
       "at": "2026-10-08T12:09:10.887776Z",
       "kind": "official_attempt",
@@ -1728,6 +1458,136 @@
       "retry_at": null,
       "run_id": "37773993704",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37773993704"
+    },
+    {
+      "at": "2026-10-08T19:02:01.668081Z",
+      "kind": "official_attempt",
+      "appid": 5300160,
+      "name": "Stellarite Miner",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:02:09.668196Z",
+      "kind": "official_attempt",
+      "appid": 5347940,
+      "name": "PALJA Survivors",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:02:17.668281Z",
+      "kind": "official_attempt",
+      "appid": 5380090,
+      "name": "Escape The Zoo",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:02:25.668375Z",
+      "kind": "official_attempt",
+      "appid": 5383020,
+      "name": "CHAPA CHAPA Munchkin Mafia",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:02:33.668459Z",
+      "kind": "official_attempt",
+      "appid": 5383030,
+      "name": "Police Activity: Cardboardman",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:02:41.668543Z",
+      "kind": "official_attempt",
+      "appid": 5354560,
+      "name": "Adventurer Guild Master",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:02:49.668629Z",
+      "kind": "official_attempt",
+      "appid": 5361370,
+      "name": "The Theory of Humanity",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:02:57.668711Z",
+      "kind": "official_attempt",
+      "appid": 4191210,
+      "name": "Tavern Farkle GB",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:03:05.668803Z",
+      "kind": "official_attempt",
+      "appid": 4919750,
+      "name": "Sea of Silence",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
+    },
+    {
+      "at": "2026-10-08T19:03:13.668892Z",
+      "kind": "official_attempt",
+      "appid": 5053750,
+      "name": "AshSpire",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "37828795746",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37828795746"
     }
   ],
   "events_limit": 100

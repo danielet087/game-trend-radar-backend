@@ -91,7 +91,7 @@ publication_report = receipt.to_dict()
 
 每次嘗試都先 fetch 最新遠端版本、reset disposable checkout，再呼叫同一個 `apply`。Git 只 stage 明確允許的 JSON 檔案，commit 後以不可變 SHA 推送；不 force push。push 失敗最多重試 `max_attempts` 次（1 至 20），fetch、內容驗證、callback、scope 或 commit 錯誤則立即停止。沒有檔案差異也必須真正 push 並獲得確認；如果遠端已前進，會重新取得最新版再嘗試，不能只因空 diff 宣稱發布完成。
 
-允許的範圍是明確 `data/<file>.json`、`data/<specified-directory>/`，以及明確 `experiments/<...>/checkpoint.json`。scope 內的更動仍限定 JSON；根目錄、絕對路徑、路徑穿越、`.git`、symlink、未授權的 tracked/index 更動都會被拒絕。收集階段已更動的 owned JSON 可以在輸入凍結後 reset；其他已存在的 untracked/ignored 輸出會保留，而且遠端更新不得覆蓋它們。callback 不能寫入 scope 外的輸出，連 ignored 檔案也會檢查。callback 需要啟動 Python 時，請使用 `-B` 及 `PYTHONDONTWRITEBYTECODE=1`，避免產生 checkout 內的 bytecode cache。
+允許的範圍是明確 `data/<file>.json`、`data/<specified-directory>/`，以及明確 `experiments/<...>/checkpoint.json`。scope 內的更動仍限定 JSON；根目錄、絕對路徑、路徑穿越、`.git`、symlink、未授權的 tracked/index 更動都會被拒絕。每次 reset 完成後、callback 執行前，會先驗證所有 owned 路徑及其祖先；owned 目錄下的任何巢狀 symlink 也會拒絕，包含 tracked／untracked、指向 checkout 內部或外部、名稱不含 `.json` 的目錄連結，避免 callback 先沿連結寫出 scope。收集階段已更動的 owned JSON 可以在輸入凍結後 reset；其他已存在的 untracked/ignored 輸出會保留，而且遠端更新不得覆蓋它們。callback 不能寫入 scope 外的輸出，連 ignored 檔案也會檢查。callback 需要啟動 Python 時，請使用 `-B` 及 `PYTHONDONTWRITEBYTECODE=1`，避免產生 checkout 內的 bytecode cache。
 
 `push_command_prefix` 取代 push 時的 `git` 執行檔；範例中的腳本本身會執行 Git，後面直接接 `push` 參數。token 由既有 askpass 環境提供，不放入 URL、命令列或錯誤訊息。可用 `environment` 傳入環境覆寫；預設使用 GitHub Actions bot 身分建立 commit，並透過單次命令的 `-c` 指定，無須更改 checkout 設定。
 

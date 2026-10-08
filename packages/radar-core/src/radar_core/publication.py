@@ -277,6 +277,28 @@ class SubprocessGitRepository:
             current = current.parent
         return path
 
+    def _validate_owned_locations(self, owned: tuple[str, ...]) -> None:
+        """Reject redirects before the callback can write through a directory.
+
+        Directory scopes need their own validation: a tracked symlink such as
+        ``data/calendar`` does not end in ``.json`` and therefore is absent from
+        the JSON snapshot. Checking only changed/selected JSON files is too late
+        if the callback already followed that link outside its checkout.
+        """
+        for relative in owned:
+            path = self._safe_owned_file(relative)
+            if not relative.endswith(".json") and path.is_dir():
+                # rglob does not follow directory symlinks, but yields the link
+                # itself. Reject both tracked and untracked redirects under an
+                # owned directory, including links to another checkout location.
+                for candidate in path.rglob("*"):
+                    if candidate.is_symlink():
+                        self._safe_owned_file(candidate.relative_to(self.root).as_posix())
+        tracked = filter(None, self._run("ls-tree", "-r", "--name-only", "-z", "HEAD").split("\x00"))
+        for relative in tracked:
+            if _is_owned(relative, owned):
+                self._safe_owned_file(relative)
+
     def _fingerprint(self, relative: str) -> str:
         """Preserve existing untracked outputs without allowing callback edits."""
         path = self.root / relative
@@ -317,6 +339,7 @@ class SubprocessGitRepository:
                 self._safe_owned_file(relative).unlink(missing_ok=True)
         self._run("reset", "--hard", f"refs/remotes/{self.remote}/{self.branch}")
         self._refresh_revision = self.head_revision()
+        self._validate_owned_locations(owned)
 
     def _assert_owned_history(self, owned: tuple[str, ...]) -> None:
         if self._refresh_revision is None:
@@ -331,6 +354,7 @@ class SubprocessGitRepository:
         owned = _paths(paths)
         _nonempty(message, "message")
         self._assert_owned_history(owned)
+        self._validate_owned_locations(owned)
         changed = self._tracked_changes()
         untracked = self._untracked()
         if any(not _is_owned(path, owned) for path in changed):
@@ -364,6 +388,7 @@ class SubprocessGitRepository:
 
     def target_snapshot_revision(self, paths: Sequence[str]) -> str:
         owned = _paths(paths)
+        self._validate_owned_locations(owned)
         tracked = set(filter(None, self._run("ls-tree", "-r", "--name-only", "-z", "HEAD").split("\x00")))
         selected = {path for path in tracked if _is_owned(path, owned)}
         selected.update(path for path in owned if path.endswith(".json"))

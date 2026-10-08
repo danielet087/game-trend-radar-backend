@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import tempfile
 import unittest
@@ -337,6 +338,85 @@ class GitPublicationTests(unittest.TestCase):
 
         receipt = self.publish(apply, paths=["experiments/daily/checkpoint.json"])
         self.assertTrue(receipt.changed)
+
+    def assert_remote_directory_symlink_is_rejected(self, link_relative, paths, *, inside=False):
+        outside = self.root / "external-data"
+        outside.mkdir()
+        protected = outside / "keep.json"
+        protected.write_text('{"original":true}', encoding="utf-8")
+        link = self.other / link_relative
+        link.parent.mkdir(parents=True, exist_ok=True)
+        if inside:
+            target = self.other / "data/shared"
+            target.mkdir()
+            (target / "keep.json").write_text('{"original":true}', encoding="utf-8")
+            link.symlink_to(os.path.relpath(target, link.parent), target_is_directory=True)
+        else:
+            link.symlink_to(outside, target_is_directory=True)
+        self.git(self.other, "add", "--", link_relative)
+        if inside:
+            self.git(self.other, "add", "data/shared/keep.json")
+        self.git(self.other, "commit", "-m", "Unsafe directory redirect fixture")
+        self.git(self.other, "push", "origin", "HEAD:main")
+        remote_head = self.git(self.root, "--git-dir", str(self.remote), "rev-parse", "main")
+        callbacks = []
+        pushes = []
+        repository = self.repository()
+        push = repository.push
+
+        def recording_push(revision=None):
+            pushes.append(True)
+            return push(revision)
+
+        repository.push = recording_push
+
+        def apply(root):
+            callbacks.append(True)
+            (root / link_relative / "keep.json").write_text('{"changed":true}', encoding="utf-8")
+
+        with self.assertRaises(PublicationScopeError):
+            self.publish(apply, repository=repository, paths=paths)
+        self.assertEqual(callbacks, [])
+        self.assertEqual(pushes, [])
+        self.assertEqual(protected.read_text(), '{"original":true}')
+        self.assertEqual(remote_head, self.git(self.root, "--git-dir", str(self.remote), "rev-parse", "main"))
+        if inside:
+            self.assertEqual((self.work / "data/shared/keep.json").read_text(), '{"original":true}')
+
+    def test_owned_directory_symlink_is_rejected_before_callback_or_push(self):
+        self.assert_remote_directory_symlink_is_rejected("data/calendar", ["data/calendar/"])
+
+    def test_owned_directory_symlink_to_inside_checkout_is_also_rejected(self):
+        self.assert_remote_directory_symlink_is_rejected("data/calendar", ["data/calendar/"], inside=True)
+
+    def test_nested_tracked_directory_symlink_without_json_suffix_is_rejected(self):
+        self.assert_remote_directory_symlink_is_rejected("data/calendar/archive", ["data/calendar/"])
+
+    def test_owned_json_file_ancestor_directory_symlink_is_rejected(self):
+        self.assert_remote_directory_symlink_is_rejected("data/calendar", ["data/calendar/keep.json"])
+
+    def test_owned_checkpoint_ancestor_directory_symlink_is_rejected(self):
+        self.assert_remote_directory_symlink_is_rejected(
+            "experiments/daily", ["experiments/daily/checkpoint.json"],
+        )
+
+    def test_nested_untracked_directory_symlink_is_rejected_before_callback(self):
+        outside = self.root / "external-data"
+        outside.mkdir()
+        protected = outside / "keep.json"
+        protected.write_text('{"original":true}', encoding="utf-8")
+        (self.work / "data/calendar").mkdir()
+        (self.work / "data/calendar/archive").symlink_to(outside, target_is_directory=True)
+        callbacks = []
+
+        def apply(root):
+            callbacks.append(True)
+            (root / "data/calendar/archive/keep.json").write_text('{"changed":true}', encoding="utf-8")
+
+        with self.assertRaises(PublicationScopeError):
+            self.publish(apply, paths=["data/calendar/"])
+        self.assertEqual(callbacks, [])
+        self.assertEqual(protected.read_text(), '{"original":true}')
 
     def test_unsafe_scopes_symlinks_and_non_disposable_checkout_are_rejected(self):
         with self.assertRaises(ValueError):

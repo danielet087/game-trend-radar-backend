@@ -18,7 +18,7 @@
 `radar-core` 0.2.0 無第三方執行依賴，支援 Python 3.12。四個專案透過 `requirements-core.txt` 安裝同一個完整提交版本：
 
 ```
-c27061c62b0e0a453447a8039ffe83b10ac7d866
+bf1d4bc64b361ec35cd4041d78c5016396d5d785
 ```
 
 原有四個 `twitch_steam_admission.py` 保留為相容入口，匯出同一組 15 個公開符號。規則實作只有一份，沒有本地備援副本。版本更新先跑四個專案的離線測試，再一起更新 SHA。

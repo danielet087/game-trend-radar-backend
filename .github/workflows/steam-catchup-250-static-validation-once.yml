@@ -17,6 +17,7 @@ jobs:
           sparse-checkout: |
             .github/workflows/steam-official-daily-catchup-250.yml
             scripts/
+            radar_backend/
             collectors/
             requirements-core.txt
             requirements.txt
@@ -39,7 +40,7 @@ jobs:
           python -m py_compile scripts/experiment_official_daily_catchup_250.py
           git clone --depth 1 https://github.com/danielet087/game-trend-radar-content-backend.git content-backend
           python -m py_compile content-backend/content_backend/enrich_game.py
-          PYTHONPATH=content-backend/content_backend python -m unittest -q content-backend/content_backend/test_enrich_game.py
+          (cd content-backend/content_backend && python -m unittest -q test_enrich_game.py)
           python - <<'PY'
           import json
           from pathlib import Path

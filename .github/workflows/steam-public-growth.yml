@@ -65,56 +65,17 @@ jobs:
         id: checkpoint
         if: always() && !cancelled() && steps.collect.outcome != 'skipped'
         run: |
-          set -euo pipefail
-          test -f output/public-growth.json
-          test -f output/growth-checkpoint-baseline.json
-          checkpoint='experiments/steam_official_daily_catchup/checkpoint.json'
-          cp "$checkpoint" output/growth-checkpoint-observed.json
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            python -m scripts.persist_growth_checkpoint merge \
-              --latest "$checkpoint" --baseline output/growth-checkpoint-baseline.json \
-              --observed output/growth-checkpoint-observed.json --report output/public-growth.json \
-              --output "$checkpoint"
-            git add "$checkpoint"
-            if ! git diff --cached --quiet; then
-              git commit -m 'state: save official growth observations and shared Community cooldown'
-            fi
-            # A clean index also needs a remote acknowledgement.
-            if git push origin HEAD:main; then
-              echo 'state_persisted=true' >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          done
-          exit 1
+          python -m radar_backend.jobs.publish_steam growth-checkpoint \
+            --receipt output/steam-growth-checkpoint-publication.json
       - name: Publish against the latest accepted catalog
         id: publish
         if: always() && !cancelled() && steps.checkpoint.outputs.state_persisted == 'true'
         env:
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
         run: |
-          set -euo pipefail
-          test -f output/public-growth.json
-          test -n "$FRONTEND_REPO_TOKEN"
-          git -C frontend config user.name 'github-actions[bot]'
-          git -C frontend config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          for attempt in 1 2 3 4 5; do
-            git -C frontend fetch origin main
-            git -C frontend reset --hard origin/main
-            python frontend/scripts/build_radar_insights.py --data-dir frontend/data --measurements output/public-growth.json
-            git -C frontend add data/insights-state.json data/activity.json data/growth.json
-            if ! git -C frontend diff --cached --quiet; then
-              git -C frontend commit -m 'data: record official growth observations through release plus 30 days'
-            fi
-            if bash scripts/git_frontend_auth.sh -C frontend push origin HEAD:main; then
-              echo 'published=true' >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-          done
-          exit 1
+          python -m radar_backend.jobs.publish_steam growth \
+            --input-revision "${{ steps.catalog.outputs.revision }}" \
+            --receipt output/steam-growth-publication.json
       - name: Record durable state and publication acknowledgements
         if: always() && !cancelled()
         env:
@@ -161,6 +122,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: steam-public-growth-result
-          path: output/public-growth.json
+          path: |
+            output/public-growth.json
+            output/steam-growth-checkpoint-publication.json
+            output/steam-growth-publication.json
           if-no-files-found: ignore
           retention-days: 7

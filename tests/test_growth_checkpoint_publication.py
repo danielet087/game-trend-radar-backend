@@ -188,14 +188,15 @@ def delivery_repo(tmp_path):
     subprocess.run(["git", "clone", str(remote), str(repo)], check=True, capture_output=True)
     git(repo, "config", "user.name", "Test")
     git(repo, "config", "user.email", "test@example.com")
-    (repo / "scripts").mkdir()
-    shutil.copytree(ROOT / "radar_backend", repo / "radar_backend",
-                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
-    for name in ("persist_growth_checkpoint.py", "external_schedule.py", "steam_official_followers.py"):
-        shutil.copyfile(ROOT / "scripts" / name, repo / "scripts" / name)
+    # The workflow now composes the complete real Python publication adapter.
+    # Copy its runtime graph rather than a hand-picked legacy script subset.
+    for name in ("scripts", "radar_backend", "collectors"):
+        shutil.copytree(ROOT / name, repo / name,
+                        ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    shutil.copyfile(ROOT / ".gitignore", repo / ".gitignore")
     baseline = {"queue": [{"appid": 1}], "official_results": {"2": {"retained": True}}}
     write_json(repo / CHECKPOINT, baseline)
-    git(repo, "add", "scripts", "radar_backend", CHECKPOINT)
+    git(repo, "add", ".gitignore", "scripts", "radar_backend", "collectors", CHECKPOINT)
     git(repo, "commit", "-m", "seed")
     git(repo, "push", "origin", "HEAD:main")
     write_json(repo / "output/growth-checkpoint-baseline.json", baseline)
@@ -257,7 +258,7 @@ def frontend_repo(tmp_path, backend):
     # payload, allowing real commits/pushes without querying any external API.
     (frontend / "scripts/build_radar_insights.py").write_text(
         "import argparse, json\nfrom pathlib import Path\n"
-        "p=argparse.ArgumentParser();p.add_argument('--data-dir');p.add_argument('--measurements');a=p.parse_args()\n"
+        "p=argparse.ArgumentParser();p.add_argument('--data-dir');p.add_argument('--measurements');p.add_argument('--observed-at');a=p.parse_args()\n"
         "m=json.loads(Path(a.measurements).read_text())\n"
         "for n in ('insights-state.json','activity.json','growth.json'):\n"
         "    Path(a.data_dir,n).write_text(json.dumps(m['measurements']))\n", encoding="utf-8",
@@ -268,13 +269,18 @@ def frontend_repo(tmp_path, backend):
     git(frontend, "commit", "-m", "seed public catalog")
     git(frontend, "push", "origin", "HEAD:main")
     # The production auth wrapper is replaced only in this local fixture.
-    (backend / "scripts/git_frontend_auth.sh").write_text('exec git "$@"\n', encoding="utf-8")
+    auth = tmp_path / "local-git-auth.sh"
+    auth.write_text('exec git "$@"\n', encoding="utf-8")
     return remote, frontend
 
 
 def run_publish_step(repo):
     _, steps = workflow_steps()
     script = next(step["run"] for step in steps if step.get("id") == "publish")
+    # Expressions are expanded by Actions in production; local integration
+    # uses a literal immutable input revision and an external token-free wrapper.
+    script = script.replace("${{ steps.catalog.outputs.revision }}", "local-catalog-input")
+    script = script.rstrip() + f' --auth-script "{repo.parent / "local-git-auth.sh"}"\n'
     output = repo / "publish-output.txt"
     env = {**os.environ, "GITHUB_OUTPUT": str(output), "FRONTEND_REPO_TOKEN": "local-test",
            "PATH": str(Path(sys.executable).parent) + os.pathsep + os.environ.get("PATH", "")}

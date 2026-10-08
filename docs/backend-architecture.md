@@ -10,15 +10,15 @@
 | application | 候選各階段、官方批次與成長觀測的協調 | `radar_backend/application/` |
 | adapters | HTTP、來源身分驗證與既有來源橋接 | `radar_backend/adapters/` |
 | state | checkpoint、快取、冷卻、原子寫入及合併 | `radar_backend/state/` |
-| publication | 公開資料發布與成功回條 | `radar_backend/publication/growth.py`；遠端 Git 仍由 workflow 確認 |
+| publication | 凍結輸入、合併最新資料及發布回條 | `radar_backend/publication/`；Git 發布由 `radar_core.publication` 確認 |
 | jobs | 命令列、依賴組裝及工作入口 | `radar_backend/jobs/`；結果契約仍為 `radar_core.jobs` |
 
 ## 共用核心版本
 
-`radar-core` 0.1.0 無第三方執行依賴，支援 Python 3.12。四個專案透過 `requirements-core.txt` 安裝同一個完整提交版本：
+`radar-core` 0.2.0 無第三方執行依賴，支援 Python 3.12。四個專案透過 `requirements-core.txt` 安裝同一個完整提交版本：
 
 ```
-67fc611b448be08808956637fcfc9342a509ce9b
+c27061c62b0e0a453447a8039ffe83b10ac7d866
 ```
 
 原有四個 `twitch_steam_admission.py` 保留為相容入口，匯出同一組 15 個公開符號。規則實作只有一份，沒有本地備援副本。版本更新先跑四個專案的離線測試，再一起更新 SHA。
@@ -58,8 +58,26 @@
 
 歷史 sparse checkout 與離線 CI 已加入 `radar_backend/`。跨 repo 的 Content 靜態驗證在其自身目錄執行，以隔離各專案的 Python package 與工作路徑。資料路徑、JSON 欄位、請求上限、資格條件、正常排程及固定核心版本不變。第二批 PR 接在第一批分支之後；先合併第一批，再將第二批 base 調整為 main。
 
-## 尚未遷移與第三批
+## 第三批：快照與發布
+
+共用核心的 `snapshot_revision` 以排序後的 UTF-8 JSON 計算 SHA-256；無效 JSON、非有限數值及不合法的路徑應中止發布。`publish_with_retry` 每次先取得遠端最新版本，再用同一份凍結輸入重新合併、只提交指定的 JSON 路徑，最後等待 Git push 成功。重試不重新收集來源，也不更新觀測時鐘。即使資料沒有改變，仍須確認遠端接受目前提交，才有成功回條。
+
+| 版本 | 意義 | 保存位置 |
+| --- | --- | --- |
+| `input_revision` | 收集工作使用的輸入版本 | 發布 metadata 與回條 |
+| `payload_revision` | 凍結批次的 JSON 雜湊 | 發布 metadata 與回條 |
+| `dataset_revision` | 公開資料的雜湊，排除包含此欄位的 manifest | 公開 metadata |
+| `target_snapshot_revision` | 提交內指定 JSON 路徑的實際快照雜湊 | 回條 |
+| `published_revision` | push 確認成功的 Git 提交 SHA | runner 的回條 artifact |
+
+Git 提交不能在自己的內容中寫入自身 SHA。因此 `published_revision` 在 push 成功後才寫到工作輸出，與同一提交內的資料版本分開。失敗或跳過的工作不沿用先前成功回條；workflow 只有取得本次回條才設定 `published`／`state_persisted`。完整性 gate 仍分別檢查收集、checkpoint 保存及公開發布。
+
+Steam 的目錄、growth 公開資料、growth checkpoint 及 hourly 佇列批次透過 `jobs/publish_steam.py` 進入發布層。Twitch 與 Content 使用各自的 publication 用例，保留來源驗證、合併規則與 JSON 契約，共用 Git 重試機制。發布前凍結時間與輸入；併發更新時保留最新狀態，無法安全合併的毀損或過期資料會中止。
+
+核心版本先以獨立 PR 發布，再以該完整 SHA 固定四個 consumer。第三批 consumer PR 接在第二批分支後，避免夾帶前兩批 diff；合併依序為核心、前兩批 consumer、第三批 consumer。Steam 的 growth 發布使用前端 builder 的 `--observed-at`，因此前端第三批須先於 Steam 第三批合併。調整 PR base 時保留提交歷史，確保固定 SHA 可達。
+
+## 尚未遷移
 
 候選來源 adapter 仍橋接既有 Steam Store 日期、成人篩選與公開目錄 helper；官方 worker 的上市日期複驗、master upsert 與 content dispatch 仍保留在相容入口，由 `adapters/official_catalog.py` 提供明確的舊流程橋接。這些原本已服務正式資料流程，需和後續發布邊界一起遷移。
 
-第三批整理公開 snapshot 的 revision、發布回條、Store/content publication 用例及 workflow 共用步驟。此批已分離主要收集與狀態責任，尚未完成所有歷史工具的分層。
+官方 worker 執行中的中途 checkpoint、daily 私有狀態保存，以及歷史一次性工具的 Git/rebase 流程仍保留。第三批遷移公開發布和批次狀態合併，尚未統一所有工作中的 checkpoint；content dispatch 的 HTTP 呼叫也仍由原流程執行。

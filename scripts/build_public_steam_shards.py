@@ -117,7 +117,11 @@ def build(
     frontend: Path,
     *,
     authoritative_future: bool = False,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
+    observed = now or datetime.now(timezone.utc)
+    if observed.tzinfo is None or observed.utcoffset() is None:
+        raise ValueError("Timezone-aware publication time required")
     incoming_payload = load_json(input_path, None)
     if not isinstance(incoming_payload, dict) or not isinstance(incoming_payload.get("games"), list):
         raise ValueError("Invalid source catalog; refusing to replace published records")
@@ -137,7 +141,7 @@ def build(
     audit_active = index.get("release_date_audited") is True or authoritative_future
     precision_exclusions = load_json(frontend / "data" / "excluded_date_appids.json", {})
     unconfirmed_ids = {int(x) for x in precision_exclusions.get("appids", [])}
-    today_s = (datetime.now(timezone.utc) + timedelta(hours=8)).date().isoformat()
+    today_s = observed.astimezone(timezone(timedelta(hours=8))).date().isoformat()
 
     def publishable(game: dict[str, Any]) -> bool:
         if not valid_record(game) or is_disallowed(game, blocked):
@@ -235,7 +239,7 @@ def build(
         day = str(row.get("release_start") or row.get("release_date"))
         by_month[day[:7]].append(row)
 
-    generated_at = incoming_payload.get("generated_at") or datetime.now(timezone.utc).isoformat()
+    generated_at = incoming_payload.get("generated_at") or observed.isoformat()
     changed_months = 0
     for month, month_rows in sorted(by_month.items()):
         payload = {
@@ -255,9 +259,8 @@ def build(
             if path.stem not in active:
                 path.unlink()
 
-    today = date.today()
-    # GitHub runner is UTC; convert operational "today" explicitly to Taiwan.
-    today = (datetime.now(timezone.utc) + timedelta(hours=8)).date()
+    # Keep one Taiwan eligibility date across publication retries.
+    today = observed.astimezone(timezone(timedelta(hours=8))).date()
     today_s = today.isoformat()
     released_from = (today - timedelta(days=30)).isoformat()
 

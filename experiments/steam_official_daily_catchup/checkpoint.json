@@ -48663,6 +48663,45 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-08T20:20:38.959778+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5056300": {
+      "appid": 5056300,
+      "name": "Souls for Relics",
+      "release_date": "2027-03-05",
+      "group_id64": "103582791475897705",
+      "steam_url": "https://store.steampowered.com/app/5056300/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-08T11:01:56.890908+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-08T20:20:46.972472+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5145320": {
+      "appid": 5145320,
+      "name": "FSPunch",
+      "release_date": "2027-03-05",
+      "group_id64": "103582791475802706",
+      "steam_url": "https://store.steampowered.com/app/5145320/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-08T11:01:56.890908+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-08T20:20:55.000261+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4643500": {
+      "appid": 4643500,
+      "name": "Rex Summons a Meteor",
+      "release_date": "2027-03-22",
+      "group_id64": "103582791476066016",
+      "steam_url": "https://store.steampowered.com/app/4643500/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-08T11:01:56.890908+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-08T20:21:02.958923+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -63570,6 +63609,36 @@
       "status": "ok",
       "github_run_id": "37773993704",
       "official_followers": 3
+    },
+    {
+      "appid": 5056300,
+      "when_taipei": "2026-10-08T20:20:46.898670+08:00",
+      "release_date": "2027-03-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37773993704",
+      "official_followers": 3
+    },
+    {
+      "appid": 5145320,
+      "when_taipei": "2026-10-08T20:20:54.898795+08:00",
+      "release_date": "2027-03-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37773993704",
+      "official_followers": 3
+    },
+    {
+      "appid": 4643500,
+      "when_taipei": "2026-10-08T20:21:02.898919+08:00",
+      "release_date": "2027-03-22",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37773993704",
+      "official_followers": 1
     }
   ],
   "next_request_after_taipei": null,
@@ -63669,20 +63738,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-08T20:20:38.959792+08:00",
+  "community_last_success_at": "2026-10-08T20:21:02.958934+08:00",
   "scheduler_batch": {
     "run_id": "37773993704",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
     "started_at": "2026-10-08T20:02:06.758673+08:00",
-    "last_updated_at": "2026-10-08T20:20:38.959829+08:00",
-    "requests_this_run": 140,
-    "official_new_this_run": 140,
+    "last_updated_at": "2026-10-08T20:21:03.005951+08:00",
+    "requests_this_run": 143,
+    "official_new_this_run": 143,
     "http_429_this_run": 0,
-    "last_appid": 4336360,
-    "last_name": "It Wants You To Stay"
+    "last_appid": 4643500,
+    "last_name": "Rex Summons a Meteor",
+    "finished_at": "2026-10-08T20:21:03.005951+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

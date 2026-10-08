@@ -1,4 +1,4 @@
-"""Validate external workflow slots without changing collection state."""
+"""Validate external workflow slots and complete daily collection results."""
 
 from __future__ import annotations
 
@@ -10,6 +10,8 @@ from zoneinfo import ZoneInfo
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 WORKFLOWS = {"daily-discovery", "official-followers", "public-growth"}
+DAILY_DISCOVERY_HOURS = {0, 6, 12, 18}
+PUBLIC_GROWTH_HOURS = {1, 7, 13, 19}
 
 
 def daily_slot(day: date) -> str:
@@ -26,6 +28,35 @@ def daily_reset_required(state: dict, day: date, *, force: bool = False) -> bool
         return False
     return not (state.get("daily_refresh_slot") == daily_slot(day)
                 and state.get("last_reset_date_taipei") == day.isoformat())
+
+
+def growth_collection_complete(result: dict, now: datetime) -> bool:
+    """Partial output stays publishable but cannot suppress later daily retries."""
+    if not isinstance(result, dict) or result.get("reason") != "completed" or result.get("errors") != []:
+        return False
+    eligible = result.get("eligible")
+    measurements = result.get("measurements")
+    if (not isinstance(eligible, int) or isinstance(eligible, bool) or eligible < 0
+            or not isinstance(measurements, list) or len(measurements) != eligible):
+        return False
+    today = now.astimezone(TAIPEI).date()
+    ids = set()
+    for row in measurements:
+        if not isinstance(row, dict):
+            return False
+        aid, followers = row.get("appid"), row.get("followers")
+        if (not isinstance(aid, int) or isinstance(aid, bool) or aid <= 0 or aid in ids
+                or not isinstance(followers, int) or isinstance(followers, bool) or followers < 0):
+            return False
+        try:
+            measured_at = datetime.fromisoformat(str(row.get("at", "")).replace("Z", "+00:00"))
+        except ValueError:
+            return False
+        if (measured_at.tzinfo is None or measured_at > now
+                or measured_at.astimezone(TAIPEI).date() != today):
+            return False
+        ids.add(aid)
+    return True
 
 
 def schedule_decision(
@@ -62,11 +93,11 @@ def schedule_decision(
     if workflow == "daily-discovery":
         if not refresh_today:
             raise ValueError("Cloudflare daily discovery requires refresh_today=true")
-        if (local.hour, local.minute) != (0, 0):
-            raise ValueError("Daily discovery target_slot must be Taiwan 00:00")
+        if local.hour not in DAILY_DISCOVERY_HOURS or local.minute != 0:
+            raise ValueError("Daily discovery target_slot must be Taiwan 00:00/06:00/12:00/18:00")
     elif workflow == "public-growth":
-        if (local.hour, local.minute) != (1, 15):
-            raise ValueError("Growth target_slot must be Taiwan 01:15")
+        if local.hour not in PUBLIC_GROWTH_HOURS or local.minute != 15:
+            raise ValueError("Growth target_slot must be Taiwan 01:15/07:15/13:15/19:15")
     elif not (3 <= local.hour <= 23 and local.minute == 0):
         raise ValueError("Followers target_slot must be a Taiwan 03:00–23:00 hour")
     if slot > now:

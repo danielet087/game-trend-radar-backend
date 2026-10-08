@@ -2,7 +2,7 @@ name: Steam candidates then Followers
 run-name: "Steam daily discovery | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 on:
-  # Daily Taiwan midnight refresh: rebuild the rolling 365-day candidate set,
+  # Taiwan 00:00/06:00/12:00/18:00 recovery checks: rebuild the rolling 365-day candidate set,
   # verify exact Store date + non-adult eligibility, then finish third-party
   # Followers prescreen. Official XML verification is handed to the separate
   # 03:00-23:00 hourly catch-up workflow.
@@ -15,7 +15,7 @@ on:
         type: choice
         options: [manual, cloudflare]
       target_slot:
-        description: Original Taiwan midnight as an ISO UTC timestamp
+        description: Original Taiwan 00:00/06:00/12:00/18:00 check as an ISO UTC timestamp
         required: false
         default: ""
         type: string
@@ -111,7 +111,7 @@ jobs:
             if git push origin HEAD:main; then exit 0; fi
           done
           exit 1
-      - name: Daily midnight discovery through complete third-party prescreen
+      - name: Daily discovery or recovery through complete third-party prescreen
         if: github.event_name == 'schedule' || inputs.refresh_today == true
         env:
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}

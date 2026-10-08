@@ -11,7 +11,7 @@ on:
         type: choice
         options: [manual, cloudflare]
       target_slot:
-        description: Original Taiwan 01:15 as an ISO UTC timestamp
+        description: Original Taiwan 01:15/07:15/13:15/19:15 check as an ISO UTC timestamp
         required: false
         default: ""
         type: string
@@ -69,6 +69,21 @@ jobs:
             if bash scripts/git_frontend_auth.sh -C frontend push origin HEAD:main; then exit 0; fi
           done
           exit 1
+      - name: Require complete growth coverage
+        if: always() && !cancelled()
+        run: |
+          python - <<'PY'
+          from datetime import datetime, timezone
+          import json
+          from pathlib import Path
+          from scripts.external_schedule import growth_collection_complete
+
+          path = Path("output/public-growth.json")
+          result = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+          if not growth_collection_complete(result, datetime.now(timezone.utc)):
+              raise SystemExit("Daily growth coverage incomplete; saved partial progress remains available for the next six-hour check")
+          print("DAILY_STEAM_GROWTH_COMPLETE", result["eligible"])
+          PY
       - name: Report measured coverage
         if: always()
         run: |

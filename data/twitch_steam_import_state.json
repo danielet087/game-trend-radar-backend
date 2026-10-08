@@ -693,15 +693,15 @@
     },
     "3948460": {
       "status": "pending",
-      "updated_at": "2026-10-07T14:02:01.368140Z",
+      "updated_at": "2026-10-08T15:02:05.259559Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 3948460,
         "twitch_game_id": "501028374",
         "igdb_id": "373092",
-        "checked_at": "2026-10-07T13:11:21Z",
-        "source_frontend_commit": "0a6202852df1d7d580c50dcbb603d80b901b37d5",
+        "checked_at": "2026-10-08T14:12:30Z",
+        "source_frontend_commit": "83a4e4926e76a0933e9cfe85d0145daf697cad89",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-01T20:17:18Z",
@@ -710,7 +710,7 @@
         }
       },
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-08T14:02:03.078103Z",
+      "retry_at": "2026-10-09T15:02:09.975700Z",
       "validation_version": 4,
       "follower_candidate": null,
       "rate_limit_stage": null,
@@ -1864,8 +1864,39 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "3883570": {
+      "status": "accepted",
+      "updated_at": "2026-10-08T15:02:05.259559Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 3883570,
+        "twitch_game_id": "1987792797",
+        "igdb_id": "359277",
+        "checked_at": "2026-10-08T14:12:30Z",
+        "source_frontend_commit": "83a4e4926e76a0933e9cfe85d0145daf697cad89",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-08T14:12:29Z",
+          "viewer_count": 13009,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "steam_verified",
+      "content_signature": "95117b2aed8876cefc56e8343a4157fa39f162aacf8a7ceb7fbb9a2aa8f1e113",
+      "followers": 7675,
+      "follower_checked_at": "2026-09-22T16:22:03.562978+08:00",
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-10-08T14:02:01.531669Z",
+  "updated_at": "2026-10-08T15:02:05.259559Z",
   "api_cooldowns": {}
 }

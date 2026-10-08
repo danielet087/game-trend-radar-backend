@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-08T21:02:02.312007Z",
+  "generated_at": "2026-10-08T22:01:48.019122Z",
   "today_taipei": "2026-10-09",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,7 +10,7 @@
     "candidate_state_updated_at": "2026-10-08T17:06:41.953520Z",
     "prefilter_updated_at": "2026-10-08T17:06:41.933575Z",
     "eligible_screened_at": "2026-10-08T17:06:42.585018Z",
-    "twitch_import_updated_at": "2026-10-08T21:02:01.156155Z",
+    "twitch_import_updated_at": "2026-10-08T22:01:45.077910Z",
     "last_official_success_at": "2026-10-08T19:05:06.302962Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -21,19 +21,19 @@
     "added_from_daily": 0,
     "eligible_count": 3813,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 1,
+    "combined_pending_now": 2,
     "completed_legacy": 384,
     "completed_new": 2104,
-    "twitch_priority_pending": 0
+    "twitch_priority_pending": 1
   },
   "summary": {
     "normal_pending": 1,
-    "twitch_priority_pending": 0,
+    "twitch_priority_pending": 1,
     "parked": 0,
-    "ready_pending": 1,
+    "ready_pending": 2,
     "followers_ready_pending": 0,
-    "awaiting_group_pending": 1,
-    "total_pending": 1,
+    "awaiting_group_pending": 2,
+    "total_pending": 2,
     "today_attempts": 24,
     "today_successes": 24,
     "today_429": 0
@@ -49,7 +49,7 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-08T22:00:00Z",
+    "next_eligible_slot": "2026-10-08T23:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -70,6 +70,20 @@
   "queue": [
     {
       "position": 1,
+      "appid": 1732430,
+      "name": "Neighbors: Suburban Warfare",
+      "steam_url": "https://store.steampowered.com/app/1732430/",
+      "release_date": "2026-09-30",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    },
+    {
+      "position": 2,
       "appid": 4435490,
       "name": "Call of Duty®: Modern Warfare® 4",
       "steam_url": "https://store.steampowered.com/app/4435490/",

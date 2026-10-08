@@ -57,6 +57,7 @@ CHECKPOINT = ROOT / "checkpoint.json"
 MASTER = Path("data/steam_upcoming_master.json")
 TZ = ZoneInfo("Asia/Taipei")
 COHORT = "steam_official_daily_catchup_dynamic_v1"
+_PERSISTENCE = None
 
 
 def clock():
@@ -343,6 +344,15 @@ def git_push():
     return _checkpoint_state.git_push(
         checkpoint=CHECKPOINT, master=MASTER, output=OUTPUT,
         export_status=export_status, rebase=rebase_checkpoint,
+        publisher=_PERSISTENCE,
+    )
+
+
+def begin_persistence(checkpoint_state, master_state):
+    global _PERSISTENCE
+    _PERSISTENCE = _checkpoint_state.begin_persistence(
+        checkpoint=CHECKPOINT, master=MASTER, checkpoint_state=checkpoint_state,
+        master_state=master_state, clock=clock,
     )
 
 
@@ -386,6 +396,7 @@ def main():
         dispatch_content_event=dispatch_content_event,
         follower_client_factory=OfficialFollowerClient,
         follower_cache_factory=OfficialFollowerCache, cooldown_factory=CooldownStore,
+        begin_persistence=begin_persistence,
     )
     run_job(paths=paths, services=services, cooldown_override=manual_cooldown_override)
 

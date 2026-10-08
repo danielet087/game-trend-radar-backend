@@ -37,6 +37,9 @@ jobs:
             data/steam_followers_cache.json
             data/steam_upcoming_master.json
             data/steam_adult_exclusion.json
+            data/scheduler_queue_status.json
+            data/steam_candidate_state.json
+            data/twitch_steam_import_state.json
           sparse-checkout-cone-mode: false
 
       - name: Python 3.12
@@ -162,16 +165,22 @@ jobs:
         if: always()
         run: |
           FILE="experiments/steam_official_daily_catchup/checkpoint.json"
-          if [ -s "$FILE" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add "$FILE"
-            if ! git diff --cached --quiet; then
-              git commit -m "experiment: persist one-off official Followers backlog"
-              git pull --rebase origin main
-              git push origin HEAD:main
-            fi
+          if [ -s output/steam_official_daily_catchup/checkpoint-pending.json ] || [ -s "$FILE" ]; then
+            python -m radar_backend.jobs.persist_official_checkpoint \
+              --pending output/steam_official_daily_catchup/checkpoint-pending.json \
+              --receipt output/steam_official_daily_catchup/checkpoint-publication.json
           fi
+
+      - name: Keep final checkpoint evidence and frozen recovery input
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-backlog-checkpoint-publication
+          path: |
+            output/steam_official_daily_catchup/checkpoint-pending.json
+            output/steam_official_daily_catchup/checkpoint-publication.json
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Summarize all actual catch-up batches
         if: always()

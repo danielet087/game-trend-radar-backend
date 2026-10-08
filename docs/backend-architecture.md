@@ -54,7 +54,7 @@ bf1d4bc64b361ec35cd4041d78c5016396d5d785
 
 既有 `scripts/steam_candidate_pipeline.py`、`experiment_official_daily_catchup_250.py`、`collect_public_growth.py`、`persist_growth_checkpoint.py` 保留原匯入及命令列介面。相容函式在呼叫時把舊公開依賴交給用例，維持既有呼叫端與測試的 monkeypatch 行為；沒有模組身分替換或第二份規則實作。可使用原 `python -m scripts.<入口>`，或新的 `python -m radar_backend.jobs.<工作>`。
 
-`external_schedule.py` 的成長完整性判斷與發布回條改由 domain/publication 單一實作，保留原公開函式。日候選 CLI 回報收集進度，最終 Git 保存仍由既有 workflow gate 確認。
+`external_schedule.py` 的成長完整性判斷與發布回條改由 domain/publication 單一實作，保留原公開函式。日候選 CLI 回報收集進度，第四批以 daily publication 用例確認最終 Git 保存。
 
 歷史 sparse checkout 與離線 CI 已加入 `radar_backend/`。跨 repo 的 Content 靜態驗證在其自身目錄執行，以隔離各專案的 Python package 與工作路徑。資料路徑、JSON 欄位、請求上限、資格條件、正常排程及固定核心版本不變。第二批 PR 接在第一批分支之後；先合併第一批，再將第二批 base 調整為 main。
 
@@ -76,8 +76,26 @@ Steam 的目錄、growth 公開資料、growth checkpoint 及 hourly 佇列批�
 
 核心版本先以獨立 PR 發布，再以該完整 SHA 固定四個 consumer。第三批 consumer PR 接在第二批分支後，避免夾帶前兩批 diff；合併依序為核心、前兩批 consumer、第三批 consumer。Steam 的 growth 發布使用前端 builder 的 `--observed-at`，因此前端第三批須先於 Steam 第三批合併。調整 PR base 時保留提交歷史，確保固定 SHA 可達。
 
+## 第四批：工作中的 checkpoint 與私有狀態
+
+| 入口 | 用例與狀態 | 工作流程 |
+| --- | --- | --- |
+| 官方中途及結尾保存 | `publication/official_checkpoint.py`、`state/official_merge.py`，由 official application／jobs 組裝 | hourly 與直接使用同一 worker 的手動 backlog |
+| 官方中斷備援 | `jobs/persist_official_checkpoint.py` 重播待保存批次 | 原 `always()` final save |
+| daily reset／私有保存 | `publication/daily_state.py`、`jobs/persist_daily_state.py` 的 reset／capture／publish | `steam-two-phase.yml` |
+
+worker 在首次修改 checkpoint／master 前捕捉 baseline，保存時先凍結觀測與時鐘，再三方合併最新遠端。成功後更新 baseline，並 reload 原有 dict，讓握有其參考的快取與冷卻 adapter 讀到併發保存的狀態。權威主清單中的其他 AppID、growth 觀測、Twitch 佇列、群組解析與較新冷卻不會被整份舊 checkpoint 覆蓋；無法判定的相同欄位衝突會中止。
+
+每次保存的待重試批次先寫在 `output/`。push 失敗後仍保留 baseline、原始觀測與固定時間，final 備援從這份批次重播，不能把 reset 後的遠端內容當成原始觀測而產生錯誤成功。如果第 10 筆已保存、第 11 筆寫到本機後中斷，final 會以先前已發布的提交為 baseline，另行保存新增觀測，不沿用舊回條。待重試檔案是恢復輸入，成功回條只在 Git 確認後產生；兩者皆保留為短期 runner artifact。保存本身不重新查 Steam 或派發內容事件。
+
+daily 在 reset 後、收集前 capture 私有狀態。reset 每次對最新狀態判定同一天的重設或恢復，沿用同一台灣日期與 slot；保留 Cloudflare 恢復與明確手動重設的差異，並拒絕覆蓋已前進到更新日期的狀態。私有 final 即使收集失敗，仍保存合法的凍結進度；baseline 未取得則停止保存。官方 worker 的本輪成功數按本輪 attempt AppID 計算，避免把併發 producer 新增的結果誤算為本輪成果。
+
+來源門檻、請求間隔、上限與 worker 時限保留。本日成功後跳過、每六小時失敗恢復的排程控制器未改。手動 backlog 的 sparse checkout 加入 dashboard 與其來源檔，使用同一保存契約；舊 `rebase_checkpoint()` 僅保留相容呼叫，正式保存由 Core 執行。
+
+第四批 PR 接在 Steam 第三批分支之後；前批合併後才調整 base。共用 Core 固定版本維持 0.2.0，不新增其他 consumer PR。
+
 ## 尚未遷移
 
 候選來源 adapter 仍橋接既有 Steam Store 日期、成人篩選與公開目錄 helper；官方 worker 的上市日期複驗、master upsert 與 content dispatch 仍保留在相容入口，由 `adapters/official_catalog.py` 提供明確的舊流程橋接。這些原本已服務正式資料流程，需和後續發布邊界一起遷移。
 
-官方 worker 執行中的中途 checkpoint、daily 私有狀態保存，以及歷史一次性工具的 Git/rebase 流程仍保留。第三批遷移公開發布和批次狀態合併，尚未統一所有工作中的 checkpoint；content dispatch 的 HTTP 呼叫也仍由原流程執行。
+`collectors/steam_upcoming.py` 對獨立 `steam-state` 分支的 GitHub Contents GET／PUT 仍保留，屬另一個狀態 transport。歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移；content dispatch 的 HTTP 呼叫也仍由原流程執行。

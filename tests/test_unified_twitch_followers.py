@@ -176,6 +176,7 @@ def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_re
     sleep = Mock()
     monkeypatch.setattr(worker.time, "sleep", sleep)
     monkeypatch.setattr(worker, "git_push", Mock(return_value=True))
+    monkeypatch.setattr(worker, "begin_persistence", Mock())
     monkeypatch.setattr(worker, "make_queue", lambda *args: (deepcopy(queue), {
         "status": "current_day_prefilter_complete", "added_from_daily": 0,
         "twitch_priority_pending": sum(item["queue_source"] == "twitch_steam_discovery"

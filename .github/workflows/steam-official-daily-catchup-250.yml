@@ -130,15 +130,22 @@ jobs:
       - name: Final checkpoint save, including error and cooldown
         if: always() && steps.window.outputs.proceed == 'true'
         run: |
-          if [ -s experiments/steam_official_daily_catchup/checkpoint.json ]; then
-            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
-            git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json data/scheduler_queue_status.json
-            if ! git diff --cached --quiet; then
-              git commit -m "experiment: save dynamic official Followers batch"
-              python -c 'from scripts.experiment_official_daily_catchup_250 import rebase_checkpoint; rebase_checkpoint()'
-              git push origin HEAD:main
-            fi
+          if [ -s output/steam_official_daily_catchup/checkpoint-pending.json ] || [ -s experiments/steam_official_daily_catchup/checkpoint.json ]; then
+            python -m radar_backend.jobs.persist_official_checkpoint \
+              --pending output/steam_official_daily_catchup/checkpoint-pending.json \
+              --receipt output/steam_official_daily_catchup/checkpoint-publication.json
           fi
+
+      - name: Keep official checkpoint evidence and frozen recovery input
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-official-checkpoint-publication
+          path: |
+            output/steam_official_daily_catchup/checkpoint-pending.json
+            output/steam_official_daily_catchup/checkpoint-publication.json
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Finalize Twitch admissions from persisted official counts
         if: always() && steps.window.outputs.proceed == 'true' && steps.prepare.outcome == 'success'

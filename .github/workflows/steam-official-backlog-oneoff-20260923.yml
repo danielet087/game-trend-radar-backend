@@ -1,13 +1,10 @@
 name: ONE-OFF Steam official Followers backlog catchup - no schedule changes
 
 # Created only to fulfill the user's explicit unscheduled catch-up request.
-# This workflow has no cron or workflow_dispatch; explicitly re-run by editing this one-off file.
+# Historical catch-up runs are available only by explicit manual dispatch.
 # Existing hourly Steam workflow remains unchanged.
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/steam-official-backlog-oneoff-20260923.yml
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,7 +13,7 @@ permissions:
 # Same group as the existing hourly schedule: zero concurrent Steam XML jobs.
 concurrency:
   group: isolated-official-nearfirst-frozen-20260922
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   catch-up:
@@ -27,13 +24,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            scripts/experiment_official_daily_catchup_250.py
+            scripts/
+            collectors/
+            requirements-core.txt
+            requirements.txt
             experiments/steam_official_nearfirst_20260922/
             experiments/steam_official_followers_20260922/checkpoint.json
             experiments/steam_official_daily_catchup/
             data/steam_candidates_eligible.json
             data/steam_prefilter_state.json
             data/steam_followers_cache.json
+            data/steam_upcoming_master.json
+            data/steam_adult_exclusion.json
           sparse-checkout-cone-mode: false
 
       - name: Python 3.12
@@ -45,7 +47,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          python -m pip install --disable-pip-version-check requests
+          python -m pip install --disable-pip-version-check -r requirements.txt
           python -m py_compile scripts/experiment_official_daily_catchup_250.py
           python - <<'PY'
           import json
@@ -85,7 +87,7 @@ jobs:
             fi
             if (( budget > 3450 )); then budget=3450; fi
             echo "ONEOFF_BATCH_BEGIN $n / 15"
-            python -u scripts/experiment_official_daily_catchup_250.py \
+            python -u -m scripts.experiment_official_daily_catchup_250 \
               --max-requests 250 \
               --interval 8 \
               --max-seconds "$budget" \

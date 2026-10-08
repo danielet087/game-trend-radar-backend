@@ -93,3 +93,7 @@ python -m pytest -q
 - [Twitch 後端](https://github.com/danielet087/game-trend-radar-twitch-backend)：自己的程式、測試與 Secrets，每小時更新 Twitch 快照、追蹤、歷史、Steam 對照與反查佇列。
 
 本 Repo 已移除直播收集器與對應 workflows，避免重複執行；既有 Git 歷史、Actions 紀錄及前端直播 JSON 保留。Steam 流程及 Secrets 維持原有設定。Twitch 每小時收集由獨立後端與 Cloudflare 排程負責。
+
+## 後端架構
+
+共用核心、工作結果契約與分批遷移範圍，見 [後端架構文件](docs/backend-architecture.md)。執行 Python 工作前請安裝 `requirements.txt`；執行離線測試請安裝 `requirements-dev.txt`。

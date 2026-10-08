@@ -43,6 +43,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install shared job contracts before validating the slot
+        run: python -m pip install --disable-pip-version-check -r requirements-core.txt
+
       - name: Check original Taiwan execution slot before Steam requests
         id: window
         env:

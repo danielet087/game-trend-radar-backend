@@ -20,7 +20,7 @@ on:
     paths: ['.github/steam-growth-trigger.txt']
 
 permissions:
-  contents: read
+  contents: write
 
 # Share the existing official-Followers lock; never run the two XML collectors together.
 concurrency:
@@ -33,29 +33,71 @@ jobs:
     timeout-minutes: 70
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install collection and shared contract dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
       - name: Validate external growth slot before collecting measurements
+        id: schedule_guard
         env:
           SCHEDULE_EVENT: ${{ github.event_name }}
           SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
         run: python -m scripts.external_schedule --workflow public-growth --fail-on-skip
-      - run: python -m pip install --disable-pip-version-check requests
       - name: Validate boundary and throttling behavior
         run: python -m unittest discover -s tests -p test_public_growth.py
       - name: Read the published catalog
-        run: git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+        id: catalog
+        run: |
+          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+          echo "revision=$(git -C frontend rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Collect dated official measurements
-        run: python scripts/collect_public_growth.py --data-dir frontend/data --output output/public-growth.json --interval 30
+        id: collect
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          cp experiments/steam_official_daily_catchup/checkpoint.json output/growth-checkpoint-baseline.json
+          python -m scripts.collect_public_growth --data-dir frontend/data --output output/public-growth.json --interval 30
+      - name: Persist official observations and cooldown against the latest queue
+        id: checkpoint
+        if: always() && !cancelled() && steps.collect.outcome != 'skipped'
+        run: |
+          set -euo pipefail
+          test -f output/public-growth.json
+          test -f output/growth-checkpoint-baseline.json
+          checkpoint='experiments/steam_official_daily_catchup/checkpoint.json'
+          cp "$checkpoint" output/growth-checkpoint-observed.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            python -m scripts.persist_growth_checkpoint merge \
+              --latest "$checkpoint" --baseline output/growth-checkpoint-baseline.json \
+              --observed output/growth-checkpoint-observed.json --report output/public-growth.json \
+              --output "$checkpoint"
+            git add "$checkpoint"
+            if ! git diff --cached --quiet; then
+              git commit -m 'state: save official growth observations and shared Community cooldown'
+            fi
+            # A clean index also needs a remote acknowledgement.
+            if git push origin HEAD:main; then
+              echo 'state_persisted=true' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          done
+          exit 1
       - name: Publish against the latest accepted catalog
-        if: always() && !cancelled()
+        id: publish
+        if: always() && !cancelled() && steps.checkpoint.outputs.state_persisted == 'true'
         env:
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
         run: |
           set -euo pipefail
-          test -f output/public-growth.json || exit 0
+          test -f output/public-growth.json
           test -n "$FRONTEND_REPO_TOKEN"
           git -C frontend config user.name 'github-actions[bot]'
           git -C frontend config user.email '41898282+github-actions[bot]@users.noreply.github.com'
@@ -64,11 +106,26 @@ jobs:
             git -C frontend reset --hard origin/main
             python frontend/scripts/build_radar_insights.py --data-dir frontend/data --measurements output/public-growth.json
             git -C frontend add data/insights-state.json data/activity.json data/growth.json
-            if git -C frontend diff --cached --quiet; then exit 0; fi
-            git -C frontend commit -m 'data: record official growth observations through release plus 30 days'
-            if bash scripts/git_frontend_auth.sh -C frontend push origin HEAD:main; then exit 0; fi
+            if ! git -C frontend diff --cached --quiet; then
+              git -C frontend commit -m 'data: record official growth observations through release plus 30 days'
+            fi
+            if bash scripts/git_frontend_auth.sh -C frontend push origin HEAD:main; then
+              echo 'published=true' >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
           done
           exit 1
+      - name: Record durable state and publication acknowledgements
+        if: always() && !cancelled()
+        env:
+          STATE_PERSISTED: ${{ steps.checkpoint.outputs.state_persisted || 'false' }}
+          PUBLISHED: ${{ steps.publish.outputs.published || 'false' }}
+          TARGET_SLOT: ${{ inputs.target_slot }}
+          INPUT_REVISION: ${{ steps.catalog.outputs.revision }}
+        run: |
+          python -m scripts.persist_growth_checkpoint stamp --report output/public-growth.json \
+            --state-persisted "$STATE_PERSISTED" --published "$PUBLISHED" \
+            --target-slot "$TARGET_SLOT" --input-revision "$INPUT_REVISION"
       - name: Require complete growth coverage
         if: always() && !cancelled()
         run: |
@@ -94,6 +151,16 @@ jobs:
           print('### Steam 成長追蹤')
           print(f"實際量測／重用：{len(d.get('measurements', []))} 筆")
           print(f"本次請求：{d.get('requests', 'interrupted')}；結束原因：{d.get('reason', 'interrupted')}")
+          job = d.get('job_result', {})
+          print(f"工作狀態：{job.get('status', 'failed')}；狀態已保存：{job.get('state_persisted', False)}；發布完成：{job.get('published', False)}")
           print('僅追蹤本站合格遊戲，至上市後第 30 天；缺值不補成 0。')
           PY
           fi
+      - name: Keep the collection and delivery report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-public-growth-result
+          path: output/public-growth.json
+          if-no-files-found: ignore
+          retention-days: 7

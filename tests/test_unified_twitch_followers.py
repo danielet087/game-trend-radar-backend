@@ -231,6 +231,24 @@ def test_ordinary_qualified_game_keeps_existing_store_gate_and_dispatch(monkeypa
     dispatch.assert_called_once()
 
 
+def test_daily_growth_official_measurement_is_reused_without_a_community_request(monkeypatch, tmp_path):
+    candidate = known_group(ordinary_candidate())
+    cached = {"official_growth_observations": {"124": {
+        "appid": 124, "group_id64": candidate["group_id64"], "official_followers": 6200,
+        "official_checked_at_taipei": NOW.isoformat(),
+    }}}
+    cp, report, client, verify, upsert, dispatch, _ = run_worker(
+        monkeypatch, tmp_path, [candidate], [], initial_checkpoint=cached)
+    client.get.assert_not_called()
+    assert cp["official_results"]["124"]["official_followers"] == 6200
+    assert cp["attempt_events"][0]["cache_reused"] is True
+    assert report["requests_this_run"] == 0
+    assert report["official_new_this_run"] == 1
+    verify.assert_called_once()
+    upsert.assert_called_once()
+    dispatch.assert_called_once()
+
+
 def test_next_run_leaves_saved_high_follower_twitch_results_to_shared_importer(monkeypatch):
     candidate = twitch_candidate()
     cp = checkpoint()

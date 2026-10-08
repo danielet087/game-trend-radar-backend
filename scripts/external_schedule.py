@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from datetime import date, datetime, time, timezone
 import os
 from zoneinfo import ZoneInfo
+
+from radar_core.jobs import JobResult, JobStatus
 
 
 TAIPEI = ZoneInfo("Asia/Taipei")
@@ -34,6 +37,16 @@ def growth_collection_complete(result: dict, now: datetime) -> bool:
     """Partial output stays publishable but cannot suppress later daily retries."""
     if not isinstance(result, dict) or result.get("reason") != "completed" or result.get("errors") != []:
         return False
+    # Existing reports predate JobResult and retain the full coverage checks
+    # below. Once a producer writes the typed contract, never ignore a failed,
+    # unpersisted or unpublished result even if its legacy reason says complete.
+    if "job_result" in result:
+        try:
+            job_result = JobResult.from_dict(result["job_result"])
+        except (ValueError, TypeError, KeyError):
+            return False
+        if job_result.job != "public-growth" or not job_result.successful:
+            return False
     eligible = result.get("eligible")
     measurements = result.get("measurements")
     if (not isinstance(eligible, int) or isinstance(eligible, bool) or eligible < 0
@@ -57,6 +70,41 @@ def growth_collection_complete(result: dict, now: datetime) -> bool:
             return False
         ids.add(aid)
     return True
+
+
+def stamp_growth_publication(
+    result: dict, now: datetime, *, state_persisted: bool, published: bool,
+    target_slot: str | None = None, input_revision: str | None = None,
+) -> dict:
+    """A publisher may acknowledge delivery only after its Git operation succeeds.
+
+    Collection coverage still comes from the original measurement checks. An
+    earlier receipt cannot be reused to make a failed retry look successful.
+    """
+    if not isinstance(result, dict):
+        raise TypeError("Growth result must be an object")
+    if type(state_persisted) is not bool or type(published) is not bool:
+        raise TypeError("Publication acknowledgements must be booleans")
+    stamped = deepcopy(result)
+    stamped.pop("job_result", None)
+    collection_complete = growth_collection_complete(stamped, now)
+    reason = str(stamped.get("reason") or "missing_collection_result")
+    if not state_persisted or not published:
+        status = JobStatus.FAILED
+        reason = "state_persistence_not_confirmed" if not state_persisted else "publication_not_confirmed"
+    elif collection_complete:
+        status = JobStatus.COMPLETE
+    elif reason == "rate_limited":
+        status = JobStatus.COOLING_DOWN
+    else:
+        status = JobStatus.PARTIAL
+    stamped["job_result"] = JobResult(
+        job="public-growth", status=status, reason=reason,
+        collection_complete=collection_complete, state_persisted=state_persisted,
+        published=published, requires_publication=True,
+        target_slot=target_slot, input_revision=input_revision,
+    ).to_dict()
+    return stamped
 
 
 def schedule_decision(

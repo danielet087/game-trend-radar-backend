@@ -166,8 +166,29 @@ metadata transport 保留 GetItems v1、TW／english／realm 1、release／basic
 
 第八批 PR 接在第七批分支之後，固定 Core 版本與 requirements、data／experiments、正式排程、Secrets、請求預算及 Git 發布流程不變。consumer 只更換共用日期／名稱 import；其他函式、命令列與 Git 保存內容維持。手動測試 workflow 補入四個新測試檔的 sparse 依賴。
 
+## 第九批：預覽 metadata 與已發布名稱更新
+
+| 責任 | 純規則 | 用例、來源與狀態 |
+| --- | --- | --- |
+| 預覽 appdetails response、兩語名稱與 metadata 欄位 | `domain/preview_metadata.py` | `application/preview_metadata.py`、`adapters/steam_preview_metadata.py` |
+| 已發布 TW／CN 名稱資格、繁體顯示與 Twitch 既有事實 | `domain/published_titles.py` | `application/published_titles.py`、`adapters/published_titles.py` |
+| 已發布名稱單批 Store 查詢 | 無收錄資格判斷 | `adapters/steam_published_titles.py` |
+| 已發布 JSON 讀取與內容變更保存 | 無來源查詢 | `state/published_titles.py` |
+
+上表路徑皆相對於 `radar_backend/`。預覽的五個 metadata／名稱 helper 及已發布名稱更新的六個公開函式保留為薄相容入口；CLI、預覽 run／搜尋／Followers／近期上市與 Git 保存函式維持原樣。新 canonical adapter 不回呼這兩個舊入口。舊函式在呼叫時傳入原 fetch、parser、名稱判定、converter、HAN、狀態、Core Twitch predicate、projection、clock、等待、logger 與 HTTP，維持原參數、常數及 monkeypatch 介面。
+
+預覽 appdetails 保留 TW／english 日期解析與 tchinese 名稱查詢，三次嘗試、25 秒 timeout、429 的 60／120／180 秒等待及其他既有錯誤的 5／10 秒等待，最後失敗回傳 `None`。名稱仍只比較 strip 後的非空原字串與英文是否不同，不加已發布名稱的 casefold／HAN／240 字門檻。名稱更新依序等待（包含零秒）、查詢、寫入 name／name_en／name_zh_tw，再加入繁體顯示，例外前完成的 mutation 保持。metadata 先解日期，非精確日即返回；之後建構欄位，只有合法 game／AppID／categories list 才讀驗證 clock，最後交給既有 categories 保存 callback。categories list 引用與 release 展開覆蓋順序保留。
+
+已發布名稱更新只處理公開 calendar 中 Followers 至少 5,000 或已驗證 Twitch 收錄的 AppID，不掃候選、不查 Followers、不新增收錄。來源按排序後的 ID 分批，先 TW 再 CN，所有查詢成功後才開始讀寫 detail。傳輸維持五次嘗試、45 秒 timeout、429 的 15／30／45／60／75 秒等待及其他既有錯誤的 5／10／15／20 秒等待；耗盡則中止，不寫入查詢不完整的新名稱。每次成功語言查詢後的 interval 等待（包括最後一批）由 application 協調，HTTP adapter 不自行加入 interval。回傳 ID 必須是 exact int，原 list membership、重複列與 raw name strip 規則保持；AttributeError 不增加到重試範圍。
+
+名稱判定拒絕英文 casefold fallback，保留 Steam 原 TW／CN 字形與另存的繁體顯示，不改語言旗標。已有名稱、舊顯示欄位及 storage_version=2 的處理保持。更新按 calendar 原順序執行，保留較完整 detail 的未知欄位與 Core Twitch 證據，已驗證 Twitch 的十六個 Followers／日期／Store 事實依原公開列保留或移除。只更新有變更的 AppID 與月份，月份 count／日期保持；即使名稱無變更仍執行原 catalog projection、aggregate 與 index 流程，兩個 clock 的讀取位置維持。
+
+state 保留 UTF-8 JSON object 驗證、原 pretty JSON 與結尾換行；檔案位元組相同時不重寫。讀寫錯誤及已完成寫入的順序照原流程傳出。domain／application 不讀寫檔案、不匯入 requests、OpenCC 或舊 scripts；catalog projection 與 categories 保存仍透過明確 bridge 連接既有 owner，另批遷移。
+
+第九批 PR 接在第八批分支之後。固定 Core／requirements、正式及手動發布 workflows、請求預算、Secrets、data／experiments、來源資格與 Git 發布邊界維持；唯一 workflow 變更是暫停中的手動測試補入四個 sparse 測試檔及命令，不重新啟用退役入口。
+
 ## 尚未遷移
 
-正式候選、官方及已接線的日期／名稱 consumer 已使用共用來源與規則層。Steam 內容詳細資料、`refresh_published_chinese_titles.py` 的另一套五次／45 秒來源流程、Twitch 來源協調與公開目錄 projection 仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
+正式候選、官方、日期／名稱及已接線的 preview metadata／已發布名稱更新已使用共用來源、規則與用例層。其他 Steam 內容詳細資料流程、Twitch 來源協調、公開目錄 projection 與 categories 保存仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

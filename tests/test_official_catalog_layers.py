@@ -315,19 +315,22 @@ def test_naive_verification_clock_fails_before_network_or_master_mutation(use_ca
 
 
 def test_store_transport_adapter_forwards_explicit_interval_and_read_errors(monkeypatch):
-    from scripts import steam_master_date_gate as shared
+    from radar_backend.domain.store_release import parse_store_release_detail
     session = object()
-    fetch = Mock(return_value={10: exact_detail()})
-    monkeypatch.setattr(shared, "fetch_store_release_details", fetch)
-    assert adapter.fetch_store_release_details(session, [10], today=TODAY, interval=0.5) == {10: exact_detail()}
-    fetch.assert_called_once_with(session, [10], today=TODAY, interval=0.5)
+    item = {"release": {"coming_soon_display": "date_full", "steam_release_date": 1791856800}}
+    fetch = Mock(return_value={10: item})
+    monkeypatch.setattr(adapter, "fetch_metadata", fetch)
+    assert adapter.fetch_store_release_details(session, [10], today=TODAY, interval=0.5) == {
+        10: parse_store_release_detail(item, today=TODAY),
+    }
+    fetch.assert_called_once_with(session, [10], interval=0.5)
     fetch.side_effect = RuntimeError("Shared Store source failed")
     with pytest.raises(RuntimeError, match="Shared Store source failed"):
         adapter.fetch_store_release_details(session, [10], today=TODAY)
 
 
 def test_adult_ledger_adapter_preserves_missing_ledger_failure_and_blocked_ids(monkeypatch):
-    from scripts import steam_adult_exclusions as shared
+    from radar_backend.state import adult_exclusions as shared
     read = Mock(return_value={10})
     monkeypatch.setattr(shared, "excluded_appids", read)
     assert adapter.excluded_appids() == {10}

@@ -1,8 +1,8 @@
 """Steam candidate source boundary and default HTTP integrations.
 
-Application phases receive this object explicitly. Legacy collectors and Store
-helpers remain concrete adapters during this bounded migration; no phase reads
-requests or environment variables directly.
+Application phases receive this object explicitly. Shared Store rules and
+transport have direct owners; remaining collectors and localization helpers
+are source adapters. No phase reads requests or environment variables directly.
 """
 from __future__ import annotations
 
@@ -17,11 +17,10 @@ import requests
 
 from collectors.steam_upcoming import SteamUpcomingCollector, UpcomingGame
 from scripts.steam_follower_prefilter import scan_batch
-from scripts.screen_steam_candidates_before_followers import build_snapshot, fetch_metadata
 from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
-from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
-from scripts.twitch_steam_admission import is_twitch_qualified
-from scripts.steam_master_date_gate import (
+from radar_core.domain.twitch_admission import is_twitch_qualified
+from radar_backend.adapters.steam_store import (
+    build_snapshot, fetch_metadata, excluded_appids, is_disallowed,
     apply_store_release_detail, fetch_store_release_details, filter_confirmed_master_games,
 )
 from scripts.update_steam_daily import merge_partial_segment

@@ -1,4 +1,4 @@
-"""Steam Store exact-date gate for officially qualified games.
+"""Compatible Steam Store exact-date gate for officially qualified games.
 
 A release timestamp from discovery is only a search hint. After official
 Followers >= 5,000, the backend must query current Steam Store metadata again.
@@ -12,48 +12,20 @@ from zoneinfo import ZoneInfo
 
 import requests
 
+from radar_backend.application import store_release as _application
+from radar_backend.domain import store_release as _rules
+from radar_backend.domain.store_release import TAIPEI, STORE_DATE_PROVIDER
 from scripts.screen_steam_candidates_before_followers import fetch_metadata
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.twitch_steam_admission import is_twitch_qualified, has_taiwan_store_date_authority
 
-TAIPEI = ZoneInfo("Asia/Taipei")
-STORE_DATE_PROVIDER = "Steam IStoreBrowseService/GetItems"
-
 
 def parse_store_release_detail(item: dict[str, Any] | None, *, today: date) -> dict[str, Any]:
-    """Return a fail-closed Store release-date decision for one AppID."""
-    if not isinstance(item, dict) or not isinstance(item.get("release"), dict):
-        return {"exact": False, "status": "unavailable"}
-    release = item["release"]
-    label = release.get("coming_soon_display")
-    stamp = release.get("steam_release_date")
-    if isinstance(stamp, bool) or not isinstance(stamp, (int, float, str)):
-        return {"exact": False, "status": str(label or "missing_release_time")}
-    try:
-        instant = datetime.fromtimestamp(int(stamp), tz=timezone.utc)
-    except (ValueError, OverflowError, OSError, TypeError):
-        return {"exact": False, "status": str(label or "invalid_release_time")}
-    tw_day = instant.astimezone(TAIPEI).date()
-    # Before release, only Steam's explicit full-date display is acceptable.
-    # After release, is_coming_soon=false plus the actual Store timestamp is an
-    # exact historical release, so previously qualified history can be kept.
-    is_coming_soon = release.get("is_coming_soon")
-    exact = label == "date_full" or (is_coming_soon is False and tw_day <= today)
-    return {
-        "exact": exact,
-        "status": "date_full" if label == "date_full" else (
-            "released_exact" if exact else str(label or "unknown")
-        ),
-        # This timestamp-derived Taiwan day is diagnostic metadata only.
-        # Steam's visible TW Store full-date announcement remains the display-date authority.
-        "release_start": tw_day.isoformat() if exact else None,
-        "release_timestamp_taipei_date": tw_day.isoformat() if exact else None,
-        "release_time_utc": instant.isoformat().replace("+00:00", "Z") if exact else None,
-        "release_display_precision": "date_full" if exact else None,
-        "release_display_provider": STORE_DATE_PROVIDER if exact else None,
-        "release_date_basis": "steam_store_browse_verified_full_date" if exact else None,
-        "release_date_timezone": "Asia/Taipei" if exact else None,
-    }
+    """Compatible entry point for the pure fail-closed Store date decision."""
+    return _rules.parse_store_release_detail(
+        item, today=today, provider=STORE_DATE_PROVIDER, taipei=TAIPEI,
+        fromtimestamp=datetime.fromtimestamp,
+    )
 
 
 def fetch_store_release_details(
@@ -64,64 +36,19 @@ def fetch_store_release_details(
     interval: float = 1.5,
 ) -> dict[int, dict[str, Any]]:
     """Batch-read Steam Store release detail without touching Followers state."""
-    ids = sorted({int(x) for x in appids if int(x) > 0})
-    if not ids:
-        return {}
-    items = fetch_metadata(session, ids, interval=interval)
-    return {
-        appid: parse_store_release_detail(items.get(appid), today=today)
-        for appid in ids
-    }
+    return _application.fetch_store_release_details(
+        session, appids, today=today, interval=interval,
+        fetch_metadata=fetch_metadata,
+        parse_store_release_detail=parse_store_release_detail,
+    )
 
 
 def apply_store_release_detail(row: dict[str, Any], detail: dict[str, Any]) -> dict[str, Any]:
     """Copy a verified Store date onto an already officially-qualified row."""
-    if detail.get("exact") is not True:
-        raise RuntimeError("Cannot apply a non-exact Steam Store release date")
-    result = dict(row)
-    store_authority = has_taiwan_store_date_authority(row)
-    timestamp_day = detail["release_start"]
-    prior_day = str(row.get("release_start") or "")
-    # When the upstream TW Store candidate was already verified as date_full,
-    # keep that announced calendar day. The Store API timestamp can cross
-    # midnight in Taiwan and must not silently shift the user-visible date.
-    try:
-        date.fromisoformat(prior_day)
-        prior_exact = row.get("release_display_precision") == "date_full"
-    except (TypeError, ValueError):
-        prior_exact = False
-    day = prior_day if prior_exact else timestamp_day
-    result["release_raw"] = day
-    result["release_start"] = day
-    result["release_end"] = day
-    result["release_precision"] = "day"
-    result["release_timestamp_taipei_date"] = detail.get(
-        "release_timestamp_taipei_date", timestamp_day
+    return _application.apply_store_release_detail(
+        row, detail, clock=lambda: datetime.now(timezone.utc),
+        has_taiwan_store_date_authority=has_taiwan_store_date_authority,
     )
-    if day != timestamp_day:
-        result["release_date_conflict"] = True
-        result["release_date_conflict_note"] = (
-            "TW Store announced full date preserved; API timestamp maps to a different Taiwan day"
-        )
-    elif store_authority:
-        result["release_date_conflict"] = False
-        result.pop("release_date_conflict_note", None)
-    else:
-        result.pop("release_date_conflict", None)
-        result.pop("release_date_conflict_note", None)
-    for key in (
-        "release_display_precision", "release_display_provider",
-        "release_date_basis", "release_date_timezone", "release_time_utc",
-    ):
-        if store_authority and key == "release_display_provider":
-            continue
-        result[key] = detail.get(key)
-    verified_at = datetime.now(timezone.utc).isoformat()
-    if not store_authority:
-        result["release_date_verified_at"] = verified_at
-    result["post_followers_store_verified_at"] = verified_at
-    result["post_followers_store_verified"] = True
-    return result
 
 
 def filter_confirmed_master_games(
@@ -131,40 +58,7 @@ def filter_confirmed_master_games(
     today: date,
 ) -> list[dict[str, Any]]:
     """Keep only >=5000 titles carrying post-Followers Store verification."""
-    blocked = excluded_appids()
-    eligible_ids = {
-        int(row["appid"])
-        for row in eligible_rows
-        if isinstance(row, dict)
-        and row.get("release_display_precision") == "date_full"
-        and row.get("sexual_content_screened") is True
-    }
-    retained: list[dict[str, Any]] = []
-    seen: set[int] = set()
-    for row in games:
-        if not isinstance(row, dict) or is_disallowed(row, blocked):
-            continue
-        try:
-            appid = int(row["appid"])
-            day = date.fromisoformat(row["release_start"])
-            followers = int(row["followers"])
-        except (KeyError, ValueError, TypeError):
-            continue
-        twitch_qualified = is_twitch_qualified(row)
-        if appid in seen or (followers < 5000 and not twitch_qualified):
-            continue
-        if day > today:
-            if row.get("release_display_precision") != "date_full":
-                continue
-            if row.get("post_followers_store_verified") is not True:
-                continue
-            # Future records must still belong to today's exact-date candidate
-            # universe. The post-Followers Store check is the final date source.
-            if appid not in eligible_ids and not twitch_qualified:
-                continue
-        # Released history is retained. Once the game has actually released,
-        # it must not disappear merely because Store Browse stops exposing the
-        # old coming-soon display metadata.
-        seen.add(appid)
-        retained.append(row)
-    return retained
+    return _application.filter_confirmed_master_games(
+        games, eligible_rows, today=today, excluded_appids=excluded_appids,
+        is_disallowed=is_disallowed, is_twitch_qualified=is_twitch_qualified,
+    )

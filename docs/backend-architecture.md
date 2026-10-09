@@ -279,8 +279,16 @@ Dashboard 讀取原來源並複製 checkpoint 後投影，僅保存指定目的�
 
 第十三批 PR 接在第十二批分支之後。固定 Core SHA、requirements、正式 workflows、排程、Secrets、請求預算及 data／experiments 均不變；暫停中的手動測試僅加入五個新 sparse 測試檔。剩餘實作為 Twitch 收集／追蹤、Twitch 映射／快照與 Content metadata／文字規則三批，再做一次四個 consumer 總驗收，預留一次修正，估計再 4～5 次。
 
-## 尚未遷移
+## 第十七批：四個 consumer 總驗收
 
-正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新、公開目錄 projection／categories 保存、公開 shard builder、Twitch → Steam 匯入／官方佇列與 Steam 剩餘正式橋接已使用共用來源、規則與用例層。Twitch 本專案的收集／追蹤／映射／快照及 Content 共用 metadata／文字規則仍需收斂；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
+Steam、Twitch、Content 與前端 Python／Core 接線已完成規劃內的分層。四個 consumer 使用同一個非 editable Core 0.2.0，安裝來源及五個 Python source files 均核對 immutable revision `bf1d4bc64b361ec35cd4041d78c5016396d5d785`；驗收使用固定 source checkout、獨立 Python 程序、替代來源、暫存 JSON 與本機 bare Git，避免同名 `radar_backend` 套件或工作目錄互相遮蔽。
+
+總驗收補齊四個實際接線／一致性問題：Steam intake 的預設時計移至 adapter／相容入口組裝，application 明確要求 clock port；所有來源 callbacks 先按原順序選定，再判定 clock 的 truthiness，保留既有依賴綁定與時間讀取。Twitch 正式 workflow 使用的舊 frontend loader 改接 canonical mapping owner。前端 insights 在五次 Git 重試外捕捉一次 UTC 時刻，重播時持續傳入 `--observed-at`。Content 同 revision 的投影只有在 version、count、games 與型別也一致時才略過；普通 no-force 事件會修復不同 producer 留下的錯誤投影，仍保留原 accepted record、FIELDS、hash、schema 與嚴格發布 gate。
+
+Steam 的離線測試補齊遺漏的 Store source fake，並加入外部 HTTP／DNS／socket 阻擋；transport 即使捕捉例外，測試仍會因實際外部請求失敗。真實 no-op、冷卻、partial／superseded、併發重新合併與 push 後成功回條保持既有契約。完整驗收證據與合併順序見 [backend-acceptance.md](backend-acceptance.md)。
+
+## 完成界線與保留入口
+
+正式候選、官方、日期／名稱、preview metadata／已發布名稱更新、公開目錄 projection／categories 保存、公開 shard builder、Twitch → Steam 匯入／官方佇列與 Steam 正式橋接已使用共用來源、規則與用例層。Twitch 收集／追蹤／映射／快照及 Content metadata／文字規則已於第十四至十六批完成；共用 Twitch 收錄純規則固定在 Core，四個相容入口匯出同一組十五個公開物件。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

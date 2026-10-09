@@ -105,7 +105,8 @@ def ports(*appids):
                 follower_candidate=queued, stamp=stamp, request=p.request,
                 rate_limit_policy=p.policy, transient_retry_policy=p.transient,
                 request_exception=RequestFailure, rate_limited_type=RateLimited,
-                monotonic=p.time.monotonic, sleep=p.time.sleep)
+                monotonic=p.time.monotonic, sleep=p.time.sleep,
+                clock=lambda: NOW)
     return p
 
 

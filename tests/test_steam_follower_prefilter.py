@@ -172,11 +172,18 @@ def test_completed_screen_checks_only_measured_4000_or_more(tmp_path):
             cache_file.write_text(json.dumps(rows), encoding="utf-8")
             return []
 
-    with patch.object(pipeline, "SteamUpcomingCollector", return_value=Collector()):
+    with (
+        patch.object(pipeline, "SteamUpcomingCollector", return_value=Collector()),
+        patch.object(pipeline, "fetch_store_release_details", return_value={}) as store_dates,
+    ):
         result = pipeline.run_follower_batch(
             args, state, {"games": catalog, "date_precision_complete": True, "date_precision_eligible": catalog}, {"games": []},
         )
     assert xml_calls == [[104]]
+    # The fake XML collector returns no qualified rows; only the existing
+    # measured cache entry reaches the separate Store date port.
+    assert store_dates.call_args.args[1] == [101]
+    assert result["store_date_rechecked"] == result["store_date_rejected"] == 1
     assert result["fresh_follower_requests"] == 1
     assert result["verified_priority_count"] == 2
     assert result["priority_total"] == 2

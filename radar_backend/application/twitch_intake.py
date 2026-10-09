@@ -13,7 +13,7 @@ APPDETAILS = "https://store.steampowered.com/api/appdetails"
 def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
             session=None, now: datetime | None = None, max_seconds: int = 900,
             caches: list[dict] | None = None, monotonic, sleep,
-            blocked: set[int] | None = None, clock=None,
+            blocked: set[int] | None = None, clock,
             session_factory, read_json, validate_snapshot, excluded_appids,
             retained_follower_candidate, is_twitch_qualified, signature,
             cached_follower, aware_time, identity_signature, build_candidate,
@@ -23,8 +23,6 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
             state_validation_version=4, datetime_type=datetime,
             timezone_type=timezone, timedelta_type=timedelta,
             json_module=json, deepcopy_fn=deepcopy) -> dict:
-    fixed_now = now
-    clock = clock or (lambda: fixed_now if fixed_now is not None else datetime_type.now(timezone_type.utc))
     now = now or clock()
     session = session or session_factory()
     session.headers.update({"User-Agent": "GameTrendRadarTwitchSteamImport/1.0"})

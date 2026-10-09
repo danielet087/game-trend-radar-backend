@@ -45,6 +45,7 @@ class OfficialBatchServices:
     follower_client_factory: Callable
     follower_cache_factory: Callable
     cooldown_factory: Callable
+    begin_persistence: Callable | None = None
 
 
 def official_job_result(report, *, state_persisted, target_slot=None):
@@ -109,8 +110,10 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
             "rate_limit_count": 0,
             "created_at_taipei": services.clock().isoformat(),
         }
-    cp.setdefault("content_dispatches", {})
     master = services.read(paths.master) if services.exists(paths.master) else {"version": 1, "games": []}
+    if services.begin_persistence is not None:
+        services.begin_persistence(cp, master)
+    cp.setdefault("content_dispatches", {})
     store_rechecks = services.reverify_pending_store_dates(cp, master)
     retried_dispatches = services.retry_pending_content_dispatches(cp)
     if store_rechecks or retried_dispatches:
@@ -121,7 +124,6 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
         cp, original, oldcp, oldgroups, eligible, prefilter,
         official_cache, other_official
     )
-    start_count = len(cp["official_results"])
     # Missing group IDs stay in the same queue. Resolve them in the existing
     # workflow before using Community XML; they must not consume XML attempts.
     follower_cache = services.follower_cache_factory(cp, official_cache, oldcp, other_official, prefilter)
@@ -230,7 +232,7 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
                     event["next_request_after_taipei"] = cp["next_request_after_taipei"]
             attempts.append(event)
             cp["attempt_events"].append(event)
-            success_count = len(cp["official_results"]) - start_count
+            success_count = len({item["appid"] for item in attempts if item["status"] == "ok"})
             cp["scheduler_batch"].update(
                 status="querying", last_updated_at=services.clock().isoformat(),
                 last_appid=aid, last_name=row.get("name") or f"Steam App {aid}",
@@ -264,8 +266,10 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
             if event["status"] != "ok":
                 break
 
-    successful = len(cp["official_results"]) - start_count
-    pending_left = max(0, len(q) - successful)
+    successful = len({item["appid"] for item in attempts if item["status"] == "ok"})
+    # Concurrent producers can add results during a checkpoint reload. They
+    # reduce the remaining queue but never count as this worker's observations.
+    pending_left = sum(str(row["appid"]) not in cp["official_results"] for row in q)
     report = {
         "source_status": source_status,
         "start_taipei": started_at_taipei,
@@ -278,13 +282,8 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
         "requests_this_run": sum(not item.get("cache_reused") for item in attempts),
         "official_new_this_run": successful,
         "store_date_rechecks_before_followers": store_rechecks,
-        "new_ge5000_this_run": sum(
-            checked_numeric(x.get("official_followers")) and x["official_followers"] >= 5000
-            for x in cp["official_results"].values()
-            if x.get("official_checked_at_taipei") in {
-                e.get("when_taipei") for e in attempts if e["status"] == "ok"
-            }
-        ),
+        "new_ge5000_this_run": sum(item.get("official_followers", -1) >= 5000
+                                   for item in attempts if item["status"] == "ok"),
         "completed_legacy": len(oldcp["official_results"]),
         "completed_dynamic": len(cp["official_results"]),
         "combined_official_completed": len(oldcp["official_results"]) + len(cp["official_results"]),
@@ -298,11 +297,6 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
         "production_cache_modified": False,
         "github_actions_hourly_schedule": "03:00-23:00 Asia/Taipei",
     }
-    # Calculate new qualified strictly from saved outcomes in this batch, not timestamps.
-    ids = {str(e["appid"]) for e in attempts if e["status"] == "ok"}
-    report["new_ge5000_this_run"] = sum(
-        cp["official_results"][aid]["official_followers"] >= 5000 for aid in ids
-    )
     cp["scheduler_batch"].update(
         active=False, status="finished", last_updated_at=report["finish_taipei"],
         finished_at=report["finish_taipei"], stop_reason=stop,

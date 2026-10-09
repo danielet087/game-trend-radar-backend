@@ -69,49 +69,13 @@ jobs:
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
           SCHEDULE_REFRESH_TODAY: ${{ inputs.refresh_today }}
         run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            python -m scripts.external_schedule --workflow daily-discovery --fail-on-skip
-            python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-          from scripts.steam_candidate_pipeline import fresh_state
-          from collectors.steam_upcoming import taiwan_today
-          from scripts.external_schedule import daily_reset_required, daily_slot
-          from scripts.update_steam_daily import save_json
-
-          today = taiwan_today()
-          path = Path("data/steam_candidate_state.json")
-          state = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
-          force = (os.environ.get("SCHEDULE_EVENT") == "workflow_dispatch"
-                   and os.environ.get("SCHEDULE_TRIGGER_SOURCE") != "cloudflare")
-          if daily_reset_required(state, today, force=force):
-              state = fresh_state(today, 365)
-              state.update(daily_refresh_slot=daily_slot(today), last_reset_date_taipei=today.isoformat())
-              save_json(path, state)
-              save_json(Path("data/steam_candidates.json"), {"games": []})
-              save_json(Path("data/steam_prefilter_state.json"), {
-                  "version": 1, "next_index": 0, "head_next_index": 0,
-                  "complete": False, "games": {},
-              })
-              print("DAILY_STEAM_REFRESH_RESET", today.isoformat())
-          else:
-              state.update(daily_refresh_slot=daily_slot(today), last_reset_date_taipei=today.isoformat())
-              save_json(path, state)
-              print("DAILY_STEAM_REFRESH_RESUME", daily_slot(today), state.get("phase"))
-          PY
-            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
-            git add data/steam_candidate_state.json data/steam_candidates.json data/steam_prefilter_state.json data/scheduler_queue_status.json
-            if git diff --cached --quiet; then exit 0; fi
-            git commit -m "data: persist daily Steam discovery reset before collection"
-            if git push origin HEAD:main; then exit 0; fi
-          done
-          exit 1
+          python -m radar_backend.jobs.persist_daily_state reset \
+            --receipt output/daily-reset-publication.json
+      - name: Capture private state before collection changes it
+        id: private_baseline
+        run: |
+          python -m radar_backend.jobs.persist_daily_state capture \
+            --output output/daily-state-baseline.json
       - name: Daily discovery or recovery through complete third-party prescreen
         if: github.event_name == 'schedule' || inputs.refresh_today == true
         env:
@@ -243,29 +207,23 @@ jobs:
 
           PY
       - name: Save private candidate catalog and checkpoint metadata
-        if: always() && steps.schedule_guard.outcome == 'success' && steps.install.outcome == 'success'
+        if: always() && steps.schedule_guard.outcome == 'success' && steps.install.outcome == 'success' && steps.private_baseline.outcome == 'success'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/steam_candidate_state.json data/steam_candidates.json
-          if [ -f data/steam_prefilter_state.json ]; then
-            git add data/steam_prefilter_state.json
-          fi
-          if [ -f data/steam_candidates_eligible.json ]; then
-            git add data/steam_candidates_eligible.json
-          fi
-          if [ -f output/steam_upcoming.json ]; then
-            git add data/steam_followers_cache.json data/steam_upcoming_master.json
-          fi
-          python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
-          git add data/scheduler_queue_status.json
-          if git diff --cached --quiet; then
-            echo "No new candidate or follower progress."
-          else
-            git commit -m "data: advance private Steam two-stage initialization"
-            python -c 'from scripts.experiment_official_daily_catchup_250 import rebase_checkpoint; rebase_checkpoint()'
-            git push origin HEAD:main
-          fi
+          python -m radar_backend.jobs.persist_daily_state publish \
+            --baseline output/daily-state-baseline.json \
+            --receipt output/daily-state-publication.json
+      - name: Keep daily state publication evidence and frozen recovery input
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-daily-state-publication
+          path: |
+            output/daily-reset-publication.json
+            output/daily-state-baseline.json
+            output/daily-state-pending.json
+            output/daily-state-publication.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Publish updated site JSON after EVERY Followers batch
         if: ${{ success() }}
         env:

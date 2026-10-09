@@ -122,6 +122,7 @@ def prepare_main(monkeypatch, tmp_path, *, push_outcomes, one_request):
     monkeypatch.setattr(worker.time, "sleep", Mock())
     push = Mock(side_effect=push_outcomes)
     monkeypatch.setattr(worker, "git_push", push)
+    monkeypatch.setattr(worker, "begin_persistence", Mock())
     monkeypatch.setattr(worker, "make_queue", lambda *args: (deepcopy(queue), {
         "status": "current_day_prefilter_complete", "twitch_priority_pending": 0,
     }))
@@ -156,24 +157,27 @@ def test_main_exits_nonzero_when_checkpoint_push_fails(monkeypatch, tmp_path, pu
     assert client.get.call_count == int(one_request)
 
 
-def test_clean_index_still_retries_a_previously_unpushed_checkpoint(monkeypatch):
-    from scripts import export_scheduler_queue_status as exporter
+def test_clean_index_still_retries_a_previously_unpushed_checkpoint(monkeypatch, tmp_path):
+    import json
+    # Exercise the compatibility facade with an actual unpublished commit;
+    # a clean index alone must not imply persistence.
+    from tests.test_official_checkpoint_publication import delivery_repository, git, persistence, save_result
+    from radar_backend.publication.official_checkpoint import CHECKPOINT, MASTER
+    from radar_backend.publication.steam import read_json
 
-    monkeypatch.setattr(exporter, "export_status", Mock())
-    rebase = Mock()
-    monkeypatch.setattr(worker, "rebase_checkpoint", rebase)
-    calls = []
-
-    def run(command, **kwargs):
-        calls.append(command)
-        # Simulate an earlier failed push whose commit has no staged changes.
-        return subprocess.CompletedProcess(command, 0)
-
-    monkeypatch.setattr(worker.subprocess, "run", run)
+    remote, _, runner = delivery_repository(tmp_path)
+    publisher = persistence(runner)
+    expected = save_result(runner)
+    git(runner, "add", CHECKPOINT)
+    git(runner, "commit", "-m", "previous checkpoint push failed")
+    assert git(runner, "status", "--porcelain") == ""
+    monkeypatch.setattr(worker, "CHECKPOINT", runner / CHECKPOINT)
+    monkeypatch.setattr(worker, "MASTER", runner / MASTER)
+    monkeypatch.setattr(worker, "_PERSISTENCE", publisher)
+    monkeypatch.setattr(worker, "rebase_checkpoint", Mock(side_effect=AssertionError("No legacy Git retry")))
     assert worker.git_push() is True
-    rebase.assert_called_once()
-    assert ["git", "push", "origin", "HEAD:main"] in calls
-    assert not any(command[:2] == ["git", "commit"] for command in calls)
+    assert json.loads(git(remote, "show", f"main:{CHECKPOINT}")) == expected
+    assert read_json(runner / CHECKPOINT) == expected
 
 
 def test_candidate_pipeline_reports_collection_and_persistence_separately():

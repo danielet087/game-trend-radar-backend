@@ -49,6 +49,15 @@ def default_services(paths):
             cached_follower=catalog.cached_follower,
         )
 
+    publisher = None
+
+    def begin(checkpoint_state, master_state):
+        nonlocal publisher
+        publisher = checkpoint.begin_persistence(
+            checkpoint=paths.checkpoint, master=paths.master,
+            checkpoint_state=checkpoint_state, master_state=master_state, clock=clock,
+        )
+
     def persist():
         output = catalog.dashboard_output()
         return checkpoint.git_push(
@@ -57,6 +66,7 @@ def default_services(paths):
             rebase=lambda: checkpoint.rebase_checkpoint(
                 output=output, export_status=catalog.export_status,
             ),
+            publisher=publisher,
         )
 
     return OfficialBatchServices(
@@ -70,6 +80,7 @@ def default_services(paths):
         dispatch_content_event=catalog.dispatch_content_event,
         follower_client_factory=OfficialFollowerClient,
         follower_cache_factory=OfficialFollowerCache, cooldown_factory=CooldownStore,
+        begin_persistence=begin,
     )
 
 

@@ -36,10 +36,16 @@ jobs:
           data/steam_followers_cache.json
           data/steam_upcoming_master.json
           data/steam_adult_exclusion.json
+          data/scheduler_queue_status.json
+          data/steam_candidate_state.json
+          data/twitch_steam_import_state.json
+          tests/test_official_checkpoint_publication.py
           EOF
           git sparse-checkout set --no-cone $(cat /tmp/sparse-list)
           python - <<'PY'
           import scripts.experiment_official_daily_catchup_250 as job
+          import radar_backend.jobs.persist_official_checkpoint
           assert job.MASTER.name == "steam_upcoming_master.json"
           print("HOURLY_SPARSE_IMPORT_OK")
           PY
+          python -m pytest -q tests/test_official_checkpoint_publication.py

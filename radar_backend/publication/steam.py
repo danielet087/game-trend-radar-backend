@@ -16,7 +16,7 @@ import tempfile
 
 from radar_core.publication import SubprocessGitRepository, publish_with_retry, snapshot_revision
 from radar_backend.domain.growth import timestamp
-from scripts.build_public_steam_shards import build
+from radar_backend.adapters.public_shards import build
 
 CATALOG_PATHS = (
     "data/index.json", "data/calendar", "data/games", "data/lists",

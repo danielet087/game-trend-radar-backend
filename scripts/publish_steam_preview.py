@@ -12,7 +12,7 @@ import requests
 
 from radar_backend.adapters.public_release_dates import fetch_store_browse_releases, resolved_store_date
 from radar_backend.adapters.steam_localized_titles import add_traditional_display_names
-from scripts.public_catalog import preserve_player_categories
+from radar_backend.adapters.public_catalog import preserve_player_categories
 from collectors.steam_upcoming import (
     STEAM_FOLLOWERS_URL, STEAM_SEARCH_URL, parse_follower_xml,
     parse_release_window, parse_search_results_html, taiwan_today, write_json,

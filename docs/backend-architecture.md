@@ -187,8 +187,30 @@ state 保留 UTF-8 JSON object 驗證、原 pretty JSON 與結尾換行；檔案
 
 第九批 PR 接在第八批分支之後。固定 Core／requirements、正式及手動發布 workflows、請求預算、Secrets、data／experiments、來源資格與 Git 發布邊界維持；唯一 workflow 變更是暫停中的手動測試補入四個 sparse 測試檔及命令，不重新啟用退役入口。
 
+## 第十批：公開目錄 projection 與 metadata 保留
+
+| 責任 | 位置 |
+| --- | --- |
+| 官方多人分類證據與較新日期稽核保留 | `domain/catalog_metadata.py` |
+| 全列 revision 與公開欄位 projection | `domain/catalog_projection.py` |
+| hash／payload／既有 revision／保存協調 | `application/catalog_projection.py` |
+| catalog.json 既有 revision 讀取與 JSON 保存 | `state/catalog_projection.py` |
+| 時鐘與共用目錄組裝 | `adapters/public_catalog.py` |
+
+上表路徑皆相對於 `radar_backend/`。六個 scripts consumer 與已發布名稱 adapter 直接使用新目錄 owner，預覽 metadata adapter 預設也接同一套 categories 保存規則，仍支援原顯式 callback。`scripts/public_catalog.py` 的四個公開函式、欄位常數與參數保留為薄相容入口，呼叫時傳入原 datetime／timezone／timedelta、snapshot callback、欄位與來源常數、JSON／hash 模組。consumer 只更換 import；其餘函式、CLI、資格、資料合併與 Git 保存內容維持。
+
+多人分類只接受原兩個官方來源、合法 categories list（包含已觀測空清單）、非 bool 正整數 ID 與字串描述、UTC 零偏移驗證時間及原五分鐘未來容許界線。無效資料不讀 clock；只有完成原驗證後才透過 adapter 提供的 clock 判定。domain 不讀實際時鐘或檔案。保留分類時先判 incoming，再於原 AppID 相等條件下判 existing；較新既有證據優先，同時刻採 incoming。缺 AppID 的原相等行為、淺拷貝與 categories 引用保持。
+
+較新日期保留仍只在既有 `date_full` 且驗證時間嚴格較新時作用，完整保留或移除原十七個 release／Store provenance 欄位，不影響其他 incoming 欄位。分類的 naive 時間不合法；日期稽核比較則沿用 naive 當 UTC、無效時間 fallback 的原契約，不加入新來源資格。
+
+projection 維持公開 version=3 與四十五個欄位的原次序；revision 先對完整 accepted rows（包含未投影的未知欄位）做 UTF-8、sort_keys、compact JSON 的 SHA-256，再取前二十位。rows 順序及 metadata 變更會更新 revision，generated_at 不參與 hash。原 JSON 型別／序列化錯誤與非有限數值處理維持，不改用 Core 的另一套發布 hash 政策。
+
+用例維持 revision → catalog 路徑 → payload → exists → 讀既有 revision → mkdir／序列化／寫入的次序。既有 revision 相符時保留原檔及 generated_at，沿用原比較範圍；讀取與比較的 OSError／ValueError／TypeError 才進入原重寫流程，其他錯誤及 exists／mkdir／write 錯誤照原契約傳出。state 保留 compact JSON、UTF-8 與尾端換行；不查來源或執行 Git。canonical 邊界不匯入舊 public_catalog，日期／名稱用例原先的目錄 bridge 已接到新 owner。
+
+第十批 PR 接在第九批分支之後。Core 固定版本、requirements、正式及手動發布 workflows、排程、請求預算、Secrets、data／experiments 與 Git 發布邊界維持；暫停中的手動測試只補入三個新 sparse 測試檔及命令。
+
 ## 尚未遷移
 
-正式候選、官方、日期／名稱及已接線的 preview metadata／已發布名稱更新已使用共用來源、規則與用例層。其他 Steam 內容詳細資料流程、Twitch 來源協調、公開目錄 projection 與 categories 保存仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
+正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新與公開目錄 projection／categories 保存已使用共用來源、規則與用例層。其他 Steam 內容詳細資料流程、Twitch 來源協調、公開 shard builder 的完整編排及歷史工具專用保存仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

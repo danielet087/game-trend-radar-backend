@@ -22,7 +22,7 @@ from zoneinfo import ZoneInfo
 import requests
 
 from collectors.steam_upcoming import parse_release_window
-from scripts.public_catalog import keep_newer_release
+from radar_backend.adapters.public_catalog import keep_newer_release
 from scripts.screen_steam_candidates_before_followers import is_explicit_sex_game
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.steam_master_date_gate import parse_store_release_detail

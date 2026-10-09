@@ -21,7 +21,7 @@ from radar_backend.application import published_titles as application
 from radar_backend.domain.published_titles import candidate
 from radar_backend.domain.published_titles import update_title as update_title_rule
 from radar_backend.state.published_titles import exists, read, save_changed
-from scripts.public_catalog import write_catalog_projection
+from radar_backend.adapters.public_catalog import write_catalog_projection
 
 CONVERT = OpenCC("s2t")
 LOG = logging.getLogger(__name__)

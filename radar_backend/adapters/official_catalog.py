@@ -64,12 +64,12 @@ def dispatch_content_event(checkpoint, result, *, clock=None):
 
 
 def is_twitch_queue_candidate(row, *, now):
-    from scripts.twitch_official_queue import is_twitch_queue_candidate as implementation
+    from radar_backend.adapters.twitch_intake import is_twitch_queue_candidate as implementation
     return implementation(row, now=now)
 
 
 def cached_follower(appid, sources, now):
-    from scripts.import_twitch_steam_discoveries import cached_follower as implementation
+    from radar_backend.adapters.twitch_intake import cached_follower as implementation
     return implementation(appid, sources, now)
 
 

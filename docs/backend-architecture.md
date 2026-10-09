@@ -209,8 +209,27 @@ projection 維持公開 version=3 與四十五個欄位的原次序；revision �
 
 第十批 PR 接在第九批分支之後。Core 固定版本、requirements、正式及手動發布 workflows、排程、請求預算、Secrets、data／experiments 與 Git 發布邊界維持；暫停中的手動測試只補入三個新 sparse 測試檔及命令。
 
+## 第十一批：公開 AppID 分片產生
+
+| 責任 | 位置 |
+| --- | --- |
+| 公開資格、metadata 合併、日期保留與清單規則 | `domain/public_shards.py` |
+| detail／月份／清單／fallback／目錄／index 產生協調 | `application/public_shards.py` |
+| JSON 容錯讀取、內容變更保存與檔案操作 | `state/public_shards.py` |
+| Core、成人排除、日期／分類、名稱及時鐘組裝 | `adapters/public_shards.py` |
+
+上表路徑皆相對於 `radar_backend/`。正式 `publication/steam.py` 直接使用新 adapter；該檔只更換 builder import，Git 驗證、凍結來源、觀測時間、Core 競爭重試與成功回條仍由原發布層負責。`scripts/build_public_steam_shards.py` 的五個公開函式與命令列保留為薄相容入口；原 JSON、日期型別、欄位集合、資格 predicate、合併、名稱、projection、時鐘及讀寫 callback 在呼叫時提供。新 canonical 路徑不回呼舊 builder、成人排除或 Twitch 相容 shim；Twitch 資格直接使用固定 Core。
+
+用例先驗證帶時區的觀測時間與 games array，再讀成人名單與既有資料；空 authoritative games array 在任何刪除前拒絕。公開列維持原有效 AppID、Followers 至少 3,000 或已驗證 Twitch、精確日曆日期及成人排除規則。今日與未來需 Followers 至少 5,000 或已驗證 Twitch；日期稽核啟用時還需 `date_full`。近期上市清單涵蓋前 30 天至昨日，沿用 Followers 至少 5,000、已驗證 Twitch，或 tracked_release／direct_release 且 Followers 嚴格大於 3,000 的原條件。
+
+合併仍依序保留較新日期、Core Twitch 證據與官方多人分類，再套用原核心欄位、名稱與資產更新；detail 的未知欄位與嵌套引用保留。Query 日期不能覆盖既有已驗證日期，也不能借用不同日期的證據。未出現在本次 rolling 輸入中的歷史 detail 仍補入繁體顯示名稱與 storage_version=2。authoritative 模式移除已不在輸入中的未來 detail，但保留有效 Twitch；成人與未確認日期的排除、原移除計數及 ValueError 容錯範圍保持。
+
+輸出沿用 detail → 月份 → 過期月份移除 → upcoming／released → legacy fallback → catalog projection → index 的原順序、排序、格式與計數。一輪產生與 Git 重試沿用同一份觀測時間及台灣日期。state 只處理 UTF-8 JSON 與檔案操作，內容僅 generated_at 改變時不重寫；原序列化、換行、symlink、讀寫例外與部分完成狀態維持。domain 不讀實際時鐘或檔案，application 只透過明確 ports 操作狀態，不新增交易、來源覆蓋率或收錄政策。
+
+第十一批 PR 接在第十批分支之後。Core 固定版本、requirements、正式及手動發布 workflows、排程、請求預算、Secrets、data／experiments 與 Git 發布內容維持；暫停中的手動測試只補入四個新 sparse 測試檔及命令。
+
 ## 尚未遷移
 
-正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新與公開目錄 projection／categories 保存已使用共用來源、規則與用例層。其他 Steam 內容詳細資料流程、Twitch 來源協調、公開 shard builder 的完整編排及歷史工具專用保存仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
+正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新、公開目錄 projection／categories 保存與公開 shard builder 的完整編排已使用共用來源、規則與用例層。其他 Steam 內容詳細資料流程、Twitch 來源協調及歷史工具專用保存仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

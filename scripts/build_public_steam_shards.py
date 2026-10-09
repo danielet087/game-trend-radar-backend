@@ -12,104 +12,35 @@ from radar_backend.adapters.public_catalog import (
     PLAYER_CATEGORY_FIELDS, keep_newer_release, preserve_player_categories,
     write_catalog_projection,
 )
+from radar_backend.application import public_shards as _shard_application
+from radar_backend.domain import public_shards as _shard_rules
+from radar_backend.state import public_shards as _shard_state
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 
-CORE_FIELDS = {
-    "appid", "followers", "follower_checked_at",
-    "release_raw", "release_start", "release_end", "release_precision",
-    "release_date_timezone", "release_date_basis", "release_time_utc",
-    "release_time_source", "store_url", "community_url", "discovered_by",
-    "sexual_content_screened", "release_display_precision", "release_display_provider",
-    "release_date_verified_at", "post_followers_store_verified_at", "post_followers_store_verified",
-    "release_date_conflict", "release_timestamp_taipei_date",
-    "release_store_date", "release_date_normalization",
-    "twitch_admission", "steam_type", "content_descriptorids",
-}
+CORE_FIELDS = _shard_rules.CORE_FIELDS
 
 
 def load_json(path: Path, default: Any) -> Any:
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError, TypeError):
-        return default
+    return _shard_state.load_json(path, default, json_module=json)
 
 
 def write_if_changed(path: Path, payload: Any) -> bool:
-    # Timestamps are not content changes. Reuse the prior timestamp so a
-    # single updated AppID cannot rewrite every monthly shard on each run.
-    if isinstance(payload, dict) and "generated_at" in payload:
-        prior = load_json(path, {})
-        if isinstance(prior, dict):
-            comparable_old = {k: v for k, v in prior.items() if k != "generated_at"}
-            comparable_new = {k: v for k, v in payload.items() if k != "generated_at"}
-            if comparable_old == comparable_new:
-                return False
-    text = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
-    try:
-        if path.read_text(encoding="utf-8") == text:
-            return False
-    except OSError:
-        pass
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
-    return True
+    return _shard_state.write_if_changed(path, payload, load_json=load_json, json_module=json)
 
 
 def valid_record(row: Any) -> bool:
-    if not isinstance(row, dict):
-        return False
-    try:
-        appid = int(row.get("appid"))
-        followers = int(row.get("followers"))
-    except (TypeError, ValueError):
-        return False
-    day = row.get("release_start") or row.get("release_date")
-    try:
-        if date.fromisoformat(day).isoformat() != day:
-            return False
-    except (ValueError, TypeError):
-        return False
-    return (
-        appid > 0
-        and (followers >= 3000 or is_twitch_qualified(row))
-        and isinstance(day, str)
-        and len(day) == 10
-        and row.get("release_precision", "day") == "day"
-    )
+    return _shard_rules.valid_record(row, date_type=date, is_twitch_qualified=is_twitch_qualified)
 
 
 def merge_game(existing: dict[str, Any], incoming: dict[str, Any]) -> dict[str, Any]:
-    """Preserve rich presentation metadata but trust backend core fields."""
-    incoming = keep_newer_release(existing, incoming)
-    incoming = preserve_twitch_admission(existing, incoming)
-    incoming = preserve_player_categories(existing, incoming)
-    merged = dict(existing)
-    for key, value in incoming.items():
-        if key in PLAYER_CATEGORY_FIELDS:
-            continue
-        if value is None or value == "":
-            continue
-        if isinstance(value, list) and not value:
-            continue
-        if key in CORE_FIELDS or key not in merged or merged.get(key) in (None, "", []):
-            merged[key] = value
-    # Names/assets supplied by the backend are also allowed to refresh when present.
-    for key in ("name", "name_en", "name_zh_tw", "name_zh_cn", "capsule_image"):
-        value = incoming.get(key)
-        if value not in (None, ""):
-            merged[key] = value
-    for key in PLAYER_CATEGORY_FIELDS:
-        if key in incoming:
-            merged[key] = incoming[key]
-        else:
-            merged.pop(key, None)
-    merged["appid"] = int(incoming.get("appid", merged.get("appid")))
-    # Preserve Steam's original localized names and create separate
-    # Traditional-script presentation fields for every future shard update.
-    add_traditional_display_names(merged)
-    merged["storage_version"] = 2
-    return merged
+    return _shard_rules.merge_game(
+        existing, incoming, keep_newer_release=keep_newer_release,
+        preserve_twitch_admission=preserve_twitch_admission,
+        preserve_player_categories=preserve_player_categories,
+        add_traditional_display_names=add_traditional_display_names,
+        core_fields=CORE_FIELDS, player_category_fields=PLAYER_CATEGORY_FIELDS,
+    )
 
 
 def build(
@@ -119,218 +50,17 @@ def build(
     authoritative_future: bool = False,
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    observed = now or datetime.now(timezone.utc)
-    if observed.tzinfo is None or observed.utcoffset() is None:
-        raise ValueError("Timezone-aware publication time required")
-    incoming_payload = load_json(input_path, None)
-    if not isinstance(incoming_payload, dict) or not isinstance(incoming_payload.get("games"), list):
-        raise ValueError("Invalid source catalog; refusing to replace published records")
-    incoming_games = incoming_payload["games"]
-    if authoritative_future and not incoming_games:
-        raise ValueError("Empty authoritative catalog; refusing mass removal")
-    incoming_ids = {
-        int(row["appid"]) for row in incoming_games
-        if isinstance(row, dict) and row.get("appid") is not None
-    }
-    games_dir = frontend / "data" / "games"
-    calendar_dir = frontend / "data" / "calendar"
-    lists_dir = frontend / "data" / "lists"
-
-    blocked = excluded_appids()
-    index = load_json(frontend / "data" / "index.json", {})
-    audit_active = index.get("release_date_audited") is True or authoritative_future
-    precision_exclusions = load_json(frontend / "data" / "excluded_date_appids.json", {})
-    unconfirmed_ids = {int(x) for x in precision_exclusions.get("appids", [])}
-    today_s = observed.astimezone(timezone(timedelta(hours=8))).date().isoformat()
-
-    def publishable(game: dict[str, Any]) -> bool:
-        if not valid_record(game) or is_disallowed(game, blocked):
-            return False
-        if (
-            int(game["appid"]) in unconfirmed_ids
-            and game.get("release_display_precision") != "date_full"
-        ):
-            return False
-        # A Query API timestamp is NOT a user-visible full-date announcement.
-        # Once the audited public catalogue is activated, every future record
-        # needs a separately verified Store display-date gate.
-        if str(game["release_start"]) >= today_s:
-            if int(game["followers"]) < 5000 and not is_twitch_qualified(game):
-                return False
-            if audit_active:
-                return game.get("release_display_precision") == "date_full"
-        return True
-
-    existing: dict[int, dict[str, Any]] = {}
-    if games_dir.exists():
-        for path in games_dir.glob("*.json"):
-            row = load_json(path, None)
-            if isinstance(row, dict) and publishable(row):
-                existing[int(row["appid"])] = row
-
-    # Removed/unconfirmed titles must not survive as stale independent
-    # AppID files after an audit. Historical released records remain.
-    removed_stale_future = 0
-    for path in games_dir.glob("*.json"):
-        try:
-            appid = int(path.stem)
-            row = load_json(path, {})
-            stale_future = (
-                authoritative_future
-                and str(row.get("release_start") or "") >= today_s
-                and appid not in incoming_ids
-                and not is_twitch_qualified(row)
-            )
-            if appid in blocked or (
-                appid in unconfirmed_ids
-                and row.get("release_display_precision") != "date_full"
-            ) or stale_future:
-                existing.pop(appid, None)
-                path.unlink()
-                if stale_future:
-                    removed_stale_future += 1
-        except ValueError:
-            continue
-
-    changed_games = 0
-    for row in incoming_games:
-        if not valid_record(row) or is_disallowed(row, blocked):
-            continue
-        appid = int(row["appid"])
-        if appid in unconfirmed_ids and row.get("release_display_precision") != "date_full":
-            continue
-        prior = existing.get(appid, {})
-        merged = merge_game(prior, row)
-        # An outdated master Query timestamp must not overwrite a verified
-        # date (or silently borrow proof from a different release date).
-        if prior.get("release_date_verified_at") and row.get("release_display_precision") != "date_full":
-            if row.get("release_start") != prior.get("release_start"):
-                merged["release_start"] = prior["release_start"]
-                merged["release_end"] = prior.get("release_end", prior["release_start"])
-                merged["release_raw"] = prior.get("release_raw", prior["release_start"])
-            merged["release_display_precision"] = prior.get("release_display_precision")
-            merged["release_date_verified_at"] = prior["release_date_verified_at"]
-        if not publishable(merged):
-            continue
-        existing[appid] = merged
-        if write_if_changed(games_dir / f"{appid}.json", merged):
-            changed_games += 1
-
-    # Also backfill records that were not present in today's rolling
-    # Followers output. Released games must retain their localized names.
-    for appid, game in existing.items():
-        previous = dict(game)
-        add_traditional_display_names(game)
-        game["storage_version"] = 2
-        if game != previous:
-            if write_if_changed(games_dir / f"{appid}.json", game):
-                changed_games += 1
-
-    rows = sorted(
-        existing.values(),
-        key=lambda g: (
-            str(g.get("release_start") or g.get("release_date") or "9999-12-31"),
-            -int(g.get("followers") or 0),
-            int(g["appid"]),
-        ),
+    return _shard_application.build(
+        input_path, frontend, authoritative_future=authoritative_future, now=now,
+        clock=lambda: datetime.now(timezone.utc),
+        load_json=load_json, write_if_changed=write_if_changed,
+        exists=_shard_state.exists, glob=_shard_state.glob, unlink=_shard_state.unlink,
+        excluded_appids=excluded_appids, is_disallowed=is_disallowed,
+        is_twitch_qualified=is_twitch_qualified, valid_record=valid_record,
+        merge_game=merge_game, add_traditional_display_names=add_traditional_display_names,
+        write_catalog_projection=write_catalog_projection,
+        timezone_type=timezone, timedelta_type=timedelta,
     )
-    by_month: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for row in rows:
-        day = str(row.get("release_start") or row.get("release_date"))
-        by_month[day[:7]].append(row)
-
-    generated_at = incoming_payload.get("generated_at") or observed.isoformat()
-    changed_months = 0
-    for month, month_rows in sorted(by_month.items()):
-        payload = {
-            "version": 2,
-            "generated_at": generated_at,
-            "month": month,
-            "count": len(month_rows),
-            "games": month_rows,
-        }
-        if write_if_changed(calendar_dir / f"{month}.json", payload):
-            changed_months += 1
-
-    # Remove obsolete month files only when no retained game belongs to that month.
-    if calendar_dir.exists():
-        active = set(by_month)
-        for path in calendar_dir.glob("????-??.json"):
-            if path.stem not in active:
-                path.unlink()
-
-    # Keep one Taiwan eligibility date across publication retries.
-    today = observed.astimezone(timezone(timedelta(hours=8))).date()
-    today_s = today.isoformat()
-    released_from = (today - timedelta(days=30)).isoformat()
-
-    upcoming = [
-        int(row["appid"]) for row in rows
-        if str(row.get("release_start") or row.get("release_date")) >= today_s
-        and (int(row.get("followers") or 0) >= 5000 or is_twitch_qualified(row))
-    ]
-    released = [
-        int(row["appid"]) for row in rows
-        if released_from <= str(row.get("release_start") or row.get("release_date")) < today_s
-        and (
-            int(row.get("followers") or 0) >= 5000
-            or is_twitch_qualified(row)
-            or (
-                int(row.get("followers") or 0) > 3000
-                and row.get("recent_source") in {"tracked_release", "direct_release"}
-            )
-        )
-    ]
-
-    write_if_changed(
-        lists_dir / "upcoming.json",
-        {"version": 2, "generated_at": generated_at, "count": len(upcoming), "appids": upcoming},
-    )
-    write_if_changed(
-        lists_dir / "released.json",
-        {"version": 2, "generated_at": generated_at, "count": len(released), "appids": released},
-    )
-    # Keep the legacy fallback authoritative too; otherwise a stale fallback
-    # can re-expose games that were removed from the sharded catalog.
-    write_if_changed(
-        frontend / "data" / "steam_upcoming.json",
-        {
-            "version": 2,
-            "generated_at": generated_at,
-            "count": len(rows),
-            "games": rows,
-        },
-    )
-    projection = write_catalog_projection(frontend / "data", rows, generated_at)
-    write_if_changed(
-        frontend / "data" / "index.json",
-        {
-            "version": 2,
-            "generated_at": generated_at,
-            "source": "Steam AppID-sharded public catalog",
-            "game_count": len(rows),
-            "months": sorted(by_month),
-            "calendar_path": "calendar/{YYYY-MM}.json",
-            "game_path": "games/{appid}.json",
-            "lists": {
-                "upcoming": "lists/upcoming.json",
-                "released": "lists/released.json",
-            },
-            "legacy_fallback": "steam_upcoming.json",
-            "release_date_audited": audit_active,
-            **projection,
-        },
-    )
-    return {
-        "games": len(rows),
-        "incoming": len(incoming_games),
-        "changed_games": changed_games,
-        "months": len(by_month),
-        "changed_months": changed_months,
-        "upcoming": len(upcoming),
-        "released": len(released),
-        "removed_stale_future": removed_stale_future,
-    }
 
 
 def main() -> None:

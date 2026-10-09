@@ -22141,6 +22141,105 @@
       "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00"
     }
   },
+  "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
+  "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
+  "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
+  "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
+  "unresolved_candidates": {},
+  "checkpoint_migration_note": "Clear transient XML-error cooldown only for confirmed AppID 4435490 without group ID; preserve HTTP 429 history and official results.",
+  "content_dispatches": {
+    "3846830": {
+      "signature": "3846830:6859:2026-10-14:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-09-25T21:47:38.282280+08:00"
+    },
+    "2087540": {
+      "signature": "2087540:6613:2026-10-22:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-09-25T21:47:38.546191+08:00"
+    },
+    "3960600": {
+      "signature": "3960600:8664:2026-10-24:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-09-25T21:47:38.788661+08:00"
+    },
+    "4814120": {
+      "signature": "4814120:24775:2027-01-15:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-09-25T21:47:39.056056+08:00"
+    },
+    "2548880": {
+      "signature": "2548880:5463:2026-10-27:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-09-26T13:23:20.718601+08:00"
+    },
+    "1799840": {
+      "signature": "1799840:11655:2026-10-31:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-10-01T09:47:53.686635+08:00"
+    },
+    "2487190": {
+      "signature": "2487190:12321:2026-11-13:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-10-02T10:09:41.075287+08:00"
+    },
+    "4732690": {
+      "signature": "4732690:9015:2026-10-15:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-10-07T04:03:17.541325+08:00"
+    },
+    "1798230": {
+      "signature": "1798230:19693:2026-10-30:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-10-08T20:10:55.097793+08:00"
+    },
+    "2849490": {
+      "signature": "2849490:41529:2027-02-08:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-10-09T03:04:57.937936+08:00"
+    },
+    "3295000": {
+      "signature": "3295000:10266:2027-03-26:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-10-09T03:05:05.975878+08:00"
+    }
+  },
+  "scheduler_batch": {
+    "run_id": "37977336847",
+    "active": true,
+    "status": "querying",
+    "manual_cooldown_override": false,
+    "request_limit": 250,
+    "started_at": "2026-10-10T03:02:32.507920+08:00",
+    "last_updated_at": "2026-10-10T03:03:44.958046+08:00",
+    "requests_this_run": 10,
+    "official_new_this_run": 10,
+    "http_429_this_run": 0,
+    "last_appid": 2373610,
+    "last_name": "Stream Slayers"
+  },
   "official_results": {
     "2069070": {
       "appid": 2069070,
@@ -50414,7 +50513,149 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-09T12:02:05.329054+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5335330": {
+      "appid": 5335330,
+      "name": "Sunlit Suites",
+      "release_date": "2026-10-10",
+      "group_id64": "103582791476072551",
+      "steam_url": "https://store.steampowered.com/app/5335330/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:02:33.029415+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5036480": {
+      "appid": 5036480,
+      "name": "여우 퇴마사는 존중받고 싶었다.",
+      "release_date": "2026-10-13",
+      "group_id64": "103582791475825341",
+      "steam_url": "https://store.steampowered.com/app/5036480/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:02:40.940318+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5188640": {
+      "appid": 5188640,
+      "name": "Pancake! No break!",
+      "release_date": "2026-10-13",
+      "group_id64": "103582791476074425",
+      "steam_url": "https://store.steampowered.com/app/5188640/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:02:48.929575+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5295730": {
+      "appid": 5295730,
+      "name": "Abyzou Rituals: The Manson Case",
+      "release_date": "2026-10-13",
+      "group_id64": "103582791475860687",
+      "steam_url": "https://store.steampowered.com/app/5295730/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 5,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:02:56.942321+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5284480": {
+      "appid": 5284480,
+      "name": "À Deriva",
+      "release_date": "2026-10-14",
+      "group_id64": "103582791475837893",
+      "steam_url": "https://store.steampowered.com/app/5284480/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 9,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:03:04.947148+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5298480": {
+      "appid": 5298480,
+      "name": "Ignite: The Ritual",
+      "release_date": "2026-10-14",
+      "group_id64": "103582791476070867",
+      "steam_url": "https://store.steampowered.com/app/5298480/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:03:12.939425+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5358680": {
+      "appid": 5358680,
+      "name": "Embersworn II: Throne of Endless Night",
+      "release_date": "2026-10-14",
+      "group_id64": "103582791476072562",
+      "steam_url": "https://store.steampowered.com/app/5358680/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:03:21.071748+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5185460": {
+      "appid": 5185460,
+      "name": "WonderLang Russian",
+      "release_date": "2026-10-15",
+      "group_id64": "103582791476072937",
+      "steam_url": "https://store.steampowered.com/app/5185460/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:03:28.925387+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5366220": {
+      "appid": 5366220,
+      "name": "Tetherlight",
+      "release_date": "2026-10-15",
+      "group_id64": "103582791476072565",
+      "steam_url": "https://store.steampowered.com/app/5366220/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:03:36.927997+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "2373610": {
+      "appid": 2373610,
+      "name": "Stream Slayers",
+      "release_date": "2026-10-16",
+      "group_id64": "103582791476063957",
+      "steam_url": "https://store.steampowered.com/app/2373610/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:03:44.957909+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
+  },
+  "rate_limit_count": 0,
+  "temporary_error_count": 0,
+  "next_request_after_taipei": null,
+  "community_cooldown": null,
+  "community_last_success_at": "2026-10-10T03:03:44.957909+08:00",
+  "group_resolution_api_cooldown": {
+    "status": "available",
+    "retry_at": null,
+    "observed_at": "2026-10-09T14:03:34.743330Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "attempt_events": [
     {
@@ -65617,117 +65858,106 @@
       "status": "ok",
       "github_run_id": "37881950754",
       "official_followers": 149
+    },
+    {
+      "appid": 5335330,
+      "when_taipei": "2026-10-10T03:02:32.816072+08:00",
+      "release_date": "2026-10-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 1
+    },
+    {
+      "appid": 5036480,
+      "when_taipei": "2026-10-10T03:02:40.816195+08:00",
+      "release_date": "2026-10-13",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 2
+    },
+    {
+      "appid": 5188640,
+      "when_taipei": "2026-10-10T03:02:48.816325+08:00",
+      "release_date": "2026-10-13",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 1
+    },
+    {
+      "appid": 5295730,
+      "when_taipei": "2026-10-10T03:02:56.816448+08:00",
+      "release_date": "2026-10-13",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 5
+    },
+    {
+      "appid": 5284480,
+      "when_taipei": "2026-10-10T03:03:04.816582+08:00",
+      "release_date": "2026-10-14",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 9
+    },
+    {
+      "appid": 5298480,
+      "when_taipei": "2026-10-10T03:03:12.816711+08:00",
+      "release_date": "2026-10-14",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 2
+    },
+    {
+      "appid": 5358680,
+      "when_taipei": "2026-10-10T03:03:20.816837+08:00",
+      "release_date": "2026-10-14",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 1
+    },
+    {
+      "appid": 5185460,
+      "when_taipei": "2026-10-10T03:03:28.816968+08:00",
+      "release_date": "2026-10-15",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 2
+    },
+    {
+      "appid": 5366220,
+      "when_taipei": "2026-10-10T03:03:36.817108+08:00",
+      "release_date": "2026-10-15",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 1
+    },
+    {
+      "appid": 2373610,
+      "when_taipei": "2026-10-10T03:03:44.817232+08:00",
+      "release_date": "2026-10-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 1
     }
-  ],
-  "next_request_after_taipei": null,
-  "rate_limit_count": 0,
-  "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
-  "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
-  "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
-  "temporary_error_count": 0,
-  "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
-  "unresolved_candidates": {},
-  "checkpoint_migration_note": "Clear transient XML-error cooldown only for confirmed AppID 4435490 without group ID; preserve HTTP 429 history and official results.",
-  "content_dispatches": {
-    "3846830": {
-      "signature": "3846830:6859:2026-10-14:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-09-25T21:47:38.282280+08:00"
-    },
-    "2087540": {
-      "signature": "2087540:6613:2026-10-22:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-09-25T21:47:38.546191+08:00"
-    },
-    "3960600": {
-      "signature": "3960600:8664:2026-10-24:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-09-25T21:47:38.788661+08:00"
-    },
-    "4814120": {
-      "signature": "4814120:24775:2027-01-15:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-09-25T21:47:39.056056+08:00"
-    },
-    "2548880": {
-      "signature": "2548880:5463:2026-10-27:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-09-26T13:23:20.718601+08:00"
-    },
-    "1799840": {
-      "signature": "1799840:11655:2026-10-31:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-10-01T09:47:53.686635+08:00"
-    },
-    "2487190": {
-      "signature": "2487190:12321:2026-11-13:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-10-02T10:09:41.075287+08:00"
-    },
-    "4732690": {
-      "signature": "4732690:9015:2026-10-15:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-10-07T04:03:17.541325+08:00"
-    },
-    "1798230": {
-      "signature": "1798230:19693:2026-10-30:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-10-08T20:10:55.097793+08:00"
-    },
-    "2849490": {
-      "signature": "2849490:41529:2027-02-08:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-10-09T03:04:57.937936+08:00"
-    },
-    "3295000": {
-      "signature": "3295000:10266:2027-03-26:store-v2",
-      "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend",
-      "event_type": "steam_game_qualified",
-      "dispatched_at_taipei": "2026-10-09T03:05:05.975878+08:00"
-    }
-  },
-  "community_cooldown": null,
-  "community_last_success_at": "2026-10-09T12:02:05.329077+08:00",
-  "scheduler_batch": {
-    "run_id": "37948602390",
-    "active": false,
-    "status": "finished",
-    "manual_cooldown_override": false,
-    "request_limit": 250,
-    "started_at": "2026-10-09T23:02:11.698169+08:00",
-    "last_updated_at": "2026-10-09T23:02:11.793185+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-10-09T23:02:11.793185+08:00",
-    "stop_reason": "awaiting_group_resolution_no_request"
-  },
-  "group_resolution_api_cooldown": {
-    "status": "available",
-    "retry_at": null,
-    "observed_at": "2026-10-09T14:03:34.743330Z",
-    "attempts": 0,
-    "source": "Steam ISteamUser/ResolveVanityURL"
-  }
+  ]
 }

@@ -22228,17 +22228,19 @@
   },
   "scheduler_batch": {
     "run_id": "37977336847",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
     "started_at": "2026-10-10T03:02:32.507920+08:00",
-    "last_updated_at": "2026-10-10T03:17:04.934545+08:00",
-    "requests_this_run": 110,
-    "official_new_this_run": 110,
+    "last_updated_at": "2026-10-10T03:17:20.995945+08:00",
+    "requests_this_run": 112,
+    "official_new_this_run": 112,
     "http_429_this_run": 0,
-    "last_appid": 5378400,
-    "last_name": "BlastMorph: Pinball"
+    "last_appid": 4458040,
+    "last_name": "忍法连珠",
+    "finished_at": "2026-10-10T03:17:20.995945+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "official_results": {
     "2069070": {
@@ -51943,13 +51945,39 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-10T03:17:04.934369+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5304120": {
+      "appid": 5304120,
+      "name": "Conflict 2026",
+      "release_date": "2027-04-15",
+      "group_id64": "103582791476072934",
+      "steam_url": "https://store.steampowered.com/app/5304120/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:17:12.935938+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4458040": {
+      "appid": 4458040,
+      "name": "忍法连珠",
+      "release_date": "2027-04-20",
+      "group_id64": "103582791476072296",
+      "steam_url": "https://store.steampowered.com/app/4458040/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-09T17:03:43.688539+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-10T03:17:20.942590+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-10T03:17:04.934369+08:00",
+  "community_last_success_at": "2026-10-10T03:17:20.942590+08:00",
   "group_resolution_api_cooldown": {
     "status": "available",
     "retry_at": null,
@@ -68253,6 +68281,26 @@
       "appid": 5378400,
       "when_taipei": "2026-10-10T03:17:04.829557+08:00",
       "release_date": "2027-04-02",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 1
+    },
+    {
+      "appid": 5304120,
+      "when_taipei": "2026-10-10T03:17:12.829694+08:00",
+      "release_date": "2027-04-15",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37977336847",
+      "official_followers": 1
+    },
+    {
+      "appid": 4458040,
+      "when_taipei": "2026-10-10T03:17:20.829830+08:00",
+      "release_date": "2027-04-20",
       "queue_source": "fresh_daily_prefilter_unresolved",
       "http": 200,
       "status": "ok",

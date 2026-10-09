@@ -251,8 +251,36 @@ JSON 讀取僅在 optional 且檔案不存在時回傳空 object；毀損或其�
 
 第十二批 PR 接在第十一批分支之後。剩餘實作以四批為目標：Steam 的 group resolver／dashboard／prefilter／partial merge／daily schedule、Twitch 收集與追蹤、Twitch 來源映射與快照保存、Content 共用 metadata／文字規則；再做一次四個 consumer 的總驗收，預留一次修正驗收發現。此完成界線涵蓋原四 consumer，前端 UI 與 IGDB 獨立後端另列範圍；既有具體 collector 可保留為 source adapter，退役實驗工具不因分層而全面重寫或重新啟用。
 
+## 第十三批：Steam 正式橋接收斂
+
+| 責任 | 位置 |
+| --- | --- |
+| 官方群組指紋、回條、較新批次與獨立 API 冷卻 | `domain/official_groups.py` |
+| 有界群組查詢與最新佇列重新投影 | `application/official_groups.py` |
+| ResolveVanityURL 傳輸與群組依賴組裝 | `adapters/steam_official_groups.py`、`adapters/official_groups.py` |
+| 官方佇列輸入、原子讀寫與共用 projection 接線 | `adapters/queue_inputs.py` |
+| 第三方 Followers parser、優先資格與候選挑選 | `domain/follower_prefilter.py` |
+| 完整預篩視窗的分階段提交與舊 null 修補 | `application/follower_prefilter.py` |
+| 有界 HTTP 重試與預篩組裝 | `adapters/steam_follower_prefilter.py`、`adapters/follower_prefilter.py` |
+| 歷史保留、部分 master 合併與成人清單讀取順序 | `domain/partial_catalog.py`、`application/partial_catalog.py`、`adapters/partial_catalog.py` |
+| 每日重設、台灣時區與外部排程槽位判斷 | `domain/daily_schedule.py` |
+| 唯讀 dashboard projection、目的檔保存與接線 | `domain/scheduler_status.py`、`application/scheduler_status.py`、`adapters/scheduler_status.py` |
+| 群組與 Twitch 官方佇列回條 CLI | `jobs/resolve_official_groups.py`、`jobs/reconcile_twitch_official_queue.py` |
+
+上表路徑皆相對於 `radar_backend/`。正式 candidate／official catalog／publish CLI／daily state 的六處舊 scripts import 全部改用新 owner；`radar_backend/` 不再直接 import 舊 scripts。正式 Git 批次出版只將兩個 subprocess module 字串改為新 jobs；新 CLI 的 main 與原入口同 AST，保留原參數、輸出、apply 與 dispatch 流程。凍結來源、Git 競爭重試、驗證與成功回條沿用原出版層。五個舊 scripts 仍支援相同呼叫與命令列，僅將指定 helper 改為薄相容入口；`update_steam_daily` 只抽離 prune_released 與 merge_partial_segment，其他 helper／run／main 不變。
+
+群組解析維持最多 20 次請求、120 秒預算、至少 1 秒間距、Twitch 優先與最新 checkpoint 勝過舊 candidate。Web API key 只進 header，不出現在保存的回條；timeout、拒絕 redirect、429／401／403／5xx 與 EResult 的停止和 Retry-After 保持。群組 API 冷卻與 Community 冷卻各自獨立。apply 仍要求最新 eligible membership、指紋一致、有效來源與群組、嚴格較新的觀測時間，不重建已完成／撤回項目，不改真實 Followers、cursor 或官方進度。
+
+第三方預篩維持 4,000 優先門檻，正式 Followers 公開門檻仍為 5,000。所有 mapping 與 bulk 成功後才提交整個視窗；失敗保留原 cursor 與 state。舊 null 的 parser 修補、200 筆 bulk 與 2,000 筆修補上限、五次有界重試、Retry-After 120 秒上限與既有 bool／數字解析行為保持。新增 transport ports 與原任意 HTTP kwargs 分開傳遞，舊替換介面不會因同名 keyword 改變。
+
+部分合併先載入成人排除清單，再保留所有歷史 dict，按 AppID 合併本批結果；依序保留 Core Twitch 證據與官方玩家分類，不增加日期或 Followers 篩選。每日重設保留既有 anchor／mode／refresh markers 與舊 state 接納規則；manual、GitHub 與 Cloudflare 的台灣時區窗口、槽位、拒絕訊息及校驗順序保持。
+
+Dashboard 讀取原來源並複製 checkpoint 後投影，僅保存指定目的檔，不寫回來源。未來 attempt 排除、最近 100 筆事件、真實 run link、優先與 parked 排序、03:00–23:00 的下一個官方槽位與 group／Community 冷卻保持。新 domain 不讀實際時鐘、HTTP 或檔案；application 透過明確 ports 協調；具體來源與時鐘由 adapters 組裝。
+
+第十三批 PR 接在第十二批分支之後。固定 Core SHA、requirements、正式 workflows、排程、Secrets、請求預算及 data／experiments 均不變；暫停中的手動測試僅加入五個新 sparse 測試檔。剩餘實作為 Twitch 收集／追蹤、Twitch 映射／快照與 Content metadata／文字規則三批，再做一次四個 consumer 總驗收，預留一次修正，估計再 4～5 次。
+
 ## 尚未遷移
 
-正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新、公開目錄 projection／categories 保存、公開 shard builder 與 Twitch → Steam 匯入／官方佇列已使用共用來源、規則與用例層。Steam 的 group resolver、dashboard、prefilter、partial merge 與 daily schedule 橋接、Twitch 本專案的收集／映射／快照及 Content 共用 metadata／文字規則仍需收斂；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
+正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新、公開目錄 projection／categories 保存、公開 shard builder、Twitch → Steam 匯入／官方佇列與 Steam 剩餘正式橋接已使用共用來源、規則與用例層。Twitch 本專案的收集／追蹤／映射／快照及 Content 共用 metadata／文字規則仍需收斂；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

@@ -1,35 +1,21 @@
-"""Resume-safe third-party >=4000 shortlist for Steam XML >=5000 verification.
-
-Only measured third-party >=4000 games proceed to new Steam XML queries.
-Missing groups stay unresolved, not assigned invented follower numbers, and
-below-threshold games do not enter the official XML verification stage.
-"""
+"""Canonical third-party priority prescreen composition; counts stay unofficial."""
 from __future__ import annotations
-
 import time
 from datetime import datetime, timezone
 from typing import Any
-
 import requests
 from radar_backend.domain import follower_prefilter as _prefilter_rules
 from radar_backend.application import follower_prefilter as _prefilter_application
 from radar_backend.adapters import steam_follower_prefilter as _prefilter_transport
-
-VANITY_URL = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/"
-BULK_URL = "https://api.steam-groups.com/api/groups/bulk"
-GROUP_BASE = 103582791429521408
-PRIORITY_THRESHOLD = 4000
-STEAM_PUBLIC_THRESHOLD = 5000
-DEFAULT_BATCH_SIZE = 200
+from radar_backend.domain.follower_prefilter import (
+    GROUP_BASE, PRIORITY_THRESHOLD, STEAM_PUBLIC_THRESHOLD, DEFAULT_BATCH_SIZE,
+    RETRYABLE_HTTP, RETRY_DELAYS, RATE_LIMIT_DELAYS,
+)
+from radar_backend.adapters.steam_follower_prefilter import VANITY_URL, BULK_URL
 
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-RETRYABLE_HTTP = {408, 425, 429, 500, 502, 503, 504}
-RETRY_DELAYS = (4, 12, 30, 60)
-RATE_LIMIT_DELAYS = (15, 30, 60, 120)
 
 
 def _request_with_retries(

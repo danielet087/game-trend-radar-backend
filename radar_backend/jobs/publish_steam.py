@@ -76,7 +76,7 @@ def main(argv=None):
             write_json(STATE, next_state)
         return 0
     if args.command == "render-queue-status":
-        from scripts.export_scheduler_queue_status import export_status
+        from radar_backend.adapters.scheduler_status import export_status
         from radar_backend.domain.growth import timestamp
         observed = timestamp(args.observed_at)
         if observed is None:

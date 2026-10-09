@@ -2059,8 +2059,65 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "2254990": {
+      "status": "accepted",
+      "updated_at": "2026-10-09T19:02:20.377553Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 2254990,
+        "twitch_game_id": "1943685030",
+        "igdb_id": "302147",
+        "checked_at": "2026-10-09T16:12:50Z",
+        "source_frontend_commit": "3d53f548a236d8d2d18f1981ea47b6ae653984b8",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-09T16:12:50Z",
+          "viewer_count": 8479,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "steam_verified",
+      "content_signature": "4b79c24ff0bdd617a942e6ee5f08d533e8bb36cbd1b0966df23a5d305086d0df",
+      "followers": 35276,
+      "follower_checked_at": "2026-09-22T16:02:18.570483+08:00",
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
+    },
+    "4437650": {
+      "status": "pending",
+      "updated_at": "2026-10-09T19:02:20.377553Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4437650,
+        "twitch_game_id": "1419737853",
+        "igdb_id": "406107",
+        "checked_at": "2026-10-09T17:13:36Z",
+        "source_frontend_commit": "3d53f548a236d8d2d18f1981ea47b6ae653984b8",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-09T17:13:36Z",
+          "viewer_count": 11859,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "uncertain_taiwan_store_date",
+      "retry_at": "2026-10-10T19:02:25.056069Z",
+      "rate_limit_stage": null,
+      "rate_limit_attempts": 0,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-10-09T15:02:05.301003Z",
+  "updated_at": "2026-10-09T19:02:20.377553Z",
   "api_cooldowns": {}
 }

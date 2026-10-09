@@ -1763,15 +1763,15 @@
     },
     "4954910": {
       "status": "pending",
-      "updated_at": "2026-10-08T21:01:42.579342Z",
+      "updated_at": "2026-10-09T21:02:22.619310Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 4954910,
         "twitch_game_id": "722422729",
         "igdb_id": "418295",
-        "checked_at": "2026-10-08T20:14:40Z",
-        "source_frontend_commit": "1bb5d1a5184fe02d5bbb1b910d42e3e4dfd61714",
+        "checked_at": "2026-10-09T20:15:33Z",
+        "source_frontend_commit": "97244c1adeac771ec1df195bb2eb1f37d6290db1",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-07T20:12:43Z",
@@ -1782,7 +1782,7 @@
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-09T21:01:47.183995Z",
+      "retry_at": "2026-10-10T21:02:27.420610Z",
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
@@ -2124,8 +2124,39 @@
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
+    },
+    "3031880": {
+      "status": "accepted",
+      "updated_at": "2026-10-09T21:02:22.619310Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 3031880,
+        "twitch_game_id": "2100615846",
+        "igdb_id": "344093",
+        "checked_at": "2026-10-09T20:15:33Z",
+        "source_frontend_commit": "97244c1adeac771ec1df195bb2eb1f37d6290db1",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-09T20:15:33Z",
+          "viewer_count": 11283,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "steam_verified",
+      "content_signature": "94c2b8abb643bacb7ee73c45597405e6533a134ae482567e1d8d3b563912969b",
+      "followers": 6726,
+      "follower_checked_at": "2026-09-22T16:22:53.557432+08:00",
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-10-09T20:02:36.327796Z",
+  "updated_at": "2026-10-09T21:02:22.619310Z",
   "api_cooldowns": {}
 }

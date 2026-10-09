@@ -49402,6 +49402,84 @@
       "official_ge5000": true,
       "official_checked_at_taipei": "2026-10-09T06:01:53.443803+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4287460": {
+      "appid": 4287460,
+      "name": "POOL LOOP",
+      "release_date": "2026-09-22",
+      "steam_url": "https://store.steampowered.com/app/4287460/",
+      "group_id64": "103582791475524493",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4287460,
+        "twitch_game_id": "1851360928",
+        "igdb_id": "392596",
+        "checked_at": "2026-10-09T03:11:41Z",
+        "source_frontend_commit": "09d2e1d2a8d1ed23656e70f112a634f55aaead0b",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-09T03:11:41Z",
+          "viewer_count": 14207,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 4287460,
+        "name": "POOL LOOP",
+        "name_en": "POOL LOOP",
+        "release_raw": "2026-09-22",
+        "release_start": "2026-09-22",
+        "release_end": "2026-09-22",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-09-22T12:04:37Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-09-22",
+        "release_date_conflict": false,
+        "release_store_date": "2026-09-22",
+        "release_date_normalization": "steam_store_date_matches_taipei",
+        "release_date_verified_at": "2026-10-09T04:01:57.168583Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-09T04:01:57.168583Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [],
+        "store_url": "https://store.steampowered.com/app/4287460/",
+        "community_url": "https://steamcommunity.com/app/4287460/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4287460,
+          "twitch_game_id": "1851360928",
+          "igdb_id": "392596",
+          "checked_at": "2026-10-09T03:11:41Z",
+          "source_frontend_commit": "09d2e1d2a8d1ed23656e70f112a634f55aaead0b",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-09T03:11:41Z",
+            "viewer_count": 14207,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-09T04:02:01.868411Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 149,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-09T12:02:05.329054+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "attempt_events": [
@@ -64595,6 +64673,16 @@
       "status": "ok",
       "github_run_id": "37850763781",
       "official_followers": 24662
+    },
+    {
+      "appid": 4287460,
+      "when_taipei": "2026-10-09T12:02:05.038723+08:00",
+      "release_date": "2026-09-22",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "37881950754",
+      "official_followers": 149
     }
   ],
   "next_request_after_taipei": null,
@@ -64686,20 +64774,22 @@
     }
   },
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-09T06:01:53.443831+08:00",
+  "community_last_success_at": "2026-10-09T12:02:05.329077+08:00",
   "scheduler_batch": {
-    "run_id": "37877348989",
+    "run_id": "37881950754",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-09T11:02:03.488165+08:00",
-    "last_updated_at": "2026-10-09T11:02:03.587518+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-09T12:02:04.940174+08:00",
+    "last_updated_at": "2026-10-09T12:02:05.381718+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "finished_at": "2026-10-09T11:02:03.587518+08:00",
-    "stop_reason": "awaiting_group_resolution_no_request"
+    "last_appid": 4287460,
+    "last_name": "POOL LOOP",
+    "finished_at": "2026-10-09T12:02:05.381718+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "group_resolution_api_cooldown": {
     "status": "available",

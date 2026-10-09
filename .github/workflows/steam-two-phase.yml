@@ -271,38 +271,17 @@ jobs:
         env:
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
         run: |
-          if [ ! -f output/steam_upcoming.json ]; then
-            echo "Discovery only: no Followers queried and no public games overwritten."
-            exit 0
+          if [ -f output/steam_upcoming.json ]; then
+            git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
           fi
-          if [ -z "$FRONTEND_REPO_TOKEN" ]; then
-            echo "::error::FRONTEND_REPO_TOKEN is required for public publish."
-            exit 1
-          fi
-          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
-          git -C frontend config user.name "github-actions[bot]"
-          git -C frontend config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # Rebuild against the newest frontend snapshot on a concurrent push.
-          # Do not rebase an old full-file JSON over a content-enrichment commit.
-          for attempt in $(seq 1 8); do
-            (
-              cd frontend
-              bash ../scripts/git_frontend_auth.sh fetch origin main
-              git reset --hard origin/main
-              git clean -fd -- data/games data/calendar data/lists
-            )
-            python -m scripts.build_public_steam_shards --input data/steam_upcoming_master.json --frontend frontend --authoritative-future
-            git -C frontend add data/index.json data/calendar data/games data/lists data/steam_upcoming.json data/catalog.json
-            if git -C frontend diff --cached --quiet; then
-              echo "Public JSON already matches."
-              exit 0
-            fi
-            git -C frontend commit -m "data: publish consistent Steam catalog"
-            if (cd frontend && bash ../scripts/git_frontend_auth.sh push origin HEAD:main); then
-              exit 0
-            fi
-            echo "::warning::Concurrent publication; rebuilding from latest frontend ($attempt/8)"
-            sleep $((attempt * 2))
-          done
-          echo "::error::Could not publish a consistent catalog after eight attempts"
-          exit 1
+          python -m radar_backend.jobs.publish_steam catalog \
+            --skip-missing-batch output/steam_upcoming.json \
+            --receipt output/steam-catalog-publication.json
+      - name: Keep acknowledged Steam publication revision
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: steam-catalog-publication
+          path: output/steam-catalog-publication.json
+          if-no-files-found: ignore
+          retention-days: 7

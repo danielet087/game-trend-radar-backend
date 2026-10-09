@@ -85,17 +85,9 @@ jobs:
           python -u -m scripts.reconcile_twitch_official_queue --phase collect \
             --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
             --batch output/steam_official_daily_catchup/twitch_prepare.json --max-seconds 300
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            python -m scripts.reconcile_twitch_official_queue --phase apply --batch output/steam_official_daily_catchup/twitch_prepare.json
-            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
-            git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json data/twitch_steam_import_state.json data/scheduler_queue_status.json
-            if git diff --cached --quiet; then exit 0; fi
-            git commit -m 'data: merge Twitch priority discoveries into official Followers queue'
-            if git push origin HEAD:main; then exit 0; fi
-          done
-          exit 1
+          python -m radar_backend.jobs.publish_steam queue \
+            --kind twitch --batch output/steam_official_daily_catchup/twitch_prepare.json \
+            --receipt output/steam_official_daily_catchup/twitch-prepare-publication.json
 
       - name: Resolve missing official group IDs before Followers XML requests
         id: groups
@@ -107,18 +99,9 @@ jobs:
           python -u -m scripts.resolve_official_group_ids --phase collect \
             --batch output/steam_official_daily_catchup/group_resolution.json \
             --max-requests 20 --max-seconds 120
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            python -m scripts.resolve_official_group_ids --phase apply \
-              --batch output/steam_official_daily_catchup/group_resolution.json
-            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
-            git add experiments/steam_official_daily_catchup/checkpoint.json data/scheduler_queue_status.json
-            if git diff --cached --quiet; then exit 0; fi
-            git commit -m 'data: resolve official groups ahead of Followers queue'
-            if git push origin HEAD:main; then exit 0; fi
-          done
-          exit 1
+          python -m radar_backend.jobs.publish_steam queue \
+            --kind groups --batch output/steam_official_daily_catchup/group_resolution.json \
+            --receipt output/steam_official_daily_catchup/group-resolution-publication.json
 
       - name: Recheck the scheduled hour after Twitch and group preparation
         id: query_window
@@ -166,17 +149,9 @@ jobs:
           python -u -m scripts.reconcile_twitch_official_queue --phase collect \
             --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
             --batch output/steam_official_daily_catchup/twitch_finalize.json --max-seconds 300
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            python -m scripts.reconcile_twitch_official_queue --phase apply --batch output/steam_official_daily_catchup/twitch_finalize.json
-            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
-            git add experiments/steam_official_daily_catchup/checkpoint.json data/steam_upcoming_master.json data/twitch_steam_import_state.json data/scheduler_queue_status.json
-            if git diff --cached --quiet; then exit 0; fi
-            git commit -m 'data: admit Twitch discoveries using unified official Followers results'
-            if git push origin HEAD:main; then exit 0; fi
-          done
-          exit 1
+          python -m radar_backend.jobs.publish_steam queue \
+            --kind twitch --batch output/steam_official_daily_catchup/twitch_finalize.json \
+            --receipt output/steam_official_daily_catchup/twitch-finalize-publication.json
 
       - name: Dispatch persisted Twitch admissions and save receipts
         if: always() && steps.window.outputs.proceed == 'true' && steps.prepare.outcome == 'success'
@@ -187,17 +162,9 @@ jobs:
           set -euo pipefail
           python -u -m scripts.reconcile_twitch_official_queue --phase dispatch \
             --batch output/steam_official_daily_catchup/twitch_dispatch.json --max-seconds 300
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            python -m scripts.reconcile_twitch_official_queue --phase apply --batch output/steam_official_daily_catchup/twitch_dispatch.json
-            python -m scripts.export_scheduler_queue_status || echo '::warning::Queue status export failed; retaining previous snapshot'
-            git add data/twitch_steam_import_state.json data/scheduler_queue_status.json
-            if git diff --cached --quiet; then exit 0; fi
-            git commit -m 'data: save unified queue Twitch content dispatch receipts'
-            if git push origin HEAD:main; then exit 0; fi
-          done
-          exit 1
+          python -m radar_backend.jobs.publish_steam queue \
+            --kind dispatch --batch output/steam_official_daily_catchup/twitch_dispatch.json \
+            --receipt output/steam_official_daily_catchup/twitch-dispatch-publication.json
 
       - name: Publish actual per-batch result summary
         if: always() && steps.query_window.outputs.proceed == 'true'

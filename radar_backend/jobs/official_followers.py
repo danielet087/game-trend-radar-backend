@@ -36,7 +36,7 @@ def default_paths():
 
 
 def default_services(paths):
-    """Compose production ports; adapters resolve the remaining legacy helpers."""
+    """Compose production sources, Store/catalog/content use cases and state."""
     from radar_backend.adapters import official_catalog as catalog
     from radar_backend.adapters.official_followers import OfficialFollowerClient
     from radar_backend.state import official_checkpoint as checkpoint
@@ -73,11 +73,13 @@ def default_services(paths):
         read=checkpoint.read, save=checkpoint.save, exists=checkpoint.exists,
         clock=clock, monotonic=time.monotonic, sleep=time.sleep,
         session_factory=requests.Session, make_queue=queue, git_push=persist,
-        reverify_pending_store_dates=catalog.reverify_pending_store_dates,
-        retry_pending_content_dispatches=catalog.retry_pending_content_dispatches,
-        verify_store_date_for_result=catalog.verify_store_date_for_result,
-        upsert_qualified_master=catalog.upsert_qualified_master,
-        dispatch_content_event=catalog.dispatch_content_event,
+        reverify_pending_store_dates=lambda data, master: catalog.reverify_pending_store_dates(
+            data, master, clock=clock, session_factory=requests.Session,
+        ),
+        retry_pending_content_dispatches=lambda data: catalog.retry_pending_content_dispatches(data, clock=clock),
+        verify_store_date_for_result=lambda result, session: catalog.verify_store_date_for_result(result, session, clock=clock),
+        upsert_qualified_master=lambda master, result: catalog.upsert_qualified_master(master, result, clock=clock),
+        dispatch_content_event=lambda data, result: catalog.dispatch_content_event(data, result, clock=clock),
         follower_client_factory=OfficialFollowerClient,
         follower_cache_factory=OfficialFollowerCache, cooldown_factory=CooldownStore,
         begin_persistence=begin,

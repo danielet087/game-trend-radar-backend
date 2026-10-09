@@ -111,8 +111,25 @@ daily 在 reset 後、收集前 capture 私有狀態。reset 每次對最新狀�
 
 第五批 PR 接在第四批分支之後。正式及歷史共用 collector 的入口一併使用新的狀態邊界；既有 sparse checkout 加入新傳輸測試，歷史工具的觸發條件維持。
 
+## 第六批：Store 複驗、主清單提升與內容派送
+
+| 責任 | 純規則 | 用例 | 外部來源與組裝 |
+| --- | --- | --- | --- |
+| Store 日期複驗與主清單提升 | `domain/official_catalog.py` | `application/official_catalog.py` | `adapters/steam_store.py`、`adapters/official_catalog.py` |
+| 內容事件資格、signature 與重試 | `domain/content_dispatch.py` | `application/content_dispatch.py` | `adapters/github_content_dispatch.py`、`adapters/official_catalog.py` |
+
+上表路徑皆相對於 `radar_backend/`。正式 `jobs/official_followers.py` 直接組裝新用例與 adapter，不再反向匯入 historical hourly worker。舊 worker 的六個公開函式保留為薄相容入口，在呼叫時提供原時鐘、Store helper、成人名單、HTTP 及派送 callback，維持既有呼叫與 monkeypatch 行為。純規則不讀環境變數、檔案、HTTP 或 Git；用例透過明確依賴協調。
+
+官方 Followers ≥ 5,000、精確 Store 日期與 `date_full` 門檻保留。主清單提升先判定資格，符合後才讀成人排除名單；名單缺失或毀損會中止，不能當成空名單。合併保留既有列的未知欄位，候選的 `None` 不覆蓋既有值，沿用原排序與 metadata。一次提升共用同一個 UTC 時間戳。
+
+合法的台灣商店公告日仍是上市日期權威；timestamp 換算的台灣日期另存為診斷與衝突資訊。Store 不可用時留下複驗時間與失敗狀態，不把舊 metadata 當成新的精確證據。時鐘必須帶時區，Store 判斷使用台灣日期；批次選取與查詢共用同一天，避免跨午夜改變查詢範圍。單筆間隔 0 秒、批次間隔 0.5 秒、預設上限 25、同日略過、已精確略過與 Twitch 佇列排除都保留。複驗回傳選取筆數，並在精確結果上依序執行主清單提升與派送，維持原有計數及 callback 契約。
+
+派送保留 `steam_game_qualified`、七個 payload 欄位、`appid:followers:release_date:store-v2` signature、環境變數優先順序、HTTP headers 與 20 秒 timeout。只有 HTTP 204 才記錄 `dispatched`，相同 signature 的已確認派送才去重；這個確認表示 GitHub 接受事件，不能代表 Content 或前端已發布。非 204 與網路例外保留失敗紀錄，例外日誌只包含類型。重試沿用原排序、Twitch 排除及預設上限 25；符合 Followers 門檻但日期未驗證或未配置傳輸的項目仍計入嘗試筆數。
+
+第六批 PR 接在第五批分支之後，共用 Core 0.2.0 固定 SHA 不變。hourly 請求預算、排程、Secrets、公開 JSON、checkpoint 格式與 Git 發布邊界沒有調整；歷史手動測試 workflow 只補入新測試的 sparse checkout 依賴，不重新啟用自動觸發。
+
 ## 尚未遷移
 
-候選來源 adapter 仍橋接既有 Steam Store 日期、成人篩選與公開目錄 helper；官方 worker 的上市日期複驗、master upsert 與 content dispatch 仍保留在相容入口，由 `adapters/official_catalog.py` 提供明確的舊流程橋接。這些原本已服務正式資料流程，需和後續發布邊界一起遷移。
+正式官方 worker 的 Store 複驗、主清單提升與內容派送已由新層擁有。候選及官方來源 adapter 仍橋接共用的 Steam Store 低層日期解析、成人篩選、Twitch 收錄與公開目錄 helper；本批沒有全面搬移這些供多個 repair／公開工具使用的底層實作。
 
-歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移；content dispatch 的 HTTP 呼叫也仍由原流程執行。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。
+歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

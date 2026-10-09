@@ -40,6 +40,7 @@ jobs:
           data/steam_candidate_state.json
           data/twitch_steam_import_state.json
           tests/test_official_checkpoint_publication.py
+          tests/test_follower_checkpoint_transport.py
           EOF
           git sparse-checkout set --no-cone $(cat /tmp/sparse-list)
           python - <<'PY'
@@ -48,4 +49,4 @@ jobs:
           assert job.MASTER.name == "steam_upcoming_master.json"
           print("HOURLY_SPARSE_IMPORT_OK")
           PY
-          python -m pytest -q tests/test_official_checkpoint_publication.py
+          python -m pytest -q tests/test_official_checkpoint_publication.py tests/test_follower_checkpoint_transport.py

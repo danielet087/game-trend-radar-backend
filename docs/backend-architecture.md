@@ -94,8 +94,25 @@ daily 在 reset 後、收集前 capture 私有狀態。reset 每次對最新狀�
 
 第四批 PR 接在 Steam 第三批分支之後；前批合併後才調整 base。共用 Core 固定版本維持 0.2.0，不新增其他 consumer PR。
 
+## 第五批：steam-state 狀態傳輸
+
+| 責任 | 位置 |
+| --- | --- |
+| Followers 觀測的時間戳合併 | `domain/follower_checkpoint.py` |
+| 本機 checkpoint JSON 與暫存檔保存 | `state/follower_checkpoint.py` |
+| GitHub Contents GET／條件式 PUT 與回條驗證 | `adapters/github_contents_checkpoint.py` |
+| 凍結輸入、合併遠端與有界競爭重試 | `application/follower_checkpoint.py` |
+
+上表路徑皆相對於 `radar_backend/`。`collectors/steam_upcoming.py` 保留原建構參數、快取合併函式及 checkpoint methods，負責組裝依賴；各 method 在呼叫時提供原 HTTP、時鐘與 payload helper，維持既有呼叫端及 monkeypatch 介面。這個傳輸使用獨立 `steam-state` 分支的 Contents API，不經 runner 的 main Git reset，也不需要調整 Core 版本。
+
+原保存流程只讀遠端 blob SHA，再 PUT 整份本機快取，可能刪除其他工作剛保存的 AppID。新用例先凍結本機觀測與時間，再讀取遠端完整內容並合併；有效時間優先，兩側皆有效時取較新量測，相同或兩側皆未知時保留先讀到的遠端整列及其未知欄位。遇到 409 只在有限次數內重新讀取遠端、重播同一輸入，不重新查 Followers。其他 HTTP 錯誤、毀損／空內容或不合法回條會停止交付，保留本機觀測與 dirty 計數，不能把讀取失敗當成空狀態後覆寫。
+
+成功回條同時驗證提交 SHA 與本次 JSON 位元組的 blob SHA，確認後才 reload 原快取 dict 並清除 dirty 計數。本機 checkpoint 與其暫存檔在寫入前驗證路徑；錯誤日誌只回報類型或狀態，不包含 token 或原始 HTTP 例外文字。無 token 時仍保存本機；預設每 5 次新查詢、429 與 segment-end 的保存時機、Followers TTL、請求預算及 Steam 來源規則不變。
+
+第五批 PR 接在第四批分支之後。正式及歷史共用 collector 的入口一併使用新的狀態邊界；既有 sparse checkout 加入新傳輸測試，歷史工具的觸發條件維持。
+
 ## 尚未遷移
 
 候選來源 adapter 仍橋接既有 Steam Store 日期、成人篩選與公開目錄 helper；官方 worker 的上市日期複驗、master upsert 與 content dispatch 仍保留在相容入口，由 `adapters/official_catalog.py` 提供明確的舊流程橋接。這些原本已服務正式資料流程，需和後續發布邊界一起遷移。
 
-`collectors/steam_upcoming.py` 對獨立 `steam-state` 分支的 GitHub Contents GET／PUT 仍保留，屬另一個狀態 transport。歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移；content dispatch 的 HTTP 呼叫也仍由原流程執行。
+歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移；content dispatch 的 HTTP 呼叫也仍由原流程執行。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

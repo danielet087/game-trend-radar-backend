@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import base64
 import calendar
+from copy import deepcopy
 import json
 import logging
 import os
@@ -16,6 +16,11 @@ from typing import Any, Iterable
 
 import requests
 from bs4 import BeautifulSoup
+
+from radar_backend.adapters import github_contents_checkpoint as checkpoint_transport
+from radar_backend.application.follower_checkpoint import persist_follower_checkpoint
+from radar_backend.domain import follower_checkpoint as checkpoint_rules
+from radar_backend.state import follower_checkpoint as checkpoint_state
 
 LOGGER = logging.getLogger(__name__)
 
@@ -290,42 +295,13 @@ def _utc_now() -> datetime:
 
 
 def _parse_iso_datetime(value: str | None) -> datetime | None:
-    if not value:
-        return None
-    try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
-        if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=timezone.utc)
-        return parsed.astimezone(timezone.utc)
-    except (TypeError, ValueError):
-        return None
+    return checkpoint_rules.parse_checked_at(value)
 
 
 def merge_follower_records(
     *sources: dict[str, dict[str, Any]],
 ) -> dict[str, dict[str, Any]]:
-    merged: dict[str, dict[str, Any]] = {}
-
-    for source in sources:
-        for appid, entry in source.items():
-            if not isinstance(entry, dict):
-                continue
-
-            key = str(appid)
-            current = merged.get(key)
-            if current is None:
-                merged[key] = dict(entry)
-                continue
-
-            incoming_time = _parse_iso_datetime(str(entry.get("checked_at") or ""))
-            current_time = _parse_iso_datetime(str(current.get("checked_at") or ""))
-
-            if incoming_time is not None and (
-                current_time is None or incoming_time > current_time
-            ):
-                merged[key] = dict(entry)
-
-    return merged
+    return checkpoint_rules.merge_follower_records(*sources, parse_timestamp=_parse_iso_datetime)
 
 
 class SteamUpcomingCollector:
@@ -418,31 +394,19 @@ class SteamUpcomingCollector:
         return {}
 
     def _load_checkpoint_file(self) -> dict[str, dict[str, Any]]:
-        if not self.checkpoint_path.exists():
-            return {}
         try:
-            payload = json.loads(self.checkpoint_path.read_text(encoding="utf-8"))
-            games = payload.get("games", payload)
-            if isinstance(games, dict):
-                return {str(k): v for k, v in games.items() if isinstance(v, dict)}
+            return checkpoint_state.load_checkpoint_file(self.checkpoint_path)
         except (OSError, ValueError, TypeError):
             LOGGER.warning("Could not read local follower checkpoint")
         return {}
 
     def _checkpoint_api_url(self) -> str | None:
-        if not self.github_repository:
-            return None
-        return (
-            f"https://api.github.com/repos/{self.github_repository}/contents/"
-            f"{self.checkpoint_path.as_posix()}"
+        return checkpoint_transport.checkpoint_api_url(
+            self.github_repository, self.checkpoint_path.as_posix(),
         )
 
     def _checkpoint_headers(self) -> dict[str, str]:
-        return {
-            "Authorization": f"Bearer {self.checkpoint_token}",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        }
+        return checkpoint_transport.checkpoint_headers(self.checkpoint_token)
 
     def _load_remote_checkpoint(self) -> dict[str, dict[str, Any]]:
         url = self._checkpoint_api_url()
@@ -450,47 +414,34 @@ class SteamUpcomingCollector:
             return {}
 
         try:
-            response = requests.get(
-                url,
-                headers=self._checkpoint_headers(),
-                params={"ref": self.checkpoint_branch},
-                timeout=self.timeout_seconds,
-            )
-            if response.status_code == 404:
-                return {}
-            response.raise_for_status()
-            payload = response.json()
-            encoded = str(payload.get("content") or "").replace("\n", "")
-            if not encoded:
-                return {}
-            decoded = base64.b64decode(encoded).decode("utf-8")
-            data = json.loads(decoded)
-            games = data.get("games", data)
-            if isinstance(games, dict):
-                return {str(k): v for k, v in games.items() if isinstance(v, dict)}
+            return checkpoint_transport.load_remote_checkpoint(
+                url=url, path=self.checkpoint_path.as_posix(), branch=self.checkpoint_branch,
+                headers=self._checkpoint_headers(), timeout=self.timeout_seconds,
+                get=requests.get,
+            ).games
         except Exception as exc:
-            LOGGER.warning("Could not load remote Steam checkpoint: %s", exc)
+            LOGGER.warning("Could not load remote Steam checkpoint: %s", checkpoint_transport.failure_detail(exc))
 
         return {}
 
     def _checkpoint_payload(self) -> dict[str, Any]:
-        return {
-            "version": 1,
-            "updated_at": _utc_now().replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-            "games": self.follower_cache,
-        }
+        return checkpoint_state.checkpoint_payload(self.follower_cache, _utc_now())
 
     def _save_checkpoint_local(self) -> None:
-        self.checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
-        temp = self.checkpoint_path.with_suffix(".tmp")
-        temp.write_text(
-            json.dumps(self._checkpoint_payload(), ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
-        temp.replace(self.checkpoint_path)
+        payload = getattr(self, "_checkpoint_frozen_payload", None)
+        if payload is None:
+            payload = self._checkpoint_payload()
+        checkpoint_state.save_checkpoint_file(self.checkpoint_path, payload)
 
     def _persist_checkpoint_remote(self, *, reason: str, force: bool = False) -> None:
-        self._save_checkpoint_local()
+        # Capture the payload once, while preserving the no-argument legacy
+        # save callback and the collector's call-time clock/payload overrides.
+        frozen = deepcopy(self._checkpoint_payload())
+        self._checkpoint_frozen_payload = frozen
+        try:
+            self._save_checkpoint_local()
+        finally:
+            del self._checkpoint_frozen_payload
 
         if not self.checkpoint_token or not self.github_repository:
             return
@@ -504,36 +455,25 @@ class SteamUpcomingCollector:
             return
 
         try:
-            existing_sha: str | None = None
-            current = requests.get(
-                url,
-                headers=self._checkpoint_headers(),
-                params={"ref": self.checkpoint_branch},
-                timeout=self.timeout_seconds,
+            persisted = persist_follower_checkpoint(
+                frozen,
+                read_latest=lambda: checkpoint_transport.load_remote_checkpoint(
+                    url=url, path=self.checkpoint_path.as_posix(), branch=self.checkpoint_branch,
+                    headers=self._checkpoint_headers(), timeout=self.timeout_seconds,
+                    get=requests.get,
+                ),
+                write_merged=lambda previous, payload: checkpoint_transport.save_remote_checkpoint(
+                    payload, previous=previous, url=url, path=self.checkpoint_path.as_posix(),
+                    branch=self.checkpoint_branch, headers=self._checkpoint_headers(),
+                    timeout=self.timeout_seconds, reason=reason, put=requests.put,
+                ),
+                merge_records=merge_follower_records,
             )
-            if current.status_code == 200:
-                existing_sha = str(current.json().get("sha") or "") or None
-            elif current.status_code != 404:
-                current.raise_for_status()
-
-            raw = (
-                json.dumps(self._checkpoint_payload(), ensure_ascii=False, indent=2) + "\n"
-            ).encode("utf-8")
-            body: dict[str, Any] = {
-                "message": f"checkpoint: save Steam follower progress ({reason})",
-                "content": base64.b64encode(raw).decode("ascii"),
-                "branch": self.checkpoint_branch,
-            }
-            if existing_sha:
-                body["sha"] = existing_sha
-
-            response = requests.put(
-                url,
-                headers=self._checkpoint_headers(),
-                json=body,
-                timeout=self.timeout_seconds,
-            )
-            response.raise_for_status()
+            # Only a validated remote acknowledgement may update the shared
+            # cache and clear this run's pending observation count.
+            checkpoint_state.save_checkpoint_file(self.checkpoint_path, persisted.payload)
+            self.follower_cache.clear()
+            self.follower_cache.update(persisted.payload["games"])
             LOGGER.info(
                 "Persisted Steam checkpoint to %s after %d new follower lookups (%s)",
                 self.checkpoint_branch,
@@ -542,7 +482,7 @@ class SteamUpcomingCollector:
             )
             self._checkpoint_dirty_count = 0
         except Exception as exc:
-            LOGGER.warning("Could not persist remote Steam checkpoint: %s", exc)
+            LOGGER.warning("Could not persist remote Steam checkpoint: %s", checkpoint_transport.failure_detail(exc))
 
     def _save_follower_cache(self) -> None:
         self.follower_cache_path.parent.mkdir(parents=True, exist_ok=True)

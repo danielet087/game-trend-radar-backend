@@ -189,11 +189,13 @@ def delivery_repo(tmp_path):
     git(repo, "config", "user.name", "Test")
     git(repo, "config", "user.email", "test@example.com")
     (repo / "scripts").mkdir()
+    shutil.copytree(ROOT / "radar_backend", repo / "radar_backend",
+                    ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
     for name in ("persist_growth_checkpoint.py", "external_schedule.py", "steam_official_followers.py"):
         shutil.copyfile(ROOT / "scripts" / name, repo / "scripts" / name)
     baseline = {"queue": [{"appid": 1}], "official_results": {"2": {"retained": True}}}
     write_json(repo / CHECKPOINT, baseline)
-    git(repo, "add", "scripts", CHECKPOINT)
+    git(repo, "add", "scripts", "radar_backend", CHECKPOINT)
     git(repo, "commit", "-m", "seed")
     git(repo, "push", "origin", "HEAD:main")
     write_json(repo / "output/growth-checkpoint-baseline.json", baseline)

@@ -26,6 +26,7 @@ jobs:
           git sparse-checkout init --no-cone
           cat > /tmp/sparse-list <<'EOF'
           scripts/
+          radar_backend/
           collectors/
           experiments/steam_official_nearfirst_20260922/
           experiments/steam_official_followers_20260922/checkpoint.json

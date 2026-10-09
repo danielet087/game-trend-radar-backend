@@ -63,6 +63,11 @@ jobs:
           tests/test_public_shard_application.py
           tests/test_public_shard_state.py
           tests/test_public_shard_composition.py
+          tests/test_twitch_intake_rules.py
+          tests/test_twitch_queue_layers.py
+          tests/test_twitch_intake_application.py
+          tests/test_twitch_intake_state_transport.py
+          tests/test_twitch_intake_composition.py
           EOF
           git sparse-checkout set --no-cone $(cat /tmp/sparse-list)
           python - <<'PY'
@@ -71,4 +76,4 @@ jobs:
           assert job.MASTER.name == "steam_upcoming_master.json"
           print("HOURLY_SPARSE_IMPORT_OK")
           PY
-          python -m pytest -q tests/test_official_checkpoint_publication.py tests/test_follower_checkpoint_transport.py tests/test_official_catalog_layers.py tests/test_content_dispatch_layers.py tests/test_official_catalog_composition.py tests/test_adult_exclusion_layers.py tests/test_steam_metadata_layers.py tests/test_store_release_layers.py tests/test_steam_store_composition.py tests/test_public_release_date_layers.py tests/test_release_timestamp_transport.py tests/test_localized_title_layers.py tests/test_release_locale_composition.py tests/test_preview_metadata_layers.py tests/test_published_title_layers.py tests/test_published_title_transport.py tests/test_preview_published_title_composition.py tests/test_catalog_metadata_layers.py tests/test_catalog_projection_layers.py tests/test_public_catalog_composition.py tests/test_public_shard_rules.py tests/test_public_shard_application.py tests/test_public_shard_state.py tests/test_public_shard_composition.py
+          python -m pytest -q tests/test_official_checkpoint_publication.py tests/test_follower_checkpoint_transport.py tests/test_official_catalog_layers.py tests/test_content_dispatch_layers.py tests/test_official_catalog_composition.py tests/test_adult_exclusion_layers.py tests/test_steam_metadata_layers.py tests/test_store_release_layers.py tests/test_steam_store_composition.py tests/test_public_release_date_layers.py tests/test_release_timestamp_transport.py tests/test_localized_title_layers.py tests/test_release_locale_composition.py tests/test_preview_metadata_layers.py tests/test_published_title_layers.py tests/test_published_title_transport.py tests/test_preview_published_title_composition.py tests/test_catalog_metadata_layers.py tests/test_catalog_projection_layers.py tests/test_public_catalog_composition.py tests/test_public_shard_rules.py tests/test_public_shard_application.py tests/test_public_shard_state.py tests/test_public_shard_composition.py tests/test_twitch_intake_rules.py tests/test_twitch_queue_layers.py tests/test_twitch_intake_application.py tests/test_twitch_intake_state_transport.py tests/test_twitch_intake_composition.py

@@ -1,48 +1,59 @@
-"""Import confirmed Twitch discoveries and queue missing official Followers.
-
-Collect caches a bounded API batch. Apply merges that batch into latest main
-without network calls. Dispatch runs only after the accepted master is saved.
-Both accepted records and dispatch receipts use the same conflict-safe apply.
-"""
+"""Compose Twitch Steam admission, metadata, state and official queue ports."""
 from __future__ import annotations
-import argparse
 from copy import deepcopy
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
-import subprocess
 import time
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 import requests
-from collectors.steam_upcoming import parse_release_window
+from radar_core.domain.twitch_admission import (
+ METHOD, aware_time, decimal_id, is_twitch_qualified, normalize_twitch_admission,
+ preserve_twitch_admission, valid_enrollment, validate_twitch_snapshot,
+ resolve_store_release_day, has_taiwan_store_date_authority,
+ TW_STORE_DATE_AUTHORITY, TW_STORE_DATE_PROVIDER,
+)
 from radar_backend.adapters.public_catalog import keep_newer_release
-from scripts.screen_steam_candidates_before_followers import is_explicit_sex_game
-from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
-from scripts.steam_master_date_gate import parse_store_release_detail
-from scripts.steam_retry_policy import rate_limit_policy, transient_retry_policy
-from scripts.twitch_steam_admission import METHOD, aware_time, decimal_id, is_twitch_qualified, normalize_twitch_admission, preserve_twitch_admission, valid_enrollment, validate_twitch_snapshot, resolve_store_release_day, TW_STORE_DATE_AUTHORITY, TW_STORE_DATE_PROVIDER
+from radar_backend.domain.candidate_screening import is_explicit_sex_game
+from radar_backend.domain.adult_exclusions import is_disallowed
+from radar_backend.state.adult_exclusions import excluded_appids
+from radar_backend.domain.store_release import parse_store_release_detail
+from radar_backend.domain.release_window import parse_release_window
+from radar_backend.domain.steam_retry import rate_limit_policy, transient_retry_policy
 from radar_backend.application import twitch_intake as _intake_application
 from radar_backend.domain import twitch_intake as _intake_rules
+from radar_backend.domain import twitch_official_queue as _queue_rules
 from radar_backend.state import twitch_intake as _intake_state
 from radar_backend.adapters import steam_twitch_intake as _intake_transport
 from radar_backend.adapters.steam_twitch_intake import RateLimited
-TAIPEI = ZoneInfo('Asia/Taipei')
-STORE_BROWSE = 'https://api.steampowered.com/IStoreBrowseService/GetItems/v1/'
-APPDETAILS = 'https://store.steampowered.com/api/appdetails'
+TAIPEI = ZoneInfo("Asia/Taipei")
+STORE_BROWSE = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
+APPDETAILS = "https://store.steampowered.com/api/appdetails"
 STATE_VALIDATION_VERSION = 4
+TWITCH_QUEUE_SOURCE = _queue_rules.TWITCH_QUEUE_SOURCE
+TWITCH_QUEUE_PRIORITY = _queue_rules.TWITCH_QUEUE_PRIORITY
+WITHDRAW_REASONS = _queue_rules.WITHDRAW_REASONS
+FOLLOWER_FIELDS = _queue_rules.FOLLOWER_FIELDS
+CHECKPOINT = Path("experiments/steam_official_daily_catchup/checkpoint.json")
+MASTER = Path("data/steam_upcoming_master.json")
+STATE = Path("data/twitch_steam_import_state.json")
+
 
 def stamp(now: datetime) -> str:
     return _intake_rules.stamp(now, timezone_type=timezone)
 
+
 def read_json(path: Path, *, optional: bool=False) -> dict:
     return _intake_state.read_json(path, optional=optional, json_module=json)
 
+
 def write_json(path: Path, value: dict) -> None:
     return _intake_state.write_json(path, value, json_module=json)
+
 
 def validate_snapshot(
     discovery: dict,
@@ -65,6 +76,7 @@ def validate_snapshot(
         method=METHOD,
         regex_module=re,
     )
+
 
 def build_candidate(
     appid: int,
@@ -104,6 +116,7 @@ def build_candidate(
         deepcopy=deepcopy,
     )
 
+
 def request(
     session,
     url: str,
@@ -130,18 +143,23 @@ def request(
         rate_limited_type=RateLimited,
     )
 
+
 def cached_follower(appid: int, documents: list[dict], now: datetime | None=None) -> tuple[int, str] | None:
     observed = now or datetime.now(timezone.utc)
     return _intake_rules.cached_follower(appid, documents, observed, aware_time=aware_time)
 
+
 def signature(row: dict) -> str:
     return _intake_rules.signature(row, json_module=json, hashlib_module=hashlib)
+
 
 def identity_signature(proof: dict) -> str:
     return _intake_rules.identity_signature(proof, json_module=json, hashlib_module=hashlib)
 
+
 def follower_candidate(probe: dict) -> dict:
     return _intake_rules.follower_candidate(probe, deepcopy=deepcopy)
+
 
 def retained_follower_candidate(appid: int, proof: dict, prior: dict, now: datetime, blocked: set[int]) -> dict | None:
     return _intake_rules.retained_follower_candidate(
@@ -163,6 +181,7 @@ def retained_follower_candidate(appid: int, proof: dict, prior: dict, now: datet
         timedelta_type=timedelta,
         deepcopy=deepcopy,
     )
+
 
 def collect(
     frontend: Path,
@@ -220,6 +239,7 @@ def collect(
         deepcopy_fn=deepcopy,
     )
 
+
 def apply_batch(master: dict, state: dict, batch: dict) -> tuple[dict, dict]:
     return _intake_state.apply_batch(
         master,
@@ -234,6 +254,7 @@ def apply_batch(master: dict, state: dict, batch: dict) -> tuple[dict, dict]:
         decimal_id=decimal_id,
         deepcopy_fn=deepcopy,
     )
+
 
 def dispatch(
     master: dict,
@@ -264,40 +285,76 @@ def dispatch(
         environ_get=os.environ.get,
     )
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--phase', required=True, choices=['collect', 'apply', 'dispatch'])
-    parser.add_argument('--frontend-path', type=Path)
-    parser.add_argument('--frontend-commit')
-    parser.add_argument('--master', type=Path, default=Path('data/steam_upcoming_master.json'))
-    parser.add_argument('--state', type=Path, default=Path('data/twitch_steam_import_state.json'))
-    parser.add_argument('--batch', type=Path, default=Path('output/twitch_steam_import_batch.json'))
-    parser.add_argument('--max-seconds', type=int, default=900)
-    args = parser.parse_args()
-    if not 1 <= args.max_seconds <= 900:
-        parser.error('max-seconds must be 1..900')
-    master = read_json(args.master)
-    if not isinstance(master.get('games'), list):
-        parser.error('master games must be an array')
-    state = read_json(args.state, optional=True)
-    if args.phase == 'collect':
-        if args.frontend_path is None or args.frontend_commit is None:
-            parser.error('collect requires frontend-path and immutable frontend-commit')
-        actual_commit = subprocess.check_output(['git', '-C', str(args.frontend_path), 'rev-parse', 'HEAD'], text=True).strip()
-        if actual_commit != args.frontend_commit:
-            parser.error('frontend-commit differs from the checked-out immutable snapshot')
-        cache_paths = [Path('data/steam_followers_cache.json'), Path('data/steam_followers_checkpoint.json'), Path('experiments/steam_official_daily_catchup/checkpoint.json'), Path('experiments/steam_official_followers_20260922/checkpoint.json'), Path('experiments/steam_official_nearfirst_20260922/checkpoint.json')]
-        caches = [read_json(path) for path in cache_paths if path.is_file()]
-        batch = collect(args.frontend_path, args.frontend_commit, master, state, max_seconds=args.max_seconds, caches=caches)
-        write_json(args.batch, batch)
-    elif args.phase == 'apply':
-        batch = read_json(args.batch)
-        master, state = apply_batch(master, state, batch)
-        write_json(args.master, master)
-        write_json(args.state, state)
-    else:
-        batch = dispatch(master, state, token=os.environ.get('CONTENT_BACKEND_TOKEN', ''), target=os.environ.get('CONTENT_BACKEND_REPOSITORY', 'danielet087/game-trend-radar-content-backend'), max_seconds=args.max_seconds)
-        write_json(args.batch, batch)
-    print('TWITCH_STEAM_IMPORT', args.phase, 'records', len(batch['records']), 'states', len(batch['state_updates']), 'stop', batch.get('stop_reason', 'complete'), flush=True)
-if __name__ == '__main__':
-    main()
+
+def _now(value: datetime) -> datetime:
+    return _queue_rules._now(value, datetime_type=datetime)
+
+
+def _exact_day(value: object) -> date | None:
+    return _queue_rules._exact_day(value, date_type=date)
+
+
+def _valid_descriptors(metadata: dict) -> bool:
+    return _queue_rules._valid_descriptors(metadata, is_disallowed=is_disallowed)
+
+
+def is_twitch_queue_candidate(row: object, now: datetime | None=None) -> bool:
+    return _queue_rules.is_twitch_queue_candidate(
+        row,
+        now,
+        decimal_id=decimal_id,
+        normalize_twitch_admission=normalize_twitch_admission,
+        exact_day=_exact_day,
+        valid_descriptors=_valid_descriptors,
+        disallowed_current=lambda metadata: is_disallowed(metadata, excluded_appids()),
+        is_explicit_sex_game=is_explicit_sex_game,
+        aware_time=aware_time,
+        checked_now=_now,
+        resolve_store_release_day=resolve_store_release_day,
+        has_taiwan_store_date_authority=has_taiwan_store_date_authority,
+        is_twitch_qualified=is_twitch_qualified,
+        taipei=TAIPEI,
+        timedelta_type=timedelta,
+        queue_source=TWITCH_QUEUE_SOURCE,
+    )
+
+
+def _restore_normal(pending: dict, aid: str, row: dict) -> None:
+    return _queue_rules._restore_normal(
+        pending,
+        aid,
+        row,
+        decimal_id=decimal_id,
+        deepcopy_fn=deepcopy,
+        queue_source=TWITCH_QUEUE_SOURCE,
+    )
+
+
+def sync_twitch_queue(checkpoint: dict, batch: dict, now: datetime) -> dict:
+    return _queue_rules.sync_twitch_queue(
+        checkpoint,
+        batch,
+        now,
+        checked_now=_now,
+        decimal_id=decimal_id,
+        is_twitch_queue_candidate=is_twitch_queue_candidate,
+        restore_normal=_restore_normal,
+        normalize_twitch_admission=normalize_twitch_admission,
+        deepcopy_fn=deepcopy,
+        queue_source=TWITCH_QUEUE_SOURCE,
+        queue_priority=TWITCH_QUEUE_PRIORITY,
+        withdraw_reasons=WITHDRAW_REASONS,
+        follower_fields=FOLLOWER_FIELDS,
+    )
+
+
+def apply_queue_batch(master: dict, state: dict, checkpoint: dict, batch: dict):
+    return _intake_application.apply_queue_batch(
+        master,
+        state,
+        checkpoint,
+        batch,
+        apply_batch=apply_batch,
+        aware_time=aware_time,
+        sync_twitch_queue=sync_twitch_queue,
+    )

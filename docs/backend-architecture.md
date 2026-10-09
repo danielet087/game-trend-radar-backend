@@ -228,8 +228,31 @@ projection 維持公開 version=3 與四十五個欄位的原次序；revision �
 
 第十一批 PR 接在第十批分支之後。Core 固定版本、requirements、正式及手動發布 workflows、排程、請求預算、Secrets、data／experiments 與 Git 發布內容維持；暫停中的手動測試只補入四個新 sparse 測試檔及命令。
 
+## 第十二批：Twitch → Steam 匯入與官方佇列
+
+| 責任 | 位置 |
+| --- | --- |
+| 固定快照驗證、Store 收錄、真實 Followers 快取與候選保留 | `domain/twitch_intake.py` |
+| 官方優先佇列資格、撤回及一般候選還原 | `domain/twitch_official_queue.py` |
+| Retry-After、服務冷卻與暫時錯誤退避 | `domain/steam_retry.py` |
+| 收集、內容事件及匯入／佇列批次協調 | `application/twitch_intake.py` |
+| JSON 原子保存與較新 master／匯入 state／冷卻合併 | `state/twitch_intake.py` |
+| Store HTTP、429 例外與依賴組裝 | `adapters/steam_twitch_intake.py`、`adapters/twitch_intake.py` |
+
+上表路徑皆相對於 `radar_backend/`。正式官方 worker 的 Twitch queue 與 Followers cache ports、發布 CLI 的 dispatch receipt apply 直接使用新 adapter。原匯入、queue、reconcile 與 retry 四個 scripts 保留薄相容函式，原參數、兩個 CLI、日期／Core／成人／JSON／hash／欄位集合／callback／HTTP／環境變數在呼叫時接線；原 monotonic／sleep 預設參數的綁定方式也保持。新 canonical 入口直接使用 Core 與已抽離的日期、成人及 parser owner，不回呼這些舊 helper。
+
+來源仍要求同一個固定 frontend 提交的 discovery、tracking registry 與 catalog 相互吻合，含有效 Twitch 新遊戲 enrollment、未到期追蹤、IGDB／Steam external link 身分與未來時間拒絕。Store 判定沿用同 AppID 的 TW appdetails、官方 Browse instant、明確台灣公告日與成人規則；日期窗口包含前 30 天至未來 365 天。真實官方 Followers 可以低於 5,000 或為零，由獨立 Twitch 證據判資格；缺值則保存 metadata 候選至既有官方佇列。資格驗證用的 placeholder 零值只存在記憶體，候選與 overlay 移除原 Followers 欄位，不偽造量測。
+
+收集先保留全部已驗證 active 候選，再執行有時限的查詢。已持久收錄的有效 master 不重新抓 Store；快取不繞過 metadata 冷卻。HTTP 保留 TW／english Browse 與 TW／tchinese appdetails、1.5 秒間隔、最多 25 秒或剩餘期限的 timeout，Community 及其子網域在 GET 前拒絕。429 依實際 response 觀測時間與 Retry-After 計算各服務冷卻並停止；一般暫時錯誤沿用原有界退避。來源 frontend commit 變更不重設同身分的 retry，STATE_VALIDATION_VERSION=4 的日期修正恢復契約保持。
+
+佇列只修改 pending_candidates，保留官方觀測、cursor、attempt、冷卻與未知欄位。優先項目撤回時還原 normal_candidate，保留較新的群組解析；重複同步保留一般候選 shadow，不重複建立。apply 先對最新 master／state 合併日期與 Core 證據，再保留較新真實 Followers；較新的 state 與較長冷卻不被舊批次覆蓋。dispatch 只處理已保存且合格的 master，沿用 signature、七個 client_payload 欄位、25 秒 timeout 與 HTTP 204 接受回條；receipt 不新增收錄或變更佇列。
+
+JSON 讀取僅在 optional 且檔案不存在時回傳空 object；毀損或其他型別照原契約中止。寫入沿用 UTF-8、pretty JSON、結尾換行與同路徑 `.tmp` replace，保留失敗時部分狀態。Git 發布／重試、凍結批次與觀測時間由既有 `publication/checkpoint_delivery.py` 負責，該檔內容未改。正式 workflows、資料、Secrets、請求預算與固定 Core SHA 維持；暫停中的手動測試只加入五個 sparse 測試檔。
+
+第十二批 PR 接在第十一批分支之後。剩餘實作以四批為目標：Steam 的 group resolver／dashboard／prefilter／partial merge／daily schedule、Twitch 收集與追蹤、Twitch 來源映射與快照保存、Content 共用 metadata／文字規則；再做一次四個 consumer 的總驗收，預留一次修正驗收發現。此完成界線涵蓋原四 consumer，前端 UI 與 IGDB 獨立後端另列範圍；既有具體 collector 可保留為 source adapter，退役實驗工具不因分層而全面重寫或重新啟用。
+
 ## 尚未遷移
 
-正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新、公開目錄 projection／categories 保存與公開 shard builder 的完整編排已使用共用來源、規則與用例層。其他 Steam 內容詳細資料流程、Twitch 來源協調及歷史工具專用保存仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
+正式候選、官方、日期／名稱、已接線的 preview metadata／已發布名稱更新、公開目錄 projection／categories 保存、公開 shard builder 與 Twitch → Steam 匯入／官方佇列已使用共用來源、規則與用例層。Steam 的 group resolver、dashboard、prefilter、partial merge 與 daily schedule 橋接、Twitch 本專案的收集／映射／快照及 Content 共用 metadata／文字規則仍需收斂；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

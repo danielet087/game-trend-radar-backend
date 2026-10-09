@@ -63,7 +63,7 @@ def validate_receipt_path(args):
 def main(argv=None):
     args = parser().parse_args(argv)
     if args.command == "apply-dispatch-batch":
-        from scripts.reconcile_twitch_official_queue import MASTER, STATE, CHECKPOINT as QUEUE_CHECKPOINT, apply_queue_batch
+        from radar_backend.adapters.twitch_intake import MASTER, STATE, CHECKPOINT as QUEUE_CHECKPOINT, apply_queue_batch
         batch = read_json(args.batch)
         if (not isinstance(batch, dict) or batch.get("records") != []
                 or "follower_candidates" in batch):

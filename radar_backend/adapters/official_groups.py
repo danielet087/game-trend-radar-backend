@@ -1,38 +1,19 @@
-"""Resolve official game groups before the existing Followers XML collector.
-
-Collection uses only Steam's ResolveVanityURL Web API. Application patches a
-fresh queue and never clears its Community cooldown or verified counts. The
-API key is neither logged nor included in receipts, errors or persisted state.
-"""
+"""Compose bounded official group resolution with canonical queue and Core ports."""
 from __future__ import annotations
-
-import argparse
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 import hashlib
 import json
 import math
-import os
-from pathlib import Path
 import time
-
 import requests
-
-from scripts import experiment_official_daily_catchup_250 as worker
-from scripts.twitch_steam_admission import aware_time, decimal_id
+from radar_core.domain.twitch_admission import aware_time, decimal_id
+from radar_backend.adapters import queue_inputs as worker
 from radar_backend.application import official_groups as _group_application
 from radar_backend.domain import official_groups as _group_rules
 from radar_backend.adapters import steam_official_groups as _group_transport
-
-
-API_URL = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/"
-SOURCE = "Steam ISteamUser/ResolveVanityURL"
-TWITCH_SOURCE = "twitch_steam_discovery"
-STATUSES = frozenset({
-    "resolved", "not_found", "missing_api_key", "api_rate_limited",
-    "api_forbidden", "network_error", "api_error", "invalid_response",
-})
+from radar_backend.domain.official_groups import API_URL, SOURCE, TWITCH_SOURCE, STATUSES
 
 
 def stamp(value):
@@ -92,27 +73,3 @@ def current_queue(checkpoint):
         official_cache=worker.OFFICIAL_CACHE, original_official=worker.ORIGINAL_OFFICIAL,
         deepcopy_fn=deepcopy,
     )
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--phase", choices=("collect", "apply"), required=True)
-    parser.add_argument("--batch", type=Path, required=True)
-    parser.add_argument("--max-requests", type=int, default=20)
-    parser.add_argument("--max-seconds", type=int, default=120)
-    args = parser.parse_args()
-    checkpoint, candidates = current_queue(worker.read(worker.CHECKPOINT))
-    if args.phase == "collect":
-        batch = collect(checkpoint, candidates, api_key=os.environ.get("STEAM_WEB_API_KEY", ""),
-                        max_requests=args.max_requests, max_seconds=args.max_seconds)
-        worker.save(args.batch, batch)
-    else:
-        batch = worker.read(args.batch)
-        checkpoint = apply_batch(checkpoint, batch, eligible_appids=[row["appid"] for row in candidates])
-        worker.save(worker.CHECKPOINT, checkpoint)
-    print("OFFICIAL_GROUP_RESOLUTION", args.phase, "requests", batch["requests_this_run"],
-          "results", len(batch["results"]), "stop", batch["stop_reason"])
-
-
-if __name__ == "__main__":
-    main()

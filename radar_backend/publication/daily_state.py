@@ -12,7 +12,7 @@ from radar_core.publication import SubprocessGitRepository, publish_with_retry, 
 from radar_backend.domain.candidates import fresh_state
 from radar_backend.publication.steam import read_json, write_json
 from radar_backend.state.official_merge import MergeConflict, merge_json_three_way, merge_master
-from scripts.external_schedule import TAIPEI, daily_reset_required, daily_slot, schedule_decision
+from radar_backend.domain.daily_schedule import TAIPEI, daily_reset_required, daily_slot, schedule_decision
 
 STATE = "data/steam_candidate_state.json"
 CATALOG = "data/steam_candidates.json"

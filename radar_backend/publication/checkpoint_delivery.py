@@ -69,7 +69,7 @@ def publish_queue_batch(root: Path, batch: dict, *, kind: str, input_revision: s
                 command = [sys.executable, "-B", "-m", "radar_backend.jobs.publish_steam",
                            "apply-dispatch-batch", "--batch", str(batch_path)]
             else:
-                script = "scripts.resolve_official_group_ids" if kind == "groups" else "scripts.reconcile_twitch_official_queue"
+                script = "radar_backend.jobs.resolve_official_groups" if kind == "groups" else "radar_backend.jobs.reconcile_twitch_official_queue"
                 command = [sys.executable, "-B", "-m", script, "--phase", "apply", "--batch", str(batch_path)]
             subprocess.run(command,
                            cwd=latest_root, check=True, capture_output=True, text=True, env=environment)

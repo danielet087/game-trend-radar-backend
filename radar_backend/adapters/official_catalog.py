@@ -74,10 +74,10 @@ def cached_follower(appid, sources, now):
 
 
 def dashboard_output():
-    from scripts.export_scheduler_queue_status import OUTPUT
+    from radar_backend.adapters.scheduler_status import OUTPUT
     return OUTPUT
 
 
 def export_status():
-    from scripts.export_scheduler_queue_status import export_status as implementation
+    from radar_backend.adapters.scheduler_status import export_status as implementation
     return implementation()

@@ -1,26 +1,14 @@
-"""Publish a read-only view of the existing official Followers queue.
-
-This command performs no requests, consumes no queue entries and writes only
-the dashboard JSON.  Queue eligibility, ordering and parked XML rows are
-projected by the same make_queue helper that the hourly collector uses.
-"""
+"""Compose the read-only official queue dashboard using canonical input ports."""
 from __future__ import annotations
-
-import argparse
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-
-from scripts import experiment_official_daily_catchup_250 as worker
-from scripts.twitch_steam_admission import aware_time
+from radar_core.domain.twitch_admission import aware_time
+from radar_backend.adapters import queue_inputs as worker
 from radar_backend.domain import scheduler_status as _status_rules
 from radar_backend.application import scheduler_status as _status_application
-
-
+from radar_backend.domain.scheduler_status import REPOSITORY, TWITCH_SOURCE, MAX_EVENTS
 OUTPUT = Path("data/scheduler_queue_status.json")
-REPOSITORY = "danielet087/game-trend-radar-backend"
-TWITCH_SOURCE = "twitch_steam_discovery"
-MAX_EVENTS = 100
 
 
 def utc(value):
@@ -63,15 +51,3 @@ def export_status(*, output=OUTPUT, now=None):
         candidate_state_path=Path("data/steam_candidate_state.json"),
         twitch_state_path=Path("data/twitch_steam_import_state.json"),
     )
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--output", type=Path, default=OUTPUT)
-    args = parser.parse_args()
-    result = export_status(output=args.output)
-    print("SCHEDULER_QUEUE_STATUS", result["today_taipei"], result["summary"])
-
-
-if __name__ == "__main__":
-    main()

@@ -16,14 +16,14 @@ from typing import Any, Callable
 import requests
 
 from collectors.steam_upcoming import SteamUpcomingCollector, UpcomingGame
-from scripts.steam_follower_prefilter import scan_batch
+from radar_backend.adapters.follower_prefilter import scan_batch
 from radar_backend.adapters.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 from radar_core.domain.twitch_admission import is_twitch_qualified
 from radar_backend.adapters.steam_store import (
     build_snapshot, fetch_metadata, excluded_appids, is_disallowed,
     apply_store_release_detail, fetch_store_release_details, filter_confirmed_master_games,
 )
-from scripts.update_steam_daily import merge_partial_segment
+from radar_backend.adapters.partial_catalog import merge_partial_segment
 from radar_backend.domain.candidates import QUERY_URL, TAIWAN_TZ, candidate_record
 
 PAGE_SIZE = 1000

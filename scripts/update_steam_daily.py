@@ -14,6 +14,8 @@ from radar_backend.adapters.public_release_dates import corrected_games, fetch_s
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 from radar_backend.adapters.public_catalog import preserve_player_categories
+from radar_backend.domain import partial_catalog as _partial_rules
+from radar_backend.application import partial_catalog as _partial_application
 
 LOGGER = logging.getLogger(__name__)
 
@@ -63,15 +65,7 @@ def release_overlaps(game: dict[str, Any], start: date, end: date) -> bool:
 
 
 def prune_released(games: list[dict[str, Any]], today: date) -> list[dict[str, Any]]:
-    """Keep qualified calendar history after release.
-
-    The function name is retained for compatibility with older callers, but
-    released titles must remain in the master/public release calendar. Daily
-    discovery is a rolling future window; it must never delete a title merely
-    because its release date is before today.
-    """
-    del today  # Compatibility parameter; release date is no longer a deletion gate.
-    return [game for game in games if isinstance(game, dict)]
+    return _partial_rules.prune_released(games, today)
 
 
 def merge_segment(
@@ -123,32 +117,11 @@ def merge_partial_segment(
     *,
     today: date,
 ) -> list[dict[str, Any]]:
-    """Persist each 50-lookup batch without discarding older segment progress.
-
-    An incomplete run cannot replace the entire two-month window: later
-    candidates have not yet been checked. Only update an AppID when the run
-    actually returned that game's Followers.
-    """
-    by_appid: dict[int, dict[str, Any]] = {}
-    blocked = excluded_appids()
-    for game in prune_released(existing_games, today) + newly_qualified:
-        if is_disallowed(game, blocked):
-            continue
-        try:
-            appid = int(game["appid"])
-        except (KeyError, ValueError, TypeError):
-            continue
-        prior = by_appid.get(appid, {})
-        by_appid[appid] = preserve_player_categories(
-            prior, preserve_twitch_admission(prior, game),
-        )
-    return sorted(
-        by_appid.values(),
-        key=lambda game: (
-            -int(game.get("followers") or 0),
-            str(game.get("release_start") or "9999-12-31"),
-            int(game["appid"]),
-        ),
+    return _partial_application.merge_partial_segment(
+        existing_games, newly_qualified, today=today, excluded_appids=excluded_appids,
+        prune_released=prune_released, is_disallowed=is_disallowed,
+        preserve_twitch_admission=preserve_twitch_admission,
+        preserve_player_categories=preserve_player_categories,
     )
 
 

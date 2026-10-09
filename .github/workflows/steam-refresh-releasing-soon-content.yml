@@ -32,8 +32,17 @@ jobs:
           sparse-checkout: |
             scripts/dispatch_content_refresh_events.py
             scripts/twitch_steam_admission.py
+            requirements-core.txt
           sparse-checkout-cone-mode: false
           persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install shared rules
+        run: python -m pip install --disable-pip-version-check -r requirements-core.txt
 
       - name: Validate dispatcher
         run: python -m py_compile scripts/dispatch_content_refresh_events.py

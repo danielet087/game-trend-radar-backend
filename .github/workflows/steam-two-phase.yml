@@ -44,7 +44,11 @@ jobs:
           cache: pip
           cache-dependency-path: |
             requirements.txt
+            requirements-core.txt
             requirements-dev.txt
+      - name: Install dependencies
+        id: install
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Validate external daily slot before resetting discovery
         id: schedule_guard
         env:
@@ -53,9 +57,6 @@ jobs:
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
           SCHEDULE_REFRESH_TODAY: ${{ inputs.refresh_today }}
         run: python -m scripts.external_schedule --workflow daily-discovery --fail-on-skip
-      - name: Install dependencies
-        id: install
-        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Run tests
         run: python -m pytest -q
 

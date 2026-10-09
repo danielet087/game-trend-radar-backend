@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import requests
+from radar_core.jobs import JobResult, JobStatus
 
 from collectors.steam_upcoming import (
     SteamUpcomingCollector, UpcomingGame, TAIWAN_TZ, taiwan_today, write_json,
@@ -535,6 +536,26 @@ def run_follower_batch(
     return {"phase": state["phase"], **state["last_attempt"]}
 
 
+def candidate_job_result(state: dict[str, Any], *, state_persisted: bool = False) -> JobResult:
+    """Collection progress is separate from the workflow's durable checkpoint."""
+    collection_complete = state.get("phase") == "complete" and state.get("initial_complete") is True
+    attempt = state.get("last_attempt") or {}
+    if collection_complete and state_persisted:
+        status = JobStatus.COMPLETE
+    elif attempt.get("rate_limit_events", 0):
+        status = JobStatus.COOLING_DOWN
+    else:
+        status = JobStatus.PARTIAL
+    return JobResult(
+        job="steam-candidate-pipeline", status=status,
+        reason=str(state.get("phase") or "unknown_phase"),
+        collection_complete=collection_complete, state_persisted=state_persisted,
+        # Producing output/steam_upcoming.json does not publish it to the site.
+        published=False, requires_publication=False,
+        target_slot=state.get("daily_refresh_slot"),
+    )
+
+
 def run(args: argparse.Namespace) -> dict[str, Any]:
     state_file = Path(args.state)
     catalog_file = Path(args.catalog)
@@ -628,6 +649,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "games": public_games,
         }
         write_json(output, args.output)
+    # Git persistence is owned by the workflow after this function returns.
+    # Preserve legacy phase/last_attempt fields and report that boundary honestly.
+    result["job_result"] = candidate_job_result(state).to_dict()
     LOG.info("Steam two-stage run: %s", result)
     return result
 

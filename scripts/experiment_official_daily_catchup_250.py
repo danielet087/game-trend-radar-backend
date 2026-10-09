@@ -13,21 +13,24 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from email.utils import parsedate_to_datetime
 import subprocess
 import time
-import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import requests
+from radar_core.jobs import JobResult, JobStatus
 
 from scripts.steam_master_date_gate import fetch_store_release_details
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.import_twitch_steam_discoveries import cached_follower
 from scripts.twitch_official_queue import is_twitch_queue_candidate
 from scripts.twitch_steam_admission import aware_time
+from scripts.steam_official_followers import (
+    GROUP_BASE, CooldownStore, FollowerOutcome, OfficialFollowerCache,
+    OfficialFollowerClient, group_to_gid, steam_429_cooldown, valid_group_id64,
+)
 
 ROOT = Path("experiments/steam_official_daily_catchup")
 FROZEN = Path("experiments/steam_official_nearfirst_20260922")
@@ -39,29 +42,7 @@ OUT = Path("output/steam_official_daily_catchup")
 CHECKPOINT = ROOT / "checkpoint.json"
 MASTER = Path("data/steam_upcoming_master.json")
 TZ = ZoneInfo("Asia/Taipei")
-GROUP_BASE = 103582791429521408
 COHORT = "steam_official_daily_catchup_dynamic_v1"
-
-
-def steam_429_cooldown(response, failure_count, now):
-    """15m, 30m, 1h, 2h, 4h ... capped at 24h; honor longer Retry-After."""
-    minutes = min(24 * 60, 15 * (2 ** min(max(failure_count - 1, 0), 7)))
-    cooldown_until = now + timedelta(minutes=minutes)
-    header = response.headers.get("Retry-After")
-    if header:
-        try:
-            value = header.strip()
-            if value.isdigit():
-                server_until = now + timedelta(seconds=int(value))
-            else:
-                server_until = parsedate_to_datetime(value)
-                if server_until.tzinfo is None:
-                    server_until = server_until.replace(tzinfo=timezone.utc)
-                server_until = server_until.astimezone(TZ)
-            cooldown_until = max(cooldown_until, server_until)
-        except (TypeError, ValueError, OverflowError):
-            pass  # Invalid Retry-After: retain locally configured backoff.
-    return cooldown_until
 
 
 def manual_cooldown_override(requested):
@@ -106,25 +87,6 @@ def save(path, data):
 
 def checked_numeric(data):
     return isinstance(data, int) and not isinstance(data, bool) and data >= 0
-
-
-def group_to_gid(short):
-    if short is None:
-        return None
-    if isinstance(short, bool) or not isinstance(short, int) or short < 0:
-        raise ValueError("Bad Steam short Group ID; no fabricated IDs")
-    return str(GROUP_BASE + short)
-
-
-def valid_group_id64(value):
-    """Accept public Steam clan IDs, never a user ID or a fabricated zero."""
-    if isinstance(value, bool) or not isinstance(value, (int, str)):
-        return None
-    text = str(value)
-    if not text.isascii() or not text.isdigit():
-        return None
-    parsed = int(text)
-    return str(parsed) if GROUP_BASE < parsed <= GROUP_BASE + (2 ** 32 - 1) else None
 
 
 def valid_date(value):
@@ -434,11 +396,14 @@ def git_push():
         subprocess.run(["git", "add", *files], check=True, timeout=20,
                        stdout=subprocess.DEVNULL)
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], timeout=20)
-        if diff.returncode == 0:
-            return True
-        subprocess.run(["git", "commit", "-m",
-                        "experiment: checkpoint dynamically queued official Followers"],
-                       check=True, timeout=25, stdout=subprocess.DEVNULL)
+        if diff.returncode not in (0, 1):
+            raise subprocess.CalledProcessError(diff.returncode, diff.args)
+        if diff.returncode == 1:
+            subprocess.run(["git", "commit", "-m",
+                            "experiment: checkpoint dynamically queued official Followers"],
+                           check=True, timeout=25, stdout=subprocess.DEVNULL)
+        # A prior checkpoint may already be committed locally after its push
+        # failed. A clean index does not prove that commit reached the remote.
         rebase_checkpoint()
         subprocess.run(["git", "push", "origin", "HEAD:main"],
                        check=True, timeout=50, stdout=subprocess.DEVNULL)
@@ -448,6 +413,41 @@ def git_push():
         print("DAILY_CATCHUP_GIT_CHECKPOINT_FAILURE",
               type(exc).__name__, flush=True)
         return False
+
+
+def official_job_result(report, *, state_persisted):
+    """Keep an hourly checkpoint distinct from complete current-day coverage."""
+    reason = report["stop_reason"]
+    source_status = report.get("source_status", {})
+    current_source_complete = (
+        source_status.get("status") == "current_day_prefilter_complete"
+    )
+    awaiting_resolution = bool(
+        source_status.get("parked_group_xml_appids")
+        or report.get("awaiting_group_resolution")
+        or report.get("unresolved_candidates")
+    )
+    collection_complete = (
+        type(report.get("remaining_queue")) is int
+        and report["remaining_queue"] == 0
+        and current_source_complete
+        and not awaiting_resolution
+    )
+    if reason in {"git_checkpoint_failure", "final_git_checkpoint_failure"} or not state_persisted:
+        status = JobStatus.FAILED
+    elif collection_complete:
+        status = JobStatus.COMPLETE
+    elif "cooldown" in reason or reason == "first_http_429":
+        status = JobStatus.COOLING_DOWN
+    else:
+        status = JobStatus.PARTIAL
+    return JobResult(
+        job="official-followers", status=status, reason=reason,
+        collection_complete=collection_complete, state_persisted=state_persisted,
+        # Saving the master or dispatching content is not a frontend publication.
+        published=False, requires_publication=False,
+        target_slot=os.environ.get("SCHEDULE_TARGET_SLOT") or None,
+    )
 
 
 def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, official_cache, other_official, *, now=None):
@@ -669,8 +669,11 @@ def main():
     start_count = len(cp["official_results"])
     # Missing group IDs stay in the same queue. Resolve them in the existing
     # workflow before using Community XML; they must not consume XML attempts.
+    follower_cache = OfficialFollowerCache(cp, official_cache, oldcp, other_official, prefilter)
+    cooldown_store = CooldownStore(cp, oldcp)
     known_group_queue = [{**row, "group_id64": gid} for row in q
-                         if (gid := valid_group_id64(row.get("group_id64"))) is not None]
+                         if (gid := valid_group_id64(row.get("group_id64"))
+                             or follower_cache.group_id(row["appid"])) is not None]
     attempts = []
     run_id = os.environ.get("GITHUB_RUN_ID", "")
     run_metadata = {"run_id": run_id} if run_id.isdecimal() else {}
@@ -685,15 +688,16 @@ def main():
     last_start = None
     client = requests.Session()
     client.headers["User-Agent"] = "GameTrendRadarOfficialDailyCatchup/1.0"
+    follower_client = OfficialFollowerClient(session=client, clock=clock, cooldown=cooldown_store)
     cooldown = cp.get("next_request_after_taipei")
     legacy_cooldown = oldcp.get("next_request_after_taipei")
     previous_deadlines = (cooldown, legacy_cooldown,
                           (cp.get("community_cooldown") or {}).get("retry_at"))
     if not q:
         stop = "nothing_pending"
-    elif not skip_cooldown and cooldown and clock() < datetime.fromisoformat(cooldown):
+    elif not skip_cooldown and CooldownStore(cp).blocked(clock()):
         stop = "official_429_cooldown_no_request"
-    elif not skip_cooldown and legacy_cooldown and clock() < datetime.fromisoformat(legacy_cooldown):
+    elif not skip_cooldown and CooldownStore(oldcp).blocked(clock()):
         stop = "legacy_official_429_cooldown_no_request"
     elif not known_group_queue:
         stop = "awaiting_group_resolution_no_request"
@@ -709,7 +713,6 @@ def main():
                     time.sleep(delay)
             last_start = time.monotonic()
             aid = row["appid"]
-            url = f'https://steamcommunity.com/gid/{row["group_id64"]}/memberslistxml/?xml=1'
             event = {
                 "appid": aid, "when_taipei": clock().isoformat(),
                 "release_date": row["release_date"],
@@ -720,116 +723,63 @@ def main():
                 event["github_run_id"] = run_id
             if skip_cooldown:
                 event["manual_cooldown_override"] = True
-            try:
-                response = client.get(url, timeout=(8, 24))
-                event["http"] = response.status_code
-                if response.status_code == 429:
-                    event["status"] = "rate_limited"
-                    cp["rate_limit_count"] += 1
-                    if response.headers.get("Retry-After"):
-                        event["retry_after_header"] = response.headers["Retry-After"][:128]
-                    observed = clock()
-                    until = steam_429_cooldown(response, cp["rate_limit_count"], observed)
-                    calculated_until = until
-                    if skip_cooldown:
-                        until = preserve_cooldown_deadline(until, *previous_deadlines)
-                    cp["next_request_after_taipei"] = until.isoformat()
-                    cp["community_cooldown"] = {
-                        "retry_at": until.astimezone(timezone.utc).isoformat(),
-                        "observed_at": observed.astimezone(timezone.utc).isoformat(),
-                        "updated_at": observed.astimezone(timezone.utc).isoformat(),
-                        "retry_seconds": int((until - observed).total_seconds()),
-                        "retry_after": response.headers.get("Retry-After"),
-                        "retry_source": ("existing_deadline_with_new_backoff" if until > calculated_until
-                                         else "steam_retry_after_with_default_minimum"
-                                         if response.headers.get("Retry-After") else "existing_queue_backoff"),
-                        "attempts": cp["rate_limit_count"],
-                    }
-                    event["next_request_after_taipei"] = cp["next_request_after_taipei"]
-                    stop = "first_http_429"
-                elif response.status_code in (401, 403) or response.status_code >= 500:
-                    event["status"] = "access_or_server_error"
-                    until = clock() + timedelta(hours=24)
-                    if skip_cooldown:
-                        until = preserve_cooldown_deadline(until, *previous_deadlines)
-                    cp["next_request_after_taipei"] = until.isoformat()
-                    stop = "http_access_or_server_error"
-                elif response.status_code != 200:
-                    event["status"] = "unexpected_http"
-                    stop = "unexpected_http"
-                else:
-                    root = ET.fromstring(response.content)
-                    raw_count = root.findtext(".//memberCount")
-                    got_gid = root.findtext(".//groupID64")
-                    if (
-                        not raw_count or not raw_count.replace(",", "").strip().isdigit()
-                        or not got_gid or not got_gid.isdigit()
-                        or (
-                            row["group_id64"] is not None
-                            and row["group_id64"] != got_gid
-                        )
-                    ):
-                        event["status"] = "missing_count_or_group_mismatch"
-                        stop = "invalid_official_xml"
+            cached = follower_cache.latest(aid, clock(), today_only=True, expected_group=row["group_id64"])
+            if cached is not None:
+                outcome = FollowerOutcome("ok", datetime.fromisoformat(cached.checked_at.replace("Z", "+00:00")),
+                                          followers=cached.followers)
+                event["cache_reused"] = True
+            else:
+                outcome = follower_client.fetch(row["group_id64"], manual_override=skip_cooldown)
+            event.update(status=outcome.status, http=outcome.http)
+            if outcome.retry_after:
+                event["retry_after_header"] = outcome.retry_after[:128]
+            if outcome.error_type:
+                event["error_type"] = outcome.error_type
+            for key in ("content_type", "response_bytes", "response_prefix"):
+                value = getattr(outcome, key)
+                if value is not None:
+                    event[key] = value
+            if outcome.status == "ok":
+                count = outcome.followers
+                event["official_followers"] = count
+                cp["official_results"][str(aid)] = {
+                    **row, "group_id64": row["group_id64"],
+                    "official_followers": count, "official_ge5000": count >= 5000,
+                    "official_checked_at_taipei": outcome.observed_at.astimezone(TZ).isoformat(),
+                    "official_source": "Steam Community XML memberCount",
+                }
+                # Twitch admissions still use the shared cache-only importer.
+                if count >= 5000 and row.get("queue_source") != "twitch_steam_discovery":
+                    official = cp["official_results"][str(aid)]
+                    exact = verify_store_date_for_result(official, client)
+                    event["store_date_exact"] = exact
+                    event["store_date_status"] = official.get("store_date_status")
+                    if exact:
+                        event["release_date"] = official["release_date"]
+                        upsert_qualified_master(master, official)
+                        save(MASTER, master)
+                        event["content_dispatch"] = dispatch_content_event(cp, official)
                     else:
-                        count = int(raw_count.replace(",", "").strip())
-                        event["status"] = "ok"
-                        event["official_followers"] = count
-                        cp["official_results"][str(aid)] = {
-                            **row,
-                            "group_id64": got_gid,
-                            "official_followers": count,
-                            "official_ge5000": count >= 5000,
-                            "official_checked_at_taipei": clock().isoformat(),
-                            "official_source": "Steam Community XML memberCount",
-                        }
-                        # Twitch admissions are finalized from this true count
-                        # by the same workflow's cache-only importer, even <5000.
-                        if count >= 5000 and row.get("queue_source") != "twitch_steam_discovery":
-                            official = cp["official_results"][str(aid)]
-                            exact = verify_store_date_for_result(official, client)
-                            event["store_date_exact"] = exact
-                            event["store_date_status"] = official.get("store_date_status")
-                            if exact:
-                                event["release_date"] = official["release_date"]
-                                upsert_qualified_master(master, official)
-                                save(MASTER, master)
-                                event["content_dispatch"] = dispatch_content_event(cp, official)
-                            else:
-                                event["content_dispatch"] = "store_date_not_verified"
-                        cp["rate_limit_count"] = 0
-                        cp["temporary_error_count"] = 0
-                        cp["next_request_after_taipei"] = None
-                        cp["community_cooldown"] = None
-                        cp["community_last_success_at"] = clock().isoformat()
-            except (requests.RequestException, ET.ParseError) as exc:
-                event["status"] = "transport_or_xml_error"
-                event["error_type"] = type(exc).__name__
-                if isinstance(exc, ET.ParseError):
-                    event["content_type"] = response.headers.get("Content-Type", "")[:100]
-                    event["response_bytes"] = len(response.content)
-                    event["response_prefix"] = response.content[:180].decode(
-                        "utf-8", errors="replace"
-                    )
-                cp["temporary_error_count"] = min(
-                    8, cp.get("temporary_error_count", 0) + 1
-                )
-                minutes = min(
-                    24 * 60, 15 * (2 ** (cp["temporary_error_count"] - 1))
-                )
-                until = clock() + timedelta(minutes=minutes)
-                if skip_cooldown:
-                    until = preserve_cooldown_deadline(until, *previous_deadlines)
-                cp["next_request_after_taipei"] = until.isoformat()
-                event["next_request_after_taipei"] = cp["next_request_after_taipei"]
-                stop = "transport_or_xml_error"
+                        event["content_dispatch"] = "store_date_not_verified"
+            else:
+                stop = {
+                    "rate_limited": "first_http_429",
+                    "access_or_server_error": "http_access_or_server_error",
+                    "unexpected_http": "unexpected_http",
+                    "missing_count_or_group_mismatch": "invalid_official_xml",
+                    "transport_or_xml_error": "transport_or_xml_error",
+                    "cooldown_no_request": "official_429_cooldown_no_request",
+                }.get(outcome.status, "awaiting_group_resolution_no_request")
+                if cp.get("next_request_after_taipei"):
+                    event["next_request_after_taipei"] = cp["next_request_after_taipei"]
             attempts.append(event)
             cp["attempt_events"].append(event)
             success_count = len(cp["official_results"]) - start_count
             cp["scheduler_batch"].update(
                 status="querying", last_updated_at=clock().isoformat(),
                 last_appid=aid, last_name=row.get("name") or f"Steam App {aid}",
-                requests_this_run=len(attempts), official_new_this_run=success_count,
+                requests_this_run=sum(not item.get("cache_reused") for item in attempts),
+                official_new_this_run=success_count,
                 http_429_this_run=sum(item.get("http") == 429 for item in attempts),
             )
             if len(cp["attempt_events"]) > 2000:
@@ -869,7 +819,7 @@ def main():
         "request_limit": args.max_requests,
         "manual_cooldown_override": skip_cooldown,
         "request_interval_seconds": args.interval,
-        "requests_this_run": len(attempts),
+        "requests_this_run": sum(not item.get("cache_reused") for item in attempts),
         "official_new_this_run": successful,
         "store_date_rechecks_before_followers": store_rechecks,
         "new_ge5000_this_run": sum(
@@ -900,17 +850,24 @@ def main():
     cp["scheduler_batch"].update(
         active=False, status="finished", last_updated_at=report["finish_taipei"],
         finished_at=report["finish_taipei"], stop_reason=stop,
-        requests_this_run=len(attempts), official_new_this_run=successful,
+        requests_this_run=report["requests_this_run"], official_new_this_run=successful,
         http_429_this_run=report["http_429_this_run"],
     )
     save(CHECKPOINT, cp)
     save(MASTER, master)
     save(OUT / "report.json", report)
     save(OUT / "attempts.json", attempts)
-    if not git_push():
+    state_persisted = git_push()
+    if not state_persisted:
         report["stop_reason"] = "final_git_checkpoint_failure"
-        save(OUT / "report.json", report)
+        cp["scheduler_batch"]["stop_reason"] = report["stop_reason"]
+        save(CHECKPOINT, cp)
+    job_result = official_job_result(report, state_persisted=state_persisted)
+    report["job_result"] = job_result.to_dict()
+    save(OUT / "report.json", report)
     print("DAILY_CATCHUP_FINAL", json.dumps(report, ensure_ascii=False, sort_keys=True), flush=True)
+    if job_result.status is JobStatus.FAILED:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

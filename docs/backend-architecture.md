@@ -147,8 +147,27 @@ metadata transport 保留 GetItems v1、TW／english／realm 1、release／basic
 
 第七批 PR 接在第六批分支之後。固定 Core 版本、正式排程、來源資格、HTTP 預算、Secrets、data／experiments 與 Git 發布流程不變；手動測試 workflow 補入四個新測試檔的 sparse 依賴。
 
+## 第八批：上市日期更新與台灣名稱本地化
+
+| 責任 | 純規則 | 用例與來源 |
+| --- | --- | --- |
+| 公告日期、年月季視窗與帶 offset 的時間解析 | `domain/release_window.py` | collector 保留 parser wrapper 與 `ReleaseWindow` 匯出 |
+| scheduled 日期權威、人工日期訂正與快取來源 | `domain/public_release_dates.py` | `application/public_release_dates.py`、`adapters/public_release_dates.py` |
+| scheduled Browse timestamp 查詢 | 無收錄資格判斷 | `adapters/steam_release_timestamps.py` |
+| 台灣中文名稱資格、繁體顯示與補名統計 | `domain/localized_titles.py` | `application/localized_titles.py`、`adapters/steam_localized_titles.py` |
+
+上表路徑皆相對於 `radar_backend/`。`ReleaseWindow` 與日期 parser 只有一份純實作，collector 保留原匯出、函式參數及呼叫時可替換的 parser ports。日期更新、預覽、候選本地化及公開 shard builder 直接匯入新日期／名稱 adapter；舊 `scripts/steam_release_dates.py` 與 `steam_localized_titles.py` 保留薄相容 wrapper，原 parser、日期訂正 map、converter、HAN、等待、logger 與 HTTP patch 在呼叫時生效。
+
+此處 scheduled 日期更新沿用有效 timestamp 優先的原契約，與正式主清單 Store gate 的台灣公告日優先分開。date-only 不猜解鎖時刻、不統一平移；帶時區時間與秒／毫秒 timestamp 換算台灣日曆日。訂正 map 只在沒有 timestamp 候選且公告日仍相符時使用，不製造 UTC 證據。候選 timestamp 只取原優先序中的第一個非 `None`／bool 值；無效時不改取後面的值。與公告日期相差超過兩天則保留公告；精確時間的 provenance、快取 fallback 與時間消失時的欄位替換保持。批次修正淺拷貝原列，保留 Followers、未知欄位與嵌套引用。
+
+兩個來源保留不同的傳輸政策：scheduled timestamp 查詢預設 35 款、2 秒間隔、25 秒 timeout、三次嘗試，429 等待 15／30／45 秒，其他既有錯誤等待 5／10 秒，耗盡後回傳已取得的部分資料。台灣名稱查詢使用 TW／tchinese、35 款、1.5 秒間隔、30 秒 timeout、四次嘗試，429 等待 20／40／60／80 秒，其他既有錯誤等待 5／10／15 秒，耗盡則中止。timestamp response 的 2010～2100 年檢查不擴大成 parser 或 resolver 的新門檻；缺單款名稱的 HTTP 成功處理與候選用例原有 95% 覆蓋率 gate 保持。
+
+名稱只來自 Steam 回傳；HAN 範圍與 240 字限制只用於中文名稱資格，不能改成 HTTP 回傳清洗政策。中文來源值保留 Steam 字形，繁體顯示值另存；`name_en` 沿用既有原名選取與 strip，遊戲 `name` 及語言支援旗標不被繁體轉換改寫。OpenCC 在 adapter 組裝；新合格中文名可補入，沒有新合格名稱時保留原已確認中文，stale 顯示欄位清理、顯示優先序及原地補名／例外次序都保持。domain 與 application 不匯入 OpenCC、requests 或舊 collector。
+
+第八批 PR 接在第七批分支之後，固定 Core 版本與 requirements、data／experiments、正式排程、Secrets、請求預算及 Git 發布流程不變。consumer 只更換共用日期／名稱 import；其他函式、命令列與 Git 保存內容維持。手動測試 workflow 補入四個新測試檔的 sparse 依賴。
+
 ## 尚未遷移
 
-正式候選與官方工作已直接使用共用 Store metadata、日期／候選篩選及成人排除層。另一套 `scripts/steam_release_dates.py` 的日期更新與部分結果重試、Steam 本地化／內容資料、Twitch 來源協調及公開目錄 projection 仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
+正式候選、官方及已接線的日期／名稱 consumer 已使用共用來源與規則層。Steam 內容詳細資料、`refresh_published_chinese_titles.py` 的另一套五次／45 秒來源流程、Twitch 來源協調與公開目錄 projection 仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

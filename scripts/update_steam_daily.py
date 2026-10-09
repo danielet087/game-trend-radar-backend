@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from collectors.steam_upcoming import SteamUpcomingCollector, parse_release_window, taiwan_today, write_json
-from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
+from radar_backend.adapters.public_release_dates import corrected_games, fetch_store_browse_releases
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
 from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 from scripts.public_catalog import preserve_player_categories

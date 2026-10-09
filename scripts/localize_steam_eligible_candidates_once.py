@@ -14,7 +14,7 @@ from pathlib import Path
 
 import requests
 
-from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
+from radar_backend.adapters.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 
 LOG = logging.getLogger(__name__)
 DEFAULT_SNAPSHOT = Path("data/steam_candidates_eligible.json")

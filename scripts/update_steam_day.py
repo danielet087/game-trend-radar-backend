@@ -16,7 +16,7 @@ from typing import Any
 import requests
 
 from collectors.steam_upcoming import SteamUpcomingCollector, taiwan_today, write_json
-from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
+from radar_backend.adapters.public_release_dates import corrected_games, fetch_store_browse_releases
 from scripts.update_steam_daily import (
     build_public_payload, load_json, merge_partial_segment, save_json,
 )

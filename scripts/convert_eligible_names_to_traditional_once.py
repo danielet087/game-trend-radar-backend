@@ -10,7 +10,7 @@ import json
 import logging
 from pathlib import Path
 
-from scripts.steam_localized_titles import add_traditional_display_names
+from radar_backend.adapters.steam_localized_titles import add_traditional_display_names
 
 LOG = logging.getLogger(__name__)
 

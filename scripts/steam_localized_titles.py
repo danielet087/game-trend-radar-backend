@@ -1,148 +1,51 @@
-"""Steam-only TW localized game names; separate from all Followers requests.
+"""Compatible Steam-only titles and separate Traditional display fields.
 
-Browse language tchinese returns an official, not machine-translated, Store title.
-Retain the original English title and do not interpret a localized description
-as evidence of a translated name. No non-Store host or unofficial translations.
+Official raw names and supported-language evidence retain their source values.
+Shared rules, enrichment and Store transport live in their explicit layers.
 """
 from __future__ import annotations
 
-import json
 import logging
-import re
 import time
-
 import requests
 from opencc import OpenCC
 
-_CONVERT_TO_TRADITIONAL = OpenCC("s2t")
+from radar_backend.adapters import steam_localized_titles as _source
+from radar_backend.application import localized_titles as _application
+from radar_backend.domain import localized_titles as _rules
 
-def display_in_traditional(raw: object) -> str | None:
-    """Convert script only; never change the original Steam Store name."""
-    if not isinstance(raw, str) or not raw.strip():
-        return None
-    return _CONVERT_TO_TRADITIONAL.convert(raw.strip())
-
-def add_traditional_display_names(game: dict) -> None:
-    for source, target in (
-        ("name_zh_tw", "name_zh_tw_traditional"),
-        ("name_zh_cn", "name_zh_cn_traditional"),
-        ("name_en", "name_en_traditional"),
-    ):
-        value = game.get(source)
-        if isinstance(value, str) and HAN.search(value):
-            game[target] = display_in_traditional(value)
-        else:
-            game.pop(target, None)
-
-    # Do not confuse a translated Store title with the game's actual
-    # supported_languages flags. Display names use the Store title only.
-    game["display_name"] = (
-        game.get("name_zh_tw_traditional")
-        or game.get("name_zh_cn_traditional")
-        or game.get("name_en")
-        or game.get("name")
-        or f"Steam App {game.get('appid')}"
-    )
-    game["display_name_source"] = (
-        "tchinese" if game.get("name_zh_tw_traditional")
-        else "schinese_converted" if game.get("name_zh_cn_traditional")
-        else "english"
-    )
-
+_CONVERT_TO_TRADITIONAL = _source._CONVERT_TO_TRADITIONAL
 LOG = logging.getLogger(__name__)
 STORE_URL = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
-HAN = re.compile(r"[\u3400-\u9fff]")
+HAN = _rules.HAN
 BATCH = 35
 
 
+def display_in_traditional(raw: object) -> str | None:
+    return _rules.display_in_traditional(raw, convert=_CONVERT_TO_TRADITIONAL.convert)
+
+
+def add_traditional_display_names(game: dict) -> None:
+    return _rules.add_traditional_display_names(game, display=display_in_traditional, han=HAN)
+
+
 def actual_zh_tw_title(value: object) -> str | None:
-    if not isinstance(value, str):
-        return None
-    name = value.strip()
-    if not name or not HAN.search(name) or len(name) > 240:
-        return None
-    return name
+    return _rules.actual_zh_tw_title(value, han=HAN)
 
 
 def fetch_store_tw_names(
-    session: requests.Session,
-    ids: list[int],
-    *,
-    batch_size: int = BATCH,
+    session: requests.Session, ids: list[int], *, batch_size: int = BATCH,
     interval: float = 1.5,
 ) -> dict[int, str]:
-    names: dict[int, str] = {}
-    ids = sorted({int(x) for x in ids if int(x) > 0})
-    last_started = 0.0
-    for offset in range(0, len(ids), batch_size):
-        batch = ids[offset:offset + batch_size]
-        payload = {
-            "ids": [{"appid": appid} for appid in batch],
-            "context": {
-                "country_code": "TW", "language": "tchinese", "steam_realm": 1,
-            },
-            "data_request": {"include_basic_info": True},
-        }
-        for attempt in range(4):
-            time.sleep(max(0.0, interval - (time.monotonic() - last_started)))
-            last_started = time.monotonic()
-            try:
-                response = session.get(
-                    STORE_URL,
-                    params={"input_json": json.dumps(payload, separators=(",", ":"))},
-                    timeout=30,
-                )
-                if response.status_code == 429:
-                    LOG.warning("Steam TW title lookup throttled; cooldown")
-                    time.sleep(20 * (attempt + 1))
-                    continue
-                response.raise_for_status()
-                rows = (response.json().get("response") or {}).get("store_items") or []
-                for row in rows:
-                    if (
-                        isinstance(row, dict)
-                        and isinstance(row.get("appid"), int)
-                        and row["appid"] in batch
-                        and isinstance(row.get("name"), str)
-                        and row["name"].strip()
-                    ):
-                        names[row["appid"]] = row["name"].strip()
-                break
-            except (requests.RequestException, ValueError, TypeError) as exc:
-                LOG.warning("Steam TW title batch retry %d: %s", attempt + 1, exc)
-                if attempt < 3:
-                    time.sleep(5 * (attempt + 1))
-        else:
-            raise RuntimeError(
-                f"Steam TW title batch {offset // batch_size + 1} failed; "
-                "do not publish incomplete localized candidates"
-            )
-        LOG.info("TW_TITLES_LOOKUP %d/%d resolved=%d",
-                 min(offset + len(batch), len(ids)), len(ids), len(names))
-    return names
+    return _source.fetch_store_tw_names(
+        session, ids, batch_size=batch_size, interval=interval,
+        sleep=time.sleep, monotonic=time.monotonic, logger=LOG,
+        requests_module=requests, url=STORE_URL,
+    )
 
 
 def enrich_tw_names(games: list[dict], store_names: dict[int, str]) -> dict[str, int]:
-    results = {"total": 0, "official_zh_tw": 0, "english_fallback": 0,
-               "store_not_returned": 0}
-    for game in games:
-        results["total"] += 1
-        appid = int(game["appid"])
-        original_english = str(game.get("name_en") or game["name"]).strip()
-        if not original_english:
-            raise RuntimeError(f"Missing English title for app {appid}")
-        game["name_en"] = original_english
-        candidate = actual_zh_tw_title(store_names.get(appid))
-        if candidate:
-            game["name_zh_tw"] = candidate
-            results["official_zh_tw"] += 1
-        elif game.get("name_zh_tw"):
-            results["official_zh_tw"] += 1
-        else:
-            results["english_fallback"] += 1
-        if appid not in store_names:
-            results["store_not_returned"] += 1
-        # Steam tchinese titles can themselves contain Simplified glyphs.
-        # Store raw names for provenance and separate Traditional display values.
-        add_traditional_display_names(game)
-    return results
+    return _application.enrich_tw_names(
+        games, store_names, select_title=actual_zh_tw_title,
+        display_names=add_traditional_display_names,
+    )

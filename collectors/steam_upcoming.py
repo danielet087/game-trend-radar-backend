@@ -21,6 +21,8 @@ from radar_backend.adapters import github_contents_checkpoint as checkpoint_tran
 from radar_backend.application.follower_checkpoint import persist_follower_checkpoint
 from radar_backend.domain import follower_checkpoint as checkpoint_rules
 from radar_backend.state import follower_checkpoint as checkpoint_state
+from radar_backend.domain import release_window as _release_window
+from radar_backend.domain.release_window import ReleaseWindow
 
 LOGGER = logging.getLogger(__name__)
 
@@ -33,17 +35,6 @@ TAIWAN_TZ = timezone(timedelta(hours=8))
 def taiwan_today() -> date:
     """Use the same calendar day for scans, release windows and the frontend."""
     return datetime.now(TAIWAN_TZ).date()
-
-
-@dataclass(frozen=True)
-class ReleaseWindow:
-    raw: str
-    start: date | None
-    end: date | None
-    precision: str
-
-    def overlaps(self, start: date, end: date) -> bool:
-        return self.start is not None and self.end is not None and self.end >= start and self.start <= end
 
 
 @dataclass(frozen=True)
@@ -74,100 +65,16 @@ class QualifiedGame:
 
 
 def _month_number(text: str) -> int | None:
-    return {
-        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
-        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
-    }.get(text.strip().lower()[:3])
+    return _release_window._month_number(text)
 
 
 def parse_release_window(raw: Any) -> ReleaseWindow:
-    if raw is None:
-        return ReleaseWindow("", None, None, "unknown")
-
-    if isinstance(raw, (int, float)) and not isinstance(raw, bool):
-        try:
-            stamp = float(raw)
-            if abs(stamp) >= 100_000_000_000:  # Unix milliseconds, if supplied.
-                stamp /= 1000
-            d = datetime.fromtimestamp(stamp, tz=TAIWAN_TZ).date()
-            return ReleaseWindow(str(raw), d, d, "day")
-        except (OverflowError, OSError, ValueError):
-            return ReleaseWindow(str(raw), None, None, "unknown")
-
-    text = " ".join(str(raw).split())
-    if not text:
-        return ReleaseWindow(text, None, None, "unknown")
-
-    # Actual release times can cross midnight in Taiwan. Convert only when
-    # an offset-aware time is supplied; an announced date alone has no hour
-    # and must not be shifted by an assumed Steam/Pacific unlock time.
-    if re.fullmatch(r"\d{10}|\d{13}", text):
-        release = parse_release_window(int(text))
-        return ReleaseWindow(text, release.start, release.end, release.precision)
-    if re.fullmatch(r"\d{4}-\d{2}-\d{2}T.+(?:Z|[+-]\d{2}:?\d{2})", text):
-        try:
-            instant = datetime.fromisoformat(text.replace("Z", "+00:00"))
-            if instant.tzinfo is not None:
-                d = instant.astimezone(TAIWAN_TZ).date()
-                return ReleaseWindow(text, d, d, "day")
-        except ValueError:
-            pass
-
-    normalized = text.lower().replace(".", "")
-    if normalized in {
-        "coming soon", "soon", "tba", "tbd", "to be announced",
-        "date to be announced", "announced later",
-    }:
-        return ReleaseWindow(text, None, None, "unknown")
-
-    try:
-        d = date.fromisoformat(text)
-        return ReleaseWindow(text, d, d, "day")
-    except ValueError:
-        pass
-
-    match = re.fullmatch(r"(\d{1,2})\s+([A-Za-z]{3,9})[,]?\s+(\d{4})", text)
-    if match:
-        month = _month_number(match.group(2))
-        if month:
-            try:
-                d = date(int(match.group(3)), month, int(match.group(1)))
-                return ReleaseWindow(text, d, d, "day")
-            except ValueError:
-                pass
-
-    match = re.fullmatch(r"([A-Za-z]{3,9})\s+(\d{1,2})[,]?\s+(\d{4})", text)
-    if match:
-        month = _month_number(match.group(1))
-        if month:
-            try:
-                d = date(int(match.group(3)), month, int(match.group(2)))
-                return ReleaseWindow(text, d, d, "day")
-            except ValueError:
-                pass
-
-    match = re.fullmatch(r"([A-Za-z]{3,9})\s+(\d{4})", text)
-    if match:
-        month = _month_number(match.group(1))
-        year = int(match.group(2))
-        if month:
-            last = calendar.monthrange(year, month)[1]
-            return ReleaseWindow(text, date(year, month, 1), date(year, month, last), "month")
-
-    match = re.fullmatch(r"Q([1-4])[,]?\s*(\d{4})", text, flags=re.IGNORECASE)
-    if match:
-        quarter = int(match.group(1))
-        year = int(match.group(2))
-        start_month = (quarter - 1) * 3 + 1
-        end_month = start_month + 2
-        last = calendar.monthrange(year, end_month)[1]
-        return ReleaseWindow(text, date(year, start_month, 1), date(year, end_month, last), "quarter")
-
-    if re.fullmatch(r"\d{4}", text):
-        year = int(text)
-        return ReleaseWindow(text, date(year, 1, 1), date(year, 12, 31), "year")
-
-    return ReleaseWindow(text, None, None, "unknown")
+    """Keep call-time collector parser ports while using shared pure rules."""
+    return _release_window.parse_release_window(
+        raw, datetime_type=datetime, date_type=date, taiwan_tz=TAIWAN_TZ,
+        window_type=ReleaseWindow, month_number=_month_number,
+        parse_window=parse_release_window,
+    )
 
 
 def _add_months_clamped(value: date, months: int) -> date:

@@ -13,7 +13,7 @@ from pathlib import Path
 
 import requests
 
-from scripts.steam_release_dates import corrected_games, fetch_store_browse_releases
+from radar_backend.adapters.public_release_dates import corrected_games, fetch_store_browse_releases
 
 LOGGER = logging.getLogger(__name__)
 

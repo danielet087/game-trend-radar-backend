@@ -1,7 +1,7 @@
 """Steam candidate source boundary and default HTTP integrations.
 
 Application phases receive this object explicitly. Shared Store rules and
-transport have direct owners; remaining collectors and localization helpers
+transport and title localization have direct owners; remaining collectors
 are source adapters. No phase reads requests or environment variables directly.
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ import requests
 
 from collectors.steam_upcoming import SteamUpcomingCollector, UpcomingGame
 from scripts.steam_follower_prefilter import scan_batch
-from scripts.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
+from radar_backend.adapters.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 from radar_core.domain.twitch_admission import is_twitch_qualified
 from radar_backend.adapters.steam_store import (
     build_snapshot, fetch_metadata, excluded_appids, is_disallowed,

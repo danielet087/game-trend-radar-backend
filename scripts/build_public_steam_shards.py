@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from scripts.steam_localized_titles import add_traditional_display_names
+from radar_backend.adapters.steam_localized_titles import add_traditional_display_names
 from scripts.public_catalog import (
     PLAYER_CATEGORY_FIELDS, keep_newer_release, preserve_player_categories,
     write_catalog_projection,

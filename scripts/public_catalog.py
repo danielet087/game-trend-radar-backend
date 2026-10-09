@@ -4,111 +4,48 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-RELEASE_FIELDS = (
-    'release_raw', 'release_start', 'release_end', 'release_precision',
-    'release_display_precision', 'release_display_provider', 'release_date_timezone',
-    'release_date_basis', 'release_date_verified_at', 'release_time_utc',
-    'release_time_source', 'release_timestamp_taipei_date', 'release_date_conflict',
-    'post_followers_store_verified', 'post_followers_store_verified_at',
-    'release_store_date', 'release_date_normalization',
-)
+from radar_backend.application import catalog_projection as _application
+from radar_backend.domain import catalog_metadata as _metadata
+from radar_backend.domain import catalog_projection as _projection
+from radar_backend.state import catalog_projection as _state
 
-PLAYER_CATEGORY_FIELDS = ('categories', 'categories_source', 'categories_checked_at')
-PLAYER_CATEGORY_SOURCES = {
-    'Steam IStoreBrowseService/GetItems supported_player_categoryids',
-    'Steam Store appdetails cc=TW categories',
-}
+RELEASE_FIELDS = _metadata.RELEASE_FIELDS
+PLAYER_CATEGORY_FIELDS = _metadata.PLAYER_CATEGORY_FIELDS
+PLAYER_CATEGORY_SOURCES = _metadata.PLAYER_CATEGORY_SOURCES
+FIELDS = _projection.FIELDS
 
 
 def player_category_snapshot(row: dict) -> tuple[datetime, dict] | None:
-    """Accept explicit official Store categories, including an observed empty list."""
-    if row.get('categories_source') not in PLAYER_CATEGORY_SOURCES:
-        return None
-    categories = row.get('categories')
-    if not isinstance(categories, list) or any(
-        not isinstance(item, dict)
-        or not isinstance(item.get('id'), int) or isinstance(item.get('id'), bool)
-        or item['id'] <= 0 or not isinstance(item.get('description'), str)
-        for item in categories
-    ):
-        return None
-    try:
-        checked = datetime.fromisoformat(str(row.get('categories_checked_at')).replace('Z', '+00:00'))
-        if checked.tzinfo is None or checked.utcoffset() != timedelta(0):
-            return None
-        if checked > datetime.now(timezone.utc) + timedelta(minutes=5):
-            return None
-    except (ValueError, TypeError):
-        return None
-    return checked, {key: row[key] for key in PLAYER_CATEGORY_FIELDS}
+    return _metadata.player_category_snapshot(
+        row, now=lambda: datetime.now(timezone.utc), datetime_type=datetime,
+        timedelta_type=timedelta, timezone_type=timezone,
+        fields=PLAYER_CATEGORY_FIELDS, sources=PLAYER_CATEGORY_SOURCES,
+    )
 
 
 def preserve_player_categories(existing: dict, incoming: dict) -> dict:
-    """Followers-only snapshots cannot erase or replace newer official player modes."""
-    result = dict(incoming)
-    for key in PLAYER_CATEGORY_FIELDS:
-        result.pop(key, None)
-    observed = player_category_snapshot(incoming)
-    prior = player_category_snapshot(existing) if existing.get('appid') == incoming.get('appid') else None
-    if prior is not None and (observed is None or prior[0] > observed[0]):
-        observed = prior
-    if observed is not None:
-        result.update(observed[1])
-    return result
+    return _metadata.preserve_player_categories(
+        existing, incoming, snapshot=player_category_snapshot, fields=PLAYER_CATEGORY_FIELDS,
+    )
 
 
 def keep_newer_release(existing: dict, incoming: dict) -> dict:
-    """Content events and master snapshots cannot roll back a newer date audit."""
-    def checked_at(row):
-        try:
-            value = datetime.fromisoformat(str(row.get('release_date_verified_at')).replace('Z', '+00:00'))
-            return value.replace(tzinfo=timezone.utc) if value.tzinfo is None else value
-        except (ValueError, TypeError):
-            return datetime.min.replace(tzinfo=timezone.utc)
-    result = dict(incoming)
-    if existing.get('release_display_precision') == 'date_full' and checked_at(existing) > checked_at(incoming):
-        for key in RELEASE_FIELDS:
-            if key in existing:
-                result[key] = existing[key]
-            else:
-                result.pop(key, None)
-    return result
-
-FIELDS = (
-    'appid', 'name', 'name_en', 'display_name', 'name_zh_tw', 'name_zh_cn',
-    'name_zh_tw_traditional', 'name_zh_cn_traditional', 'name_en_traditional',
-    'language_support', 'release_start', 'release_end', 'release_precision',
-    'release_display_precision', 'release_date_timezone', 'followers',
-    'follower_checked_at', 'recent_source', 'first_week_qualified_at',
-    'header_image', 'header_image_2x', 'main_capsule_image', 'main_capsule_image_2x',
-    'small_capsule_image', 'capsule_image', 'tags', 'genres',
-    'tag_ids', 'tag_labels_zh_tw', 'genre_labels_zh_tw',
-    'content_enriched_at', 'tags_fetch_status',
-    *PLAYER_CATEGORY_FIELDS,
-    'twitch_admission', 'steam_type', 'sexual_content_screened',
-    'release_time_utc', 'release_timestamp_taipei_date', 'release_date_conflict',
-    'release_store_date', 'release_date_normalization',
-    'release_display_provider', 'release_date_verified_at',
-)
+    return _metadata.keep_newer_release(
+        existing, incoming, datetime_type=datetime,
+        timezone_type=timezone, fields=RELEASE_FIELDS,
+    )
 
 
 def write_catalog_projection(data_dir: Path, rows: list[dict], generated_at: str) -> dict:
-    # Hash every accepted field, not only the number of games: metadata-only
-    # changes must invalidate the release snapshot too.
-    canonical = json.dumps(rows, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
-    revision = hashlib.sha256(canonical.encode()).hexdigest()[:20]
-    path = data_dir / 'catalog.json'
-    payload = {
-        'version': 3, 'revision': revision, 'generated_at': generated_at,
-        'count': len(rows),
-        'games': [{key: row[key] for key in FIELDS if key in row} for row in rows],
-    }
-    if path.exists():
-        try:
-            if json.loads(path.read_text(encoding='utf-8')).get('revision') == revision:
-                return {'catalog_path': 'catalog.json', 'catalog_revision': revision}
-        except (OSError, ValueError, TypeError):
-            pass
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, ensure_ascii=False, separators=(',', ':')) + '\n', encoding='utf-8')
-    return {'catalog_path': 'catalog.json', 'catalog_revision': revision}
+    return _application.write_catalog_projection(
+        data_dir, rows, generated_at,
+        revision_for_rows=lambda values: _projection.catalog_revision(
+            values, json_module=json, hashlib_module=hashlib,
+        ),
+        payload_for_rows=lambda values, at, revision: _projection.catalog_payload(
+            values, at, revision, fields=FIELDS,
+        ),
+        exists=_state.exists,
+        read_revision=lambda path: _state.read_revision(path, json_module=json),
+        write_payload=lambda path, payload: _state.write_payload(path, payload, json_module=json),
+    )

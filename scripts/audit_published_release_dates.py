@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from scripts.public_catalog import write_catalog_projection
+from radar_backend.adapters.public_catalog import write_catalog_projection
 import logging
 import re
 import time

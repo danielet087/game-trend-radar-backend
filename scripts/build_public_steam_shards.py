@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from radar_backend.adapters.steam_localized_titles import add_traditional_display_names
-from scripts.public_catalog import (
+from radar_backend.adapters.public_catalog import (
     PLAYER_CATEGORY_FIELDS, keep_newer_release, preserve_player_categories,
     write_catalog_projection,
 )

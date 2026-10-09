@@ -8,6 +8,7 @@ from typing import Any, Callable
 
 import requests
 
+from radar_backend.adapters.public_catalog import preserve_player_categories as _preserve_player_categories
 from radar_backend.adapters.public_release_dates import resolved_store_date
 from radar_backend.adapters.steam_localized_titles import add_traditional_display_names
 from radar_backend.application import preview_metadata as application
@@ -72,13 +73,16 @@ def add_traditional_name(
 def normalized_metadata(
     appid: int, details: dict[str, Any], followers: int | None,
     checked_at: str | None, *, browse_release: dict[str, Any] | None = None,
-    preserve_player_categories: Callable, resolve: Callable | None = None,
+    preserve_player_categories: Callable | None = None, resolve: Callable | None = None,
     clock: Callable | None = None,
 ) -> dict[str, Any] | None:
-    """The catalog owner supplies its category-preservation bridge explicitly."""
+    """Use the shared catalog owner, retaining an explicit replacement port."""
     return application.normalized_metadata(
         appid, details, followers, checked_at, browse_release=browse_release,
         resolved_store_date=resolve if resolve is not None else resolved_store_date,
-        preserve_player_categories=preserve_player_categories,
+        preserve_player_categories=(
+            preserve_player_categories if preserve_player_categories is not None
+            else _preserve_player_categories
+        ),
         clock=clock if clock is not None else lambda: datetime.now(timezone.utc).isoformat(),
     )

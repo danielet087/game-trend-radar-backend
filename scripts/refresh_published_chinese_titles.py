@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
-from scripts.public_catalog import write_catalog_projection
+from radar_backend.adapters.public_catalog import write_catalog_projection
 from scripts.twitch_steam_admission import is_twitch_qualified, preserve_twitch_admission
 import logging
 import re

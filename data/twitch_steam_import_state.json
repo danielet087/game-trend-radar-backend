@@ -2022,8 +2022,8 @@
       }
     },
     "4287460": {
-      "status": "pending",
-      "updated_at": "2026-10-09T04:01:57.168583Z",
+      "status": "accepted",
+      "updated_at": "2026-10-09T04:02:10.072190Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -2040,80 +2040,19 @@
         }
       },
       "validation_version": 4,
-      "follower_candidate": {
-        "appid": 4287460,
-        "name": "POOL LOOP",
-        "release_date": "2026-09-22",
-        "steam_url": "https://store.steampowered.com/app/4287460/",
-        "group_id64": null,
-        "queue_source": "twitch_steam_discovery",
-        "twitch_admission": {
-          "schema_version": 1,
-          "method": "twitch_igdb_external_steam_v1",
-          "appid": 4287460,
-          "twitch_game_id": "1851360928",
-          "igdb_id": "392596",
-          "checked_at": "2026-10-09T03:11:41Z",
-          "source_frontend_commit": "09d2e1d2a8d1ed23656e70f112a634f55aaead0b",
-          "source_enrollment": {
-            "source": "igdb_first_release_date",
-            "observed_at": "2026-10-09T03:11:41Z",
-            "viewer_count": 14207,
-            "min_viewers": 7000
-          }
-        },
-        "steam_candidate": {
-          "appid": 4287460,
-          "name": "POOL LOOP",
-          "name_en": "POOL LOOP",
-          "release_raw": "2026-09-22",
-          "release_start": "2026-09-22",
-          "release_end": "2026-09-22",
-          "release_precision": "day",
-          "release_display_precision": "date_full",
-          "release_display_provider": "Steam IStoreBrowseService/GetItems",
-          "release_date_basis": "steam_store_browse_verified_full_date",
-          "release_date_timezone": "Asia/Taipei",
-          "release_time_utc": "2026-09-22T12:04:37Z",
-          "release_time_source": "Steam IStoreBrowseService/GetItems",
-          "release_timestamp_taipei_date": "2026-09-22",
-          "release_date_conflict": false,
-          "release_store_date": "2026-09-22",
-          "release_date_normalization": "steam_store_date_matches_taipei",
-          "release_date_verified_at": "2026-10-09T04:01:57.168583Z",
-          "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-09T04:01:57.168583Z",
-          "sexual_content_screened": true,
-          "steam_type": "game",
-          "content_descriptorids": [],
-          "store_url": "https://store.steampowered.com/app/4287460/",
-          "community_url": "https://steamcommunity.com/app/4287460/",
-          "twitch_admission": {
-            "schema_version": 1,
-            "method": "twitch_igdb_external_steam_v1",
-            "appid": 4287460,
-            "twitch_game_id": "1851360928",
-            "igdb_id": "392596",
-            "checked_at": "2026-10-09T03:11:41Z",
-            "source_frontend_commit": "09d2e1d2a8d1ed23656e70f112a634f55aaead0b",
-            "source_enrollment": {
-              "source": "igdb_first_release_date",
-              "observed_at": "2026-10-09T03:11:41Z",
-              "viewer_count": 14207,
-              "min_viewers": 7000
-            }
-          }
-        }
-      },
-      "reason": "queued_official_followers",
+      "follower_candidate": null,
+      "reason": "steam_verified",
       "rate_limit_stage": null,
       "retry_at": null,
       "retry_source": null,
       "retry_after": null,
       "retry_attempts": 0,
-      "rate_limit_attempts": 0
+      "rate_limit_attempts": 0,
+      "content_signature": "bd8f843e8240b09cb1785e78824553f22a270c2ad02d83c7ed08879ce9463d0c",
+      "followers": 149,
+      "follower_checked_at": "2026-10-09T12:02:05.329054+08:00"
     }
   },
-  "updated_at": "2026-10-09T04:01:57.168583Z",
+  "updated_at": "2026-10-09T04:02:10.072190Z",
   "api_cooldowns": {}
 }

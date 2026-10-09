@@ -18,6 +18,10 @@ from collectors.steam_upcoming import (
     parse_release_window, parse_search_results_html, taiwan_today, write_json,
 )
 
+from radar_backend.application import preview_metadata as _preview_application
+from radar_backend.domain import preview_metadata as _preview_rules
+from radar_backend.adapters import steam_preview_metadata as _preview_metadata
+
 LOGGER = logging.getLogger(__name__)
 APP_DETAILS = "https://store.steampowered.com/api/appdetails"
 FEATURED = "https://store.steampowered.com/api/featuredcategories"
@@ -25,93 +29,46 @@ UA = "Mozilla/5.0 (compatible; GameTrendRadar/0.4)"
 
 
 def steam_get(session: requests.Session, url: str, params: dict[str, Any]) -> dict[str, Any] | None:
-    for attempt in range(3):
-        try:
-            response = session.get(url, params=params, timeout=25)
-            if response.status_code == 429:
-                delay = max(60, min(180, 60 * (attempt + 1)))
-                LOGGER.warning("Steam Store returned 429; sleeping %ds", delay)
-                time.sleep(delay)
-                continue
-            response.raise_for_status()
-            body = response.json()
-            return body if isinstance(body, dict) else None
-        except (requests.RequestException, ValueError) as exc:
-            LOGGER.warning("Steam Store metadata request failed: %s", exc)
-            if attempt < 2:
-                time.sleep(5 * (attempt + 1))
-    return None
+    return _preview_metadata.steam_get(
+        session, url, params, sleep=time.sleep, logger=LOGGER, requests_module=requests,
+    )
 
 
 def app_details(
     session: requests.Session, appid: int, *, language: str = "english"
 ) -> dict[str, Any] | None:
-    data = steam_get(session, APP_DETAILS, {"appids": appid, "cc": "TW", "l": language})
-    item = (data or {}).get(str(appid), {})
-    if isinstance(item, dict) and item.get("success") and isinstance(item.get("data"), dict):
-        return item["data"]
-    return None
+    return _preview_metadata.app_details(
+        session, appid, language=language, fetch=steam_get, url=APP_DETAILS,
+    )
 
 
 def localized_names(
     english_details: dict[str, Any], traditional_details: dict[str, Any] | None
 ) -> tuple[str, str | None]:
-    english_name = str(english_details.get("name") or "").strip()
-    traditional_name = str((traditional_details or {}).get("name") or "").strip()
-    return english_name, traditional_name if traditional_name and traditional_name != english_name else None
+    return _preview_rules.localized_names(english_details, traditional_details)
 
 
 def add_traditional_name(
     session: requests.Session, appid: int, game: dict[str, Any], english_details: dict[str, Any],
     *, delay_seconds: float,
 ) -> None:
-    # Request names in tchinese, but keep the English locale for parsing release dates.
-    # Some games have no localized Store title; never invent a translation.
-    time.sleep(delay_seconds)
-    traditional_details = app_details(session, appid, language="tchinese")
-    name_en, name_zh_tw = localized_names(english_details, traditional_details)
-    game["name"] = name_en or game["name"]
-    game["name_en"] = name_en or game["name"]
-    game["name_zh_tw"] = name_zh_tw
-    # Keep the official title untouched; UI uses converted display fields.
-    add_traditional_display_names(game)
+    return _preview_application.add_traditional_name(
+        session, appid, game, english_details, delay_seconds=delay_seconds,
+        sleep=time.sleep, app_details=app_details, localized_names=localized_names,
+        add_traditional_display_names=add_traditional_display_names,
+    )
 
 
 def normalized_metadata(
     appid: int, details: dict[str, Any], followers: int | None, checked_at: str | None,
     *, browse_release: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
-    release_details = details.get("release_date") or {}
-    release = resolved_store_date(appid, release_details.get("date"), browse_release, fallback_detail=release_details)
-    if release["release_precision"] != "day" or not release["release_start"]:
-        return None
-    game = {
-        "appid": appid,
-        "name": str(details.get("name") or f"Steam App {appid}"),
-        "name_en": str(details.get("name") or f"Steam App {appid}"),
-        "name_zh_tw": None,
-        **release,
-        "followers": followers,
-        "follower_checked_at": checked_at,
-        "capsule_image": details.get("capsule_image") or details.get("header_image"),
-        "header_image": details.get("header_image"),
-        "store_url": f"https://store.steampowered.com/app/{appid}/",
-    }
-    # Categories are already present in the existing full appdetails request.
-    # An absent/malformed list is unknown, rather than proof of single-player.
-    if (
-        details.get('type') == 'game'
-        and isinstance(details.get('steam_appid'), int)
-        and not isinstance(details['steam_appid'], bool)
-        and details['steam_appid'] == appid
-        and isinstance(details.get('categories'), list)
-    ):
-        game.update({
-            'categories': details['categories'],
-            'categories_source': 'Steam Store appdetails cc=TW categories',
-            'categories_checked_at': datetime.now(timezone.utc).isoformat(),
-        })
-    return preserve_player_categories({}, game)
+    return _preview_application.normalized_metadata(
+        appid, details, followers, checked_at, browse_release=browse_release,
+        resolved_store_date=resolved_store_date,
+        preserve_player_categories=preserve_player_categories,
+        clock=lambda: datetime.now(timezone.utc).isoformat(),
+    )
 
 
 RECENT_DAYS = 30

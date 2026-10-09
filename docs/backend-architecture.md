@@ -128,8 +128,27 @@ daily 在 reset 後、收集前 capture 私有狀態。reset 每次對最新狀�
 
 第六批 PR 接在第五批分支之後，共用 Core 0.2.0 固定 SHA 不變。hourly 請求預算、排程、Secrets、公開 JSON、checkpoint 格式與 Git 發布邊界沒有調整；歷史手動測試 workflow 只補入新測試的 sparse checkout 依賴，不重新啟用自動觸發。
 
+## 第七批：共用 Store 與成人排除邊界
+
+| 責任 | 純規則 | 用例、來源與狀態 |
+| --- | --- | --- |
+| Store 日期解析、公告日保留與主清單過濾 | `domain/store_release.py` | `application/store_release.py` |
+| 候選日期／成人內容分類與完整快照 | `domain/candidate_screening.py` | `application/candidate_screening.py` |
+| Store Browse 分批 HTTP、節流與重試 | 無資格判斷 | `adapters/steam_metadata.py` |
+| 成人排除名單與 descriptor 判斷 | `domain/adult_exclusions.py` | `state/adult_exclusions.py` |
+
+上表路徑皆相對於 `radar_backend/`。`adapters/steam_store.py` 組裝共用邊界，正式 `CandidateSources` 與官方 worker 直接使用新規則、來源與狀態。`scripts/steam_master_date_gate.py`、`screen_steam_candidates_before_followers.py` 與 `steam_adult_exclusions.py` 保留公開函式、常數、預設路徑及既有命令列介面，以薄 wrapper 在呼叫時提供原 metadata、parser、分類、ledger、HTTP 等待、logger、時鐘及成人／Twitch predicate。正式 Store ports 不再回呼這三個相容 helper。
+
+Store 日期解析仍拒絕 bool timestamp，保留原數字／字串轉換、UTC instant 到 `Asia/Taipei` 的日曆日期，以及 `date_full` 或已上市精確日期的判定。套用 Store 證據先完成純規則才讀時鐘；已公告的 full date 保留，TW 權威來源另外保留原 provider 與原日期驗證時間。主清單過濾維持先讀成人名單、首筆去重、原列身分與順序、未來候選資格及已上市歷史／Twitch 例外。
+
+候選快照依序驗證 games array、讀成人名單、完整分類，再產生 UTC `screened_at`。既有 descriptor 3／4、tag 位置與文字規則、source／rule／reasons／count 及來源不修改的契約保留。成人名單讀取維持原 criteria 與 JSON 驗證及錯誤傳遞，不以空集合備援；既有型別轉換、descriptor 優先順序、容錯與 symlink 行為保持。
+
+metadata transport 保留 GetItems v1、TW／english／realm 1、release／basic info／20 tags、35 款 batch、1.5 秒預設間隔、30 秒 timeout 與四次嘗試。429 冷卻依序 20／40／60／80 秒，其他既有可重試錯誤的等待為 5／10／15 秒；耗盡後中止，不回傳部分結果。成功但缺少單款 metadata 仍交由日期規則判定 unavailable，不新增來源覆蓋率政策。所有等待、monotonic、logger 與 HTTP 邊界都可替換，離線測試不需要正式查詢。
+
+第七批 PR 接在第六批分支之後。固定 Core 版本、正式排程、來源資格、HTTP 預算、Secrets、data／experiments 與 Git 發布流程不變；手動測試 workflow 補入四個新測試檔的 sparse 依賴。
+
 ## 尚未遷移
 
-正式官方 worker 的 Store 複驗、主清單提升與內容派送已由新層擁有。候選及官方來源 adapter 仍橋接共用的 Steam Store 低層日期解析、成人篩選、Twitch 收錄與公開目錄 helper；本批沒有全面搬移這些供多個 repair／公開工具使用的底層實作。
+正式候選與官方工作已直接使用共用 Store metadata、日期／候選篩選及成人排除層。另一套 `scripts/steam_release_dates.py` 的日期更新與部分結果重試、Steam 本地化／內容資料、Twitch 來源協調及公開目錄 projection 仍有舊 helper；共用 Twitch 收錄純規則已固定在 Core，不再複製實作。
 
 歷史 prescreen、shortlist、stress 與公開 maintenance 工具的 Git/rebase 仍各自執行，資料所有權及格式不同，尚未全面遷移。Stage 2 prescreen、Stage 3 shortlist 與 preview 是手動／暫停的恢復入口，沒有正式自動排程；舊 `update-steam` 的 collector 入口已硬停止。後續整理需各自定義 cursor、公開資格或 recent-release 的保存契約，不因架構重構重新啟用退役入口。

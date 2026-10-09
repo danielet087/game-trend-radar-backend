@@ -6,39 +6,19 @@ Do not drop the exclusion gate when publishing already-qualified history.
 """
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
-EXCLUSION_PATH = Path(__file__).resolve().parents[1] / "data" / "steam_adult_exclusion.json"
-EXCLUDED_DESCRIPTORS = frozenset({3, 4})
+from radar_backend.domain import adult_exclusions as _rules
+from radar_backend.state import adult_exclusions as _ledger
+
+EXCLUSION_PATH = _ledger.EXCLUSION_PATH
+EXCLUDED_DESCRIPTORS = _rules.EXCLUDED_DESCRIPTORS
 
 
 def excluded_appids(path: Path = EXCLUSION_PATH) -> set[int]:
-    if not path.is_file():
-        raise RuntimeError(f"Steam adult exclusion ledger missing: {path}")
-    doc = json.loads(path.read_text(encoding="utf-8"))
-    if set(doc["criteria"]["exclude_content_descriptor_ids"]) != EXCLUDED_DESCRIPTORS:
-        raise RuntimeError("Steam adult exclusion criterion changed unexpectedly")
-    rows = doc.get("games")
-    if not isinstance(rows, list):
-        raise RuntimeError("Steam adult exclusion ledger malformed")
-    return {
-        int(row["appid"]) for row in rows
-        if set(row.get("excluded_descriptor_ids", [])) & EXCLUDED_DESCRIPTORS
-    }
+    return _ledger.excluded_appids(path, excluded_descriptors=EXCLUDED_DESCRIPTORS)
 
 
 def is_disallowed(row: dict[str, Any], blocked: set[int]) -> bool:
-    try:
-        appid = int(row["appid"])
-    except (TypeError, ValueError, KeyError):
-        return True
-    descriptors = row.get("content_descriptorids") or row.get("content_descriptors") or []
-    if isinstance(descriptors, dict):
-        descriptors = descriptors.get("ids") or []
-    try:
-        flagged = bool({int(x) for x in descriptors} & EXCLUDED_DESCRIPTORS)
-    except (TypeError, ValueError):
-        flagged = False
-    return appid in blocked or flagged
+    return _rules.is_disallowed(row, blocked, excluded_descriptors=EXCLUDED_DESCRIPTORS)

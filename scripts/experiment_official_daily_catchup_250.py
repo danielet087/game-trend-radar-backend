@@ -35,6 +35,11 @@ from radar_backend.domain.official_queue import (
 )
 from radar_backend.jobs.official_followers import manual_cooldown_override, run_job
 from radar_backend.state import official_checkpoint as _checkpoint_state
+from radar_backend.application import official_catalog as _catalog_application
+from radar_backend.application import content_dispatch as _dispatch_application
+from radar_backend.domain import official_catalog as _catalog_rules
+from radar_backend.domain import content_dispatch as _dispatch_rules
+from radar_backend.adapters.github_content_dispatch import compose_services as _dispatch_services
 
 from scripts.steam_master_date_gate import fetch_store_release_details
 from scripts.steam_adult_exclusions import excluded_appids, is_disallowed
@@ -73,265 +78,49 @@ def save(path, data):
 
 
 def upsert_qualified_master(master, result):
-    """Persist only official >=5000 + post-Followers Store-exact games."""
-    if (
-        not checked_numeric(result.get("official_followers"))
-        or result["official_followers"] < 5000
-        or result.get("store_date_exact") is not True
-        or result.get("release_display_precision") != "date_full"
-        or not valid_date(result.get("release_date"))
-    ):
+    """Keep call-time ledger/clock ports for the historical public helper."""
+    if not _catalog_rules.qualifies_for_master(result):
         return False
     blocked = excluded_appids()
-    candidate = {
-        "appid": int(result["appid"]),
-        "name": result.get("name") or f"Steam App {int(result['appid'])}",
-        "name_en": result.get("name") or f"Steam App {int(result['appid'])}",
-        "release_raw": result["release_date"],
-        "release_start": result["release_date"],
-        "release_end": result["release_date"],
-        "release_precision": "day",
-        "release_display_precision": "date_full",
-        "release_display_provider": result.get("release_display_provider"),
-        "release_date_basis": result.get("release_date_basis"),
-        "release_date_timezone": result.get("release_date_timezone") or "Asia/Taipei",
-        "release_time_utc": result.get("release_time_utc"),
-        "release_time_source": result.get("release_display_provider"),
-        "release_timestamp_taipei_date": result.get("release_timestamp_taipei_date"),
-        "release_date_conflict": result.get("release_date_conflict") is True,
-        "release_date_verified_at": datetime.now(timezone.utc).isoformat(),
-        "post_followers_store_verified": True,
-        "post_followers_store_verified_at": datetime.now(timezone.utc).isoformat(),
-        "followers": int(result["official_followers"]),
-        "follower_checked_at": result.get("official_checked_at_taipei"),
-        "follower_source": result.get("official_source") or "Steam Community XML memberCount",
-        "official_ge5000": True,
-        "store_url": result.get("steam_url") or f"https://store.steampowered.com/app/{int(result['appid'])}/",
-    }
-    if is_disallowed(candidate, blocked):
-        return False
-    games = master.get("games")
-    if not isinstance(games, list):
-        games = []
-    by_id = {int(x["appid"]): dict(x) for x in games if isinstance(x, dict) and x.get("appid") is not None}
-    prior = by_id.get(candidate["appid"], {})
-    merged = dict(prior)
-    merged.update({k: v for k, v in candidate.items() if v is not None})
-    changed = merged != prior
-    by_id[candidate["appid"]] = merged
-    master["games"] = sorted(
-        by_id.values(),
-        key=lambda x: (
-            str(x.get("release_start") or "9999-12-31"),
-            -int(x.get("followers") or 0),
-            int(x.get("appid") or 0),
-        ),
+    return _catalog_rules.upsert_qualified_master(
+        master, result, now=datetime.now(timezone.utc),
+        blocked=blocked, is_disallowed=is_disallowed,
     )
-    if changed:
-        now = datetime.now(timezone.utc).isoformat()
-        master["updated_at"] = now
-        master["post_followers_store_gate_version"] = 1
-        master["post_followers_store_gate_checked_at"] = now
-    return changed
 
 
 def content_dispatch_signature(result):
-    return (
-        f"{int(result['appid'])}:"
-        f"{int(result['official_followers'])}:"
-        f"{result['release_date']}:store-v2"
-    )
+    return _dispatch_rules.content_dispatch_signature(result)
 
 
 def dispatch_content_event(cp, result):
-    """Notify the independent content backend after official >=5000 verification.
-
-    Today the receiver lives as a logically separate backend/workflow in this
-    repository. CONTENT_BACKEND_REPOSITORY can later point at a dedicated repo
-    without changing the Followers scanner.
-    """
-    if not checked_numeric(result.get("official_followers")) or result["official_followers"] < 5000:
-        return "not_qualified"
-    if not valid_date(result.get("release_date")):
-        return "invalid_release_date"
-    if (
-        result.get("store_date_exact") is not True
-        or result.get("release_display_precision") != "date_full"
-    ):
-        return "store_date_not_verified"
-
-    target = (os.environ.get("CONTENT_BACKEND_REPOSITORY") or
-              os.environ.get("GITHUB_REPOSITORY") or "").strip()
-    token = (os.environ.get("CONTENT_BACKEND_TOKEN") or
-             os.environ.get("GITHUB_TOKEN") or "").strip()
-    if not target or not token:
-        return "not_configured"
-
-    aid = str(int(result["appid"]))
-    signature = content_dispatch_signature(result)
-    registry = cp.setdefault("content_dispatches", {})
-    prior = registry.get(aid) or {}
-    if prior.get("signature") == signature and prior.get("status") == "dispatched":
-        return "already_dispatched"
-
-    payload = {
-        "event_type": "steam_game_qualified",
-        "client_payload": {
-            "appid": int(aid),
-            "official_followers": int(result["official_followers"]),
-            "release_date": result["release_date"],
-            "official_checked_at_taipei": result.get("official_checked_at_taipei"),
-            "official_source": result.get("official_source"),
-            "source_repository": os.environ.get("GITHUB_REPOSITORY"),
-            "signature": signature,
-        },
-    }
-    attempted = clock().isoformat()
-    try:
-        response = requests.post(
-            f"https://api.github.com/repos/{target}/dispatches",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": "2022-11-28",
-                "User-Agent": "GameTrendRadarFollowersDispatch/1.0",
-            },
-            json=payload,
-            timeout=20,
-        )
-        if response.status_code == 204:
-            registry[aid] = {
-                "signature": signature,
-                "status": "dispatched",
-                "target_repository": target,
-                "event_type": "steam_game_qualified",
-                "dispatched_at_taipei": attempted,
-            }
-            print("CONTENT_DISPATCH_OK", aid, signature, flush=True)
-            return "dispatched"
-        registry[aid] = {
-            "signature": signature,
-            "status": "failed",
-            "target_repository": target,
-            "http": response.status_code,
-            "attempted_at_taipei": attempted,
-        }
-        print("CONTENT_DISPATCH_FAILED", aid, response.status_code, flush=True)
-        return "failed"
-    except requests.RequestException as exc:
-        registry[aid] = {
-            "signature": signature,
-            "status": "failed",
-            "target_repository": target,
-            "error_type": type(exc).__name__,
-            "attempted_at_taipei": attempted,
-        }
-        print("CONTENT_DISPATCH_FAILED", aid, type(exc).__name__, flush=True)
-        return "failed"
+    return _dispatch_application.dispatch_content_event(
+        cp, result,
+        services=_dispatch_services(clock, os.environ, requests.post, emit=print),
+        signature=content_dispatch_signature,
+    )
 
 
 def verify_store_date_for_result(result, session):
-    """Second date gate: run only after official Followers >= 5000."""
-    detail = fetch_store_release_details(
-        session, [int(result["appid"])], today=clock().date(), interval=0.0,
-    ).get(int(result["appid"])) or {"exact": False, "status": "unavailable"}
-    result["store_date_checked_at_taipei"] = clock().isoformat()
-    result["store_date_exact"] = detail.get("exact") is True
-    result["store_date_status"] = detail.get("status")
-    if result["store_date_exact"]:
-        announced_day = result.get("release_date")
-        timestamp_day = detail["release_start"]
-        # The candidate queue's release_date came from the verified TW Store
-        # full-date display. Store Browse's timestamp is secondary metadata and
-        # may map to the following Taiwan day.
-        result["release_date"] = announced_day if valid_date(announced_day) else timestamp_day
-        result["release_timestamp_taipei_date"] = detail.get(
-            "release_timestamp_taipei_date", timestamp_day
-        )
-        result["release_date_conflict"] = result["release_date"] != timestamp_day
-        result["release_display_precision"] = "date_full"
-        result["release_display_provider"] = detail.get("release_display_provider")
-        result["release_date_basis"] = detail.get("release_date_basis")
-        result["release_date_timezone"] = detail.get("release_date_timezone")
-        result["release_time_utc"] = detail.get("release_time_utc")
-    return result["store_date_exact"]
+    return _catalog_application.verify_store_date_for_result(
+        result, session, clock=clock,
+        fetch_store_release_details=fetch_store_release_details,
+    )
 
 
 def reverify_pending_store_dates(cp, master, limit=25):
-    """Recheck already-official >=5000 games when Store date was not exact yet.
-
-    This lets an unannounced game become publishable later without re-querying
-    Steam Community Followers.
-    """
-    today = clock().date().isoformat()
-    selected = []
-    for result in sorted(
-        cp.get("official_results", {}).values(),
-        key=lambda x: (x.get("release_date", "9999-12-31"), int(x.get("appid", 0))),
-    ):
-        if len(selected) >= limit:
-            break
-        if result.get("queue_source") == "twitch_steam_discovery":
-            continue
-        if not checked_numeric(result.get("official_followers")) or result["official_followers"] < 5000:
-            continue
-        checked = str(result.get("store_date_checked_at_taipei") or "")
-        if result.get("store_date_exact") is True or checked.startswith(today):
-            continue
-        selected.append(result)
-    if not selected:
-        return 0
-
-    session = requests.Session()
-    details = fetch_store_release_details(
-        session, [int(x["appid"]) for x in selected], today=clock().date(), interval=0.5,
+    return _catalog_application.reverify_pending_store_dates(
+        cp, master, limit, clock=clock, session_factory=requests.Session,
+        fetch_store_release_details=fetch_store_release_details,
+        upsert_qualified_master=upsert_qualified_master,
+        dispatch_content_event=dispatch_content_event,
     )
-    exact_count = 0
-    for result in selected:
-        detail = details.get(int(result["appid"])) or {"exact": False, "status": "unavailable"}
-        result["store_date_checked_at_taipei"] = clock().isoformat()
-        result["store_date_exact"] = detail.get("exact") is True
-        result["store_date_status"] = detail.get("status")
-        if result["store_date_exact"]:
-            exact_count += 1
-            announced_day = result.get("release_date")
-            timestamp_day = detail["release_start"]
-            result["release_date"] = announced_day if valid_date(announced_day) else timestamp_day
-            result["release_timestamp_taipei_date"] = detail.get(
-                "release_timestamp_taipei_date", timestamp_day
-            )
-            result["release_date_conflict"] = result["release_date"] != timestamp_day
-            result["release_display_precision"] = "date_full"
-            result["release_display_provider"] = detail.get("release_display_provider")
-            result["release_date_basis"] = detail.get("release_date_basis")
-            result["release_date_timezone"] = detail.get("release_date_timezone")
-            result["release_time_utc"] = detail.get("release_time_utc")
-            upsert_qualified_master(master, result)
-            dispatch_content_event(cp, result)
-    return len(selected)
 
 
 def retry_pending_content_dispatches(cp, limit=25):
-    """Retry qualified outcomes that were saved before an event was delivered."""
-    retried = 0
-    for result in sorted(
-        cp.get("official_results", {}).values(),
-        key=lambda x: (x.get("release_date", "9999-12-31"), int(x.get("appid", 0))),
-    ):
-        if retried >= limit:
-            break
-        if result.get("queue_source") == "twitch_steam_discovery":
-            continue
-        if not checked_numeric(result.get("official_followers")) or result["official_followers"] < 5000:
-            continue
-        aid = str(int(result["appid"]))
-        prior = (cp.get("content_dispatches") or {}).get(aid) or {}
-        signature = content_dispatch_signature(result)
-        if prior.get("signature") == signature and prior.get("status") == "dispatched":
-            continue
-        dispatch_content_event(cp, result)
-        retried += 1
-    return retried
+    return _dispatch_application.retry_pending_content_dispatches(
+        cp, limit, dispatch=dispatch_content_event,
+        signature=content_dispatch_signature,
+    )
 
 
 def rebase_checkpoint():
@@ -375,8 +164,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
 def main():
     """Historical composition root; evaluate callbacks at invocation for callers.
 
-    Store date verification, master promotion and content dispatch are explicit
-    legacy ports until their cross-job migration can be reviewed separately.
+    Store date verification, master promotion and content dispatch use thin
+    compatibility wrappers that compose the shared application and adapter ports.
     Queue, Community transport, cache/cooldown, persistence and batch coordination
     already live in their layers rather than behind renamed script modules.
     """

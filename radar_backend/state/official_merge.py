@@ -91,7 +91,9 @@ def merge_master(latest, baseline, observed):
             continue
         remote_time = aware_time(remote.get("follower_checked_at") or remote.get("official_checked_at_taipei"))
         new_time = aware_time(row.get("follower_checked_at") or row.get("official_checked_at_taipei"))
-        if remote_time is not None and new_time is not None and remote_time > new_time:
+        remote_known = type(remote.get("followers")) is int and remote["followers"] >= 0
+        incoming_unknown = row.get("follower_status") == "unavailable_group_id" and row.get("followers") is None
+        if (remote_known and incoming_unknown) or (remote_time is not None and new_time is not None and remote_time > new_time):
             new_games[key] = deepcopy(remote)
     games = merge_json_three_way(remote_games, before_games, new_games)
     metadata = [{key: deepcopy(item) for key, item in value.items() if key not in {"games", "count"}}

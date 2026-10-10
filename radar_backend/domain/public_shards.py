@@ -10,6 +10,8 @@ from radar_backend.domain.catalog_metadata import PLAYER_CATEGORY_FIELDS
 
 CORE_FIELDS = {
     "appid", "followers", "follower_checked_at",
+    "follower_source", "official_ge5000", "group_id64", "official_group_id64", "group_short_id",
+    "follower_status", "follower_unavailable_at",
     "release_raw", "release_start", "release_end", "release_precision",
     "release_date_timezone", "release_date_basis", "release_time_utc",
     "release_time_source", "store_url", "community_url", "discovered_by",
@@ -28,7 +30,9 @@ def valid_record(
         return False
     try:
         appid = int(row.get("appid"))
-        followers = int(row.get("followers"))
+        followers = row.get("followers")
+        if followers is not None:
+            followers = int(followers)
     except (TypeError, ValueError):
         return False
     day = row.get("release_start") or row.get("release_date")
@@ -39,7 +43,7 @@ def valid_record(
         return False
     return (
         appid > 0
-        and (followers >= 3000 or is_twitch_qualified(row))
+        and ((followers is not None and followers >= 3000) or is_twitch_qualified(row))
         and isinstance(day, str)
         and len(day) == 10
         and row.get("release_precision", "day") == "day"
@@ -56,9 +60,23 @@ def merge_game(
     incoming = keep_newer_release(existing, incoming)
     incoming = preserve_twitch_admission(existing, incoming)
     incoming = preserve_player_categories(existing, incoming)
+    if (type(existing.get("followers")) is int and existing["followers"] >= 0
+            and incoming.get("followers") is None):
+        incoming = dict(incoming)
+        for field in ("followers", "follower_checked_at", "follower_source", "official_ge5000",
+                      "group_id64", "official_group_id64", "group_short_id"):
+            if field in existing:
+                incoming[field] = existing[field]
+            else:
+                incoming.pop(field, None)
+        incoming.pop("follower_status", None)
+        incoming.pop("follower_unavailable_at", None)
     merged = dict(existing)
     for key, value in incoming.items():
         if key in player_category_fields:
+            continue
+        if value is None and key in core_fields and incoming.get("follower_status") == "unavailable_group_id":
+            merged[key] = None
             continue
         if value is None or value == "":
             continue
@@ -75,6 +93,9 @@ def merge_game(
             merged[key] = incoming[key]
         else:
             merged.pop(key, None)
+    if type(incoming.get("followers")) is int:
+        merged.pop("follower_status", None)
+        merged.pop("follower_unavailable_at", None)
     merged["appid"] = int(incoming.get("appid", merged.get("appid")))
     add_traditional_display_names(merged)
     merged["storage_version"] = 2
@@ -94,7 +115,7 @@ def publishable(
     ):
         return False
     if str(game["release_start"]) >= today_s:
-        if int(game["followers"]) < 5000 and not is_twitch_qualified(game):
+        if int(game.get("followers") or 0) < 5000 and not is_twitch_qualified(game):
             return False
         if audit_active:
             return game.get("release_display_precision") == "date_full"

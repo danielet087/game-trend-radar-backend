@@ -6,6 +6,8 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 
+from radar_backend.domain.twitch_intake import cached_group
+
 STORE_BROWSE = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 APPDETAILS = "https://store.steampowered.com/api/appdetails"
 
@@ -72,9 +74,13 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
             break
         prior = (previous.get("games") or {}).get(str(appid), {})
         record = by_id.get(appid)
+        count = (cached_follower(appid, caches or [], now)
+                 if isinstance(record, dict) and record.get("follower_status") == "unavailable_group_id"
+                 else None)
         # Persistent membership outlives Twitch expiry. No Steam fetch is needed
         # on every subsequent import; the normal content reconciler owns refresh.
-        if isinstance(record, dict) and is_twitch_qualified(record):
+        if (isinstance(record, dict) and is_twitch_qualified(record)
+                and not (record.get("follower_status") == "unavailable_group_id" and count is not None)):
             queued.pop(appid, None)
             content_signature = signature(record)
             if (prior.get("status") == "accepted" and prior.get("retry_at") is None
@@ -89,22 +95,27 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                 "status": "accepted", "updated_at": stamp(now),
                 "validation_version": state_validation_version,
                 "twitch_admission": record["twitch_admission"],
-                "content_signature": content_signature, "reason": "steam_verified",
+                "content_signature": content_signature,
+                "reason": "twitch_verified_without_group" if record.get("follower_status") == "unavailable_group_id" else "steam_verified",
                 "retry_at": None, "retry_attempts": 0, "rate_limit_attempts": 0,
                 "rate_limit_stage": None, "retry_source": None, "retry_after": None,
                 "follower_candidate": None,
             }
             continue
-        count = cached_follower(appid, caches or [], now)
+        if not (isinstance(record, dict) and record.get("follower_status") == "unavailable_group_id"):
+            count = cached_follower(appid, caches or [], now)
+        group_id = cached_group(appid, caches or [], record, prior)
         if count is None and isinstance(record, dict):
             count = cached_follower(appid, [{"games": {str(appid): {
                 "followers": record.get("followers"), "checked_at": record.get("follower_checked_at"),
             }}}], now)
         retry_at = aware_time(prior.get("retry_at"))
         prior_proof = prior.get("twitch_admission")
+        group_fallback_migration = (count is None and group_id is None
+                                    and prior.get("reason") == "queued_official_followers")
         parser_migration = (prior.get("validation_version") != state_validation_version
                              and prior.get("reason") in {"uncertain_steam_date", "uncertain_taiwan_store_date", "steam_date_conflict"})
-        if (not parser_migration
+        if (not parser_migration and not group_fallback_migration
                 and retry_at is not None and retry_at > clock() and isinstance(prior_proof, dict)
                 and identity_signature(prior_proof) == identity_signature(proof)):
             continue
@@ -148,22 +159,28 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                     queued.pop(appid, None)
                     state["follower_candidate"] = None
                 continue
-            if count is None:
+            if count is None and group_id is not None:
                 queued[appid] = follower_candidate(probe)
+                queued[appid]["group_id64"] = group_id
                 state.update(reason="queued_official_followers", rate_limit_stage=None,
                              retry_at=None, retry_source=None, retry_after=None,
                              retry_attempts=0, rate_limit_attempts=0,
                              follower_candidate=deepcopy_fn(queued[appid]))
                 continue
-            row, reason = build_candidate(appid, proof, item, details, *count, now, blocked)
+            row, reason = build_candidate(appid, proof, item, details,
+                                          *(count if count is not None else (None, None)), now, blocked)
             if row is None:
                 state.update(reason=reason, **transient_retry_policy(prior, clock()),
                              rate_limit_stage=None, rate_limit_attempts=0, retry_after=None)
                 continue
+            if group_id is not None:
+                row["group_id64"] = group_id
             batch["records"].append(row)
             queued.pop(appid, None)
-            state.update(status="accepted", reason="steam_verified", content_signature=signature(row),
+            state.update(status="accepted", reason="twitch_verified_without_group" if count is None else "steam_verified", content_signature=signature(row),
                          followers=row["followers"], follower_checked_at=row["follower_checked_at"],
+                         follower_status=row.get("follower_status"),
+                         follower_unavailable_at=row.get("follower_unavailable_at"),
                          retry_at=None, retry_attempts=0, rate_limit_attempts=0,
                          rate_limit_stage=None, retry_source=None, retry_after=None)
             state["follower_candidate"] = None
@@ -220,6 +237,11 @@ def dispatch(master: dict, state: dict, *, token: str, target: str,
             "twitch_admission": row["twitch_admission"], "signature": sig,
             "source_repository": environ_get("GITHUB_REPOSITORY", "danielet087/game-trend-radar-backend"),
         }}
+        if row.get("follower_status") == "unavailable_group_id":
+            payload["client_payload"].update({key: row.get(key) for key in (
+                "follower_status", "follower_unavailable_at", "follower_source", "group_id64",
+                "official_ge5000",
+            )})
         try:
             response = session.post(f"https://api.github.com/repos/{target}/dispatches", json=payload,
                 headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
@@ -232,10 +254,16 @@ def dispatch(master: dict, state: dict, *, token: str, target: str,
 
 
 def apply_queue_batch(master: dict, state: dict, checkpoint: dict, batch: dict, *,
-                      apply_batch, aware_time, sync_twitch_queue):
+                      apply_batch, aware_time, sync_twitch_queue, fallback_allowed):
     """Apply the same frozen evidence before reconciling its Followers queue."""
     master, state = apply_batch(master, state, batch)
     now = aware_time(batch.get("generated_at"))
     if "follower_candidates" in batch:
-        checkpoint = sync_twitch_queue(checkpoint, batch, now)
+        successful = batch
+        if any(row.get("follower_status") == "unavailable_group_id" for row in batch.get("records", [])):
+            by_id = {row["appid"]: row for row in master["games"]}
+            successful = {**batch, "records": [by_id[row["appid"]] for row in batch["records"]
+                         if row["appid"] in by_id and fallback_allowed(by_id[row["appid"]])
+                         and by_id[row["appid"]].get("twitch_admission") == row.get("twitch_admission")]}
+        checkpoint = sync_twitch_queue(checkpoint, successful, now)
     return master, state, checkpoint

@@ -78,6 +78,11 @@ def require_current_followers(root: Path, source: dict):
         if not path.exists():
             continue
         previous = read_json(path)
+        if (incoming.get("follower_status") == "unavailable_group_id"
+                and incoming.get("followers") is None
+                and type(previous.get("followers")) is int and previous["followers"] >= 0):
+            # The shard merger retains the known numeric evidence as one bundle.
+            continue
         old_time = timestamp(previous.get("follower_checked_at"))
         new_time = timestamp(incoming.get("follower_checked_at"))
         if old_time and (new_time is None or new_time < old_time):

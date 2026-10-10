@@ -4,10 +4,13 @@ from __future__ import annotations
 import re
 from typing import Callable
 
+from radar_core.domain.twitch_admission import preserve_follower_measurement
+
 
 HAN = re.compile(r"[\u3400-\u9fff]")
 TWITCH_PUBLISHED_FIELDS = (
-    "followers", "follower_checked_at", "steam_type", "sexual_content_screened",
+    "followers", "follower_checked_at", "follower_source", "official_ge5000",
+    "group_id64", "follower_status", "follower_unavailable_at", "steam_type", "sexual_content_screened",
     "release_start", "release_end", "release_precision", "release_display_precision",
     "release_date_timezone", "release_time_utc", "release_timestamp_taipei_date",
     "release_date_conflict", "release_store_date", "release_date_normalization",
@@ -58,6 +61,7 @@ def update_title(
 
 def preserve_published_twitch_fields(old: dict, merged: dict) -> None:
     """Retain the accepted facts after the caller verifies Twitch admission."""
+    old = preserve_follower_measurement(merged, old)
     for field in TWITCH_PUBLISHED_FIELDS:
         if field in old:
             merged[field] = old[field]

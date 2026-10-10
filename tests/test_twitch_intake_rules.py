@@ -401,12 +401,12 @@ def test_cached_follower_latest_time_and_equal_time_tie_preserve_input_order():
     assert documents == before
 
 
-def test_cached_follower_does_not_fall_back_after_present_null_followers_or_truthy_wrong_map():
+def test_cached_follower_preserves_null_measurement_but_checks_other_checkpoint_maps():
     document = {"games": {"123": {"followers": None, "official_followers": 20,
                                 "checked_at": "2026-10-02T06:00:00Z"}}}
     assert rules.cached_follower(123, [document], NOW, aware_time=core.aware_time) is None
     document = {"games": [1], "verified": {"123": {"followers": 20, "checked_at": "2026-10-02T06:00:00Z"}}}
-    assert rules.cached_follower(123, [document], NOW, aware_time=core.aware_time) is None
+    assert rules.cached_follower(123, [document], NOW, aware_time=core.aware_time) == (20, "2026-10-02T06:00:00Z")
 
 
 def test_signature_has_exact_json_wire_shape_and_ignores_unrelated_metadata():

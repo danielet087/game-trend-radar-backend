@@ -9,7 +9,7 @@ import os
 import subprocess
 from pathlib import Path
 from radar_backend.adapters.twitch_intake import apply_batch, collect, dispatch, read_json, write_json
-from radar_backend.adapters.twitch_intake import sync_twitch_queue
+from radar_backend.adapters.twitch_intake import sync_twitch_queue, is_twitch_qualified, is_disallowed, excluded_appids
 from radar_core.domain.twitch_admission import aware_time
 from radar_backend.application import twitch_intake as _intake_application
 CHECKPOINT = Path('experiments/steam_official_daily_catchup/checkpoint.json')
@@ -25,6 +25,7 @@ def apply_queue_batch(master: dict, state: dict, checkpoint: dict, batch: dict):
         apply_batch=apply_batch,
         aware_time=aware_time,
         sync_twitch_queue=sync_twitch_queue,
+        fallback_allowed=lambda row: is_twitch_qualified(row) and not is_disallowed(row, excluded_appids()),
     )
 
 def main():

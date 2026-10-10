@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-10T21:02:39.787201Z",
+  "generated_at": "2026-10-10T21:02:43.841779Z",
   "today_taipei": "2026-10-11",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-10T20:02:33.602387Z",
+    "checkpoint_updated_at": "2026-10-10T21:02:43.708329Z",
     "group_resolution_updated_at": "2026-10-10T21:02:39.589743Z",
     "candidate_state_updated_at": "2026-10-10T17:08:22.422849Z",
     "prefilter_updated_at": "2026-10-10T17:08:22.403979Z",
     "eligible_screened_at": "2026-10-10T17:08:23.032407Z",
     "twitch_import_updated_at": "2026-10-10T21:02:27.855155Z",
-    "last_official_success_at": "2026-10-10T19:13:07.761458Z",
+    "last_official_success_at": "2026-10-10T21:02:43.652223Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -21,21 +21,21 @@
     "added_from_daily": 0,
     "eligible_count": 3929,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 2,
+    "combined_pending_now": 1,
     "completed_legacy": 384,
-    "completed_new": 2298,
-    "twitch_priority_pending": 1
+    "completed_new": 2299,
+    "twitch_priority_pending": 0
   },
   "summary": {
     "normal_pending": 1,
-    "twitch_priority_pending": 1,
+    "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 2,
-    "followers_ready_pending": 1,
+    "ready_pending": 1,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 1,
-    "total_pending": 2,
-    "today_attempts": 80,
-    "today_successes": 80,
+    "total_pending": 1,
+    "today_attempts": 81,
+    "today_successes": 81,
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
@@ -55,42 +55,23 @@
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-11T04:02:33.282403+08:00",
-    "last_updated_at": "2026-10-11T04:02:33.602387+08:00",
-    "finished_at": "2026-10-11T04:02:33.602387+08:00",
-    "stop_reason": "awaiting_group_resolution_no_request",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-11T05:02:43.195200+08:00",
+    "last_updated_at": "2026-10-11T05:02:43.708329+08:00",
+    "finished_at": "2026-10-11T05:02:43.708329+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 4652040,
+    "last_name": "Night Record: Thin Walls",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "38082098375",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38082098375"
+    "run_id": "38086016710",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38086016710"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 4652040,
-      "name": "Night Record: Thin Walls",
-      "steam_url": "https://store.steampowered.com/app/4652040/",
-      "release_date": "2026-09-20",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475625460",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-10T21:02:39.507314Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
       "appid": 4435490,
       "name": "Call of Duty®: Modern Warfare® 4",
       "steam_url": "https://store.steampowered.com/app/4435490/",
@@ -114,19 +95,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-10-09T19:14:48.827546Z",
-      "kind": "official_attempt",
-      "appid": 4971980,
-      "name": "Click Cafe",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 10,
-      "retry_at": null,
-      "run_id": "37977336847",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/37977336847"
-    },
     {
       "at": "2026-10-09T19:14:56.827670Z",
       "kind": "official_attempt",
@@ -1413,6 +1381,19 @@
       "retry_at": null,
       "run_id": "38078142504",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38078142504"
+    },
+    {
+      "at": "2026-10-10T21:02:43.527706Z",
+      "kind": "official_attempt",
+      "appid": 4652040,
+      "name": "Night Record: Thin Walls",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 343,
+      "retry_at": null,
+      "run_id": "38086016710",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38086016710"
     }
   ],
   "events_limit": 100

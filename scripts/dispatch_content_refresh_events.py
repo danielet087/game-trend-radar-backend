@@ -64,13 +64,15 @@ def select_games(payload: dict, window_days: int | None) -> list[dict]:
             continue
         try:
             appid = int(row["appid"])
-            followers = int(row["followers"])
+            followers = row["followers"]
+            if followers is not None:
+                followers = int(followers)
         except (KeyError, TypeError, ValueError):
             continue
         release = row.get("release_start") or row.get("release_date")
         if (
             appid <= 0
-            or (followers < 5000 and not is_twitch_qualified(row))
+            or ((followers is None or followers < 5000) and not is_twitch_qualified(row))
             or not valid_date(release)
             or row.get("release_precision") not in (None, "day")
             or row.get("release_display_precision") not in (None, "date_full")
@@ -90,10 +92,13 @@ def select_games(payload: dict, window_days: int | None) -> list[dict]:
                 "release_date": release,
                 "follower_checked_at": row.get("follower_checked_at"),
                 **({"twitch_admission": row["twitch_admission"]} if is_twitch_qualified(row) else {}),
+                **({key: row.get(key) for key in ("follower_status", "follower_unavailable_at",
+                    "follower_source", "group_id64", "official_ge5000")}
+                    if row.get("follower_status") == "unavailable_group_id" else {}),
             }
         )
 
-    selected.sort(key=lambda x: (x["release_date"], -x["followers"], x["appid"]))
+    selected.sort(key=lambda x: (x["release_date"], -int(x.get("followers") or 0), x["appid"]))
     return selected
 
 
@@ -110,6 +115,9 @@ def dispatch(token: str, row: dict, reason: str) -> None:
             ),
             "refresh_reason": reason,
             **({"twitch_admission": row["twitch_admission"]} if row.get("twitch_admission") else {}),
+            **({key: row.get(key) for key in ("follower_status", "follower_unavailable_at",
+                "follower_source", "group_id64", "official_ge5000")}
+                if row.get("follower_status") == "unavailable_group_id" else {}),
         },
     }
     data = json.dumps(payload).encode("utf-8")

@@ -46,7 +46,7 @@ def main() -> None:
         if not isinstance(row, dict) or is_disallowed(row, blocked):
             continue
         try:
-            if int(row["followers"]) >= 5000 or is_twitch_qualified(row):
+            if is_twitch_qualified(row) or int(row["followers"]) >= 5000:
                 official.append(row)
         except (KeyError, TypeError, ValueError):
             continue
@@ -134,7 +134,7 @@ def main() -> None:
         "checked_at": stamp,
         "today_taipei": today.isoformat(),
         "before_master_count": len(games),
-        "official_ge5000_checked": sum(int(row["followers"]) >= 5000 for row in official),
+        "official_ge5000_checked": sum(int(row.get("followers") or 0) >= 5000 for row in official),
         "twitch_admission_checked": sum(is_twitch_qualified(row) for row in official),
         "twitch_admission_deferred": deferred_twitch,
         "stale_future_before": len(stale_future_before),

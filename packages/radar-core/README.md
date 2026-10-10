@@ -1,6 +1,6 @@
 # radar-core
 
-遊戲雷達後端共用的純規則、工作結果契約及 Git 發布流程。版本 `0.2.0`，支援 Python 3.12 以上，沒有執行期第三方套件依賴，也不會自行查詢 API 或啟動收集工作。新版保留 `0.1.0` 的收錄規則及 `JobResult` 行為。
+遊戲雷達後端共用的純規則、工作結果契約及 Git 發布流程。版本 `0.3.0`，支援 Python 3.12 以上，沒有執行期第三方套件依賴，也不會自行查詢 API 或啟動收集工作。新版保留既有 Followers 數字、收錄門檻、日期政策及工作／發布回條行為，新增 GroupID 未取得時的 Twitch 收錄契約。
 
 ## 安裝
 
@@ -22,6 +22,10 @@ radar-core @ git+https://github.com/danielet087/game-trend-radar-backend.git@<40
 ## 純收錄規則
 
 `radar_core.domain.twitch_admission` 提供原有 Twitch 入選證據驗證、Steam 台灣日期判斷及既有證據保留函式；網路請求與資料保存由各後端負責。
+
+GroupID 未取得時，符合完整既有 Twitch 資格的遊戲可保留真正未知的 Followers，不用填成 `0`。這類列必須明確保存 `followers: null`、`follower_checked_at: null`、`follower_source: null`、`official_ge5000: false`、`follower_status: "unavailable_group_id"` 及具時區的 `follower_unavailable_at`；`group_id64` 可以省略或為 `null`，不能帶有任何已知 GroupID。未取得時間不得早於該列 Twitch 身分證據的查核時間。只缺一部分標記、沒有合格 Twitch 證據、非本作 IGDB／Steam 映射、日期不明確或未通過內容檢查者仍不能入選。實際量到的非負整數（包含 `0`）沿用原契約，不接受字串、布林或負數。
+
+`has_unavailable_group_followers()` 只檢查這組未知 Followers 證據；發布資格必須使用 `is_twitch_qualified()` 的完整驗證。`preserve_twitch_admission()` 在僅更新名稱等中繼資料時保留已驗證的未知觀測；不能替任意 `null` 更新補造憑證。`preserve_follower_measurement()`（也由前者呼叫）保留同一 AppID 已量到的真正數字、原始查核時間及來源：之後找不到 GroupID，即使未取得觀測較新，也不能抹除舊數字。取得真正 Followers 及查核時間後，會清除舊的 GroupID 未取得標記，避免新數字與舊狀態矛盾；兩次真正數字之間的時間競合仍由 consumer 沿用原政策。Twitch 門檻仍為本作分類觀眾至少 7,000，並沿用不可變來源 commit、入選證據、日期與成人內容排除規則。
 
 ## 工作結果
 

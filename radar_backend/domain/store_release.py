@@ -111,11 +111,13 @@ def filter_confirmed_master_games(
         try:
             appid = int(row["appid"])
             day = date.fromisoformat(row["release_start"])
-            followers = int(row["followers"])
+            followers = row["followers"]
+            if followers is not None:
+                followers = int(followers)
         except (KeyError, ValueError, TypeError):
             continue
         twitch_qualified = is_twitch_qualified(row)
-        if appid in seen or (followers < 5000 and not twitch_qualified):
+        if appid in seen or ((followers is None or followers < 5000) and not twitch_qualified):
             continue
         if day > today:
             if row.get("release_display_precision") != "date_full":

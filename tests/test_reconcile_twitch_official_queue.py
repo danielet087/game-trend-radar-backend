@@ -61,7 +61,9 @@ def precollect(root, master=None, state=None, cp=None, *, now=NOW):
     session = Mock()
     session.get.side_effect = responses()
     batch = collect(root, SHA, master or {"games": []}, state or {}, session=session,
-                    now=now, caches=[cp] if cp is not None else [], blocked=set(),
+                    now=now, caches=[*( [cp] if cp is not None else []),
+                    {"pending_candidates": {str(aid): {"appid": aid, "group_id64": str(103582791429521408 + aid)}
+                                            for aid in APPIDS}}], blocked=set(),
                     sleep=lambda _: None)
     assert session.get.call_count == 2 * len(APPIDS)
     assert all(not call.args[0].startswith("https://steamcommunity.com/")

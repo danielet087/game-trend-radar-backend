@@ -73,7 +73,7 @@ def test_canonical_collect_and_queue_keep_real_counts_separate_from_pending_meta
         status_code=200, json=lambda: next(responses), raise_for_status=lambda: None))
     session = SimpleNamespace(headers={}, get=get)
     sleep = Mock()
-    caches = [] if count is None else [{"games": {"123": {"followers": count,
+    caches = [{"pending_candidates": {"123": {"appid": 123, "group_id64": "103582791429521531"}}}] if count is None else [{"games": {"123": {"followers": count,
                                                         "checked_at": "2026-10-08T08:00:00Z"}}}]
     batch = intake.collect(frontend, SHA, {"games": []}, {}, session=session, now=NOW,
                            caches=caches, monotonic=lambda: 100, sleep=sleep)

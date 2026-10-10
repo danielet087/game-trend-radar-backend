@@ -22,17 +22,20 @@ def run(root, state=None, *, master=None, session=None, **kwargs):
 def seed(root, *appids):
     session = Mock()
     session.get.side_effect = [response for aid in appids for response in metadata_responses(aid)]
-    batch = run(root, session=session)
+    batch = run(root, session=session, caches=[{"pending_candidates": {
+        str(aid): {"appid": aid, "group_id64": str(103582791429521408 + aid)}
+        for aid in appids}}])
     _, state = apply_batch({"games": []}, {}, batch)
     return state
 
 
-def test_unknown_count_is_queued_without_community_request(tmp_path):
+def test_known_group_unknown_count_is_queued_without_community_request(tmp_path):
     fake_frontend(tmp_path)
     session = Mock()
     session.get.side_effect = list(metadata_responses(123))
 
-    batch = run(tmp_path, session=session)
+    batch = run(tmp_path, session=session, caches=[{"pending_candidates": {
+        "123": {"appid": 123, "group_id64": "103582791429521531"}}}])
 
     assert session.get.call_count == 2
     assert all(not call.args[0].startswith("https://steamcommunity.com/") for call in session.get.call_args_list)
@@ -41,7 +44,7 @@ def test_unknown_count_is_queued_without_community_request(tmp_path):
     candidate, = batch["follower_candidates"]
     assert candidate["appid"] == 123 and candidate["release_date"] == "2026-10-02"
     assert candidate["queue_source"] == "twitch_steam_discovery"
-    assert candidate["group_id64"] is None
+    assert candidate["group_id64"] == "103582791429521531"
     for field in ("followers", "follower_checked_at", "follower_source", "official_ge5000"):
         assert field not in candidate["steam_candidate"]
     pending = batch["state_updates"]["123"]

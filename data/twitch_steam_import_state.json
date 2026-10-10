@@ -2204,8 +2204,8 @@
       }
     },
     "4652040": {
-      "status": "pending",
-      "updated_at": "2026-10-10T21:02:27.855155Z",
+      "status": "accepted",
+      "updated_at": "2026-10-10T21:02:51.150589Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -2222,80 +2222,19 @@
         }
       },
       "validation_version": 4,
-      "follower_candidate": {
-        "appid": 4652040,
-        "name": "Night Record: Thin Walls",
-        "release_date": "2026-09-20",
-        "steam_url": "https://store.steampowered.com/app/4652040/",
-        "group_id64": null,
-        "queue_source": "twitch_steam_discovery",
-        "twitch_admission": {
-          "schema_version": 1,
-          "method": "twitch_igdb_external_steam_v1",
-          "appid": 4652040,
-          "twitch_game_id": "1748094675",
-          "igdb_id": "405696",
-          "checked_at": "2026-10-10T20:13:50Z",
-          "source_frontend_commit": "28bae1c65538ef2db30a7938af4aa11ba062dbb9",
-          "source_enrollment": {
-            "source": "igdb_first_release_date",
-            "observed_at": "2026-10-10T20:13:50Z",
-            "viewer_count": 17069,
-            "min_viewers": 7000
-          }
-        },
-        "steam_candidate": {
-          "appid": 4652040,
-          "name": "Night Record: Thin Walls",
-          "name_en": "Night Record: Thin Walls",
-          "release_raw": "2026-09-20",
-          "release_start": "2026-09-20",
-          "release_end": "2026-09-20",
-          "release_precision": "day",
-          "release_display_precision": "date_full",
-          "release_display_provider": "Steam IStoreBrowseService/GetItems",
-          "release_date_basis": "steam_store_browse_verified_full_date",
-          "release_date_timezone": "Asia/Taipei",
-          "release_time_utc": "2026-09-19T16:31:07Z",
-          "release_time_source": "Steam IStoreBrowseService/GetItems",
-          "release_timestamp_taipei_date": "2026-09-20",
-          "release_date_conflict": false,
-          "release_store_date": "2026-09-19",
-          "release_date_normalization": "steam_utc_date_normalized_to_taipei",
-          "release_date_verified_at": "2026-10-10T21:02:27.855155Z",
-          "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-10T21:02:27.855155Z",
-          "sexual_content_screened": true,
-          "steam_type": "game",
-          "content_descriptorids": [],
-          "store_url": "https://store.steampowered.com/app/4652040/",
-          "community_url": "https://steamcommunity.com/app/4652040/",
-          "twitch_admission": {
-            "schema_version": 1,
-            "method": "twitch_igdb_external_steam_v1",
-            "appid": 4652040,
-            "twitch_game_id": "1748094675",
-            "igdb_id": "405696",
-            "checked_at": "2026-10-10T20:13:50Z",
-            "source_frontend_commit": "28bae1c65538ef2db30a7938af4aa11ba062dbb9",
-            "source_enrollment": {
-              "source": "igdb_first_release_date",
-              "observed_at": "2026-10-10T20:13:50Z",
-              "viewer_count": 17069,
-              "min_viewers": 7000
-            }
-          }
-        }
-      },
-      "reason": "queued_official_followers",
+      "follower_candidate": null,
+      "reason": "steam_verified",
       "rate_limit_stage": null,
       "retry_at": null,
       "retry_source": null,
       "retry_after": null,
       "retry_attempts": 0,
-      "rate_limit_attempts": 0
+      "rate_limit_attempts": 0,
+      "content_signature": "62024a363f375e0db1fdbb171deca91d0f1c92929927885252a828ab36378d54",
+      "followers": 343,
+      "follower_checked_at": "2026-10-11T05:02:43.652223+08:00"
     }
   },
-  "updated_at": "2026-10-10T21:02:27.855155Z",
+  "updated_at": "2026-10-10T21:02:51.150589Z",
   "api_cooldowns": {}
 }

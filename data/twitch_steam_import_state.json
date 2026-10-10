@@ -693,15 +693,15 @@
     },
     "3948460": {
       "status": "pending",
-      "updated_at": "2026-10-10T15:03:16.330608Z",
+      "updated_at": "2026-10-10T19:02:22.035965Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 3948460,
         "twitch_game_id": "501028374",
         "igdb_id": "373092",
-        "checked_at": "2026-10-09T14:13:54Z",
-        "source_frontend_commit": "04b4fdf900b0b19d6b58e5fb2a5040498a6ae136",
+        "checked_at": "2026-10-10T15:13:23Z",
+        "source_frontend_commit": "24f700dc1428a416e4cc8c3667752f46a2202774",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-01T20:17:18Z",
@@ -710,7 +710,7 @@
         }
       },
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-11T15:03:18.008017Z",
+      "retry_at": "2026-10-11T19:02:26.794992Z",
       "validation_version": 4,
       "follower_candidate": null,
       "rate_limit_stage": null,
@@ -2101,15 +2101,15 @@
     },
     "4437650": {
       "status": "pending",
-      "updated_at": "2026-10-09T19:02:20.377553Z",
+      "updated_at": "2026-10-10T19:02:22.035965Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 4437650,
         "twitch_game_id": "1419737853",
         "igdb_id": "406107",
-        "checked_at": "2026-10-09T17:13:36Z",
-        "source_frontend_commit": "3d53f548a236d8d2d18f1981ea47b6ae653984b8",
+        "checked_at": "2026-10-10T18:14:11Z",
+        "source_frontend_commit": "24f700dc1428a416e4cc8c3667752f46a2202774",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-09T17:13:36Z",
@@ -2120,7 +2120,7 @@
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-10T19:02:25.056069Z",
+      "retry_at": "2026-10-11T19:02:29.743152Z",
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
@@ -2163,8 +2163,39 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "1215940": {
+      "status": "accepted",
+      "updated_at": "2026-10-10T19:02:22.035965Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 1215940,
+        "twitch_game_id": "1861940133",
+        "igdb_id": "136299",
+        "checked_at": "2026-10-10T18:14:11Z",
+        "source_frontend_commit": "24f700dc1428a416e4cc8c3667752f46a2202774",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-10T18:14:11Z",
+          "viewer_count": 9906,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "steam_verified",
+      "content_signature": "a3d9b0cd3f83fde1389d707e95c353f5184df1f2ad3825cea3e594937084dc0b",
+      "followers": 6856,
+      "follower_checked_at": "2026-09-22T16:20:23.550613+08:00",
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-10-10T15:03:16.330608Z",
+  "updated_at": "2026-10-10T19:02:22.035965Z",
   "api_cooldowns": {}
 }

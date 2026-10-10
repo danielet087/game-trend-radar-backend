@@ -339,3 +339,33 @@ def test_public_date_audit_keeps_qualified_unknown_in_upcoming_and_released_list
     assert read_json(data / "lists/upcoming.json")["appids"] == [124]
     assert read_json(data / "lists/released.json")["appids"] == [123]
     assert all(is_twitch_qualified(r) for r in read_json(data / "catalog.json")["games"])
+
+
+@pytest.mark.parametrize("newer_layer", ["detail", "calendar"])
+def test_title_refresh_keeps_newer_unknown_observation_coherent_with_its_proof(tmp_path, newer_layer):
+    from scripts.refresh_published_chinese_titles import refresh
+    from radar_core.domain.twitch_admission import UNKNOWN_FOLLOWER_FIELDS
+    older = unknown(); newer = deepcopy(older)
+    newer["twitch_admission"]["checked_at"] = (NOW + timedelta(minutes=5)).isoformat()
+    newer["follower_unavailable_at"] = (NOW + timedelta(minutes=6)).isoformat()
+    assert is_twitch_qualified(older) and is_twitch_qualified(newer)
+    calendar, detail = (older, newer) if newer_layer == "detail" else (newer, older)
+    data = tmp_path / "data"
+    write_json(data / "index.json", {"version": 2, "months": ["2026-10"]})
+    write_json(data / "calendar/2026-10.json", {"count": 1, "games": [calendar]})
+    write_json(data / "games/123.json", detail)
+    client = Mock()
+    response = Mock(status_code=200)
+    response.json.return_value = {"response": {"store_items": [{"appid": 123, "name": "新作繁中名稱"}]}}
+    client.get.return_value = response
+    stats = refresh(data, session=client, interval=0)
+    assert stats["changed_appids"] == [123]
+    for path in ("games/123.json", "catalog.json", "steam_upcoming.json", "calendar/2026-10.json"):
+        doc = read_json(data / path); published = doc if "games" not in doc else doc["games"][0]
+        assert is_twitch_qualified(published) and has_unavailable_group_followers(published)
+        assert published["twitch_admission"] == newer["twitch_admission"]
+        assert all(published[field] == newer[field] for field in UNKNOWN_FOLLOWER_FIELDS)
+    before = {path.relative_to(data): path.read_bytes() for path in data.rglob("*.json")}
+    assert refresh(data, session=client, interval=0)["changed_games"] == 0
+    assert (data / "games/123.json").read_bytes() == before[Path("games/123.json")]
+    assert (data / "calendar/2026-10.json").read_bytes() == before[Path("calendar/2026-10.json")]

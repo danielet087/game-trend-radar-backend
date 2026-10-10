@@ -4,7 +4,10 @@ from __future__ import annotations
 import re
 from typing import Callable
 
-from radar_core.domain.twitch_admission import preserve_follower_measurement
+from radar_core.domain.twitch_admission import (
+    UNKNOWN_FOLLOWER_FIELDS, aware_time, decimal_id, has_unavailable_group_followers,
+    preserve_follower_measurement,
+)
 
 
 HAN = re.compile(r"[\u3400-\u9fff]")
@@ -62,6 +65,13 @@ def update_title(
 def preserve_published_twitch_fields(old: dict, merged: dict) -> None:
     """Retain the accepted facts after the caller verifies Twitch admission."""
     old = preserve_follower_measurement(merged, old)
+    if (decimal_id(old.get("appid")) == decimal_id(merged.get("appid"))
+            and has_unavailable_group_followers(old) and has_unavailable_group_followers(merged)
+            and aware_time(merged["follower_unavailable_at"]) > aware_time(old["follower_unavailable_at"])):
+        # The detail may already contain a newer verified Twitch snapshot.
+        # Its proof survives composition; its missing-group observation must
+        # survive too, rather than predating that proof after a title refresh.
+        old = {**old, **{field: merged[field] for field in UNKNOWN_FOLLOWER_FIELDS}}
     for field in TWITCH_PUBLISHED_FIELDS:
         if field in old:
             merged[field] = old[field]

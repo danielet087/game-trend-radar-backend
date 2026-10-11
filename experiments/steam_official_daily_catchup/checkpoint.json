@@ -23540,7 +23540,7 @@
       "name": "Flick",
       "release_date": "2026-11-19",
       "steam_url": "https://store.steampowered.com/app/4450660/",
-      "group_id64": null,
+      "group_id64": "103582791475541934",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -23601,7 +23601,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-11T22:02:17.869295Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     }
   },
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
@@ -56661,7 +56669,7 @@
   "group_resolution_api_cooldown": {
     "status": "available",
     "retry_at": null,
-    "observed_at": "2026-10-11T19:02:48.441272Z",
+    "observed_at": "2026-10-11T22:02:18.061268Z",
     "attempts": 0,
     "source": "Steam ISteamUser/ResolveVanityURL"
   },

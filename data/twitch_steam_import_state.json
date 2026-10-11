@@ -1762,8 +1762,8 @@
       }
     },
     "4954910": {
-      "status": "pending",
-      "updated_at": "2026-10-10T22:02:16.604345Z",
+      "status": "accepted",
+      "updated_at": "2026-10-11T22:02:32.544479Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -1771,7 +1771,7 @@
         "twitch_game_id": "722422729",
         "igdb_id": "418295",
         "checked_at": "2026-10-10T21:13:28Z",
-        "source_frontend_commit": "dbec52f2fdccebe424769b6719218545c102750c",
+        "source_frontend_commit": "580ab7ae1f0ac52850a1a896b6d191bed1dc91db",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-07T20:12:43Z",
@@ -1781,11 +1781,16 @@
       },
       "validation_version": 4,
       "follower_candidate": null,
-      "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-11T22:02:18.363067Z",
+      "reason": "steam_verified",
+      "retry_at": null,
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
-      "retry_after": null
+      "retry_after": null,
+      "content_signature": "956f393071648b357bf5a95e667dba3a5f1211f7a0268351260d0a60cbaf4d7b",
+      "followers": 1613,
+      "follower_checked_at": "2026-09-23T17:16:07.238209+08:00",
+      "retry_attempts": 0,
+      "retry_source": null
     },
     "4412320": {
       "status": "accepted",
@@ -2283,7 +2288,7 @@
     },
     "4450660": {
       "status": "pending",
-      "updated_at": "2026-10-11T22:02:12.355381Z",
+      "updated_at": "2026-10-11T22:02:32.544479Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -2340,9 +2345,9 @@
           "release_date_conflict": false,
           "release_store_date": "2026-11-19",
           "release_date_normalization": "steam_store_date_matches_taipei",
-          "release_date_verified_at": "2026-10-11T22:02:12.355381Z",
+          "release_date_verified_at": "2026-10-11T22:02:32.544479Z",
           "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-11T22:02:12.355381Z",
+          "post_followers_store_verified_at": "2026-10-11T22:02:32.544479Z",
           "sexual_content_screened": true,
           "steam_type": "game",
           "content_descriptorids": [
@@ -2376,6 +2381,6 @@
       "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-11T22:02:12.355381Z",
+  "updated_at": "2026-10-11T22:02:32.544479Z",
   "api_cooldowns": {}
 }

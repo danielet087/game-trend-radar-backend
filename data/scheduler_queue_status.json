@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-11T22:02:18.261098Z",
+  "generated_at": "2026-10-11T22:02:22.312100Z",
   "today_taipei": "2026-10-12",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-11T21:02:30.040655Z",
+    "checkpoint_updated_at": "2026-10-11T22:02:22.174084Z",
     "group_resolution_updated_at": "2026-10-11T22:02:18.061268Z",
     "candidate_state_updated_at": "2026-10-11T17:09:36.547923Z",
     "prefilter_updated_at": "2026-10-11T17:09:36.526380Z",
@@ -34,9 +34,9 @@
     "followers_ready_pending": 1,
     "awaiting_group_pending": 1,
     "total_pending": 2,
-    "today_attempts": 75,
+    "today_attempts": 76,
     "today_successes": 75,
-    "today_429": 0
+    "today_429": 1
   },
   "group_resolution_api_cooldown": {
     "status": "available",
@@ -46,26 +46,26 @@
     "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "cooldown": {
-    "active": false,
-    "until": null,
-    "reason": null,
+    "active": true,
+    "until": "2026-10-11T22:17:22.173992Z",
+    "reason": "steam_http_429",
     "next_eligible_slot": "2026-10-11T23:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": false,
-    "status": "finished",
-    "started_at": "2026-10-12T05:02:29.698382+08:00",
-    "last_updated_at": "2026-10-12T05:02:30.040655+08:00",
-    "finished_at": "2026-10-12T05:02:30.040655+08:00",
-    "stop_reason": "awaiting_group_resolution_no_request",
-    "requests_this_run": 0,
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-10-12T06:02:21.672805+08:00",
+    "last_updated_at": "2026-10-12T06:02:22.174084+08:00",
+    "last_appid": 4450660,
+    "last_name": "Flick",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
+    "http_429_this_run": 1,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "38174609655",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38174609655"
+    "run_id": "38178716051",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38178716051"
   },
   "queue": [
     {
@@ -76,7 +76,7 @@
       "release_date": "2026-11-19",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "waiting",
+      "state": "cooldown",
       "group_id64": "103582791475541934",
       "group_resolution": {
         "status": "resolved",
@@ -86,8 +86,8 @@
         "http": 200,
         "api_result": 1
       },
-      "last_attempt_at": null,
-      "last_attempt_status": null
+      "last_attempt_at": "2026-10-11T22:02:22.018074Z",
+      "last_attempt_status": "rate_limited"
     },
     {
       "position": 2,
@@ -114,19 +114,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-10-10T19:10:03.404433Z",
-      "kind": "official_attempt",
-      "appid": 5291620,
-      "name": "Loadpath",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 8,
-      "retry_at": null,
-      "run_id": "38078142504",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38078142504"
-    },
     {
       "at": "2026-10-10T19:10:11.404559Z",
       "kind": "official_attempt",
@@ -1413,6 +1400,19 @@
       "retry_at": null,
       "run_id": "38166271405",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38166271405"
+    },
+    {
+      "at": "2026-10-11T22:02:22.018074Z",
+      "kind": "official_attempt",
+      "appid": 4450660,
+      "name": "Flick",
+      "status": "rate_limited",
+      "http": 429,
+      "source": "twitch_steam_discovery",
+      "official_followers": null,
+      "retry_at": "2026-10-11T22:17:22.173992Z",
+      "run_id": "38178716051",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38178716051"
     }
   ],
   "events_limit": 100

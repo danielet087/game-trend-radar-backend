@@ -23698,18 +23698,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "38174609655",
-    "active": false,
-    "status": "finished",
+    "run_id": "38178716051",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-12T05:02:29.698382+08:00",
-    "last_updated_at": "2026-10-12T05:02:30.040655+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-10-12T06:02:21.672805+08:00",
+    "last_updated_at": "2026-10-12T06:02:22.174084+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-10-12T05:02:30.040655+08:00",
-    "stop_reason": "awaiting_group_resolution_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 4450660,
+    "last_name": "Flick"
   },
   "official_growth_group_resolutions": {
     "3510740": {
@@ -55693,10 +55693,18 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
+  "next_request_after_taipei": "2026-10-12T06:17:22.173992+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-10-11T22:17:22.173992+00:00",
+    "observed_at": "2026-10-11T22:02:22.173992+00:00",
+    "updated_at": "2026-10-11T22:02:22.173992+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
   "community_last_success_at": "2026-10-12T03:12:44.848711+08:00",
   "official_growth_observations": {
     "2826790": {
@@ -74554,6 +74562,16 @@
       "status": "ok",
       "github_run_id": "38166271405",
       "official_followers": 1
+    },
+    {
+      "appid": 4450660,
+      "when_taipei": "2026-10-12T06:02:22.018074+08:00",
+      "release_date": "2026-11-19",
+      "queue_source": "twitch_steam_discovery",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "38178716051",
+      "next_request_after_taipei": "2026-10-12T06:17:22.173992+08:00"
     }
   ]
 }

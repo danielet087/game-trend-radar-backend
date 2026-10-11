@@ -253,7 +253,7 @@ def test_growth_cli_retry_passes_one_frozen_observation_clock_and_keeps_metadata
     receipt = publish_growth(root, frozen, input_revision="catalog-source",
                             repository=GrowthRace(root, disposable_checkout=True))
     assert receipt.attempts == 2
-    assert calls == [True]
+    assert calls == [True, True]  # Coverage is checked anew on the Git retry.
     assert rendered == [clock.isoformat()] * 2
     assert published_json(remote, "data/growth.json")["as_of"] == "2026-10-08"
     assert published_json(remote, "data/insights-state.json")["records"][str(row["appid"])]["first_seen_at"] == clock.isoformat()

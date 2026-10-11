@@ -8,6 +8,29 @@ legacy rows had no GroupID. They were also absent from the identity queues.
 The normal admission resolver intentionally skips games with a measured count,
 so retrying the growth workflow could never resolve these identities.
 
+The original unresolved cohort was:
+
+| AppID | Game | Retained historical official Followers |
+| --- | --- | ---: |
+| 3510740 | Normal Golf Game | 1,731 |
+| 4739040 | DISCIPLINE SIMULATOR | 17,796 |
+| 3328490 | Airport Control 27 | 5,207 |
+| 4694270 | Backrooms: Code Yellow | 1,413 |
+| 2710040 | Delverium | 6,735 |
+| 4019220 | Dressmaker | 12,629 |
+| 4705510 | Happy Wheels | 10,789 |
+| 3255500 | Ved: Recure | 5,572 |
+| 3699590 | Well Dweller | 5,046 |
+| 4072240 | Woman Simulator | 5,242 |
+| 4080220 | EA SPORTS FC™ 27 | 21,415 |
+| 3832490 | Antivirus Survivors 2003 Professional | 2,395 |
+| 3917700 | Dicevaders | 1,513 |
+
+These historical values are not new daily measurements. Their identities must
+be resolved or carry actual official unavailability evidence; the existing
+Twitch admission policy keeps qualified games eligible, including counts below
+the ordinary Steam threshold.
+
 Growth now invokes the existing bounded official ResolveVanityURL resolver for
 accepted games that lack both a current Taiwan-day measurement and a GroupID.
 `resolve_for_growth=True` permits identity repair independently of a historical
@@ -37,6 +60,12 @@ Identity receipts live in `official_growth_group_resolutions`, separate from
 admission queues and official observations. Checkpoint publication merges only
 newer identity/API-cooldown receipts and retains concurrently resolved GroupIDs,
 observations and unrelated queue updates. Progress is saved before XML collection.
+
+`coverage_checked_at` records the actual publication attempt clock. Each Git
+retry rechecks availability against its current delivery time, while the frozen
+collection clock and real history timestamps remain unchanged. The frontend
+uses this bounded clock for coverage, so a newer durable receipt is neither
+misclassified as future evidence nor trusted after expiry.
 
 Public publication rebuilds against the latest accepted catalog. It records
 `published_eligible_appids` and `published_resolvable_appids`; a changed cohort

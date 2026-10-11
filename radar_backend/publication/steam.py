@@ -116,9 +116,10 @@ def publish_growth(frontend: Path, report: dict, *, input_revision: str,
     frozen = deepcopy(report)
     if not isinstance(frozen, dict) or not isinstance(frozen.get("measurements"), list):
         raise ValueError("Malformed frozen growth collection result")
-    delivery_clock = now or datetime.now(timezone.utc)
-    clock = now or (timestamp(frozen["generated_at"]) if frozen.get("generated_at") else delivery_clock)
-    if clock is None or clock.tzinfo is None or clock.utcoffset() is None:
+    clock = timestamp(frozen["generated_at"]) if frozen.get("generated_at") else now
+    if ((frozen.get("generated_at") and clock is None)
+            or (clock is not None and (clock.tzinfo is None or clock.utcoffset() is None))
+            or (now is not None and (now.tzinfo is None or now.utcoffset() is None))):
         raise ValueError("Timezone-aware growth observation clock required")
     # Delivery metadata does not constitute a new measurement revision.
     payload = {key: value for key, value in frozen.items()
@@ -129,6 +130,12 @@ def publish_growth(frontend: Path, report: dict, *, input_revision: str,
         measurements = Path(scratch) / "measurements.json"
         write_json(measurements, payload)
         def apply(root):
+            nonlocal clock
+            # Availability expires independently of frozen observations. A Git
+            # retry must evaluate the newest target with its own real clock.
+            delivery_clock = now or datetime.now(timezone.utc)
+            if clock is None:
+                clock = delivery_clock
             validate_json_paths(root, (*GROWTH_PATHS, "data/catalog.json",
                                       "data/nintendo_upcoming.json", "data/nintendo_refresh_status.json"))
             current = growth_publication_payload(payload, read_json(root / "data/catalog.json"), delivery_clock)

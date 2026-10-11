@@ -352,6 +352,22 @@ def test_global_cooldown_update_requires_strictly_newer_observation(age):
     assert apply(cp, batch)['group_resolution_api_cooldown'] == prior
 
 
+def test_growth_api_cooldown_apply_only_merges_newer_api_backoff_without_admission_mutation():
+    cp = checkpoint(row())
+    cp['official_results']['123'] = {'official_followers': 5000}
+    before = deepcopy(cp)
+    update = {'status': 'api_rate_limited', 'source': rules.SOURCE, 'attempts': 1,
+              'observed_at': STAMP(NOW), 'retry_at': STAMP(NOW + timedelta(hours=1))}
+    result = rules.apply_api_cooldown(cp, {'api_cooldown_update': update}, aware_time=aware_time)
+    assert cp == before
+    assert result['group_resolution_api_cooldown'] == update
+    assert {key: value for key, value in result.items() if key != 'group_resolution_api_cooldown'} == before
+    # Replayed old batches cannot shorten a newer durable API deadline.
+    result['group_resolution_api_cooldown'] = {**update, 'observed_at': STAMP(NOW + timedelta(minutes=1)),
+                                              'retry_at': STAMP(NOW + timedelta(days=1))}
+    assert rules.apply_api_cooldown(result, {'api_cooldown_update': update}, aware_time=aware_time) == result
+
+
 def test_current_queue_projects_fresh_inputs_in_order_and_appends_parked_without_time_override():
     cp = checkpoint(row())
     root = Path('frozen')
@@ -371,3 +387,144 @@ def test_current_queue_projects_fresh_inputs_in_order_and_appends_parked_without
     assert rows == [row(), parked]
     assert 'unresolved_candidates' not in cp
     assert projected['unresolved_candidates']['124'] is parked
+
+
+def test_growth_resolution_repairs_completed_follower_identity_without_changing_admission_queue():
+    cp = checkpoint()
+    cp['official_results']['123'] = {'official_followers': 7000}
+    candidate = {'appid': 123, 'release_start': '2026-10-09', 'followers': 7000}
+    before = deepcopy(cp)
+    request = Mock(return_value=found(123))
+    # Admission resolution keeps its existing completed-follower exclusion.
+    assert collect(cp, [candidate], request=request)['requests_this_run'] == 0
+    request.assert_not_called()
+    batch = collect(cp, [candidate], request=request, resolve_for_growth=True)
+    assert batch['requests_this_run'] == 1
+    assert batch['results']['123']['group_id64'] == GROUP
+    assert batch['results']['123']['candidate_fingerprint'] == FINGERPRINT(
+        {**candidate, 'release_date': candidate['release_start'], 'queue_source': 'accepted_steam_growth'})
+    assert cp == before
+
+
+@pytest.mark.parametrize('storage', ['pending_candidates', 'official_growth_group_resolutions'])
+def test_growth_resolution_reuses_identity_from_either_shared_checkpoint_store(storage):
+    cp = checkpoint()
+    cp[storage] = {'123': {'appid': 123, 'group_id64': GROUP}}
+    request = Mock(side_effect=AssertionError('known group must not be requested'))
+    batch = collect(cp, [row()], request=request, resolve_for_growth=True)
+    assert batch['requests_this_run'] == 0
+    request.assert_not_called()
+
+
+def test_growth_resolution_respects_latest_shared_receipt_and_retries_after_its_deadline():
+    cp = checkpoint(row(group_resolution={'status': 'not_found', 'checked_at': STAMP(NOW - timedelta(days=1)),
+                                         'retry_at': STAMP(NOW + timedelta(days=3))}))
+    cp['official_growth_group_resolutions'] = {'123': {'appid': 123, 'group_resolution': {
+        'status': 'not_found', 'checked_at': STAMP(NOW - timedelta(hours=1)),
+        'retry_at': STAMP(NOW + timedelta(hours=1))}}}
+    request = Mock(return_value=found(123))
+    assert collect(cp, request=request, resolve_for_growth=True)['requests_this_run'] == 0
+    request.assert_not_called()
+    batch = collect(cp, request=request, resolve_for_growth=True, now=NOW + timedelta(hours=2))
+    assert batch['requests_this_run'] == 1
+    assert batch['results']['123']['group_resolution']['status'] == 'resolved'
+
+
+def test_growth_resolution_ignores_future_dated_no_mapping_evidence():
+    cp = checkpoint()
+    cp['official_growth_group_resolutions'] = {'123': {'appid': 123, 'group_resolution': {
+        'status': 'not_found', 'checked_at': STAMP(NOW + timedelta(hours=1)),
+        'retry_at': STAMP(NOW + timedelta(days=1))}}}
+    assert collect(cp, [row()], resolve_for_growth=True)['requests_this_run'] == 1
+
+
+def test_growth_resolution_does_not_bypass_shared_api_cooldown():
+    cp = checkpoint()
+    cp['group_resolution_api_cooldown'] = {'status': 'api_forbidden', 'retry_at': STAMP(NOW + timedelta(days=1))}
+    request = Mock(side_effect=AssertionError('global API cooldown remains active'))
+    batch = collect(cp, [row()], request=request, resolve_for_growth=True)
+    assert batch['requests_this_run'] == 0
+    assert batch['stop_reason'] == 'api_cooldown'
+    request.assert_not_called()
+
+
+@pytest.mark.parametrize('malformed', [None, [], 'invalid', 0])
+def test_growth_resolution_rejects_malformed_independent_state(malformed):
+    cp = checkpoint()
+    cp['official_growth_group_resolutions'] = malformed
+    request = Mock(side_effect=AssertionError('must validate state before transport'))
+    with pytest.raises(ValueError, match='growth group resolution state'):
+        collect(cp, [row()], request=request, resolve_for_growth=True)
+    request.assert_not_called()
+
+
+@pytest.mark.parametrize('steamid', [GROUP, 'malformed', True, False, 0.0, [], {}])
+def test_no_match_with_contradictory_steamid_remains_retryable_invalid_response(steamid):
+    batch = collect(checkpoint(row()), request=lambda *args: response(
+        payload={'response': {'success': 42, 'steamid': steamid}}))
+    assert batch['results']['123']['group_resolution']['status'] == 'invalid_response'
+    assert 'api_cooldown_update' not in batch
+
+
+def test_growth_resolution_does_not_reuse_identity_for_a_mismatched_appid():
+    cp = checkpoint()
+    cp['official_growth_group_resolutions'] = {'123': {'appid': 999, 'group_id64': GROUP}}
+    request = Mock(return_value=found(123))
+    batch = collect(cp, [row()], request=request, resolve_for_growth=True)
+    assert batch['requests_this_run'] == 1
+    assert batch['results']['123']['group_id64'] == GROUP
+
+
+@pytest.mark.parametrize('steamid', [None, '', '0', 0])
+def test_only_official_no_match_without_identity_produces_missing_group_evidence(steamid):
+    batch = collect(checkpoint(row()), request=lambda *args: response(
+        payload={'response': {'success': 42, 'steamid': steamid}}))
+    result = batch['results']['123']['group_resolution']
+    assert result == {'status': 'not_found', 'checked_at': STAMP(NOW), 'source': rules.SOURCE,
+                      'attempted': True, 'http': 200, 'retry_at': STAMP(NOW + timedelta(days=1)),
+                      'api_result': 42}
+
+
+@pytest.mark.parametrize('failure,status', [
+    (response(payload={}), 'invalid_response'),
+    (response(payload={'response': {'success': 7}}), 'api_error'),
+    (response(404), 'api_error'),
+])
+def test_growth_per_game_transient_is_actually_requested_again_at_next_six_hour_check(failure, status):
+    cp = checkpoint()
+    candidate = row()
+    first = collect(cp, [candidate], request=lambda *args: failure, resolve_for_growth=True)
+    resolution = first['results']['123']['group_resolution']
+    assert resolution['status'] == status
+    assert resolution['retry_at'] == STAMP(NOW + timedelta(hours=6))
+    cp['official_growth_group_resolutions'] = {'123': {'appid': 123, 'group_resolution': resolution}}
+    request = Mock(return_value=found(123))
+    before = collect(cp, [candidate], request=request, resolve_for_growth=True,
+                     now=NOW + timedelta(hours=6) - timedelta(seconds=1))
+    assert before['requests_this_run'] == 0
+    request.assert_not_called()
+    retried = collect(cp, [candidate], request=request, resolve_for_growth=True,
+                      now=NOW + timedelta(hours=6))
+    assert retried['requests_this_run'] == 1
+    assert retried['results']['123']['group_resolution']['status'] == 'resolved'
+
+
+@pytest.mark.parametrize('mode,hours', [(False, 24), (True, 6)])
+def test_growth_transient_retry_change_preserves_normal_admission_policy(mode, hours):
+    batch = collect(checkpoint(row()), request=lambda *args: response(payload={}), resolve_for_growth=mode)
+    assert batch['results']['123']['group_resolution']['retry_at'] == STAMP(NOW + timedelta(hours=hours))
+
+
+@pytest.mark.parametrize('failure', [response(404, headers={'Retry-After': '172800'}),
+                                     response(payload={}, headers={'Retry-After': '172800'}),
+                                     response(payload={'response': {'success': 42}}, headers={'Retry-After': '172800'})])
+def test_growth_per_game_retry_respects_later_official_retry_after(failure):
+    cp = checkpoint()
+    first = collect(cp, [row()], request=lambda *args: failure, resolve_for_growth=True)
+    resolution = first['results']['123']['group_resolution']
+    assert resolution['retry_at'] == STAMP(NOW + timedelta(days=2))
+    cp['official_growth_group_resolutions'] = {'123': {'appid': 123, 'group_resolution': resolution}}
+    request = Mock(side_effect=AssertionError('Steam deadline must not be shortened for six-hour retry'))
+    result = collect(cp, [row()], request=request, resolve_for_growth=True, now=NOW + timedelta(hours=6))
+    assert result['requests_this_run'] == 0
+    request.assert_not_called()

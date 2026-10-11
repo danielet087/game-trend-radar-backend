@@ -17,6 +17,7 @@ import tempfile
 from radar_core.publication import SubprocessGitRepository, publish_with_retry, snapshot_revision
 from radar_backend.domain.growth import timestamp
 from radar_backend.adapters.public_shards import build
+from radar_backend.publication.growth import growth_publication_payload
 
 CATALOG_PATHS = (
     "data/index.json", "data/calendar", "data/games", "data/lists",
@@ -110,31 +111,45 @@ def publish_catalog(frontend: Path, source: dict, *, input_revision: str,
 
 
 def publish_growth(frontend: Path, report: dict, *, input_revision: str,
-                   auth_script: Path | None = None, max_attempts=5, repository=None, now=None):
+                   auth_script: Path | None = None, max_attempts=5, repository=None, now=None,
+                   published_report: dict | None = None):
     frozen = deepcopy(report)
     if not isinstance(frozen, dict) or not isinstance(frozen.get("measurements"), list):
         raise ValueError("Malformed frozen growth collection result")
-    clock = now or (timestamp(frozen["generated_at"]) if frozen.get("generated_at") else datetime.now(timezone.utc))
+    delivery_clock = now or datetime.now(timezone.utc)
+    clock = now or (timestamp(frozen["generated_at"]) if frozen.get("generated_at") else delivery_clock)
     if clock is None or clock.tzinfo is None or clock.utcoffset() is None:
         raise ValueError("Timezone-aware growth observation clock required")
     # Delivery metadata does not constitute a new measurement revision.
     payload = {key: value for key, value in frozen.items()
                if key not in {"job_result", "publication_receipt", "checkpoint_receipt"}}
     revision = snapshot_revision(payload)
+    applied = {}
     with tempfile.TemporaryDirectory(prefix="radar-steam-growth-") as scratch:
         measurements = Path(scratch) / "measurements.json"
         write_json(measurements, payload)
         def apply(root):
             validate_json_paths(root, (*GROWTH_PATHS, "data/catalog.json",
                                       "data/nintendo_upcoming.json", "data/nintendo_refresh_status.json"))
+            current = growth_publication_payload(payload, read_json(root / "data/catalog.json"), delivery_clock)
+            # Replay the same measurements against the newest accepted cohort;
+            # a push race can invalidate completeness without losing history.
+            write_json(measurements, current)
             subprocess.run([sys.executable, "-B", str(root / "scripts/build_radar_insights.py"),
                             "--data-dir", str(root / "data"), "--measurements", str(measurements),
                             "--observed-at", clock.isoformat()],
                            check=True, capture_output=True, text=True,
                            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"})
-        return publish_with_retry(
+            applied.clear()
+            applied.update(current)
+        receipt = publish_with_retry(
             repository or frontend_repository(frontend, auth_script=auth_script), apply,
             paths=GROWTH_PATHS,
             message="data: record official growth observations through release plus 30 days",
             input_revision=input_revision, payload_revision=revision, max_attempts=max_attempts,
         )
+        if published_report is not None:
+            # Do not expose a candidate render as acknowledged public coverage.
+            published_report.clear()
+            published_report.update({**deepcopy(frozen), **deepcopy(applied)})
+        return receipt

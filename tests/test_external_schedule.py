@@ -8,7 +8,31 @@ import unittest
 
 from scripts.external_schedule import (
     daily_reset_required, daily_slot, growth_collection_complete, schedule_decision,
+    stamp_growth_publication,
 )
+
+
+def accounted_growth_report():
+    """One official measurement and one evidenced unavailable official group."""
+    return {
+        "coverage_schema_version": 2,
+        "collection_date_taipei": "2026-10-11",
+        "generated_at": "2026-10-11T01:20:00+08:00",
+        "reason": "completed", "eligible": 2, "eligible_appids": [10, 20],
+        "collection_complete": True, "measurement_complete": False,
+        "measurements": [{"appid": 10, "followers": 5001,
+                          "at": "2026-10-11T01:16:00+08:00", "source": "steam_community"}],
+        "unavailable": [{
+            "appid": 20, "reason": "official_group_not_found",
+            "group_resolution": {
+                "status": "not_found", "source": "Steam ISteamUser/ResolveVanityURL",
+                "checked_at": "2026-10-11T01:17:00+08:00", "attempted": True,
+                "http": 200, "api_result": 42, "retry_at": "2026-10-18T01:17:00+08:00",
+            },
+        }],
+        "pending": [], "errors": [],
+        "published_eligible_appids": [10, 20], "published_resolvable_appids": [10],
+    }
 
 
 class ExternalScheduleTests(unittest.TestCase):
@@ -80,6 +104,54 @@ class ExternalScheduleTests(unittest.TestCase):
             with self.subTest(updates=updates):
                 self.assertFalse(growth_collection_complete({**result, **updates}, now))
         self.assertFalse(growth_collection_complete({"measurements": [measurement]}, now))
+
+    def test_verified_unavailability_can_finish_daily_work_without_inventing_a_measurement(self):
+        report = accounted_growth_report()
+        now = datetime.fromisoformat("2026-10-11T07:15:00+08:00")
+        finished = stamp_growth_publication(report, now, state_persisted=True, published=True)
+        self.assertTrue(growth_collection_complete(finished, now))
+        self.assertEqual(len(finished["measurements"]), 1)
+        self.assertFalse(finished["measurement_complete"])
+        self.assertNotIn("followers", finished["unavailable"][0])
+        self.assertEqual(finished["measurements"][0]["followers"], 5001)
+        for persisted, published in ((False, True), (True, False), (False, False)):
+            with self.subTest(persisted=persisted, published=published):
+                failed = stamp_growth_publication(
+                    finished, now, state_persisted=persisted, published=published,
+                )
+                self.assertFalse(growth_collection_complete(failed, now))
+                self.assertEqual(failed["job_result"]["status"], "failed")
+
+    def test_unresolved_retry_and_new_public_games_keep_six_hour_recovery_available(self):
+        now = datetime.fromisoformat("2026-10-11T07:15:00+08:00")
+        for updates in (
+            {"reason": "awaiting_group_resolution", "collection_complete": False,
+             "unavailable": [], "pending": [{"appid": 20, "reason": "group_missing_api_key"}]},
+            {"reason": "source_unavailable", "collection_complete": False, "errors": [20]},
+            {"published_eligible_appids": [10, 20, 30]},
+            {"published_resolvable_appids": [10, 20]},
+        ):
+            report = {**accounted_growth_report(), **updates}
+            delivered = stamp_growth_publication(report, now, state_persisted=True, published=True)
+            with self.subTest(updates=updates):
+                self.assertFalse(growth_collection_complete(delivered, now))
+                for hour in (7, 13, 19):
+                    local = datetime.fromisoformat(f"2026-10-11T{hour:02d}:15:00+08:00")
+                    slot = local.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+                    self.assertTrue(schedule_decision(
+                        "public-growth", "workflow_dispatch", "cloudflare", slot, False, local,
+                    )[0])
+
+    def test_empty_new_coverage_cannot_be_reused_across_taiwan_midnight(self):
+        report = {**accounted_growth_report(), "eligible": 0, "eligible_appids": [],
+                  "measurements": [], "unavailable": [], "measurement_complete": True,
+                  "published_eligible_appids": [], "published_resolvable_appids": []}
+        same_day = datetime.fromisoformat("2026-10-11T23:59:59+08:00")
+        finished = stamp_growth_publication(report, same_day, state_persisted=True, published=True)
+        self.assertTrue(growth_collection_complete(finished, same_day))
+        self.assertFalse(growth_collection_complete(
+            finished, datetime.fromisoformat("2026-10-12T00:00:00+08:00"),
+        ))
 
     def test_persisted_same_slot_resumes_progress_and_manual_can_reset(self):
         day = date(2026, 10, 3)

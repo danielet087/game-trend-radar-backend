@@ -12,6 +12,7 @@ import tempfile
 from radar_core.publication import SubprocessGitRepository, publish_with_retry, snapshot_revision
 from radar_backend.publication.steam import read_json, validate_json_paths, write_json
 from radar_backend.state.growth_checkpoint import merge_growth_checkpoint
+from radar_backend.publication.growth import growth_checkpoint_payload
 
 CHECKPOINT = "experiments/steam_official_daily_catchup/checkpoint.json"
 TWITCH_PATHS = (CHECKPOINT, "data/steam_upcoming_master.json",
@@ -25,21 +26,33 @@ def backend_repository(root):
 
 
 def publish_growth_checkpoint(root: Path, baseline: dict, observed: dict, report: dict,
-                              *, input_revision: str, max_attempts=5, repository=None):
+                              *, input_revision: str, max_attempts=5, repository=None,
+                              persisted_report: dict | None = None, now=None):
     frozen = deepcopy({"baseline": baseline, "observed": observed, "report": report})
     # Validate all frozen state before the first reset or remote operation.
     merge_growth_checkpoint(baseline, baseline, observed, report)
     revision = snapshot_revision(frozen)
+    clock = now or datetime.now(timezone.utc)
+    if clock.tzinfo is None:
+        raise ValueError("Timezone-aware checkpoint delivery clock required")
+    applied = {}
     def apply(latest_root):
         path = latest_root / CHECKPOINT
         merged = merge_growth_checkpoint(read_json(path), frozen["baseline"],
                                          frozen["observed"], frozen["report"])
         write_json(path, merged)
-    return publish_with_retry(
+        current = growth_checkpoint_payload(frozen["report"], merged, now=clock)
+        applied.clear()
+        applied.update(current)
+    receipt = publish_with_retry(
         repository or backend_repository(root), apply, paths=(CHECKPOINT,),
         message="state: save official growth observations and shared Community cooldown",
         input_revision=input_revision, payload_revision=revision, max_attempts=max_attempts,
     )
+    if persisted_report is not None:
+        persisted_report.clear()
+        persisted_report.update(deepcopy(applied))
+    return receipt
 
 
 def publish_queue_batch(root: Path, batch: dict, *, kind: str, input_revision: str,

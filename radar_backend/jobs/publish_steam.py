@@ -98,12 +98,19 @@ def main(argv=None):
         if args.command == "catalog":
             receipt = publish_catalog(args.repo.resolve(), read_json(args.input), **common)
         else:
-            receipt = publish_growth(args.repo.resolve(), read_json(args.report), **common)
+            published_report = {}
+            receipt = publish_growth(args.repo.resolve(), read_json(args.report),
+                                     published_report=published_report, **common)
+            # The final delivery gate reads this report. Keep its cohort bound
+            # to the exact successful publication attempt, including Git races.
+            write_json(args.report, published_report)
         acknowledgement = "published=true"
     elif args.command == "growth-checkpoint":
+        persisted_report = {}
         receipt = publish_growth_checkpoint(args.repo.resolve(), read_json(args.baseline),
                     read_json(args.observed), read_json(args.report), input_revision=revision,
-                    max_attempts=args.max_attempts)
+                    max_attempts=args.max_attempts, persisted_report=persisted_report)
+        write_json(args.report, persisted_report)
         acknowledgement = "state_persisted=true"
     else:
         receipt = publish_queue_batch(args.repo.resolve(), read_json(args.batch), kind=args.kind,

@@ -23623,17 +23623,19 @@
   },
   "scheduler_batch": {
     "run_id": "38166271405",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
     "started_at": "2026-10-12T03:02:52.377798+08:00",
-    "last_updated_at": "2026-10-12T03:12:04.818848+08:00",
-    "requests_this_run": 70,
-    "official_new_this_run": 70,
+    "last_updated_at": "2026-10-12T03:12:44.900781+08:00",
+    "requests_this_run": 75,
+    "official_new_this_run": 75,
     "http_429_this_run": 0,
-    "last_appid": 5310790,
-    "last_name": "Paradice Run Club"
+    "last_appid": 5200310,
+    "last_name": "Fold'Em",
+    "finished_at": "2026-10-12T03:12:44.900781+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "official_growth_group_resolutions": {
     "3510740": {
@@ -55550,13 +55552,78 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-12T03:12:04.818681+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5097660": {
+      "appid": 5097660,
+      "name": "Keystrike",
+      "release_date": "2026-12-16",
+      "group_id64": "103582791476086291",
+      "steam_url": "https://store.steampowered.com/app/5097660/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-11T17:09:36.526380+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-12T03:12:12.843913+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5322820": {
+      "appid": 5322820,
+      "name": "Drillionaire",
+      "release_date": "2027-01-01",
+      "group_id64": "103582791476083479",
+      "steam_url": "https://store.steampowered.com/app/5322820/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-11T17:09:36.526380+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-12T03:12:20.787333+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5256930": {
+      "appid": 5256930,
+      "name": "STAROPHAGE",
+      "release_date": "2027-03-04",
+      "group_id64": "103582791476089210",
+      "steam_url": "https://store.steampowered.com/app/5256930/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-11T17:09:36.526380+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-12T03:12:28.797723+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "3990710": {
+      "appid": 3990710,
+      "name": "Invasion Of Britannia",
+      "release_date": "2027-03-16",
+      "group_id64": "103582791475807989",
+      "steam_url": "https://store.steampowered.com/app/3990710/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-11T17:09:36.526380+00:00",
+      "official_followers": 7,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-12T03:12:36.803484+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5200310": {
+      "appid": 5200310,
+      "name": "Fold'Em",
+      "release_date": "2027-03-23",
+      "group_id64": "103582791476082699",
+      "steam_url": "https://store.steampowered.com/app/5200310/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-11T17:09:36.526380+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-12T03:12:44.848711+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-12T03:12:04.818681+08:00",
+  "community_last_success_at": "2026-10-12T03:12:44.848711+08:00",
   "official_growth_observations": {
     "2826790": {
       "appid": 2826790,
@@ -74358,6 +74425,56 @@
       "appid": 5310790,
       "when_taipei": "2026-10-12T03:12:04.714482+08:00",
       "release_date": "2026-12-15",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38166271405",
+      "official_followers": 1
+    },
+    {
+      "appid": 5097660,
+      "when_taipei": "2026-10-12T03:12:12.714600+08:00",
+      "release_date": "2026-12-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38166271405",
+      "official_followers": 3
+    },
+    {
+      "appid": 5322820,
+      "when_taipei": "2026-10-12T03:12:20.714713+08:00",
+      "release_date": "2027-01-01",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38166271405",
+      "official_followers": 2
+    },
+    {
+      "appid": 5256930,
+      "when_taipei": "2026-10-12T03:12:28.714818+08:00",
+      "release_date": "2027-03-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38166271405",
+      "official_followers": 1
+    },
+    {
+      "appid": 3990710,
+      "when_taipei": "2026-10-12T03:12:36.714915+08:00",
+      "release_date": "2027-03-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38166271405",
+      "official_followers": 7
+    },
+    {
+      "appid": 5200310,
+      "when_taipei": "2026-10-12T03:12:44.715026+08:00",
+      "release_date": "2027-03-23",
       "queue_source": "fresh_daily_prefilter_unresolved",
       "http": 200,
       "status": "ok",

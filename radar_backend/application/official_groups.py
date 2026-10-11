@@ -8,7 +8,7 @@ from copy import deepcopy
 from datetime import timedelta
 import math
 
-from radar_backend.domain.official_groups import SOURCE, TWITCH_SOURCE
+from radar_backend.domain.official_groups import SOURCE, TWITCH_SOURCE, retry_after as default_retry_after
 
 def collect(checkpoint, candidates, *, api_key, now=None, session=None,
             max_requests=20, max_seconds=120, interval=1.0,
@@ -16,7 +16,8 @@ def collect(checkpoint, candidates, *, api_key, now=None, session=None,
             completed, valid_group_id, aware_time, fingerprint, failure_cooldown,
             request, session_factory, configure_session, request_exception,
             math_module=math, timedelta_type=timedelta, source=SOURCE,
-            twitch_source=TWITCH_SOURCE):
+            twitch_source=TWITCH_SOURCE, resolve_for_growth=False,
+            retry_after=default_retry_after):
     if type(max_requests) is not int or type(max_seconds) is not int or not 1 <= max_requests <= 20 or not 1 <= max_seconds <= 120 or not math_module.isfinite(interval) or interval < 1.0:
         raise ValueError("Group resolver requires <=20 requests, <=120 seconds and >=1s pacing")
     fixed_now = now
@@ -29,17 +30,40 @@ def collect(checkpoint, candidates, *, api_key, now=None, session=None,
     batch = {"schema_version": 1, "generated_at": stamp(now), "results": {},
              "requests_this_run": 0, "stop_reason": "nothing_due"}
     pending = checkpoint.get("pending_candidates") or {}
+    growth_groups = checkpoint.get("official_growth_group_resolutions", {})
+    if resolve_for_growth and not isinstance(growth_groups, dict):
+        raise ValueError("Malformed official growth group resolution state")
     selected = []
     seen = set()
     for candidate in candidates:
         if not isinstance(candidate, dict):
             continue
         aid = decimal_id(candidate.get("appid"))
-        if aid is None or aid in seen or completed(checkpoint, aid):
+        if aid is None or aid in seen or (not resolve_for_growth and completed(checkpoint, aid)):
             continue
         seen.add(aid)
-        # The latest checkpoint wins over a stale projected candidate.
-        row = pending.get(aid) if isinstance(pending.get(aid), dict) else candidate
+        if resolve_for_growth:
+            # Accepted growth games can already have official Followers while
+            # their original collector never retained a GroupID.  Resolve only
+            # the caller's accepted set without enrolling them in the admission
+            # queue or replacing any numeric follower observation.
+            row = {**candidate, "release_date": candidate.get("release_start") or candidate.get("release_date"),
+                   "queue_source": "accepted_steam_growth"}
+            receipts = [item for item in (pending.get(aid), growth_groups.get(aid))
+                        if isinstance(item, dict) and decimal_id(item.get("appid", aid)) == aid]
+            for item in receipts:
+                group = valid_group_id(item.get("group_id64"))
+                if group is not None:
+                    row["group_id64"] = group
+            resolutions = [item["group_resolution"] for item in receipts
+                           if isinstance(item.get("group_resolution"), dict)
+                           and aware_time(item["group_resolution"].get("checked_at")) is not None
+                           and aware_time(item["group_resolution"]["checked_at"]) <= now]
+            if resolutions:
+                row["group_resolution"] = max(resolutions, key=lambda value: aware_time(value["checked_at"]))
+        else:
+            # The latest checkpoint wins over a stale projected candidate.
+            row = pending.get(aid) if isinstance(pending.get(aid), dict) else candidate
         if valid_group_id(row.get("group_id64")):
             continue
         resolution = row.get("group_resolution") or {}
@@ -106,7 +130,16 @@ def collect(checkpoint, candidates, *, api_key, now=None, session=None,
                 receipt(aid, row, status, observed, attempted=True, http=http, retry_at=cooldown["retry_at"])
                 batch.update(api_cooldown_update=cooldown, stop_reason=status)
                 break
-            per_game_retry = stamp(observed + timedelta_type(hours=24))
+            server_retry = retry_after((getattr(response, "headers", {}) or {}).get("Retry-After"), observed)
+
+            def per_game_deadline(hours):
+                # Local transient failures are due by the next growth check;
+                # Steam's later deadline and shared API guard still win.
+                return stamp(max(value for value in (
+                    observed + timedelta_type(hours=hours), server_retry, cooldown_until,
+                ) if value is not None))
+
+            per_game_retry = per_game_deadline(6 if resolve_for_growth else 24)
             if http != 200:
                 receipt(aid, row, "api_error", observed, attempted=True, http=http, retry_at=per_game_retry)
                 continue
@@ -133,12 +166,19 @@ def collect(checkpoint, candidates, *, api_key, now=None, session=None,
                     "observed_at": stamp(clock()), "attempts": 0, "source": source}
                 prior_cooldown = batch["api_cooldown_update"]
             else:
-                status = "not_found" if code == 42 else "invalid_response" if code == 1 else "api_error"
-                if code == 42 and row.get("queue_source") == twitch_source:
-                    per_game_retry = stamp(observed + timedelta_type(hours=3))
+                # A contradictory ID is malformed evidence, even with
+                # NoMatch.  Only an actual official no-mapping receipt can
+                # support a growth observation being unavailable.
+                steamid = result.get("steamid")
+                no_mapping = code == 42 and (steamid is None
+                    or type(steamid) is str and steamid in {"", "0"}
+                    or type(steamid) is int and steamid == 0)
+                status = "not_found" if no_mapping else "invalid_response" if code in (1, 42) else "api_error"
+                if no_mapping:
+                    per_game_retry = per_game_deadline(3 if row.get("queue_source") == twitch_source else 24)
                 receipt(aid, row, status, observed, attempted=True, http=http,
                         retry_at=per_game_retry, api_result=code)
-                if code == 42:
+                if no_mapping:
                     batch["api_cooldown_update"] = {"status": "available", "retry_at": None,
                         "observed_at": stamp(clock()), "attempts": 0, "source": source}
                     prior_cooldown = batch["api_cooldown_update"]

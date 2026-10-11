@@ -48,7 +48,9 @@ jobs:
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
         run: python -m scripts.external_schedule --workflow public-growth --fail-on-skip
       - name: Validate boundary and throttling behavior
-        run: python -m unittest discover -s tests -p test_public_growth.py
+        run: |
+          python -m unittest discover -s tests -p test_public_growth.py
+          python -m unittest discover -s tests -p test_external_schedule.py
       - name: Read the published catalog
         id: catalog
         run: |
@@ -56,6 +58,8 @@ jobs:
           echo "revision=$(git -C frontend rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Collect dated official measurements
         id: collect
+        env:
+          STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
         run: |
           set -euo pipefail
           mkdir -p output
@@ -99,8 +103,17 @@ jobs:
           path = Path("output/public-growth.json")
           result = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
           if not growth_collection_complete(result, datetime.now(timezone.utc)):
-              raise SystemExit("Daily growth coverage incomplete; saved partial progress remains available for the next six-hour check")
-          print("DAILY_STEAM_GROWTH_COMPLETE", result["eligible"])
+              job = result.get("job_result", {})
+              raise SystemExit(
+                  "Daily growth coverage incomplete; saved partial progress remains available for the next six-hour check; "
+                  f"reason={job.get('reason', result.get('reason', 'missing_collection_result'))}; "
+                  f"measured={len(result.get('measurements', []))}; "
+                  f"unavailable={len(result.get('unavailable', []))}; "
+                  f"retryable={len(result.get('pending', []))}; eligible={result.get('eligible', 'unknown')}"
+              )
+          print("DAILY_STEAM_GROWTH_COMPLETE", result["eligible"],
+                f"measured={len(result['measurements'])}",
+                f"unavailable={len(result.get('unavailable', []))}")
           PY
       - name: Report measured coverage
         if: always()
@@ -109,11 +122,18 @@ jobs:
             python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           d=json.load(open('output/public-growth.json'))
+          coverage=d.get('coverage', {})
           print('### Steam 成長追蹤')
           print(f"實際量測／重用：{len(d.get('measurements', []))} 筆")
+          print(f"符合追蹤資格：{coverage.get('eligible', d.get('eligible', 'unknown'))} 款；官方確認目前無 GroupID：{coverage.get('unavailable', len(d.get('unavailable', [])))} 款；仍待重試：{coverage.get('pending', len(d.get('pending', [])))} 款")
           print(f"本次請求：{d.get('requests', 'interrupted')}；結束原因：{d.get('reason', 'interrupted')}")
+          print(f"官方 GroupID 解析請求：{d.get('group_resolution_requests', 0)}；全部取得 Followers 量測：{d.get('measurement_complete', d.get('collection_complete', False))}")
           job = d.get('job_result', {})
           print(f"工作狀態：{job.get('status', 'failed')}；狀態已保存：{job.get('state_persisted', False)}；發布完成：{job.get('published', False)}")
+          for item in d.get('unavailable', []):
+              print(f"- AppID {item['appid']}：官方確認目前無 GroupID；保留既有 Followers，未產生新量測。")
+          for item in d.get('pending', []):
+              print(f"- AppID {item['appid']}：待重試（{item.get('reason', 'unknown')}）。")
           print('僅追蹤本站合格遊戲，至上市後第 30 天；缺值不補成 0。')
           PY
           fi

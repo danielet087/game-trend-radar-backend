@@ -106,7 +106,11 @@ def test_push_race_preserves_growth_and_remote_queue_changes_without_recollectio
                 latest = read_json(seed / CHECKPOINT)
                 latest["official_growth_observations"] = {"456": observation(456)}
                 latest["pending_candidates"]["999"] = {"appid": 999, "remote": "Twitch priority"}
-                latest["group_resolution_api_cooldown"] = {"status": "newer remote"}
+                latest["group_resolution_api_cooldown"] = {
+                    "status": "api_rate_limited", "source": "Steam ISteamUser/ResolveVanityURL",
+                    "observed_at": "2026-10-09T09:30:00Z", "retry_at": "2026-10-09T10:30:00Z",
+                    "attempts": 1, "http": 429,
+                }
                 write_json(seed / CHECKPOINT, latest)
                 write_json(seed / MASTER, {"games": [{"appid": 999, "remote": True}], "count": 1})
                 git(seed, "add", ".")
@@ -122,7 +126,7 @@ def test_push_race_preserves_growth_and_remote_queue_changes_without_recollectio
     assert merged["official_results"]["123"]["official_followers"] == 10
     assert merged["official_growth_observations"]["456"] == observation(456)
     assert merged["pending_candidates"]["999"]["remote"] == "Twitch priority"
-    assert merged["group_resolution_api_cooldown"] == {"status": "newer remote"}
+    assert merged["group_resolution_api_cooldown"] == read_json(seed / CHECKPOINT)["group_resolution_api_cooldown"]
     assert len(merged["attempt_events"]) == 1
     assert publisher.baseline["checkpoint"] == merged
     assert read_json(runner / MASTER)["count"] == 1

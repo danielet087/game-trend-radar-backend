@@ -6,12 +6,20 @@ that an in-memory observation has been committed to Git.
 from __future__ import annotations
 
 from datetime import timedelta, timezone
+from copy import deepcopy
 import json
 from pathlib import Path
 
 from radar_backend.domain.official_queue import (
     TAIPEI, OfficialObservation, aware_time, checked_numeric,
     group_to_gid, steam_429_cooldown, valid_group_id64,
+)
+from radar_backend.domain.growth import validated_group_resolution
+
+GROWTH_GROUPS = "official_growth_group_resolutions"
+FOLLOWER_SOURCE_FIELDS = (
+    "official_results", "official_growth_observations", GROWTH_GROUPS,
+    "games", "verified", "pending_candidates", "unresolved_candidates",
 )
 
 def read_state(path: Path, *, optional=False):
@@ -38,15 +46,25 @@ class OfficialFollowerCache:
         for source in self.sources:
             if not isinstance(source, dict):
                 raise ValueError("Malformed official Followers source state")
-            for field in ("official_results", "official_growth_observations", "games", "verified", "pending_candidates"):
+            for field in FOLLOWER_SOURCE_FIELDS:
                 if field in source and not isinstance(source[field], dict):
                     raise ValueError(f"Malformed official Followers {field} state")
+            for aid, row in source.get(GROWTH_GROUPS, {}).items():
+                if (not isinstance(row, dict) or type(row.get("appid")) is not int
+                        or row["appid"] <= 0 or str(row["appid"]) != aid
+                        or "followers" in row or "official_followers" in row):
+                    raise ValueError("Malformed growth group identity state")
+                receipt = validated_group_resolution(row.get("group_resolution"))
+                if (receipt is None
+                        or (receipt["status"] == "resolved" and valid_group_id64(row.get("group_id64")) is None)
+                        or (receipt["status"] != "resolved" and row.get("group_id64") is not None)):
+                    raise ValueError("Unverified growth group identity state")
 
     def _rows(self, appid, *, observations_only=False):
         aid = str(appid)
         for source in self.sources:
-            for field in ("official_results", "official_growth_observations", "games", "verified", "pending_candidates"):
-                if observations_only and field == "pending_candidates":
+            for field in FOLLOWER_SOURCE_FIELDS:
+                if observations_only and field in {GROWTH_GROUPS, "pending_candidates", "unresolved_candidates"}:
                     continue
                 rows = source.get(field) or {}
                 if isinstance(rows, dict) and isinstance(rows.get(aid), dict):
@@ -62,6 +80,40 @@ class OfficialFollowerCache:
             if type(short) is int and 0 < short <= 2 ** 32 - 1:
                 return group_to_gid(short)
         return None
+
+    def group_resolution(self, appid):
+        """Return the newest verified identity receipt, independent of counts."""
+        receipts = [validated_group_resolution(row.get("group_resolution"))
+                    for row in self._rows(appid)]
+        receipts = [receipt for receipt in receipts if receipt is not None]
+        newest = max(receipts, key=lambda receipt: aware_time(receipt["checked_at"]), default=None)
+        return deepcopy(newest)
+
+    def remember_group_resolution(self, appid, resolution, group_id64=None):
+        """Store only metadata evidence; it never creates or erases Followers."""
+        if type(appid) is not int or appid <= 0:
+            raise ValueError("A positive growth Group AppID is required")
+        if isinstance(resolution, dict) and "group_resolution" in resolution:
+            group_id64 = resolution.get("group_id64", group_id64)
+            resolution = resolution["group_resolution"]
+        receipt = validated_group_resolution(resolution)
+        group = valid_group_id64(group_id64)
+        if (receipt is None or (receipt["status"] == "resolved" and group is None)
+                or (receipt["status"] != "resolved" and group_id64 is not None)):
+            raise ValueError("Unverified growth group resolution")
+        # An official numeric group remains useful even if an older worker
+        # returns a missing mapping. Resolution retries do not own its removal.
+        if receipt["status"] != "resolved" and self.group_id(appid) is not None:
+            return
+        prior = self.group_resolution(appid)
+        if prior is not None and aware_time(prior["checked_at"]) >= aware_time(receipt["checked_at"]):
+            return
+        rows = self.checkpoint.setdefault(GROWTH_GROUPS, {})
+        if not isinstance(rows, dict):
+            raise ValueError("Malformed growth group resolution state")
+        rows[str(appid)] = {"appid": appid, "group_resolution": deepcopy(receipt)}
+        if receipt["status"] == "resolved":
+            rows[str(appid)]["group_id64"] = group
 
     def latest(self, appid, now, *, today_only=False, expected_group=None):
         candidates = []

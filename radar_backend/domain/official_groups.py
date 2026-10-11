@@ -109,6 +109,12 @@ def apply_batch(checkpoint, batch, *, eligible_appids=None, completed,
         }}
         if resolution["status"] == "resolved":
             row["group_id64"] = group
+    return apply_api_cooldown(merged, batch, aware_time=aware_time, deepcopy_fn=lambda value: value)
+
+
+def apply_api_cooldown(checkpoint, batch, *, aware_time, deepcopy_fn=deepcopy):
+    """Merge only newer shared API backoff without modifying queue membership."""
+    merged = deepcopy_fn(checkpoint)
     update = batch.get("api_cooldown_update")
     old = merged.get("group_resolution_api_cooldown") or {}
     old = old if isinstance(old, dict) else {}

@@ -42,7 +42,8 @@ def failure_cooldown(prior, status, now, response=None):
 
 def collect(checkpoint, candidates, *, api_key, now=None, session=None,
             max_requests=20, max_seconds=120, interval=1.0,
-            monotonic=time.monotonic, sleep=time.sleep, clock=None):
+            monotonic=time.monotonic, sleep=time.sleep, clock=None,
+            resolve_for_growth=False):
     return _group_application.collect(
         checkpoint, candidates, api_key=api_key, now=now, session=session,
         max_requests=max_requests, max_seconds=max_seconds, interval=interval,
@@ -55,6 +56,8 @@ def collect(checkpoint, candidates, *, api_key, now=None, session=None,
         session_factory=requests.Session, configure_session=_group_transport.configure_session,
         request_exception=requests.RequestException, math_module=math,
         timedelta_type=timedelta, source=SOURCE, twitch_source=TWITCH_SOURCE,
+        resolve_for_growth=resolve_for_growth,
+        retry_after=retry_after,
     )
 
 
@@ -64,6 +67,11 @@ def apply_batch(checkpoint, batch, *, eligible_appids=None):
         valid_group_id=valid_group_id, fingerprint=fingerprint, aware_time=aware_time,
         deepcopy_fn=deepcopy, statuses=STATUSES, source=SOURCE,
     )
+
+
+def apply_api_cooldown(checkpoint, batch):
+    return _group_rules.apply_api_cooldown(checkpoint, batch, aware_time=aware_time,
+                                         deepcopy_fn=deepcopy)
 
 
 def current_queue(checkpoint):

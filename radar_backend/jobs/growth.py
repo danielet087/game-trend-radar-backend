@@ -4,11 +4,14 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 import json
+import os
 from pathlib import Path
 import time
 import requests
 
 from radar_backend.adapters.official_followers import OfficialFollowerClient
+from radar_backend.adapters.official_groups import collect as collect_groups
+from radar_backend.adapters.official_groups import apply_api_cooldown
 from radar_backend.application.growth import collect_observations
 from radar_backend.state.growth import GrowthProgressWriter, load_growth_inputs
 from radar_backend.state.official_followers import CooldownStore, OfficialFollowerCache
@@ -20,7 +23,8 @@ def collect(data_dir, output, *, max_requests=120, interval=30, now=None, sessio
             sleep=time.sleep, checkpoint_path=None, official_cache_path=None,
             legacy_checkpoint_path=None, group_state_path=None, original_checkpoint_path=None, clock=None,
             client_factory=OfficialFollowerClient, cache_factory=OfficialFollowerCache,
-            cooldown_factory=CooldownStore, session_factory=requests.Session, monotonic=time.monotonic):
+            cooldown_factory=CooldownStore, session_factory=requests.Session, monotonic=time.monotonic,
+            api_key=None, group_collector=collect_groups):
     if clock is None:
         clock = (lambda: now) if now is not None else (lambda: datetime.now(timezone.utc))
     if clock().tzinfo is None:
@@ -38,11 +42,25 @@ def collect(data_dir, output, *, max_requests=120, interval=30, now=None, sessio
     http.headers.update({"User-Agent": "GameTrendRadar/1.0 (+https://github.com/danielet087/game-trend-radar)"})
     client = client_factory(session=http, clock=clock, cooldown=cooldown)
     writer = GrowthProgressWriter(output, checkpoint_path)
+    key = os.environ.get("STEAM_WEB_API_KEY", "") if api_key is None else api_key
+
+    def resolve_groups(checkpoint, candidates, *, now):
+        # Reuse the official identity resolver, independently of whether an old
+        # Followers observation exists. Admission remains the catalog's job.
+        candidates = [{**row, "release_date": row["release_start"],
+                       "queue_source": "accepted_steam_growth"} for row in candidates]
+        batch = group_collector(checkpoint, candidates, api_key=key, now=now,
+                                session=http, clock=clock, monotonic=monotonic,
+                                sleep=sleep, resolve_for_growth=True)
+        checkpoint.update(apply_api_cooldown(checkpoint, batch))
+        return batch
+
     result = collect_observations(inputs.rows, inputs.history, inputs.checkpoint,
                                   client=client, cache=cache, cooldown=cooldown,
                                   clock=clock, sleep=sleep, monotonic=monotonic, persist=writer.save,
                                   max_requests=max_requests, interval=interval,
-                                  state_saved=checkpoint_path is not None)
+                                  state_saved=checkpoint_path is not None,
+                                  group_resolver=resolve_groups)
     print(json.dumps({k: v for k, v in result.items() if k not in {"measurements", "events", "pending"}}))
     return result
 

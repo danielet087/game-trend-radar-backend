@@ -117,6 +117,13 @@ def growth_collection_complete(result: dict, now: datetime) -> bool:
             or len(measurements) + len(unavailable) != eligible):
         return False
     today = now.astimezone(TAIPEI).date()
+    if "coverage_checked_at" in result:
+        coverage_checked = timestamp(result["coverage_checked_at"])
+        generated = timestamp(result.get("generated_at"))
+        if (coverage_checked is None or coverage_checked > now
+                or coverage_checked.astimezone(TAIPEI).date() != today
+                or (generated is not None and coverage_checked < generated)):
+            return False
     # Version 2 adds an explicit cohort and day. Legacy all-measurement reports
     # remain readable; no legacy receipt can silently acquire an exclusion.
     new_coverage = "coverage_schema_version" in result or bool(unavailable)

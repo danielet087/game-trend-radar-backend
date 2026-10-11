@@ -621,6 +621,143 @@ def test_newer_valid_checkpoint_unavailability_can_still_complete_daily_coverage
     assert current["coverage"] == {"eligible": 1, "measured": 0, "unavailable": 1, "pending": 0}
 
 
+def test_public_coverage_clock_accepts_newer_durable_receipt_without_redating_collection():
+    delivery = datetime(2026, 10, 2, 1, 40, tzinfo=timezone.utc)
+    original = availability_report()
+    original["generated_at"] = "2026-10-02T01:20:00+00:00"
+    original.update(eligible=2, eligible_appids=[1, 2], measurements=[{
+        "appid": 2, "followers": 7600, "at": "2026-10-02T01:10:00Z", "source": "steam_community"}])
+    checkpoint = {GROWTH_GROUPS: {"1": resolution_row(at="2026-10-02T01:30:00Z")},
+                  "official_growth_observations": {"2": observation(2, at="2026-10-02T01:10:00Z", followers=7600)}}
+    state_report = growth_checkpoint_payload(original, checkpoint, now=delivery)
+    catalog = {"count": 2, "games": [
+        {"appid": aid, "followers": 6000, "release_start": "2026-10-02"} for aid in (1, 2)]}
+    published = growth_publication_payload(state_report, catalog, delivery)
+    assert published["coverage_checked_at"] == delivery.isoformat()
+    assert published["generated_at"] == original["generated_at"]
+    assert published["measurements"] == original["measurements"]
+    assert published["unavailable"] == original["unavailable"]
+    assert published["checkpoint_group_resolutions"]["1"]["checked_at"] == "2026-10-02T01:30:00Z"
+    assert published["coverage"] == {"eligible": 2, "measured": 1, "unavailable": 1, "pending": 0}
+    assert published["collection_complete"] and not published["measurement_complete"]
+    stamped = stamp_growth_publication(published, delivery, state_persisted=True, published=True)
+    assert growth_collection_complete(stamped, delivery)
+
+
+@pytest.mark.parametrize("bad_clock", [
+    None, "broken", "2026-10-02T01:40:00", "2026-10-02T01:00:00Z",
+    "2026-10-02T01:41:00Z", "2026-10-01T15:59:00Z",
+])
+def test_invalid_or_future_public_coverage_clock_cannot_complete_daily_tracking(bad_clock):
+    delivery = datetime(2026, 10, 2, 1, 40, tzinfo=timezone.utc)
+    original = availability_report()
+    original["generated_at"] = "2026-10-02T01:20:00+00:00"
+    original["coverage_checked_at"] = bad_clock
+    assert not growth_collection_complete(original, delivery)
+
+
+def test_real_publisher_passes_coverage_clock_while_freezing_measurement_and_event_clock(tmp_path):
+    _, backend, _ = delivery_repo(tmp_path)
+    remote, frontend = frontend_repo(tmp_path, backend)
+    # The subprocess fixture captures the exact frozen observation clock and
+    # payload received by the same frontend CLI used in production.
+    (frontend / "scripts/build_radar_insights.py").write_text(
+        "import argparse,json\nfrom pathlib import Path\n"
+        "p=argparse.ArgumentParser();p.add_argument('--data-dir');p.add_argument('--measurements');p.add_argument('--observed-at');a=p.parse_args()\n"
+        "m=json.loads(Path(a.measurements).read_text());m['builder_observed_at']=a.observed_at\n"
+        "for n in ('insights-state.json','activity.json','growth.json'):\n"
+        "    Path(a.data_dir,n).write_text(json.dumps(m))\n", encoding="utf-8")
+    git(frontend, "add", "scripts/build_radar_insights.py")
+    git(frontend, "commit", "-m", "capture independent coverage evaluation clock")
+    git(frontend, "push", "origin", "HEAD:main")
+    generated = "2026-10-02T01:20:00+00:00"
+    delivery = datetime(2026, 10, 2, 1, 40, tzinfo=timezone.utc)
+    original = availability_report()
+    original["generated_at"] = generated
+    checkpoint = {GROWTH_GROUPS: {"1": resolution_row(at="2026-10-02T01:30:00Z")}}
+    state_report = growth_checkpoint_payload(original, checkpoint, now=delivery)
+    delivered = {}
+    publish_growth(frontend, state_report, input_revision="frozen-collector-catalog",
+                   now=delivery, published_report=delivered)
+    published = json.loads(git(remote, "show", "main:data/growth.json"))
+    assert published["builder_observed_at"] == generated
+    assert published["generated_at"] == generated
+    assert published["coverage_checked_at"] == delivery.isoformat()
+    assert delivered["coverage_checked_at"] == delivery.isoformat()
+    assert published["checkpoint_group_resolutions"]["1"]["checked_at"] == "2026-10-02T01:30:00Z"
+    assert published["measurement_complete"] is False
+    assert published["measurements"] == []
+    stamped = stamp_growth_publication(delivered, delivery, state_persisted=True, published=True)
+    assert growth_collection_complete(stamped, delivery)
+
+
+def test_growth_push_retry_rechecks_receipt_expiry_at_actual_attempt_clock(tmp_path, monkeypatch):
+    import radar_backend.publication.steam as publisher
+    _, backend, _ = delivery_repo(tmp_path)
+    remote, frontend = frontend_repo(tmp_path, backend)
+    (frontend / "scripts/build_radar_insights.py").write_text(
+        "import argparse,json\nfrom pathlib import Path\n"
+        "p=argparse.ArgumentParser();p.add_argument('--data-dir');p.add_argument('--measurements');p.add_argument('--observed-at');a=p.parse_args()\n"
+        "m=json.loads(Path(a.measurements).read_text());m['builder_observed_at']=a.observed_at\n"
+        "for n in ('insights-state.json','activity.json','growth.json'):\n"
+        "    Path(a.data_dir,n).write_text(json.dumps(m))\n", encoding="utf-8")
+    git(frontend, "add", "scripts/build_radar_insights.py")
+    git(frontend, "commit", "-m", "capture retried coverage evaluation")
+    git(frontend, "push", "origin", "HEAD:main")
+    writer = tmp_path / "coverage-clock-racer"
+    subprocess.run(["git", "clone", str(remote), str(writer)], check=True, capture_output=True)
+    git(writer, "config", "user.name", "Test")
+    git(writer, "config", "user.email", "test@example.com")
+    first = datetime(2026, 10, 2, 1, 40, tzinfo=timezone.utc)
+    second = datetime(2026, 10, 2, 2, 0, tzinfo=timezone.utc)
+    clocks = []
+
+    class ProgressingClock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            value = first if not clocks else second
+            clocks.append(value)
+            return value
+
+    monkeypatch.setattr(publisher, "datetime", ProgressingClock)
+    renders = []
+
+    class CoverageClockRace(SubprocessGitRepository):
+        raced = False
+        def _run(self, *args, push=False):
+            if push:
+                renders.append(json.loads((frontend / "data/growth.json").read_text()))
+                if not self.raced:
+                    self.raced = True
+                    write_json(writer / "data/unrelated.json", {"newer": True})
+                    git(writer, "add", "data/unrelated.json")
+                    git(writer, "commit", "-m", "concurrent public metadata advance")
+                    git(writer, "push", "origin", "HEAD:main")
+            return super()._run(*args, push=push)
+
+    original = availability_report()
+    original["generated_at"] = "2026-10-02T01:20:00+00:00"
+    latest = {**resolution(at="2026-10-02T01:30:00Z"), "retry_at": "2026-10-02T01:45:00Z"}
+    checkpoint = {GROWTH_GROUPS: {"1": {"appid": 1, "group_resolution": latest}}}
+    state_report = growth_checkpoint_payload(original, checkpoint, now=first)
+    delivered = {}
+    receipt = publish_growth(frontend, state_report, input_revision="original-frozen-catalog",
+                             repository=CoverageClockRace(frontend, disposable_checkout=True),
+                             published_report=delivered)
+    assert receipt.attempts == 2
+    assert clocks == [first, second]
+    assert [render["coverage_checked_at"] for render in renders] == [first.isoformat(), second.isoformat()]
+    assert [render["builder_observed_at"] for render in renders] == [original["generated_at"]] * 2
+    assert renders[0]["collection_complete"] is True
+    assert renders[1]["collection_complete"] is False
+    assert delivered["coverage_checked_at"] == second.isoformat()
+    assert delivered["generated_at"] == original["generated_at"]
+    assert delivered["coverage"] == {"eligible": 1, "measured": 0, "unavailable": 0, "pending": 1}
+    assert delivered["unavailable"] == [] and delivered["measurements"] == []
+    stamped = stamp_growth_publication(delivered, second, state_persisted=True, published=True)
+    assert not growth_collection_complete(stamped, second)
+
+
 def test_availability_expiring_between_checkpoint_and_publication_clears_public_complete_flag():
     start = datetime(2026, 10, 2, 1, 40, tzinfo=timezone.utc)
     original = availability_report()

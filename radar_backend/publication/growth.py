@@ -153,6 +153,9 @@ def growth_publication_payload(result: dict, catalog: dict, now: datetime) -> di
     payload = deepcopy(result)
     for field in ("job_result", "publication_receipt", "checkpoint_receipt"):
         payload.pop(field, None)
+    # Availability may be reconciled after collection against newer durable
+    # receipts. Expose that evaluation clock without redating observations.
+    payload["coverage_checked_at"] = now.isoformat()
     payload["published_eligible_appids"] = published_ids
     payload["published_resolvable_appids"] = sorted(resolvable)
     unavailable_ids = {row.get("appid") for row in payload.get("unavailable", [])

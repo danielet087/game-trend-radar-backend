@@ -1152,15 +1152,15 @@
     },
     "5160800": {
       "status": "pending",
-      "updated_at": "2026-10-11T21:02:17.704009Z",
+      "updated_at": "2026-10-12T21:02:13.812905Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 5160800,
         "twitch_game_id": "1458901309",
         "igdb_id": "415859",
-        "checked_at": "2026-10-11T20:14:28Z",
-        "source_frontend_commit": "bcdb69219a20f34a72a524ca35cdfaf95b9eaf2a",
+        "checked_at": "2026-10-12T20:14:50Z",
+        "source_frontend_commit": "719c9fb2300bcfd24aae8231ddf9c8a841f28919",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-03T16:12:05Z",
@@ -1171,7 +1171,7 @@
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-12T21:02:22.331143Z",
+      "retry_at": "2026-10-13T21:02:18.478756Z",
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
@@ -2358,8 +2358,100 @@
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
+    },
+    "3768400": {
+      "status": "pending",
+      "updated_at": "2026-10-12T21:02:13.812905Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 3768400,
+        "twitch_game_id": "1195436775",
+        "igdb_id": "395075",
+        "checked_at": "2026-10-12T20:14:50Z",
+        "source_frontend_commit": "719c9fb2300bcfd24aae8231ddf9c8a841f28919",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-12T20:14:50Z",
+          "viewer_count": 7362,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": {
+        "appid": 3768400,
+        "name": "Gridlords",
+        "release_date": "2026-10-07",
+        "steam_url": "https://store.steampowered.com/app/3768400/",
+        "group_id64": null,
+        "queue_source": "twitch_steam_discovery",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 3768400,
+          "twitch_game_id": "1195436775",
+          "igdb_id": "395075",
+          "checked_at": "2026-10-12T20:14:50Z",
+          "source_frontend_commit": "719c9fb2300bcfd24aae8231ddf9c8a841f28919",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-12T20:14:50Z",
+            "viewer_count": 7362,
+            "min_viewers": 7000
+          }
+        },
+        "steam_candidate": {
+          "appid": 3768400,
+          "name": "Gridlords",
+          "name_en": "Gridlords",
+          "release_raw": "2026-10-07",
+          "release_start": "2026-10-07",
+          "release_end": "2026-10-07",
+          "release_precision": "day",
+          "release_display_precision": "date_full",
+          "release_display_provider": "Steam IStoreBrowseService/GetItems",
+          "release_date_basis": "steam_store_browse_verified_full_date",
+          "release_date_timezone": "Asia/Taipei",
+          "release_time_utc": "2026-10-07T15:04:29Z",
+          "release_time_source": "Steam IStoreBrowseService/GetItems",
+          "release_timestamp_taipei_date": "2026-10-07",
+          "release_date_conflict": false,
+          "release_store_date": "2026-10-07",
+          "release_date_normalization": "steam_store_date_matches_taipei",
+          "release_date_verified_at": "2026-10-12T21:02:13.812905Z",
+          "post_followers_store_verified": true,
+          "post_followers_store_verified_at": "2026-10-12T21:02:13.812905Z",
+          "sexual_content_screened": true,
+          "steam_type": "game",
+          "content_descriptorids": [],
+          "store_url": "https://store.steampowered.com/app/3768400/",
+          "community_url": "https://steamcommunity.com/app/3768400/",
+          "twitch_admission": {
+            "schema_version": 1,
+            "method": "twitch_igdb_external_steam_v1",
+            "appid": 3768400,
+            "twitch_game_id": "1195436775",
+            "igdb_id": "395075",
+            "checked_at": "2026-10-12T20:14:50Z",
+            "source_frontend_commit": "719c9fb2300bcfd24aae8231ddf9c8a841f28919",
+            "source_enrollment": {
+              "source": "igdb_first_release_date",
+              "observed_at": "2026-10-12T20:14:50Z",
+              "viewer_count": 7362,
+              "min_viewers": 7000
+            }
+          }
+        }
+      },
+      "reason": "queued_official_followers",
+      "rate_limit_stage": null,
+      "retry_at": null,
+      "retry_source": null,
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-12T20:02:31.608471Z",
+  "updated_at": "2026-10-12T21:02:13.812905Z",
   "api_cooldowns": {}
 }

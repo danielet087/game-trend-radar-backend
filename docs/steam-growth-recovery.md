@@ -37,7 +37,49 @@ accepted games that lack both a current Taiwan-day measurement and a GroupID.
 Followers count. Normal admission and Twitch fallback rules are unchanged.
 The workflow passes the existing `STEAM_WEB_API_KEY` secret. API requests retain
 the resolver's limit of 20 requests, 120 seconds and at least one-second pacing;
-Community XML retains its separate 120-request budget and 30-second pacing.
+Community XML retains 30-second pacing. The compatibility collector defaults
+to 120 requests / 3,600 seconds; production daily collection now explicitly
+uses at most 250 total requests / 9,000 total seconds, including all waits.
+Official identity API requests remain capped at 20 requests / 120 seconds for
+the entire workflow even when XML collection resumes.
+
+## Overnight capacity and shared cooldown
+
+Runs 38158944602 and 38183633764 on Taiwan 2026-10-12 exposed a separate
+capacity bug. The 01:15 run had no same-day points and stopped at the default
+120 requests with 16 of 136 games pending. Merely raising the request cap would
+still hit the independent 3,600-second application deadline and 70-minute job
+timeout. The 07:15 run reused those 120 real points; its current cohort had 138
+games, but the hourly official collector had received a genuine 429 at 07:02.
+The shared cooldown ended at 07:32, so immediate exit deferred all 18 remaining
+games for another six hours. This was not another missing-GroupID regression.
+
+Production uses a bounded daily orchestration around the existing collector.
+It can wait up to 3,600 actual seconds for an acknowledged shared deadline and
+resume within its remaining 250-request / 9,000-second total allocation. Every
+wait, API call and XML call consumes elapsed time; retries never reset either
+budget. A longer cooldown, source error, identity failure or exhausted budget
+remains honestly incomplete and preserves the next six-hour retry. Cooldown
+receipts are never shortened or cleared to make a request happen sooner.
+The workflow timeout is 170 minutes, leaving a delivery buffer beyond the
+150-minute collection allocation. Typical fresh-day coverage of 138 games at
+30-second start intervals needs roughly 69 minutes, rather than the previous
+impossible 60-minute collection cap.
+
+Before collection, the workflow fetches the latest main state while retaining
+its pinned code revision. Only the checkpoint owned by the growth publisher is
+restored to the tracked worktree; four auxiliary state files are frozen in
+`output/growth-inputs` and passed as explicit read-only sources. This keeps the
+strict Git publication ownership boundary and avoids stale queued-run inputs.
+A local bare-Git regression exercises refresh, collection progress and the real
+checkpoint publisher together.
+
+Artifact fields `daily_budget`, `max_requests`, `max_seconds`, `elapsed_seconds`
+record the actual allocation, waits, passes and stop reason. `requests` counts
+all real XML attempts, including a 429 that later recovers; `events` retains its
+HTTP history. `reused` excludes genuine measurements newly taken earlier in the
+same workflow. Coverage still comes exclusively from dated observations or
+validated official unavailability, and final publication remains mandatory.
 
 ## Evidence and completion
 

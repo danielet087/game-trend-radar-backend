@@ -36,16 +36,21 @@ def parse_count(body):
             return int(text)
     raise ValueError("Missing Steam Community memberCount")
 
-def collect(data_dir, output, *, max_requests=120, interval=30, now=None, session=None,
+def collect(data_dir, output, *, max_requests=120, max_seconds=3600, interval=30,
+            wait_for_cooldown=False, max_cooldown_wait=3600, now=None, session=None,
             sleep=time.sleep, checkpoint_path=None, official_cache_path=None,
-            legacy_checkpoint_path=None, group_state_path=None, original_checkpoint_path=None, clock=None):
+            legacy_checkpoint_path=None, group_state_path=None, original_checkpoint_path=None, clock=None,
+            monotonic=None):
     # Preserve legacy monkeypatch points while the use case consumes explicit ports.
-    return _collect(data_dir, output, max_requests=max_requests, interval=interval, now=now,
+    return _collect(data_dir, output, max_requests=max_requests, max_seconds=max_seconds,
+                    interval=interval, wait_for_cooldown=wait_for_cooldown,
+                    max_cooldown_wait=max_cooldown_wait, now=now,
                     session=session, sleep=sleep, checkpoint_path=checkpoint_path,
                     official_cache_path=official_cache_path, legacy_checkpoint_path=legacy_checkpoint_path,
                     group_state_path=group_state_path, original_checkpoint_path=original_checkpoint_path,
                     clock=clock, client_factory=OfficialFollowerClient, cache_factory=OfficialFollowerCache,
-                    cooldown_factory=CooldownStore, session_factory=requests.Session, monotonic=time.monotonic)
+                    cooldown_factory=CooldownStore, session_factory=requests.Session,
+                    monotonic=time.monotonic if monotonic is None else monotonic)
 
 
 def main():

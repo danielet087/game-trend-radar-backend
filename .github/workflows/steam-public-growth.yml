@@ -30,7 +30,9 @@ concurrency:
 jobs:
   observe:
     runs-on: ubuntu-latest
-    timeout-minutes: 70
+    # 150 minutes collection budget, including bounded cooldown waiting, plus
+    # setup and acknowledged checkpoint/publication delivery.
+    timeout-minutes: 170
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,6 +58,33 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
           echo "revision=$(git -C frontend rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Refresh growth state after acquiring the shared lock
+        id: growth_state
+        run: |
+          set -euo pipefail
+          code_revision=$(git rev-parse HEAD)
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          state_revision=$(git rev-parse refs/remotes/origin/main)
+          state_paths=(
+            experiments/steam_official_daily_catchup/checkpoint.json
+            experiments/steam_official_nearfirst_20260922/checkpoint.json
+            experiments/steam_official_followers_20260922/checkpoint.json
+            data/steam_followers_cache.json
+            data/steam_prefilter_state.json
+          )
+          for state_path in "${state_paths[@]}"; do
+            git cat-file -e "$state_revision:$state_path"
+          done
+          # The checkpoint publisher owns only the primary checkpoint. Freeze
+          # auxiliary inputs outside tracked paths so its scope guard remains strict.
+          mkdir -p output/growth-inputs
+          git show "$state_revision:data/steam_followers_cache.json" > output/growth-inputs/official-cache.json
+          git show "$state_revision:experiments/steam_official_nearfirst_20260922/checkpoint.json" > output/growth-inputs/legacy-checkpoint.json
+          git show "$state_revision:data/steam_prefilter_state.json" > output/growth-inputs/group-state.json
+          git show "$state_revision:experiments/steam_official_followers_20260922/checkpoint.json" > output/growth-inputs/original-checkpoint.json
+          git restore --source="$state_revision" --worktree -- experiments/steam_official_daily_catchup/checkpoint.json
+          echo "revision=$state_revision" >> "$GITHUB_OUTPUT"
+          echo "GROWTH_STATE_INPUT code=$code_revision state=$state_revision"
       - name: Collect dated official measurements
         id: collect
         env:
@@ -64,7 +93,13 @@ jobs:
           set -euo pipefail
           mkdir -p output
           cp experiments/steam_official_daily_catchup/checkpoint.json output/growth-checkpoint-baseline.json
-          python -m scripts.collect_public_growth --data-dir frontend/data --output output/public-growth.json --interval 30
+          python -m scripts.collect_public_growth --data-dir frontend/data --output output/public-growth.json \
+            --interval 30 --max-requests 250 --max-seconds 9000 \
+            --wait-for-cooldown --max-cooldown-wait 3600 \
+            --official-cache output/growth-inputs/official-cache.json \
+            --legacy-checkpoint output/growth-inputs/legacy-checkpoint.json \
+            --group-state output/growth-inputs/group-state.json \
+            --original-checkpoint output/growth-inputs/original-checkpoint.json
       - name: Persist official observations and cooldown against the latest queue
         id: checkpoint
         if: always() && !cancelled() && steps.collect.outcome != 'skipped'

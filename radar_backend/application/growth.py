@@ -6,6 +6,7 @@ not create an HTTP session, choose file paths or acknowledge publication.
 from __future__ import annotations
 
 from datetime import timezone
+import math
 from radar_core.jobs import JobResult, JobStatus
 from radar_backend.domain.growth import (
     TAIPEI, eligible, group_unavailable, growth_collection_complete,
@@ -16,7 +17,13 @@ from radar_backend.domain.official_queue import OfficialObservation
 
 def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
                          clock, sleep, monotonic, persist, max_requests=120,
-                         interval=30, state_saved=False, group_resolver=None):
+                         interval=30, state_saved=False, group_resolver=None,
+                         max_seconds=3600):
+    if (isinstance(max_seconds, bool) or not isinstance(max_seconds, (int, float))
+            or not math.isfinite(max_seconds) or max_seconds <= 0):
+        raise ValueError("Growth collection requires a positive finite seconds budget")
+    if type(max_requests) is not int or max_requests < 0:
+        raise ValueError("Growth collection requires a non-negative integer request budget")
     now = clock()
     if now.tzinfo is None:
         raise ValueError("Growth collection needs an aware clock")
@@ -37,7 +44,19 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
     measurements, errors, pending, events, unavailable = [], [], [], [], []
     attempts = reused = 0
     previous_start = None
-    started = monotonic()
+    previous_tick = None
+
+    def read_monotonic():
+        nonlocal previous_tick
+        tick = monotonic()
+        if (isinstance(tick, bool) or not isinstance(tick, (int, float))
+                or not math.isfinite(tick)
+                or (previous_tick is not None and tick < previous_tick)):
+            raise ValueError("Growth collection requires a finite non-decreasing monotonic clock")
+        previous_tick = tick
+        return tick
+
+    started = read_monotonic()
     reason = "completed"
     group_batch = None
 
@@ -97,13 +116,22 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
             reason = "rate_limited"
             pending.append({"appid": aid, "reason": "community_cooldown"})
             continue
-        if attempts >= max_requests or monotonic() - started > 3600:
+        next_start = read_monotonic()
+        delay = max(0, interval - (next_start - previous_start)) if previous_start is not None else 0
+        # Include the pacing delay in the deadline. Checking only before sleep
+        # permits an extra request after the configured collection budget.
+        if attempts >= max_requests or next_start + delay - started >= max_seconds:
             reason = "bounded_run"
             pending.append({"appid": aid, "reason": "bounded_run"})
             continue
         if previous_start is not None:
-            sleep(max(0, interval - (monotonic() - previous_start)))
-        previous_start = monotonic()
+            sleep(delay)
+        previous_start = read_monotonic()
+        # A real scheduler can wake late; never start a request after its budget.
+        if previous_start - started >= max_seconds:
+            reason = "bounded_run"
+            pending.append({"appid": aid, "reason": "bounded_run"})
+            continue
         outcome = client.fetch(gid)
         if outcome.http is not None or outcome.error_type is not None:
             attempts += 1
@@ -142,6 +170,8 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
     save_progress()
     finished = clock()
     result = {"generated_at": finished.isoformat(), "eligible": len(rows),
+              "max_requests": max_requests, "max_seconds": max_seconds,
+              "elapsed_seconds": read_monotonic() - started,
               "coverage_schema_version": 2, "eligible_appids": eligible_appids,
               "collection_date_taipei": today.isoformat(),
               "requests": attempts, "reused": reused, "errors": errors, "reason": reason,

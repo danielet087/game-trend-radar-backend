@@ -23698,18 +23698,20 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "38190276228",
+    "run_id": "38194193659",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-12T09:02:34.100164+08:00",
-    "last_updated_at": "2026-10-12T09:02:34.308615+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-12T10:03:08.207103+08:00",
+    "last_updated_at": "2026-10-12T10:03:08.748770+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "finished_at": "2026-10-12T09:02:34.308615+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "last_appid": 4450660,
+    "last_name": "Flick",
+    "finished_at": "2026-10-12T10:03:08.748770+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "official_growth_group_resolutions": {
     "3510740": {
@@ -55691,21 +55693,93 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-12T03:12:44.848711+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4450660": {
+      "appid": 4450660,
+      "name": "Flick",
+      "release_date": "2026-11-19",
+      "steam_url": "https://store.steampowered.com/app/4450660/",
+      "group_id64": "103582791475541934",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4450660,
+        "twitch_game_id": "70001252",
+        "igdb_id": "409649",
+        "checked_at": "2026-10-11T21:12:32Z",
+        "source_frontend_commit": "b062a53b361f2c1e0c070d0ca30c9bb27d0c7845",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-11T21:12:32Z",
+          "viewer_count": 17078,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 4450660,
+        "name": "Flick",
+        "name_en": "Flick",
+        "release_raw": "2026-11-19",
+        "release_start": "2026-11-19",
+        "release_end": "2026-11-19",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-11-19T09:00:00Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-11-19",
+        "release_date_conflict": false,
+        "release_store_date": "2026-11-19",
+        "release_date_normalization": "steam_store_date_matches_taipei",
+        "release_date_verified_at": "2026-10-12T02:02:58.808082Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-12T02:02:58.808082Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [
+          5
+        ],
+        "store_url": "https://store.steampowered.com/app/4450660/",
+        "community_url": "https://steamcommunity.com/app/4450660/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4450660,
+          "twitch_game_id": "70001252",
+          "igdb_id": "409649",
+          "checked_at": "2026-10-11T21:12:32Z",
+          "source_frontend_commit": "b062a53b361f2c1e0c070d0ca30c9bb27d0c7845",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-11T21:12:32Z",
+            "viewer_count": 17078,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-11T22:02:17.869295Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 232,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-12T10:03:08.676668+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 3,
+  "rate_limit_count": 0,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-12T09:02:40.859835+08:00",
-  "community_cooldown": {
-    "retry_at": "2026-10-12T01:02:40.859835+00:00",
-    "observed_at": "2026-10-12T00:02:40.859835+00:00",
-    "updated_at": "2026-10-12T00:02:40.859835+00:00",
-    "retry_seconds": 3600,
-    "retry_after": null,
-    "retry_source": "existing_queue_backoff",
-    "attempts": 3
-  },
-  "community_last_success_at": "2026-10-12T03:12:44.848711+08:00",
+  "next_request_after_taipei": null,
+  "community_cooldown": null,
+  "community_last_success_at": "2026-10-12T10:03:08.676668+08:00",
   "official_growth_observations": {
     "2826790": {
       "appid": 2826790,
@@ -74592,6 +74666,16 @@
       "status": "rate_limited",
       "github_run_id": "38186443015",
       "next_request_after_taipei": "2026-10-12T09:02:40.859835+08:00"
+    },
+    {
+      "appid": 4450660,
+      "when_taipei": "2026-10-12T10:03:08.554651+08:00",
+      "release_date": "2026-11-19",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38194193659",
+      "official_followers": 232
     }
   ]
 }

@@ -11,6 +11,7 @@ import pytest
 from radar_core.publication import PublicationError, SubprocessGitRepository, snapshot_revision
 from radar_backend.jobs.publish_steam import main, parser
 from radar_backend.publication.checkpoint_delivery import CHECKPOINT, publish_queue_batch
+from radar_backend.publication.activity_origins import ACTIVITY_ORIGINS_PATH, freeze_activity_context
 from radar_backend.publication.steam import CATALOG_PATHS, publish_catalog, publish_growth, read_json, write_json
 
 
@@ -52,10 +53,13 @@ def published_json(remote, path):
 def test_catalog_commit_covers_all_projections_and_receipt_is_actual_remote_head(tmp_path):
     remote, root, source = frontend(tmp_path)
     original = deepcopy(source)
-    receipt = publish_catalog(root, source, input_revision="backend-source")
+    clock = datetime(2026, 10, 3, tzinfo=timezone.utc)
+    receipt = publish_catalog(root, source, input_revision="backend-source", now=clock,
+                              activity_source="steam_daily_search")
     assert source == original
     assert receipt.published_revision == git(remote, "rev-parse", "main")
-    assert receipt.payload_revision == snapshot_revision({"steam_master": source})
+    assert receipt.payload_revision == snapshot_revision({"steam_master": source,
+        "activity_context": freeze_activity_context(now=clock, activity_source="steam_daily_search")})
     index = published_json(remote, "data/index.json")
     catalog = published_json(remote, "data/catalog.json")
     game = published_json(remote, f"data/games/{source['games'][0]['appid']}.json")
@@ -66,6 +70,11 @@ def test_catalog_commit_covers_all_projections_and_receipt_is_actual_remote_head
     assert published_json(remote, "data/lists/upcoming.json")["appids"] == [game["appid"]]
     assert "published_revision" not in catalog  # Commit receipts cannot self-reference.
     assert receipt.target_snapshot_revision
+    origins = published_json(remote, ACTIVITY_ORIGINS_PATH)
+    assert origins["events"] == [{"appid": game["appid"], "type": "added",
+        "date": game["release_start"], "at": "2026-10-03T00:00:00Z",
+        "update_reason": "steam_daily_search", "payload_revision": receipt.payload_revision}]
+    assert ACTIVITY_ORIGINS_PATH in CATALOG_PATHS
 
 
 def test_catalog_refresh_preserves_concurrent_rich_metadata_then_acknowledges_noop(tmp_path):
@@ -81,13 +90,19 @@ def test_catalog_refresh_preserves_concurrent_rich_metadata_then_acknowledges_no
     git(writer, "add", row_path)
     git(writer, "commit", "-m", "new metadata")
     git(writer, "push", "origin", "HEAD:main")
-    first = publish_catalog(root, source, input_revision="backend-source")
+    clock = datetime(2026, 10, 3, tzinfo=timezone.utc)
+    first = publish_catalog(root, source, input_revision="backend-source", now=clock,
+                            activity_source="steam_daily_search")
     assert published_json(remote, row_path)["tags"] == ["latest metadata"]
-    second = publish_catalog(root, source, input_revision="backend-source")
+    origins = published_json(remote, ACTIVITY_ORIGINS_PATH)
+    second = publish_catalog(root, source, input_revision="backend-source", now=clock,
+                             activity_source="steam_official_verification")
     assert second.published_revision == first.published_revision
     assert second.changed is False
     assert second.attempts == 1
     assert second.target_snapshot_revision == first.target_snapshot_revision
+    assert second.payload_revision != first.payload_revision
+    assert published_json(remote, ACTIVITY_ORIGINS_PATH) == origins
 
 
 def test_push_race_rebuilds_frozen_source_against_concurrent_metadata_without_recollection(tmp_path):
@@ -97,6 +112,8 @@ def test_push_race_rebuilds_frozen_source_against_concurrent_metadata_without_re
     git(writer, "config", "user.name", "Test")
     git(writer, "config", "user.email", "test@example.com")
     row_path = f"data/games/{source['games'][0]['appid']}.json"
+    concurrent_origin = {"appid": 9999, "type": "added", "date": "2026-10-20",
+                         "at": "2026-10-02T00:00:00Z", "update_reason": "steam_metadata_refresh"}
     class RacingRepository(SubprocessGitRepository):
         raced = False
         def _run(self, *args, push=False):
@@ -105,16 +122,24 @@ def test_push_race_rebuilds_frozen_source_against_concurrent_metadata_without_re
                 row = read_json(writer / row_path)
                 row["tags"] = ["arrived during push"]
                 write_json(writer / row_path, row)
-                git(writer, "add", row_path)
+                write_json(writer / ACTIVITY_ORIGINS_PATH, {"schema_version": 1, "events": [concurrent_origin]})
+                git(writer, "add", row_path, ACTIVITY_ORIGINS_PATH)
                 git(writer, "commit", "-m", "race after frozen replay")
                 git(writer, "push", "origin", "HEAD:main")
             return super()._run(*args, push=push)
     repository = RacingRepository(root, disposable_checkout=True)
-    receipt = publish_catalog(root, source, input_revision="frozen-source", repository=repository)
+    clock = datetime(2026, 10, 3, tzinfo=timezone.utc)
+    receipt = publish_catalog(root, source, input_revision="frozen-source", repository=repository,
+                              now=clock, activity_source="steam_official_verification")
     assert receipt.attempts == 2
     assert receipt.published_revision == git(remote, "rev-parse", "main")
     assert published_json(remote, row_path)["tags"] == ["arrived during push"]
-    assert receipt.payload_revision == snapshot_revision({"steam_master": source})
+    assert receipt.payload_revision == snapshot_revision({"steam_master": source,
+        "activity_context": freeze_activity_context(now=clock, activity_source="steam_official_verification")})
+    origins = published_json(remote, ACTIVITY_ORIGINS_PATH)["events"]
+    assert len(origins) == 2
+    assert origins[0] == concurrent_origin
+    assert origins[1]["payload_revision"] == receipt.payload_revision
 
 
 def test_catalog_retry_uses_one_taiwan_day_even_if_system_clock_crosses_midnight(tmp_path, monkeypatch):
@@ -125,6 +150,7 @@ def test_catalog_retry_uses_one_taiwan_day_even_if_system_clock_crosses_midnight
     git(writer, "config", "user.name", "Test")
     git(writer, "config", "user.email", "test@example.com")
     row_path = f"data/games/{source['games'][0]['appid']}.json"
+    monkeypatch.setenv("GITHUB_WORKFLOW", "Steam candidates then Followers")
     # At 23:59 Taiwan this game belongs to upcoming, at 00:00 it belongs to
     # released. A push race must not change the batch's frozen projection day.
     source["games"][0]["release_start"] = "2026-10-08"
@@ -140,6 +166,7 @@ def test_catalog_retry_uses_one_taiwan_day_even_if_system_clock_crosses_midnight
         def _run(self, *args, push=False):
             if push and not self.raced:
                 self.raced = True
+                monkeypatch.setenv("GITHUB_WORKFLOW", "Steam official Followers - hourly auto 250")
                 row = read_json(writer / row_path)
                 row["tags"] = ["midnight race"]
                 write_json(writer / row_path, row)
@@ -161,6 +188,10 @@ def test_catalog_retry_uses_one_taiwan_day_even_if_system_clock_crosses_midnight
     assert times == [clock, clock]
     assert len(clock_calls) == 1
     assert published_json(remote, "data/lists/upcoming.json")["appids"] == [source["games"][0]["appid"]]
+    origins = published_json(remote, ACTIVITY_ORIGINS_PATH)["events"]
+    assert len(origins) == 1
+    assert origins[0]["update_reason"] == "steam_daily_search"
+    assert origins[0]["at"] == "2026-10-08T15:59:59Z"
 
 
 def test_catalog_stale_followers_cannot_roll_back_newer_published_measurement(tmp_path):
@@ -170,6 +201,43 @@ def test_catalog_stale_followers_cannot_roll_back_newer_published_measurement(tm
     with pytest.raises(ValueError, match="Stale official Followers"):
         publish_catalog(root, source, input_revision="old-source")
     assert git(remote, "rev-parse", "main") == before
+
+
+def test_catalog_date_origin_compares_delivered_catalog_and_preserves_earlier_enrollment(tmp_path):
+    remote, root, source = frontend(tmp_path)
+    first_clock = datetime(2026, 10, 3, tzinfo=timezone.utc)
+    publish_catalog(root, source, input_revision="initial", now=first_clock,
+                    activity_source="steam_daily_search")
+    prior = published_json(remote, "data/catalog.json")["games"][0]
+    before_events = published_json(remote, ACTIVITY_ORIGINS_PATH)["events"]
+    next_date = (datetime.fromisoformat(prior["release_start"]) + timedelta(days=1)).date().isoformat()
+    source["games"][0].update(release_start=next_date, release_end=next_date,
+                              followers=5600, follower_checked_at="2026-10-04T01:00:00Z")
+    receipt = publish_catalog(root, source, input_revision="date-correction",
+        now=datetime(2026, 10, 4, 2, tzinfo=timezone.utc),
+        activity_source="steam_official_verification")
+    catalog = published_json(remote, "data/catalog.json")
+    origins = published_json(remote, ACTIVITY_ORIGINS_PATH)["events"]
+    assert catalog["games"][0]["release_start"] == next_date
+    assert origins[:-1] == before_events
+    assert origins[-1] == {"appid": prior["appid"], "type": "release_date",
+        "date": next_date, "previous_date": prior["release_start"],
+        "update_reason": "steam_official_verification", "at": "2026-10-04T02:00:00Z",
+        "payload_revision": receipt.payload_revision}
+    assert published_json(remote, f"data/games/{prior['appid']}.json")["release_start"] == next_date
+
+
+def test_catalog_does_not_publish_over_an_invalid_existing_origin_ledger(tmp_path):
+    remote, root, source = frontend(tmp_path)
+    write_json(root / ACTIVITY_ORIGINS_PATH, {"schema_version": 2, "events": []})
+    git(root, "add", ACTIVITY_ORIGINS_PATH)
+    git(root, "commit", "-m", "unsupported activity ledger")
+    git(root, "push", "origin", "HEAD:main")
+    before = git(remote, "rev-parse", "main")
+    with pytest.raises(ValueError, match="activity origins sidecar"):
+        publish_catalog(root, source, input_revision="source")
+    assert git(remote, "rev-parse", "main") == before
+    assert published_json(remote, ACTIVITY_ORIGINS_PATH) == {"schema_version": 2, "events": []}
 
 
 @pytest.mark.parametrize("malformed", ['{"games":[]}', '{"games":[],"games":[]}', '{"games": NaN}'])

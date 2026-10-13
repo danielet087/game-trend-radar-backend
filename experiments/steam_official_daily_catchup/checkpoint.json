@@ -24745,18 +24745,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "38467424779",
-    "active": false,
-    "status": "finished",
+    "run_id": "38481600718",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-14T05:02:48.823710+08:00",
-    "last_updated_at": "2026-10-14T05:02:49.149251+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-10-14T07:02:41.347266+08:00",
+    "last_updated_at": "2026-10-14T07:02:41.880222+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-10-14T05:02:49.149251+08:00",
-    "stop_reason": "awaiting_group_resolution_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 4944320,
+    "last_name": "Twin Drive"
   },
   "official_growth_group_resolutions": {
     "3510740": {
@@ -57675,10 +57675,18 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
+  "next_request_after_taipei": "2026-10-14T07:17:41.880134+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-10-13T23:17:41.880134+00:00",
+    "observed_at": "2026-10-13T23:02:41.880134+00:00",
+    "updated_at": "2026-10-13T23:02:41.880134+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
   "community_last_success_at": "2026-10-14T02:26:47.737874+08:00",
   "official_growth_observations": {
     "2826790": {
@@ -77271,6 +77279,16 @@
       "status": "ok",
       "github_run_id": "38360177403",
       "official_followers": 1450
+    },
+    {
+      "appid": 4944320,
+      "when_taipei": "2026-10-14T07:02:41.686902+08:00",
+      "release_date": "2026-10-15",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "38481600718",
+      "next_request_after_taipei": "2026-10-14T07:17:41.880134+08:00"
     }
   ]
 }

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-13T07:03:34.178415Z",
+  "generated_at": "2026-10-13T07:03:38.993162Z",
   "today_taipei": "2026-10-13",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-13T06:02:49.894038Z",
+    "checkpoint_updated_at": "2026-10-13T07:03:38.823359Z",
     "group_resolution_updated_at": "2026-10-12T21:02:22.113547Z",
     "candidate_state_updated_at": "2026-10-12T17:10:07.354433Z",
     "prefilter_updated_at": "2026-10-12T17:10:07.333173Z",
     "eligible_screened_at": "2026-10-12T17:10:07.996706Z",
     "twitch_import_updated_at": "2026-10-13T07:03:27.803440Z",
-    "last_official_success_at": "2026-10-12T19:10:58.026215Z",
+    "last_official_success_at": "2026-10-13T07:03:38.760356Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -21,21 +21,21 @@
     "added_from_daily": 0,
     "eligible_count": 4028,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 2,
+    "combined_pending_now": 1,
     "completed_legacy": 384,
-    "completed_new": 2434,
-    "twitch_priority_pending": 1
+    "completed_new": 2435,
+    "twitch_priority_pending": 0
   },
   "summary": {
     "normal_pending": 1,
-    "twitch_priority_pending": 1,
+    "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 2,
-    "followers_ready_pending": 1,
+    "ready_pending": 1,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 1,
-    "total_pending": 2,
-    "today_attempts": 64,
-    "today_successes": 59,
+    "total_pending": 1,
+    "today_attempts": 65,
+    "today_successes": 60,
     "today_429": 5
   },
   "group_resolution_api_cooldown": {
@@ -47,7 +47,7 @@
   },
   "cooldown": {
     "active": false,
-    "until": "2026-10-13T06:03:06.420725Z",
+    "until": null,
     "reason": null,
     "next_eligible_slot": "2026-10-13T08:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
@@ -55,42 +55,23 @@
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-10-13T14:02:49.700816+08:00",
-    "last_updated_at": "2026-10-13T14:02:49.894038+08:00",
-    "finished_at": "2026-10-13T14:02:49.894038+08:00",
-    "stop_reason": "official_429_cooldown_no_request",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-13T15:03:38.076778+08:00",
+    "last_updated_at": "2026-10-13T15:03:38.823359+08:00",
+    "finished_at": "2026-10-13T15:03:38.823359+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 3768400,
+    "last_name": "Gridlords",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "run_id": "38354469352",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38354469352"
+    "run_id": "38360177403",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38360177403"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 3768400,
-      "name": "Gridlords",
-      "steam_url": "https://store.steampowered.com/app/3768400/",
-      "release_date": "2026-10-07",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791475559906",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-12T21:02:21.913475Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": "2026-10-13T02:03:06.285676Z",
-      "last_attempt_status": "rate_limited"
-    },
-    {
-      "position": 2,
       "appid": 4435490,
       "name": "Call of Duty®: Modern Warfare® 4",
       "steam_url": "https://store.steampowered.com/app/4435490/",
@@ -114,19 +95,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-10-11T19:08:36.709997Z",
-      "kind": "official_attempt",
-      "appid": 5337120,
-      "name": "Monster Club League Manager",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "38166271405",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38166271405"
-    },
     {
       "at": "2026-10-11T19:08:44.710092Z",
       "kind": "official_attempt",
@@ -1413,6 +1381,19 @@
       "retry_at": "2026-10-13T06:03:06.420725Z",
       "run_id": "38334935072",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38334935072"
+    },
+    {
+      "at": "2026-10-13T07:03:38.433620Z",
+      "kind": "official_attempt",
+      "appid": 3768400,
+      "name": "Gridlords",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 1450,
+      "retry_at": null,
+      "run_id": "38360177403",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/38360177403"
     }
   ],
   "events_limit": 100

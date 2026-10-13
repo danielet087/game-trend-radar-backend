@@ -17,11 +17,14 @@ import tempfile
 from radar_core.publication import SubprocessGitRepository, publish_with_retry, snapshot_revision
 from radar_backend.domain.growth import timestamp
 from radar_backend.adapters.public_shards import build
+from radar_backend.publication.activity_origins import (
+    ACTIVITY_ORIGINS_PATH, catalog_activity_origins, freeze_activity_context,
+)
 from radar_backend.publication.growth import growth_publication_payload
 
 CATALOG_PATHS = (
     "data/index.json", "data/calendar", "data/games", "data/lists",
-    "data/steam_upcoming.json", "data/catalog.json",
+    "data/steam_upcoming.json", "data/catalog.json", ACTIVITY_ORIGINS_PATH,
 )
 GROWTH_PATHS = ("data/insights-state.json", "data/activity.json", "data/growth.json")
 
@@ -86,14 +89,16 @@ def require_current_followers(root: Path, source: dict):
 
 
 def publish_catalog(frontend: Path, source: dict, *, input_revision: str,
-                    auth_script: Path | None = None, max_attempts=8, repository=None, now=None):
+                    auth_script: Path | None = None, max_attempts=8, repository=None, now=None,
+                    activity_source: str | None = None):
     frozen = deepcopy(source)
     clock = now or datetime.now(timezone.utc)
     if clock.tzinfo is None or clock.utcoffset() is None:
         raise ValueError("Timezone-aware publication clock required")
     if not isinstance(frozen, dict) or not isinstance(frozen.get("games"), list) or not frozen["games"]:
         raise ValueError("Invalid or empty authoritative Steam catalog")
-    revision = snapshot_revision({"steam_master": frozen})
+    activity_context = freeze_activity_context(now=clock, activity_source=activity_source)
+    revision = snapshot_revision({"steam_master": frozen, "activity_context": activity_context})
     # The source file lives outside the refreshed target checkout and remains
     # identical across races. Neither fetch/reset nor a retry can recollect it.
     with tempfile.TemporaryDirectory(prefix="radar-steam-catalog-") as scratch:
@@ -102,7 +107,15 @@ def publish_catalog(frontend: Path, source: dict, *, input_revision: str,
         def apply(root):
             validate_json_paths(root, (*CATALOG_PATHS, "data/excluded_date_appids.json"))
             require_current_followers(root, frozen)
+            previous_catalog = read_json(root / "data/catalog.json", optional=True)
+            previous_origins = read_json(root / ACTIVITY_ORIGINS_PATH, optional=True)
             build(source_path, root, authoritative_future=True, now=clock)
+            origins = catalog_activity_origins(
+                previous_origins, previous_catalog, read_json(root / "data/catalog.json"),
+                **activity_context, payload_revision=revision,
+            )
+            if origins != previous_origins and (previous_origins or origins["events"]):
+                write_json(root / ACTIVITY_ORIGINS_PATH, origins)
         return publish_with_retry(
             repository or frontend_repository(frontend, auth_script=auth_script), apply,
             paths=CATALOG_PATHS, message="data: publish consistent Steam catalog",

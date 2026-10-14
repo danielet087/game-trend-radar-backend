@@ -693,15 +693,15 @@
     },
     "3948460": {
       "status": "pending",
-      "updated_at": "2026-10-13T19:02:41.910045Z",
+      "updated_at": "2026-10-14T20:02:18.447771Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 3948460,
         "twitch_game_id": "501028374",
         "igdb_id": "373092",
-        "checked_at": "2026-10-13T17:15:23Z",
-        "source_frontend_commit": "35c610c05b91a314b68e4679f3e4ffb8ccbadae3",
+        "checked_at": "2026-10-14T18:14:48Z",
+        "source_frontend_commit": "325221655a514c736981ebc6d2747b5f88ab12fc",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-01T20:17:18Z",
@@ -710,7 +710,7 @@
         }
       },
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-14T19:02:43.596221Z",
+      "retry_at": "2026-10-15T20:02:20.271780Z",
       "validation_version": 4,
       "follower_candidate": null,
       "rate_limit_stage": null,
@@ -2335,15 +2335,15 @@
     },
     "4418080": {
       "status": "pending",
-      "updated_at": "2026-10-13T19:02:41.910045Z",
+      "updated_at": "2026-10-14T20:02:18.447771Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 4418080,
         "twitch_game_id": "868958654",
         "igdb_id": "398306",
-        "checked_at": "2026-10-13T18:15:33Z",
-        "source_frontend_commit": "35c610c05b91a314b68e4679f3e4ffb8ccbadae3",
+        "checked_at": "2026-10-14T19:14:08Z",
+        "source_frontend_commit": "325221655a514c736981ebc6d2747b5f88ab12fc",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-12T18:13:24Z",
@@ -2354,7 +2354,7 @@
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-14T19:02:46.521234Z",
+      "retry_at": "2026-10-15T20:02:26.080967Z",
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
@@ -2553,8 +2553,102 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "4218620": {
+      "status": "pending",
+      "updated_at": "2026-10-14T20:02:18.447771Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4218620,
+        "twitch_game_id": "398341943",
+        "igdb_id": "403675",
+        "checked_at": "2026-10-14T18:14:48Z",
+        "source_frontend_commit": "325221655a514c736981ebc6d2747b5f88ab12fc",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-14T18:14:48Z",
+          "viewer_count": 18290,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": {
+        "appid": 4218620,
+        "name": "Double Dealers",
+        "release_date": "2026-10-13",
+        "steam_url": "https://store.steampowered.com/app/4218620/",
+        "group_id64": null,
+        "queue_source": "twitch_steam_discovery",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4218620,
+          "twitch_game_id": "398341943",
+          "igdb_id": "403675",
+          "checked_at": "2026-10-14T18:14:48Z",
+          "source_frontend_commit": "325221655a514c736981ebc6d2747b5f88ab12fc",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-14T18:14:48Z",
+            "viewer_count": 18290,
+            "min_viewers": 7000
+          }
+        },
+        "steam_candidate": {
+          "appid": 4218620,
+          "name": "Double Dealers",
+          "name_en": "Double Dealers",
+          "release_raw": "2026-10-13",
+          "release_start": "2026-10-13",
+          "release_end": "2026-10-13",
+          "release_precision": "day",
+          "release_display_precision": "date_full",
+          "release_display_provider": "Steam IStoreBrowseService/GetItems",
+          "release_date_basis": "steam_store_browse_verified_full_date",
+          "release_date_timezone": "Asia/Taipei",
+          "release_time_utc": "2026-10-13T11:59:43Z",
+          "release_time_source": "Steam IStoreBrowseService/GetItems",
+          "release_timestamp_taipei_date": "2026-10-13",
+          "release_date_conflict": false,
+          "release_store_date": "2026-10-13",
+          "release_date_normalization": "steam_store_date_matches_taipei",
+          "release_date_verified_at": "2026-10-14T20:02:18.447771Z",
+          "post_followers_store_verified": true,
+          "post_followers_store_verified_at": "2026-10-14T20:02:18.447771Z",
+          "sexual_content_screened": true,
+          "steam_type": "game",
+          "content_descriptorids": [
+            5
+          ],
+          "store_url": "https://store.steampowered.com/app/4218620/",
+          "community_url": "https://steamcommunity.com/app/4218620/",
+          "twitch_admission": {
+            "schema_version": 1,
+            "method": "twitch_igdb_external_steam_v1",
+            "appid": 4218620,
+            "twitch_game_id": "398341943",
+            "igdb_id": "403675",
+            "checked_at": "2026-10-14T18:14:48Z",
+            "source_frontend_commit": "325221655a514c736981ebc6d2747b5f88ab12fc",
+            "source_enrollment": {
+              "source": "igdb_first_release_date",
+              "observed_at": "2026-10-14T18:14:48Z",
+              "viewer_count": 18290,
+              "min_viewers": 7000
+            }
+          }
+        }
+      },
+      "reason": "queued_official_followers",
+      "rate_limit_stage": null,
+      "retry_at": null,
+      "retry_source": null,
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-14T08:02:43.705006Z",
+  "updated_at": "2026-10-14T20:02:18.447771Z",
   "api_cooldowns": {}
 }

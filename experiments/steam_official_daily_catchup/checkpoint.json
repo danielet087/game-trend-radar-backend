@@ -781,11 +781,71 @@
     "4435490": {
       "appid": 4435490,
       "name": "Call of Duty®: Modern Warfare® 4",
-      "release_date": "2026-10-23",
-      "group_id64": null,
+      "release_date": "2026-10-22",
       "steam_url": "https://store.steampowered.com/app/4435490/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-10-14T17:12:17.340916+00:00",
+      "group_id64": null,
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4435490,
+        "twitch_game_id": "1478650472",
+        "igdb_id": "403310",
+        "checked_at": "2026-10-14T20:14:09Z",
+        "source_frontend_commit": "cc36b41a409a3e14ff103ce396e78576562dee05",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-14T20:14:09Z",
+          "viewer_count": 7874,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 4435490,
+        "name": "Call of Duty®: Modern Warfare® 4",
+        "name_en": "Call of Duty®: Modern Warfare® 4",
+        "release_raw": "2026-10-22",
+        "release_start": "2026-10-22",
+        "release_end": "2026-10-22",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam Store appdetails cc=TW l=tchinese",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-10-23T05:00:00Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-10-23",
+        "release_date_conflict": true,
+        "release_store_date": "2026-10-22",
+        "release_date_normalization": "steam_taiwan_store_date_authoritative",
+        "release_date_verified_at": "2026-10-14T21:02:11.687296Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-14T21:02:11.687296Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [
+          2,
+          5
+        ],
+        "store_url": "https://store.steampowered.com/app/4435490/",
+        "community_url": "https://steamcommunity.com/app/4435490/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4435490,
+          "twitch_game_id": "1478650472",
+          "igdb_id": "403310",
+          "checked_at": "2026-10-14T20:14:09Z",
+          "source_frontend_commit": "cc36b41a409a3e14ff103ce396e78576562dee05",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-14T20:14:09Z",
+            "viewer_count": 7874,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
       "group_resolution": {
         "status": "not_found",
         "checked_at": "2026-10-13T20:02:49.724575Z",
@@ -794,6 +854,24 @@
         "http": 200,
         "retry_at": "2026-10-14T20:02:49.724575Z",
         "api_result": 42
+      },
+      "normal_candidate": {
+        "appid": 4435490,
+        "name": "Call of Duty®: Modern Warfare® 4",
+        "release_date": "2026-10-23",
+        "group_id64": null,
+        "steam_url": "https://store.steampowered.com/app/4435490/",
+        "queue_source": "fresh_daily_prefilter_unresolved",
+        "daily_source_updated_at": "2026-10-14T17:12:17.340916+00:00",
+        "group_resolution": {
+          "status": "not_found",
+          "checked_at": "2026-10-13T20:02:49.724575Z",
+          "source": "Steam ISteamUser/ResolveVanityURL",
+          "attempted": true,
+          "http": 200,
+          "retry_at": "2026-10-14T20:02:49.724575Z",
+          "api_result": 42
+        }
       }
     },
     "4459220": {
@@ -24665,7 +24743,7 @@
         "twitch_game_id": "398341943",
         "igdb_id": "403675",
         "checked_at": "2026-10-14T18:14:48Z",
-        "source_frontend_commit": "325221655a514c736981ebc6d2747b5f88ab12fc",
+        "source_frontend_commit": "cc36b41a409a3e14ff103ce396e78576562dee05",
         "source_enrollment": {
           "source": "igdb_first_release_date",
           "observed_at": "2026-10-14T18:14:48Z",
@@ -24691,9 +24769,9 @@
         "release_date_conflict": false,
         "release_store_date": "2026-10-13",
         "release_date_normalization": "steam_store_date_matches_taipei",
-        "release_date_verified_at": "2026-10-14T20:02:49.001473Z",
+        "release_date_verified_at": "2026-10-14T21:02:11.687296Z",
         "post_followers_store_verified": true,
-        "post_followers_store_verified_at": "2026-10-14T20:02:49.001473Z",
+        "post_followers_store_verified_at": "2026-10-14T21:02:11.687296Z",
         "sexual_content_screened": true,
         "steam_type": "game",
         "content_descriptorids": [
@@ -24708,7 +24786,7 @@
           "twitch_game_id": "398341943",
           "igdb_id": "403675",
           "checked_at": "2026-10-14T18:14:48Z",
-          "source_frontend_commit": "325221655a514c736981ebc6d2747b5f88ab12fc",
+          "source_frontend_commit": "cc36b41a409a3e14ff103ce396e78576562dee05",
           "source_enrollment": {
             "source": "igdb_first_release_date",
             "observed_at": "2026-10-14T18:14:48Z",

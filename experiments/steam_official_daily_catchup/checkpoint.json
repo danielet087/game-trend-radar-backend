@@ -25727,20 +25727,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "38636887940",
-    "active": false,
-    "status": "finished",
+    "run_id": "38644602499",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 250,
-    "started_at": "2026-10-15T05:02:27.476051+08:00",
-    "last_updated_at": "2026-10-15T05:02:33.858574+08:00",
+    "started_at": "2026-10-15T06:02:13.056264+08:00",
+    "last_updated_at": "2026-10-15T06:02:13.535436+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 4218620,
-    "last_name": "Double Dealers",
-    "finished_at": "2026-10-15T05:02:33.858574+08:00",
-    "stop_reason": "first_http_429"
+    "last_name": "Double Dealers"
   },
   "official_growth_group_resolutions": {
     "3510740": {
@@ -58659,17 +58657,17 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-15T05:32:27.986007+08:00",
+  "next_request_after_taipei": "2026-10-15T07:02:13.534722+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-14T21:32:27.986007+00:00",
-    "observed_at": "2026-10-14T21:02:27.986007+00:00",
-    "updated_at": "2026-10-14T21:02:27.986007+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-10-14T23:02:13.534722+00:00",
+    "observed_at": "2026-10-14T22:02:13.534722+00:00",
+    "updated_at": "2026-10-14T22:02:13.534722+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-10-15T03:12:47.732378+08:00",
   "official_growth_observations": {
@@ -78350,6 +78348,16 @@
       "status": "rate_limited",
       "github_run_id": "38636887940",
       "next_request_after_taipei": "2026-10-15T05:32:27.986007+08:00"
+    },
+    {
+      "appid": 4218620,
+      "when_taipei": "2026-10-15T06:02:13.271944+08:00",
+      "release_date": "2026-10-13",
+      "queue_source": "twitch_steam_discovery",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "38644602499",
+      "next_request_after_taipei": "2026-10-15T07:02:13.534722+08:00"
     }
   ]
 }

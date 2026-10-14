@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-14T06:02:38.500690Z",
+  "generated_at": "2026-10-14T06:02:42.812911Z",
   "today_taipei": "2026-10-14",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-14T06:02:38.387464Z",
+    "checkpoint_updated_at": "2026-10-14T06:02:42.704994Z",
     "group_resolution_updated_at": "2026-10-13T20:02:49.830975Z",
     "candidate_state_updated_at": "2026-10-13T22:13:36.292025Z",
     "prefilter_updated_at": "2026-10-13T22:13:36.274860Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-14T14:02:37.911810+08:00",
-    "last_updated_at": "2026-10-14T14:02:38.387464+08:00",
+    "last_updated_at": "2026-10-14T14:02:42.704994+08:00",
+    "finished_at": "2026-10-14T14:02:42.704994+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4944320,
     "last_name": "Twin Drive",
     "requests_this_run": 1,

@@ -13,10 +13,10 @@ def test_hourly_collection_leaves_time_for_all_bounded_queue_phases():
     job = workflow["jobs"]["follower-catchup"]
     steps = job["steps"]
     collect = next(step for step in steps
-                   if "scripts.experiment_official_daily_catchup_250" in step.get("run", ""))
+                   if "radar_backend.jobs.official_followers" in step.get("run", ""))
     commands = collect["run"].replace("\\\n", " ")
     argv = shlex.split(next(line for line in commands.splitlines()
-                           if "python -u -m scripts.experiment_official_daily_catchup_250" in line))
+                           if "python -u -m radar_backend.jobs.official_followers" in line))
     option = lambda name: argv[argv.index(name) + 1]
     assert int(collect["env"]["REQUEST_LIMIT"]) == 90
     assert option("--max-requests") == "$REQUEST_LIMIT"
@@ -26,7 +26,7 @@ def test_hourly_collection_leaves_time_for_all_bounded_queue_phases():
     auxiliary_budgets = []
     for step in steps:
         for line in step.get("run", "").replace("\\\n", " ").splitlines():
-            if "--max-seconds" not in line or "scripts.experiment_official_daily_catchup_250" in line:
+            if "--max-seconds" not in line or "radar_backend.jobs.official_followers" in line:
                 continue
             args = shlex.split(line)
             auxiliary_budgets.append(int(args[args.index("--max-seconds") + 1]))

@@ -29,6 +29,9 @@ concurrency:
 
 jobs:
   observe:
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    env:
+      RADAR_DATABASE_PRIMARY: ${{ vars.RADAR_DATABASE_PRIMARY || '0' }}
     runs-on: ubuntu-latest
     # 150 minutes collection budget, including bounded cooldown waiting, plus
     # setup and acknowledged checkpoint/publication delivery.
@@ -50,16 +53,25 @@ jobs:
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
         run: python -m scripts.external_schedule --workflow public-growth --fail-on-skip
       - name: Validate boundary and throttling behavior
+        env:
+          RADAR_DATABASE_PRIMARY: '0'
         run: |
           python -m unittest discover -s tests -p test_public_growth.py
           python -m unittest discover -s tests -p test_external_schedule.py
       - name: Read the published catalog
         id: catalog
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend
+          python -m radar_core.storage.primary hydrate --root frontend --source danielet087/game-trend-radar@main
           echo "revision=$(git -C frontend rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Refresh growth state after acquiring the shared lock
         id: growth_state
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           set -euo pipefail
           code_revision=$(git rev-parse HEAD)
@@ -72,28 +84,41 @@ jobs:
             data/steam_followers_cache.json
             data/steam_prefilter_state.json
           )
-          for state_path in "${state_paths[@]}"; do
-            git cat-file -e "$state_revision:$state_path"
-          done
           # The checkpoint publisher owns only the primary checkpoint. Freeze
           # auxiliary inputs outside tracked paths so its scope guard remains strict.
           mkdir -p output/growth-inputs
-          git show "$state_revision:data/steam_followers_cache.json" > output/growth-inputs/official-cache.json
-          git show "$state_revision:experiments/steam_official_nearfirst_20260922/checkpoint.json" > output/growth-inputs/legacy-checkpoint.json
-          git show "$state_revision:data/steam_prefilter_state.json" > output/growth-inputs/group-state.json
-          git show "$state_revision:experiments/steam_official_followers_20260922/checkpoint.json" > output/growth-inputs/original-checkpoint.json
-          git restore --source="$state_revision" --worktree -- experiments/steam_official_daily_catchup/checkpoint.json
+          # Database mode freezes every auxiliary input from the same hydrated
+          # source. Git is retained only as the deployment/cache revision.
+          if [ "${RADAR_DATABASE_PRIMARY:-0}" = "1" ]; then
+            python -m radar_core.storage.primary hydrate --root . --source danielet087/game-trend-radar-backend@main
+            for state_path in "${state_paths[@]}"; do test -s "$state_path"; done
+            cp data/steam_followers_cache.json output/growth-inputs/official-cache.json
+            cp experiments/steam_official_nearfirst_20260922/checkpoint.json output/growth-inputs/legacy-checkpoint.json
+            cp data/steam_prefilter_state.json output/growth-inputs/group-state.json
+            cp experiments/steam_official_followers_20260922/checkpoint.json output/growth-inputs/original-checkpoint.json
+          else
+            for state_path in "${state_paths[@]}"; do
+              git cat-file -e "$state_revision:$state_path"
+            done
+            git show "$state_revision:data/steam_followers_cache.json" > output/growth-inputs/official-cache.json
+            git show "$state_revision:experiments/steam_official_nearfirst_20260922/checkpoint.json" > output/growth-inputs/legacy-checkpoint.json
+            git show "$state_revision:data/steam_prefilter_state.json" > output/growth-inputs/group-state.json
+            git show "$state_revision:experiments/steam_official_followers_20260922/checkpoint.json" > output/growth-inputs/original-checkpoint.json
+            git restore --source="$state_revision" --worktree -- experiments/steam_official_daily_catchup/checkpoint.json
+          fi
           echo "revision=$state_revision" >> "$GITHUB_OUTPUT"
           echo "GROWTH_STATE_INPUT code=$code_revision state=$state_revision"
       - name: Collect dated official measurements
         id: collect
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
         run: |
           set -euo pipefail
           mkdir -p output
           cp experiments/steam_official_daily_catchup/checkpoint.json output/growth-checkpoint-baseline.json
-          python -m scripts.collect_public_growth --data-dir frontend/data --output output/public-growth.json \
+          python -m radar_backend.jobs.growth --data-dir frontend/data --output output/public-growth.json \
             --interval 30 --max-requests 250 --max-seconds 9000 \
             --wait-for-cooldown --max-cooldown-wait 3600 \
             --official-cache output/growth-inputs/official-cache.json \
@@ -103,6 +128,9 @@ jobs:
       - name: Persist official observations and cooldown against the latest queue
         id: checkpoint
         if: always() && !cancelled() && steps.collect.outcome != 'skipped'
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           python -m radar_backend.jobs.publish_steam growth-checkpoint \
             --receipt output/steam-growth-checkpoint-publication.json
@@ -110,6 +138,8 @@ jobs:
         id: publish
         if: always() && !cancelled() && steps.checkpoint.outputs.state_persisted == 'true'
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
         run: |
           python -m radar_backend.jobs.publish_steam growth \
@@ -179,6 +209,8 @@ jobs:
           name: steam-public-growth-result
           path: |
             output/public-growth.json
+            output/growth-database-pending.json
+            output/growth-checkpoint-baseline.json
             output/steam-growth-checkpoint-publication.json
             output/steam-growth-publication.json
           if-no-files-found: ignore

@@ -17,12 +17,22 @@ def stamp(now: datetime, *, timezone_type=timezone) -> str:
 
 
 def validate_snapshot(
-    discovery: dict, tracking: dict, catalog: dict, commit: str, now: datetime, *,
+    discovery: dict, tracking: dict, catalog: dict, commit: str | dict, now: datetime, *,
     decimal_id, aware_time, valid_enrollment, normalize_twitch_admission,
     validate_twitch_snapshot, method, regex_module=re,
 ) -> list[tuple[int, dict]]:
-    """Cross-check links against the authoritative registry in one git commit."""
-    if not isinstance(commit, str) or regex_module.fullmatch(r"[0-9a-f]{40}", commit) is None:
+    """Cross-check links against one immutable Git or database snapshot."""
+    if isinstance(commit, dict):
+        fields = {"source_database_revision", "source_database_generation", "source_database_namespace"}
+        if (set(commit) != fields or not isinstance(commit["source_database_revision"], str)
+                or regex_module.fullmatch(r"[0-9a-f]{64}", commit["source_database_revision"]) is None
+                or type(commit["source_database_generation"]) is not int or commit["source_database_generation"] < 1
+                or commit["source_database_namespace"] != "danielet087/game-trend-radar@main"):
+            raise ValueError("An immutable database snapshot is required")
+        provenance = dict(commit)
+    elif isinstance(commit, str) and regex_module.fullmatch(r"[0-9a-f]{40}", commit):
+        provenance = {"source_frontend_commit": commit}
+    else:
         raise ValueError("An immutable frontend commit is required")
     if discovery.get("schema_version") != 1 or not isinstance(discovery.get("games"), dict):
         raise ValueError("Malformed Twitch discovery state")
@@ -83,7 +93,7 @@ def validate_snapshot(
             proof = normalize_twitch_admission({
                 "schema_version": 1, "method": method, "appid": int(aid),
                 "twitch_game_id": str(gid), "igdb_id": igdb,
-                "checked_at": row["checked_at"], "source_frontend_commit": commit,
+                "checked_at": row["checked_at"], **provenance,
                 "source_enrollment": enrollment,
             }, aid)
             if proof is not None and validate_twitch_snapshot(proof, tracking, discovery, now):
@@ -227,7 +237,8 @@ def signature(row: dict, *, json_module=json, hashlib_module=hashlib) -> str:
 
 
 def identity_signature(proof: dict, *, json_module=json, hashlib_module=hashlib) -> str:
-    identity = {key: value for key, value in proof.items() if key != "source_frontend_commit"}
+    identity = {key: value for key, value in proof.items()
+                if key not in {"source_frontend_commit", "source_database_revision", "source_database_generation", "source_database_namespace"}}
     return hashlib_module.sha256(json_module.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 

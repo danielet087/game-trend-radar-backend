@@ -2,26 +2,30 @@
 
 ## 目前整合邊界
 
-已實作的資料流是 **各收集器的 Git 資料 → Turso 完整文件儲存 → D1 非同步備援**。
-Turso 是這套資料庫儲存的唯一寫入來源，D1 只接收已提交的完整版本。
-既有收集器仍以 Git JSON 交接、合併狀態及發布靜態網站；本版沒有把收集器的
-所有讀寫直接切到資料庫，也不會在 Turso 故障時自動將 D1 升為另一個寫入來源。
+主庫模式的資料流是 **收集器 → Turso 讀寫 → Git 公開投影與 D1 非同步備援**。
+切換由 `Coordinate database primary cutover` 控制；部署程式不等於已切換。
+以成功的 cutover 報告、七個來源的 primary policy 與各 runtime 的
+`RADAR_DATABASE_PRIMARY=1` 為準。尚未切換的來源仍按原本 Git 匯入流程運作。
+瀏覽器只讀靜態 JSON，資料庫 Token 僅注入 Actions 後端工作。
+D1 不會自動升為另一個寫入來源；主庫故障時保留最後成功的公開資料。
 
 這個邊界保留既有 Followers / growth 的三方合併、較新量測優先及 Git 發布回執。
-資料庫同步有自己的排程、concurrency 與時間上限，不占用收集器鎖。
+資料庫操作使用跨 repository 的短期租約與 fencing，外部收集與 D1 網路等待不占用主庫租約。
 
 ```mermaid
 flowchart TD
-  A[各收集器與 Git 資料] --> B[Turso 完整快照與待同步事件]
+  A[收集器讀寫] <--> B[Turso 完整快照與待同步事件]
   B --> C[D1 備援]
   B --> D[每日 SQL 備份]
   D --> E[GitHub Releases]
+  B --> F[Git 公開 JSON]
+  F --> G[前端唯讀]
 ```
 
 ## 完整來源
 
-來源選取規則在 `radar_backend/storage/sources.py`，每輪先固定各分支的 Git commit，
-再讀取該 commit 的完整 tree 和 blobs。來源包含 JSON、JSONL、NDJSON。
+來源選取規則在 `radar_core/storage/sources.py`，初始匯入固定 Git commit 並保存完整 bytes。
+啟用主庫後不再從 Git 覆蓋該來源。來源包含 JSON、JSONL、NDJSON。
 
 | Repository / branch | 範圍 |
 | --- | --- |
@@ -29,7 +33,7 @@ flowchart TD
 | `game-trend-radar-backend` / main | `data/`、`experiments/`、`reports/` |
 | `game-trend-radar-backend` / steam-state | `data/`；另一路 Followers checkpoint |
 | `game-trend-radar-content-backend` / main | `data/`、人工 `content_backend/descriptions_zh_tw.json` |
-| `game-trend-radar-igdb-backend` / main | `data/` 全部，保留完整壓縮 master 封裝 |
+| `game-trend-radar-igdb-backend` / main | 保留遷移前 `data/` 鏡像；主庫模式的新 IGDB master、catalog 與回條統一寫入 frontend namespace |
 | `game-trend-radar-twitch-backend` / main | `data/` 全部 |
 | `game-trend-radar-youtube-backend` / main | 監看 `data/`；初始無資料檔，實際公開輸出已包含於 frontend |
 
@@ -45,26 +49,32 @@ gzip/base64 去重 chunks 約 39.4 MB，另外加上索引、來源清單與同�
   SQLite trigger 在同一個交易中產生待同步事件，避免只有主資料而沒有同步紀錄。
 - D1 必須讀回並驗證完整資料後才確認同步成功。失敗事件保留，後續重試可重複執行。
 - 來源下載、JSON 驗證或 Git 讀取失敗時，保留上一份快照，不將失敗解讀為刪除。
-- 清理只回收不被現行來源或未完成同步事件引用的暫存資料；完整歷史檔案仍在來源中。
-  所有資料庫寫入、備援、匯出與清理必須使用同一個 workflow concurrency。
+- 清理只回收不被現行來源、待同步、待發布或保留證據引用的資料；完整歷史檔仍在來源中。
+- schema v2 的遠端租約與 DB trigger 阻擋過期 writer、舊版 Git 匯入及不合法清理。
+  workflow concurrency 僅負責單一排程，跨 repo 安全性由資料庫保證。
+- CAS 衝突重新讀取主庫並重播固定觀測；API 不重查、觀測時間不改寫。
+- DB 保存成功與 Git push 成功分開記錄。Git 失敗保留 pending，維運工作補發布；
+  `published_revision` 永遠是真 Git SHA。IGDB 的 `persisted` 回條僅表示 DB 已保存。
 
 資料表是可攜式 SQLite 文件儲存：`radar_sources` 為來源版本，`radar_objects` /
 `radar_chunks` 保存內容，`radar_outbox` 保存待同步事件，`radar_revisions` 防止同一
-Git 版本被賦予不同內容。`radar_schema` 記錄 schema 版本。
+Git 版本被賦予不同內容。`radar_schema` 記錄 schema 版本；v2 另有來源權限、租約、
+operations、projections 與 evidence，保存冪等寫入、真實發布回執及歷史收錄證據。
 這不是供前端直接 SQL 查詢的正規化遊戲資料表；前端繼續讀靜態 JSON。
 
 ## 排程與故障
 
 Actions workflow：**Sync radar data to Turso and D1**。
 
-- 每小時第 43 分掃描全部來源；GitHub 排程可能延遲，不是準點保證。
+- 每小時第 43 分執行備援與維運；GitHub 排程可能延遲，不是準點保證。
 - Steam 每日候選、官方 Followers、成長追蹤完成後也掃描，包括有保存進度的失敗 run。
-- 跨 repo 的 Twitch / IGDB / content 更新由每小時掃描補上。
+- 主庫模式的跨 repo 更新直接提交 Turso，D1 由維運工作追上。
 - 不依賴 `GITHUB_TOKEN` 提交觸發 push；這類提交通常不會建立後續 push workflow。
-- HTTP 每次最多 15 秒、最多 3 次；主庫操作總預算 25 分鐘，D1 10 分鐘，job 上限 35 分鐘。
+- HTTP 每次最多 15 秒、最多 3 次；維運 job 上限 45 分鐘。
 - 每日備份先於 D1 同步執行，避免 D1 故障拖延主庫的獨立備份。
-- 原始收集排程不等待資料庫；同步失敗會在獨立 workflow 顯示失敗，Git 保留已提交資料，
-  下次掃描可重建當時仍存在的完整來源。兩次掃描之間被來源刪除的短暫資料不保證捕捉。
+- 收集器必須確認 Turso 已保存才宣告保存成功，主庫錯誤會中止該工作，不以 Git 舊資料代替。
+- D1 失敗不回滾 Turso；待同步事件保留。Git 補發布每輪最多 8 分鐘、每來源 3 次，
+  未成功 push 不確認 ACK；失敗不使後續排程無限等待。
 
 報告包含每個來源 commit / generation、同步 pending 數、主備一致性、容量與備份結果。
 `events_pending = 0` 代表當輪已保存於 Turso 的事件都已同步，不代表跨來源同時刻的全域交易。
@@ -74,12 +84,15 @@ Actions workflow：**Sync radar data to Turso and D1**。
 
 | mode | 用途 |
 | --- | --- |
-| `sync` | 掃描全部來源、匯入 Turso、補同步 D1、清理孤兒資料 |
+| `sync` | 匯入尚未啟用主庫的來源、補同步 D1、清理孤兒資料 |
 | `replicate` | 不重新收集 Git，重試已有的 D1 待同步事件 |
 | `verify` | 要求完整 7 個來源，逐來源還原主備資料並比對原始 bytes |
 | `export` | 匯出現在的 Turso 快照，額外提供保留 1 天的下載 artifact |
 
-需要的五個 repository Actions Secrets 沿用 `docs/turso-d1-rollout.md`。
+五個 repository Actions Secrets 沿用 `docs/turso-d1-rollout.md`。
+Turso 兩個 secrets 亦需配置到 frontend Actions、Twitch、Content 與 YouTube runtime；
+IGDB 由 Twitch workflow 執行。`prepare` 只使用既有具權限的 Token，將固定兩個 Secrets
+以各目的 repo 的 public key 加密後寫入；不輸出明文。缺少權限時停止並回報，不繞過權限。
 GitHub Releases 使用 Actions 自帶的 `GITHUB_TOKEN`，不用再建立另一個 Token。
 
 ## 每日可攜式備份與還原
@@ -118,8 +131,18 @@ chunk payload 達 300 MiB 時，workflow 會明確回報容量警示並失敗提
 擴大來源 prefix 或新增資料類型時，需做來源 scope 版本遷移；不能直接讓相同 Git commit
 指向不同 manifest。資料表升級亦需明確 schema migration，未知版本會拒絕執行。
 
-將收集器直接改成 DB primary 是後續獨立切換：需處理初始 hydrate、每次 merge 的最新資料來源、
-跨 repo writer fencing、DB/Git 各自的回執及故障待送紀錄。這些沒有在本次改動中偷偷繞過。
+## 正式切換與重試
+
+1. 先部署所有 repo，primary 開關保留 0；外部 repo 固定同一個 immutable core SHA。
+2. `prepare` 配置 runtime secrets，既有開關不重設。
+3. 在 `config/database-rollout.json` 填入已審 core SHA、所有 writer workflow SHA-256 與 `phase: cutover`。
+4. 控制工作驗證部署、暫停 writer、等待在途工作完成、最後匯入與保留舊收錄證據，再啟用七個來源。
+5. 全部 runtime 開關確認為 1 後才恢復排程；啟用後 Git 反向匯入會被資料庫拒絕。
+
+切換途中失敗會保留暫停，不讓部分新舊 writer 同時運作。修正錯誤後重跑 cutover；
+`resume` 只接受全部來源均未啟用或均已啟用，部分啟用時必須先完成 cutover。
+不要手動將已啟用的 runtime 改回 0；還原為 Git 權威來源需要獨立的資料遷移。
+人工設定檔仍可由 Git 維護；舊版人工資料 writer 在主庫模式下停用。
 
 ## 官方參考
 

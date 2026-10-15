@@ -1,0 +1,49 @@
+name: Coordinate database primary cutover
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [prepare, cutover, resume]
+        default: prepare
+  push:
+    branches: [main]
+    paths: [config/database-rollout.json, .github/workflows/database-primary-control.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radar-database-cutover
+  cancel-in-progress: false
+
+jobs:
+  coordinate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the checked-out core and sealed-box encryption
+        run: python -m pip install --disable-pip-version-check ./packages/radar-core 'PyNaCl>=1.6,<2'
+      - name: Prepare credentials or perform the reviewed cutover
+        env:
+          FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
+          CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          REQUESTED_MODE: ${{ inputs.mode }}
+        run: python -u -m scripts.database_primary_control --report "$RUNNER_TEMP/database-cutover.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: database-primary-cutover
+          path: ${{ runner.temp }}/database-cutover.json
+          retention-days: 7
+          if-no-files-found: warn

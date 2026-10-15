@@ -1,6 +1,22 @@
 # radar-core
 
-遊戲雷達後端共用的純規則、工作結果契約及 Git 發布流程。版本 `0.2.0`，支援 Python 3.12 以上，沒有執行期第三方套件依賴，也不會自行查詢 API 或啟動收集工作。新版保留 `0.1.0` 的收錄規則及 `JobResult` 行為。
+遊戲雷達後端共用的純規則、工作結果契約、資料庫儲存及 Git 發布流程。版本 `0.2.0`，支援 Python 3.12 以上，沒有執行期第三方套件依賴。匯入套件不會查詢 API 或啟動收集工作；資料庫操作必須明確呼叫。保留既有收錄規則及 `JobResult` 行為。
+
+## 資料庫主庫模式
+
+`RADAR_DATABASE_PRIMARY=1` 時，`SubprocessGitRepository` 透過
+`radar_core.storage.primary` 讀取已啟用的 Turso namespace。發布先做增量 CAS，
+再將已提交的完整資料投影至 Git；Git 失敗保留 pending operation，成功後才記錄真實 Git SHA。
+`0` 保留遷移前行為，無效開關值拒絕執行。主庫模式缺少憑證、來源未啟用或讀取失敗均中止，
+不退回 Git。所有外部收集應在租約之外完成，CAS 重播只合併已凍結觀測。
+
+`primary.read_files/read_json` 提供固定版本讀取；`write_files` 只修改明確指定的檔案，
+需要 `base_generation` 與固定 `operation_id`。`hydrate` 是 runner 的資料快取，
+不是權威來源。Twitch evidence 使用 namespace、generation 與 manifest digest，
+既有 Git proof 必須有真實歷史對映，不能用現在的資料假冒。
+
+儲存使用 SQLite-compatible schema v2；主庫權限、過期 writer fencing、待備援、
+待發布及證據保留均存於 DB。D1、可攜式 SQL 匯出與 GC 共用相同完整性檢查。
 
 ## 安裝
 

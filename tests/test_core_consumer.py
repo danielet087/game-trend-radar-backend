@@ -1,4 +1,4 @@
-"""The historical import path must expose the installed, pinned core."""
+"""The owner uses its checked-out core; historical imports retain identity."""
 
 from pathlib import Path
 import re
@@ -13,6 +13,9 @@ def test_legacy_exports_are_core_objects():
         assert getattr(compat, name) is getattr(core, name)
 
 
-def test_dependency_is_an_immutable_core_revision():
+def test_owner_dependency_uses_the_same_checked_out_revision():
     requirements = Path(__file__).resolve().parents[1] / "requirements-core.txt"
-    assert re.search(r"\.git@[0-9a-f]{40}#subdirectory=packages/radar-core", requirements.read_text())
+    entries = [line.strip() for line in requirements.read_text().splitlines()
+               if line.strip() and not line.startswith("#")]
+    assert entries == ["./packages/radar-core"]
+    assert (requirements.parent / entries[0] / "pyproject.toml").is_file()

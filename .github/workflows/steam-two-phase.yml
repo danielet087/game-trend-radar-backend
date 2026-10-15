@@ -31,6 +31,9 @@ concurrency:
   cancel-in-progress: false
 jobs:
   batch:
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    env:
+      RADAR_DATABASE_PRIMARY: ${{ vars.RADAR_DATABASE_PRIMARY || '0' }}
     # Ephemeral GitHub-hosted runner: safe default before making this repo public.
     runs-on: ubuntu-latest
     timeout-minutes: 180
@@ -58,12 +61,22 @@ jobs:
           SCHEDULE_REFRESH_TODAY: ${{ inputs.refresh_today }}
         run: python -m scripts.external_schedule --workflow daily-discovery --fail-on-skip
       - name: Run tests
+        env:
+          RADAR_DATABASE_PRIMARY: '0'
         run: python -m pytest -q
+
+      - name: Load authoritative Steam state before collection
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m radar_core.storage.primary hydrate --root . --source danielet087/game-trend-radar-backend@main
 
       - name: Persist daily reset once, or resume the existing scheduled slot
         id: daily_reset
         if: github.event_name == 'schedule' || inputs.refresh_today == true
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           SCHEDULE_EVENT: ${{ github.event_name }}
           SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
@@ -79,6 +92,8 @@ jobs:
       - name: Daily discovery or recovery through complete third-party prescreen
         if: github.event_name == 'schedule' || inputs.refresh_today == true
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -95,7 +110,7 @@ jobs:
             if [ "$phase" = "followers" ] || [ "$phase" = "complete" ]; then
               break
             fi
-            python -m scripts.steam_candidate_pipeline               --days 365               --batch-days 365               --request-interval 30               --search-interval 1.5               --state data/steam_candidate_state.json               --catalog data/steam_candidates.json               --master data/steam_upcoming_master.json               --follower-cache data/steam_followers_cache.json               --checkpoint data/steam_followers_checkpoint.json               --checkpoint-branch steam-state               --prefilter-state data/steam_prefilter_state.json               --prefilter-batch-size 200               --prefilter-request-interval 0.5               --output output/steam_upcoming.json
+            python -m radar_backend.jobs.candidates               --days 365               --batch-days 365               --request-interval 30               --search-interval 1.5               --state data/steam_candidate_state.json               --catalog data/steam_candidates.json               --master data/steam_upcoming_master.json               --follower-cache data/steam_followers_cache.json               --checkpoint data/steam_followers_checkpoint.json               --checkpoint-branch steam-state               --prefilter-state data/steam_prefilter_state.json               --prefilter-batch-size 200               --prefilter-request-interval 0.5               --output output/steam_upcoming.json
           done
           python - <<'PY'
           import json
@@ -114,10 +129,12 @@ jobs:
       - name: Manual continuation of Steam two-phase pipeline
         if: github.event_name == 'workflow_dispatch' && inputs.refresh_today != true
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
           STEAM_CHECKPOINT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
-          python -m scripts.steam_candidate_pipeline
+          python -m radar_backend.jobs.candidates
           --days 365
           --batch-days 365
           --request-interval 30
@@ -208,6 +225,9 @@ jobs:
           PY
       - name: Save private candidate catalog and checkpoint metadata
         if: always() && steps.schedule_guard.outcome == 'success' && steps.install.outcome == 'success' && steps.private_baseline.outcome == 'success'
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           python -m radar_backend.jobs.persist_daily_state publish \
             --baseline output/daily-state-baseline.json \
@@ -227,6 +247,8 @@ jobs:
       - name: Publish updated site JSON after EVERY Followers batch
         if: ${{ success() }}
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
         run: |
           if [ -f output/steam_upcoming.json ]; then

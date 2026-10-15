@@ -65,10 +65,16 @@ def _schema(connection):
     ).fetchall()
 
 
-def _expected_schema():
+def _expected_schema(version=2):
     client = SqliteClient(":memory:")
     try:
-        documents.initialize(client)
+        if version == 1:
+            client.execute("""CREATE TABLE IF NOT EXISTS radar_schema (
+                singleton INTEGER PRIMARY KEY CHECK(singleton=1), version INTEGER NOT NULL)""")
+            for statement in documents._SCHEMA:
+                client.execute(statement)
+        else:
+            documents.initialize(client)
         return [tuple(row) for row in _schema(client.connection)]
     finally:
         client.close()
@@ -91,7 +97,7 @@ def _import_authorizer(expected):
         if action in {sqlite3.SQLITE_SELECT, sqlite3.SQLITE_TRANSACTION}:
             return sqlite3.SQLITE_OK
         if action == sqlite3.SQLITE_FUNCTION:
-            return sqlite3.SQLITE_OK if (second or "").lower() == "raise" else sqlite3.SQLITE_DENY
+            return sqlite3.SQLITE_OK if (second or "").lower() in {"raise", "strftime"} else sqlite3.SQLITE_DENY
         if database != "main":
             return sqlite3.SQLITE_DENY
         if action == sqlite3.SQLITE_CREATE_TABLE and first in tables:
@@ -209,7 +215,8 @@ def restore(*, output, sqlite_path=None, sql_gzip=None, source_id=None) -> dict:
         raise StorageError("INPUT_NOT_FOUND", "The specified backup file does not exist.")
     if source_id is not None:
         namespace_for_source(source_id)
-    expected = _expected_schema()
+    expected_versions = [_expected_schema(version) for version in (1, 2)]
+    expected = expected_versions[-1]
     with tempfile.TemporaryDirectory(prefix=".radar-restore-", dir=target.parent) as temporary:
         temporary = Path(temporary)
         working_db = temporary / "working.sqlite"
@@ -220,8 +227,12 @@ def restore(*, output, sqlite_path=None, sql_gzip=None, source_id=None) -> dict:
         client = SqliteClient(working_db)
         try:
             client.connection.enable_load_extension(False)
-            if _normalized_schema(_schema(client.connection)) != _normalized_schema(expected):
+            actual_schema = _normalized_schema(_schema(client.connection))
+            if not any(actual_schema == _normalized_schema(candidate) for candidate in expected_versions):
                 raise StorageError("INVALID_STORAGE_SCHEMA", "The backup does not contain the expected radar storage schema.")
+            version = client.execute("SELECT version FROM radar_schema WHERE singleton=1")
+            if version not in ([{"version": 1}], [{"version": 2}]):
+                raise StorageError("UNSUPPORTED_SCHEMA", "The backup requires an unsupported schema version.")
             client.connection.execute("PRAGMA query_only=ON")
             check = client.execute("PRAGMA integrity_check")
             if check != [{"integrity_check": "ok"}]:
@@ -245,7 +256,7 @@ def restore(*, output, sqlite_path=None, sql_gzip=None, source_id=None) -> dict:
                 if namespace in namespaces:
                     raise StorageError("NAMESPACE_CONFLICT", "Source namespaces collided; no output was published.")
                 namespaces.add(namespace)
-                head, files = documents.read_snapshot(client, identifier)
+                head, files = documents.read_local_snapshot(client, identifier)
                 directory = stage / namespace
                 directory.mkdir()
                 entry = {key: head[key] for key in (

@@ -68,7 +68,7 @@ class StorageDocumentsTests(unittest.TestCase):
         self.assertEqual(self.primary.execute("SELECT COUNT(*) AS n FROM radar_outbox")[0]["n"], 1)
 
     def test_incompatible_schema_requires_explicit_migration(self):
-        self.primary.execute("UPDATE radar_schema SET version=2 WHERE singleton=1")
+        self.primary.execute("UPDATE radar_schema SET version=? WHERE singleton=1", (store.SCHEMA_VERSION + 1,))
         self.code("UNSUPPORTED_SCHEMA", lambda: store.initialize(self.primary))
 
     def test_trigger_failure_rolls_back_head_and_revision(self):
@@ -119,6 +119,10 @@ class StorageDocumentsTests(unittest.TestCase):
             nonlocal raced
             if sql.startswith("INSERT INTO radar_sources") and not raced:
                 raced = True
+                # Simulate a legacy uploader resuming after its lease expired.
+                # The independent source-generation CAS must still preserve
+                # the newer snapshot even before primary mode is activated.
+                self.primary.execute("UPDATE radar_leases SET expires_at=0 WHERE name='global'")
                 self.publish("winner", competing, captured="2026-10-15T09:02:00Z", expected_generation=1)
 
         client = InterceptClient(self.primary, before=before)
@@ -280,9 +284,10 @@ class StorageDocumentsTests(unittest.TestCase):
 
         def change(sql, params):
             nonlocal reads
-            if sql == "SELECT * FROM radar_sources ORDER BY source_id":
+            if "FROM radar_sources ORDER BY source_id" in sql:
                 reads += 1
                 if reads == 2:
+                    self.primary.execute("UPDATE radar_leases SET expires_at=0 WHERE name='global'")
                     self.publish("b", captured="2026-10-15T09:01:00Z")
 
         with tempfile.TemporaryDirectory() as folder:

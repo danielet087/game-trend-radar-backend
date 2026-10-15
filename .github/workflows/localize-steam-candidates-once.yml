@@ -14,6 +14,8 @@ concurrency:
 
 jobs:
   localize:
+    # Legacy Git writers cannot bypass an activated database primary.
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1' && vars.RADAR_DATABASE_PRIMARY != '1'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

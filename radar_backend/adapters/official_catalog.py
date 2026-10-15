@@ -19,21 +19,21 @@ def _clock():
     return datetime.now(TAIPEI)
 
 
-def reverify_pending_store_dates(checkpoint, master, limit=25, *, clock=None, session_factory=None):
+def reverify_pending_store_dates(checkpoint, master, limit=25, *, clock=None, session_factory=None, dispatch=None):
     current_clock = clock or _clock
     return catalog_application.reverify_pending_store_dates(
         checkpoint, master, limit, clock=current_clock,
         session_factory=session_factory or requests.Session,
         fetch_store_release_details=steam_store.fetch_store_release_details,
         upsert_qualified_master=lambda data, result: upsert_qualified_master(data, result, clock=current_clock),
-        dispatch_content_event=lambda data, result: dispatch_content_event(data, result, clock=current_clock),
+        dispatch_content_event=dispatch or (lambda data, result: dispatch_content_event(data, result, clock=current_clock)),
     )
 
 
-def retry_pending_content_dispatches(checkpoint, limit=25, *, clock=None):
+def retry_pending_content_dispatches(checkpoint, limit=25, *, clock=None, dispatch=None):
     return dispatch_application.retry_pending_content_dispatches(
         checkpoint, limit,
-        dispatch=lambda data, result: dispatch_content_event(data, result, clock=clock),
+        dispatch=dispatch or (lambda data, result: dispatch_content_event(data, result, clock=clock)),
         signature=dispatch_rules.content_dispatch_signature,
     )
 
@@ -55,11 +55,12 @@ def upsert_qualified_master(master, result, *, clock=None):
     )
 
 
-def dispatch_content_event(checkpoint, result, *, clock=None):
+def dispatch_content_event(checkpoint, result, *, clock=None, persist=None):
     return dispatch_application.dispatch_content_event(
         checkpoint, result,
         services=compose_services(clock or _clock, os.environ, requests.post, emit=print),
         signature=dispatch_rules.content_dispatch_signature,
+        **({"persist": persist} if persist is not None else {}),
     )
 
 

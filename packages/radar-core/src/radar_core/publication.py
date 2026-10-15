@@ -209,6 +209,7 @@ class SubprocessGitRepository:
         environment: Mapping[str, str] | None = None,
         committer_name: str = "github-actions[bot]",
         committer_email: str = "41898282+github-actions[bot]@users.noreply.github.com",
+        primary=None,
     ) -> None:
         if disposable_checkout is not True:
             raise ValueError("publication requires an explicitly disposable checkout")
@@ -242,6 +243,22 @@ class SubprocessGitRepository:
         top = self._run("rev-parse", "--show-toplevel").strip()
         if Path(top).resolve() != self.root:
             raise ValueError("root must be the Git checkout root")
+        from .storage.primary import git_primary
+        self._primary = primary if primary is not None else git_primary(
+            self.root, remote=remote, branch=branch)
+
+    def begin_publication(self, *, input_revision: str, payload_revision: str,
+                          paths: Sequence[str]) -> None:
+        if self._primary is not None:
+            self._primary.payload_revision = payload_revision
+            self._primary.operation_id = snapshot_revision({
+                "input_revision": input_revision, "payload_revision": payload_revision,
+                "paths": sorted(_paths(paths)),
+            })
+
+    def acknowledge_projection(self, revision: str) -> None:
+        if self._primary is not None:
+            self._primary.acknowledge(revision)
 
     def _run(self, *args: str, push: bool = False) -> str:
         command = (*self.push_command_prefix, *args) if push and self.push_command_prefix else ("git", *args)
@@ -338,8 +355,16 @@ class SubprocessGitRepository:
             if _is_owned(relative, owned):
                 self._safe_owned_file(relative).unlink(missing_ok=True)
         self._run("reset", "--hard", f"refs/remotes/{self.remote}/{self.branch}")
-        self._refresh_revision = self.head_revision()
         self._validate_owned_locations(owned)
+        if self._primary is not None:
+            # The temporary commit supplies a clean builder baseline. It is
+            # already committed DB data, never an alternate source of truth.
+            self._primary.refresh(self.root)
+            self._untracked_baseline = {
+                path: self._fingerprint(path) for path in self._untracked()
+                if not _is_owned(path, owned)
+            }
+        self._refresh_revision = self.head_revision()
 
     def _assert_owned_history(self, owned: tuple[str, ...]) -> None:
         if self._refresh_revision is None:
@@ -367,6 +392,11 @@ class SubprocessGitRepository:
         all_changed = changed | {path for path in untracked if _is_owned(path, owned)}
         for path in all_changed:
             self._safe_owned_file(path)
+        if self._primary is not None:
+            # Validate the callback's scope before persisting anything. The
+            # bridge then projects only committed DB bytes, including pending
+            # changes from earlier runs whose public Git push failed.
+            return self._primary.commit(self.root, owned)
         if all_changed:
             self._run("add", "--all", "--", *sorted(all_changed))
         staged = set(filter(None, self._run("diff", "--cached", "--name-only", "--no-renames", "-z", "--").split("\x00")))
@@ -433,15 +463,26 @@ def publish_with_retry(
         raise ValueError("max_attempts must be between 1 and 20")
     if not callable(apply):
         raise TypeError("apply must be callable")
+    if hasattr(repository, "begin_publication"):
+        repository.begin_publication(input_revision=input_revision,
+                                     payload_revision=payload_revision, paths=owned)
     for attempt in range(1, max_attempts + 1):
         repository.refresh(owned)
         apply(repository.root)
-        changed = repository.stage_commit(owned, message)
+        try:
+            changed = repository.stage_commit(owned, message)
+        except Exception as error:
+            from .storage.sql import StorageError
+            if isinstance(error, StorageError) and error.code == "STALE_GENERATION":
+                continue
+            raise
         revision = repository.head_revision()
         target_revision = repository.target_snapshot_revision(owned)
         if repository.push(revision):
             if repository.head_revision() != revision:
                 raise PublicationError("checkout HEAD changed during publication")
+            if hasattr(repository, "acknowledge_projection"):
+                repository.acknowledge_projection(revision)
             return PublicationReceipt(
                 input_revision=input_revision, payload_revision=payload_revision,
                 published_revision=revision, target_ref=repository.target_ref,

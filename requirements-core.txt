@@ -1,2 +1,3 @@
-# Shared rules are pinned to an immutable revision; update after offline tests.
-radar-core @ git+https://github.com/danielet087/game-trend-radar-backend.git@bf1d4bc64b361ec35cd4041d78c5016396d5d785#subdirectory=packages/radar-core
+# The package owner uses the exact core from this checked-out Git revision.
+# External collector repositories continue to pin an immutable commit SHA.
+./packages/radar-core

@@ -104,20 +104,38 @@ def valid_enrollment(value: object) -> bool:
     )
 
 
+def _source_locator(proof: dict) -> dict | None:
+    """Keep exactly one immutable source identity; database hashes are not Git SHAs."""
+    database_fields = ("source_database_revision", "source_database_generation", "source_database_namespace")
+    if any(field in proof for field in database_fields):
+        if "source_frontend_commit" in proof:
+            return None
+        revision, generation, namespace = (proof.get(field) for field in database_fields)
+        if (not isinstance(revision, str) or re.fullmatch(r"[0-9a-f]{64}", revision) is None
+                or type(generation) is not int or generation <= 0
+                or namespace != "danielet087/game-trend-radar@main"):
+            return None
+        return {field: proof[field] for field in database_fields}
+    commit = proof.get("source_frontend_commit")
+    if not isinstance(commit, str) or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+        return None
+    return {"source_frontend_commit": commit}
+
+
 def normalize_twitch_admission(proof: object, appid: object) -> dict | None:
     aid = decimal_id(appid)
     if not isinstance(proof, dict) or aid is None:
         return None
+    locator = _source_locator(proof)
     if (
-        type(proof.get("schema_version")) is not int
+        locator is None
+        or type(proof.get("schema_version")) is not int
         or proof["schema_version"] != 1
         or proof.get("method") != METHOD
         or decimal_id(proof.get("appid")) != aid
         or decimal_id(proof.get("twitch_game_id")) is None
         or decimal_id(proof.get("igdb_id")) is None
         or aware_time(proof.get("checked_at")) is None
-        or not isinstance(proof.get("source_frontend_commit"), str)
-        or re.fullmatch(r"[0-9a-f]{40}", proof["source_frontend_commit"]) is None
         or not valid_enrollment(proof.get("source_enrollment"))
     ):
         return None
@@ -128,7 +146,7 @@ def normalize_twitch_admission(proof: object, appid: object) -> dict | None:
         "twitch_game_id": decimal_id(proof["twitch_game_id"]),
         "igdb_id": decimal_id(proof["igdb_id"]),
         "checked_at": proof["checked_at"],
-        "source_frontend_commit": proof["source_frontend_commit"],
+        **locator,
         "source_enrollment": deepcopy(proof["source_enrollment"]),
     }
 
@@ -141,7 +159,7 @@ def has_twitch_admission(row: object) -> bool:
 
 def validate_twitch_snapshot(proof: object, registry: dict, discovery: dict,
                             now: datetime | None = None) -> bool:
-    """Verify the producer's links and enrollment in the proof's immutable SHA."""
+    """Verify the producer's links and enrollment in the proof's immutable snapshot."""
     if not isinstance(proof, dict):
         return False
     proof = normalize_twitch_admission(proof, proof.get("appid"))

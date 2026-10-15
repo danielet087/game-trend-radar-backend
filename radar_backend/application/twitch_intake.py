@@ -32,7 +32,8 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
     candidates = validate_snapshot(discovery, tracking, catalog, commit, now)
     by_id = {int(row["appid"]): row for row in master["games"]}
     blocked = excluded_appids() if blocked is None else blocked
-    batch = {"schema_version": 1, "generated_at": stamp(now), "source_frontend_commit": commit,
+    provenance = commit if isinstance(commit, dict) else {"source_frontend_commit": commit}
+    batch = {"schema_version": 1, "generated_at": stamp(now), **provenance,
              "records": [], "state_updates": {}, "cooldown_updates": {}, "stop_reason": "complete",
              "active_twitch_appids": [appid for appid, _ in candidates]}
     queued = {}

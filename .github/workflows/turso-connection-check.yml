@@ -1,0 +1,42 @@
+name: Verify Turso database connection
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/turso-connection-check.yml
+      - scripts/check_turso_connection.py
+      - tests/test_turso_connection.py
+
+permissions:
+  contents: read
+
+concurrency:
+  group: turso-connection-check
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify diagnostic safeguards without credentials
+        run: python -m unittest tests.test_turso_connection -v
+      - name: Verify Turso read, write and cleanup
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m scripts.check_turso_connection --report-path "$RUNNER_TEMP/turso-connection-report.json"
+      - name: Preserve credential-free diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: turso-connection-report
+          path: ${{ runner.temp }}/turso-connection-report.json
+          if-no-files-found: warn
+          retention-days: 7

@@ -1,0 +1,85 @@
+name: Sync radar data to Turso and D1
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Sync all sources, retry standby, verify full bytes, or export a backup
+        type: choice
+        options: [sync, replicate, verify, export]
+        default: sync
+  schedule:
+    - cron: '43 * * * *'
+  workflow_run:
+    workflows:
+      - Steam candidates then Followers
+      - Steam official Followers - hourly bounded queue
+      - Track accepted game growth through release plus 30 days
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/source-storage-sync.yml
+      - radar_backend/storage/**
+      - scripts/storage_sync.py
+
+# The sole writer for both stores. Never cancel a run during manifest commit,
+# replication or garbage collection. Collectors use their existing separate locks.
+concurrency:
+  group: radar-source-storage-v1
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify storage safeguards without credentials
+        run: |
+          python -m pip install --disable-pip-version-check 'pytest>=8,<9'
+          python -m pytest -q tests/test_storage_*.py
+      - name: Ingest complete sources, replicate and keep a daily portable backup
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+          CLOUDFLARE_D1_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          STORAGE_MODE: ${{ inputs.mode || 'sync' }}
+        run: >-
+          python -u -m scripts.storage_sync
+          --mode "$STORAGE_MODE"
+          --report-path "$RUNNER_TEMP/storage-report.json"
+          --backup-dir "$RUNNER_TEMP/storage-backup"
+          --daily-backup --publish-backup
+      - name: Preserve status and recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: radar-storage-report
+          path: ${{ runner.temp }}/storage-report.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Downloadable fresh export when explicitly requested
+        if: success() && inputs.mode == 'export'
+        uses: actions/upload-artifact@v4
+        with:
+          name: radar-storage-fresh-export
+          path: |
+            ${{ runner.temp }}/storage-backup/radar.sql.gz
+            ${{ runner.temp }}/storage-backup/manifest.json
+            ${{ runner.temp }}/storage-backup/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 1

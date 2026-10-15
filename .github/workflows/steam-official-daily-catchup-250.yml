@@ -1,4 +1,4 @@
-name: Steam official Followers - hourly auto 250
+name: Steam official Followers - hourly bounded queue
 run-name: "Steam Followers | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 # One scheduler and XML queue for ordinary candidates and Twitch discoveries.
@@ -33,7 +33,9 @@ concurrency:
 jobs:
   follower-catchup:
     runs-on: ubuntu-latest
-    timeout-minutes: 80
+    # Reserve 25 minutes for setup, queue preparation, checkpoint delivery and
+    # finalization; collection itself is capped at 35 minutes below.
+    timeout-minutes: 60
     steps:
       - name: Checkout backend
         uses: actions/checkout@v4
@@ -112,19 +114,19 @@ jobs:
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
         run: python -m scripts.external_schedule --workflow official-followers
 
-      - name: Fetch up to 250 official counts, Twitch first, with >=8s pacing
+      - name: Fetch up to 90 official counts, Twitch first, with >=30s pacing
         if: steps.query_window.outputs.proceed == 'true'
         env:
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
-          REQUEST_LIMIT: "250"
+          REQUEST_LIMIT: "90"
           SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
           SKIP_COOLDOWN: ${{ github.event_name == 'workflow_dispatch' && inputs.trigger_source == 'manual' && inputs.skip_cooldown || false }}
         run: |
           args=()
           if [ "$SKIP_COOLDOWN" = "true" ]; then args+=(--skip-cooldown); fi
           python -u -m scripts.experiment_official_daily_catchup_250 \
-            --max-requests "$REQUEST_LIMIT" --interval 8 --max-seconds 3450 \
+            --max-requests "$REQUEST_LIMIT" --interval 30 --max-seconds 2100 \
             --save-every 10 "${args[@]}"
 
       - name: Final checkpoint save, including error and cooldown

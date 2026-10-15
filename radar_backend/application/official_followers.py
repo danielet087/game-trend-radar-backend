@@ -132,6 +132,7 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
                          if (gid := valid_group_id64(row.get("group_id64"))
                              or follower_cache.group_id(row["appid"])) is not None]
     attempts = []
+    consecutive_item_errors = 0
     run_metadata = {"run_id": run_id} if run_id.isdecimal() else {}
     cp["scheduler_batch"] = {
         **run_metadata, "active": True, "status": "preparing",
@@ -168,7 +169,15 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
             if last_start is not None:
                 delay = args.interval - (services.monotonic() - last_start)
                 if delay > 0:
+                    if delay >= args.max_seconds - 40 - (services.monotonic() - started):
+                        stop = "hour_time_budget"
+                        break
                     services.sleep(delay)
+            # Pacing also consumes the collection budget. Leave enough time
+            # for the bounded HTTP request and final durable checkpoint.
+            if services.monotonic() - started >= args.max_seconds - 40:
+                stop = "hour_time_budget"
+                break
             last_start = services.monotonic()
             aid = row["appid"]
             event = {
@@ -189,6 +198,16 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
             else:
                 outcome = follower_client.fetch(row["group_id64"], manual_override=skip_cooldown)
             event.update(status=outcome.status, http=outcome.http)
+            # These responses identify an unusable individual group, rather
+            # than permission to ignore a shared service cooldown. Keep its
+            # failure evidence for next-run rotation and try the next group.
+            item_error = (
+                outcome.status == "missing_count_or_group_mismatch"
+                or (outcome.status == "unexpected_http" and outcome.http in {404, 410})
+            )
+            consecutive_item_errors = consecutive_item_errors + 1 if item_error else 0
+            if item_error:
+                event["retry_scope"] = "candidate"
             if outcome.retry_after:
                 event["retry_after_header"] = outcome.retry_after[:128]
             if outcome.error_type:
@@ -263,8 +282,17 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
                 cp.update(latest_checkpoint)
                 master.clear()
                 master.update(latest_master)
-            if event["status"] != "ok":
+            if event["status"] != "ok" and not item_error:
                 break
+            if consecutive_item_errors >= 3:
+                # Repeated malformed groups can also indicate a service-side
+                # change. Bound the diagnostic batch instead of hammering it.
+                stop = "consecutive_item_errors"
+                break
+
+        else:
+            if any(item.get("retry_scope") == "candidate" for item in attempts) and not skip_cooldown:
+                stop = "item_errors_pending_retry"
 
     successful = len({item["appid"] for item in attempts if item["status"] == "ok"})
     # Concurrent producers can add results during a checkpoint reload. They
@@ -290,6 +318,7 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
         "remaining_queue": pending_left,
         "awaiting_group_resolution": len(q) - len(known_group_queue),
         "http_429_this_run": sum(e["http"] == 429 for e in attempts),
+        "candidate_errors_this_run": sum(e.get("retry_scope") == "candidate" for e in attempts),
         "twitch_priority_pending": source_status.get("twitch_priority_pending", 0),
         "twitch_official_success_this_run": sum(e.get("queue_source") == "twitch_steam_discovery"
                                                 and e["status"] == "ok" for e in attempts),

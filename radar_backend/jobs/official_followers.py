@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime
+import math
 import os
 from pathlib import Path
 import time
@@ -98,16 +99,16 @@ def manual_cooldown_override(requested):
 
 def run_job(*, paths, services, argv=None, cooldown_override=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--max-requests", type=int, default=250)
-    parser.add_argument("--interval", type=float, default=8.0)
-    parser.add_argument("--max-seconds", type=int, default=3450)
+    parser.add_argument("--max-requests", type=int, default=90)
+    parser.add_argument("--interval", type=float, default=30.0)
+    parser.add_argument("--max-seconds", type=int, default=2700)
     parser.add_argument("--save-every", type=int, default=10)
     parser.add_argument("--skip-cooldown", action="store_true",
                         help="Explicit manual dispatch only: probe one queued game during cooldown")
     args = parser.parse_args(argv)
-    if not 1 <= args.max_requests <= 250 or args.interval < 8.0:
-        raise ValueError("Max 250 single-file requests, min 8 seconds apart")
-    if not 120 <= args.max_seconds <= 3500 or not 1 <= args.save_every <= 20:
+    if not 1 <= args.max_requests <= 90 or not math.isfinite(args.interval) or args.interval < 30.0:
+        raise ValueError("Max 90 single-file requests, min 30 seconds apart")
+    if not 120 <= args.max_seconds <= 2700 or not 1 <= args.save_every <= 20:
         raise ValueError("Invalid duration/save interval")
     skip_cooldown = (cooldown_override or manual_cooldown_override)(args.skip_cooldown)
     if skip_cooldown:

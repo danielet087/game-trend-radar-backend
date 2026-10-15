@@ -105,6 +105,45 @@ def utc_date_as_taipei(value):
         return None
 
 
+def last_failed_request_times(events, *, now):
+    """Find unresolved real failures across every queue source.
+
+    Cached results and skipped requests never introduce a failure. A later
+    success clears the previous failure, including a successful cache reuse.
+    Comparing observation times also handles events merged out of order.
+    """
+    latest = {}
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        status = event.get("status")
+        # Older checkpoints can omit status while retaining an explicit HTTP
+        # error. Such a 429 still represents a real failed request.
+        if status is None and type(event.get("http")) is int and event["http"] >= 400:
+            status = "unexpected_http"
+        if not isinstance(status, str):
+            continue
+        succeeded = status == "ok"
+        if not succeeded and (
+            event.get("cache_reused")
+            or status in {"cooldown_no_request", "awaiting_group_resolution"}
+            or not (type(event.get("http")) is int
+                    or isinstance(event.get("error_type"), str) and event["error_type"])
+        ):
+            continue
+        attempted_at = admission_aware_time(event.get("when_taipei"))
+        if attempted_at is None or attempted_at > now:
+            continue
+        aid = str(event.get("appid"))
+        # A success wins a timestamp tie so replaying merged observations
+        # cannot restore a failure already followed by an accepted count.
+        observation = (attempted_at.timestamp(), succeeded)
+        if observation > latest.get(aid, (float("-inf"), False)):
+            latest[aid] = observation
+    return {aid: attempted_at for aid, (attempted_at, succeeded) in latest.items()
+            if not succeeded}
+
+
 def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, official_cache, other_official, *, now, is_twitch_queue_candidate, cached_follower):
     observed = now.astimezone(TAIPEI)
     if len(frozen_rows) != 1317 or len(old_group_rows) != 1358:
@@ -243,19 +282,15 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
             continue
         cp.setdefault("unresolved_candidates", {}).pop(aid, None)
         pending.append(row)
-    # Rotate priority candidates after a bounded attempt. An unavailable XML
-    # endpoint must not always be first after the shared cooldown expires.
-    last_twitch_attempt = {}
-    for event in cp.get("attempt_events", []):
-        if not isinstance(event, dict) or event.get("queue_source") != "twitch_steam_discovery":
-            continue
-        attempted_at = admission_aware_time(event.get("when_taipei"))
-        if attempted_at is not None and attempted_at <= observed:
-            aid = str(event.get("appid"))
-            last_twitch_attempt[aid] = max(last_twitch_attempt.get(aid, 0), attempted_at.timestamp())
+    # Give unfailed work a turn before retrying any failed candidate. This
+    # tier must precede Twitch priority: one unavailable Twitch endpoint must
+    # not monopolize every first request after the shared cooldown expires.
+    # Failed ordinary candidates rotate too, oldest real failure first.
+    last_failure = last_failed_request_times(cp.get("attempt_events", []), now=observed)
     pending.sort(key=lambda r: (
+        str(r["appid"]) in last_failure,
+        last_failure.get(str(r["appid"]), 0),
         0 if r.get("queue_source") == "twitch_steam_discovery" else 1,
-        last_twitch_attempt.get(str(r["appid"]), 0) if r.get("queue_source") == "twitch_steam_discovery" else 0,
         r["release_date"] < today,
         r["release_date"] if r["release_date"] >= today
         else -datetime.fromisoformat(r["release_date"]).date().toordinal(),

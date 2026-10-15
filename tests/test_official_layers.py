@@ -129,7 +129,7 @@ def test_application_reuses_real_zero_and_requires_durable_ack(tmp_path, persist
         dispatch_content_event=legacy_api, follower_client_factory=adapter.OfficialFollowerClient,
         follower_cache_factory=state.OfficialFollowerCache, cooldown_factory=state.CooldownStore,
     )
-    args = SimpleNamespace(max_requests=250, interval=8.0, max_seconds=3450, save_every=10)
+    args = SimpleNamespace(max_requests=90, interval=30.0, max_seconds=2700, save_every=10)
 
     result = run_official_batch(args, paths=paths, services=services)
 
@@ -153,6 +153,29 @@ def test_job_rejects_automated_cooldown_override_before_starting_batch(monkeypat
     with pytest.raises(ValueError, match="explicit manual"):
         job.run_job(paths=None, services=None, argv=["--skip-cooldown"])
     batch.assert_not_called()
+
+
+@pytest.mark.parametrize("argument,value", [
+    ("--max-requests", "0"), ("--max-requests", "91"),
+    ("--interval", "8"), ("--interval", "29.9"),
+    ("--interval", "nan"), ("--interval", "inf"),
+    ("--max-seconds", "119"), ("--max-seconds", "2701"),
+])
+def test_hourly_cli_rejects_unbounded_or_aggressive_collection_before_io(monkeypatch, argument, value):
+    batch = Mock(side_effect=AssertionError("No collection with unsafe budgets"))
+    monkeypatch.setattr(job, "run_official_batch", batch)
+    with pytest.raises(ValueError):
+        job.run_job(paths=None, services=None, argv=[argument, value])
+    batch.assert_not_called()
+
+
+def test_hourly_cli_defaults_reserve_a_bounded_45_minute_collection(monkeypatch):
+    expected = SimpleNamespace(status=JobStatus.PARTIAL)
+    batch = Mock(return_value=expected)
+    monkeypatch.setattr(job, "run_official_batch", batch)
+    assert job.run_job(paths=None, services=None, argv=[]) is expected
+    args = batch.call_args.args[0]
+    assert (args.max_requests, args.interval, args.max_seconds) == (90, 30.0, 2700)
 
 
 @pytest.mark.parametrize("entry", [

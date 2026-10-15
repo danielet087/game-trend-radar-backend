@@ -49,7 +49,7 @@ def test_projection_matches_official_order_without_mutating_source_inputs():
 
     assert status["generated_at"] == "2026-10-02T09:00:00Z"
     assert [row["appid"] for row in status["queue"]] == [row["appid"] for row in official]
-    assert [row["appid"] for row in status["queue"]] == [124, 126, 123, 127, 128]
+    assert [row["appid"] for row in status["queue"]] == [124, 127, 128, 126, 123]
     assert [row["position"] for row in status["queue"]] == [1, 2, 3, 4, 5]
     assert {row["appid"]: row["state"] for row in status["queue"]} == {
         124: "awaiting_group", 126: "awaiting_group", 123: "waiting",
@@ -208,7 +208,7 @@ def test_batch_reports_last_actual_attempt_without_claiming_current_processing(m
     assert status["batch"]["last_name"] == first["name"]
     assert status["batch"]["run_url"].endswith("/actions/runs/123456")
     assert status["batch"]["manual_cooldown_override"] is manual_probe
-    assert status["batch"]["request_limit"] == (1 if manual_probe else 250)
+    assert status["batch"]["request_limit"] == (1 if manual_probe else 90)
     assert status["events"][-1].get("manual_cooldown_override", False) is manual_probe
     assert "current_appid" not in status["batch"]
     assert "current_name" not in status["batch"]

@@ -73,7 +73,7 @@ def test_scheduled_run_without_override_keeps_obeying_cooldown(monkeypatch, tmp_
 
     client.get.assert_not_called()
     assert report["stop_reason"] == "official_429_cooldown_no_request"
-    assert report["request_limit"] == 250
+    assert report["request_limit"] == 90
     assert report["manual_cooldown_override"] is False
     assert cp["scheduler_batch"]["manual_cooldown_override"] is False
     assert cp["next_request_after_taipei"] == deadline(5)
@@ -88,7 +88,7 @@ def test_authorized_probe_bypasses_both_cooldowns_once_and_accepts_true_zero(mon
     cp, report, client, verify, upsert, dispatch, sleep = run_worker(
         monkeypatch, tmp_path, [first, later], [xml_response(0)],
         cooldown=deadline(5), legacy_cooldown=deadline(7),
-        initial_checkpoint=original, extra_args=("--skip-cooldown",), max_requests=250,
+        initial_checkpoint=original, extra_args=("--skip-cooldown",), max_requests=90,
     )
 
     assert client.get.call_count == report["requests_this_run"] == 1

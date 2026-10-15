@@ -24,6 +24,7 @@ ACTIVITY_REASONS = frozenset({
 WORKFLOW_REASONS = {
     "Steam candidates then Followers": "steam_daily_search",
     "Steam official Followers - hourly auto 250": "steam_official_verification",
+    "Steam official Followers - hourly bounded queue": "steam_official_verification",
 }
 
 

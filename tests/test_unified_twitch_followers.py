@@ -87,7 +87,7 @@ def test_completed_cohort_accepts_new_twitch_priority_without_duplicate_or_losin
 
 
 @pytest.mark.parametrize("untried_release", ["2026-09-09", "2026-09-04"])
-def test_twitch_rotation_gives_untried_and_older_attempts_a_turn_before_latest_failure(
+def test_failure_rotation_crosses_twitch_and_ordinary_source_boundaries(
         monkeypatch, untried_release):
     monkeypatch.setattr(worker, "clock", lambda: NOW.astimezone(worker.TZ))
     failed = twitch_candidate(123, "2026-09-09")
@@ -101,7 +101,7 @@ def test_twitch_rotation_gives_untried_and_older_attempts_a_turn_before_latest_f
          "when_taipei": "2026-10-01T18:00:00+08:00", "http": 429, "status": "rate_limited"},
         {"appid": 123, "queue_source": "twitch_steam_discovery",
          "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 429, "status": "rate_limited"},
-        # An ordinary-source event must not falsely count as a Twitch attempt.
+        # Failure follows the AppID even if its queue source later changes.
         {"appid": 124, "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
          "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 429, "status": "rate_limited"},
     ]
@@ -110,10 +110,10 @@ def test_twitch_rotation_gives_untried_and_older_attempts_a_turn_before_latest_f
     queue, source = worker.make_queue(cp, frozen, legacy, groups, {"games": []}, {},
                                      {"games": {}}, {"verified": {}})
 
-    assert [item["appid"] for item in queue] == [124, 126, 123, 125, 127]
+    assert [item["appid"] for item in queue] == [125, 127, 126, 123, 124]
     assert source["twitch_priority_pending"] == 3
     assert cp["official_results"] == {}
-    assert queue[2]["twitch_admission"] == failed["twitch_admission"]
+    assert queue[3]["twitch_admission"] == failed["twitch_admission"]
 
 
 @pytest.mark.parametrize("count,checked,expected", [
@@ -147,7 +147,7 @@ def known_group(candidate):
     return candidate
 
 
-def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_requests=250,
+def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_requests=90,
                extra_args=(), initial_checkpoint=None, legacy_cooldown=None):
     cp = checkpoint(queue)
     cp.update(deepcopy(initial_checkpoint or {}))
@@ -317,7 +317,7 @@ def test_priority_and_normal_share_request_budget_and_pacing(monkeypatch, tmp_pa
     assert set(cp["official_results"]) == {"123", "124"}
     assert report["requests_this_run"] == 2
     assert report["remaining_queue"] == 1
-    sleep.assert_called_once_with(8.0)
+    sleep.assert_called_once_with(30.0)
 
 
 def test_unknown_priority_id_waits_for_resolution_without_blocking_known_normal(monkeypatch, tmp_path):

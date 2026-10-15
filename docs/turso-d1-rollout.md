@@ -8,20 +8,25 @@ Configure these **repository Actions secrets** in `game-trend-radar-backend`:
 | --- | --- |
 | `TURSO_DATABASE_URL` | The empty libSQL database's `libsql://…turso.io` URL |
 | `TURSO_AUTH_TOKEN` | A database-scoped read/write token, not a Turso account-management token |
+| `CLOUDFLARE_ACCOUNT_ID` | The Cloudflare account containing the standby database |
+| `CLOUDFLARE_D1_DATABASE_ID` | The UUID of `game-trend-radar-backup` |
+| `CLOUDFLARE_D1_API_TOKEN` | An API token with Account → D1 → Edit (D1 Write), scoped to that account |
 
-Run **Verify Turso database connection** from Actions. It also runs when its
-workflow, diagnostic or tests change on `main`. It has no recurring schedule.
-The offline safeguards run before secrets are injected into the live probe.
+Run **Verify Turso database connection** and **Verify Cloudflare D1 database
+connection** from Actions. Each also runs when its own workflow, diagnostic or
+tests change on `main`. Neither has a recurring schedule. Offline safeguards run
+before the respective provider's secrets are injected into the live probe.
 
-The probe creates `_radar_connection_checks`, commits one uniquely identified
+Each probe creates `_radar_connection_checks`, commits one uniquely identified
 test row, verifies a separate read, deletes only that row and verifies cleanup.
-An empty diagnostic table remains. Game data and collection workflows are not
-read or changed. Requests have bounded retries/timeouts and reject redirects.
+The value includes Chinese text and an exact GroupID64 string. An empty
+diagnostic table remains in each provider. Game data and collection workflows
+are not read or changed. Requests have bounded retries/timeouts and reject redirects.
 The main probe has a 120-second request budget, with a separate 30-second
 cleanup budget; the Actions job also has a five-minute hard timeout.
 Logs, job summary and the 7-day report artifact contain status only, never the
-URL, token or provider error body. A failed cleanup is a failed check, not a
-successful connection claim. An interrupted run can leave its diagnostic row;
+URL, account/database identifiers, token or provider error body. A failed cleanup
+is a failed check, not a successful connection claim. An interrupted run can leave its diagnostic row;
 do not confuse this with game data or delete another active run's row.
 
 Successful connectivity does **not** mean that production data has migrated or
@@ -51,12 +56,9 @@ raw JSON size. Initial imports and catch-up writes must respect daily quotas.
 
 ## Stage 3: D1 standby and portability
 
-Create an empty D1 database, provision a dedicated account-scoped D1 write API
-token and configure the intended synchronization repository with:
-
-- `CLOUDFLARE_ACCOUNT_ID`
-- `CLOUDFLARE_D1_DATABASE_ID`
-- `CLOUDFLARE_D1_API_TOKEN`
+Validate the empty D1 database using the Stage 1 check and its three repository
+secrets before implementing synchronization. If synchronization later moves to
+another repository, provision its secrets explicitly there as well.
 
 Confirm actual account plan and shared quotas. The current Free limits are
 500 MB/database, 10 databases/account, 5 GB total and 100,000 rows written/day;
@@ -87,5 +89,6 @@ of scope for this rollout.
 - https://docs.turso.tech/sdk/http/reference
 - https://docs.turso.tech/cli/db/shell
 - https://developers.cloudflare.com/d1/platform/limits/
+- https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/query/
 - https://developers.cloudflare.com/d1/platform/pricing/
 - https://developers.cloudflare.com/d1/best-practices/import-export-data/

@@ -6,6 +6,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock
 
+import pytest
+
 from radar_backend.adapters import public_catalog as catalog
 from radar_backend.adapters import published_titles
 from radar_backend.adapters import steam_preview_metadata as preview
@@ -61,6 +63,44 @@ def test_catalog_revision_keeps_full_rows_and_matching_revision_does_not_rewrite
     canonical = json.dumps([changed], ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     assert second["catalog_revision"] == hashlib.sha256(canonical.encode()).hexdigest()[:20]
     assert path.read_bytes().endswith(b"\n")
+
+
+@pytest.mark.parametrize("text, language, source_name", [
+    ("探索廣闊世界，展開全新冒險。", "zh-TW", "steam_tchinese"),
+    ("Explore a vast world.", "en", "steam_english"),
+])
+def test_follower_refresh_retains_published_description_in_browser_catalog(tmp_path, text, language, source_name):
+    frontend, source = tmp_path / "frontend", tmp_path / "input.json"
+    evidence = {
+        "short_description": text,
+        "short_description_en": "Explore a vast world.",
+        "short_description_language": language,
+        "short_description_source": source_name,
+        "description_source_url": "https://store.steampowered.com/app/7/",
+    }
+    original = {
+        "appid": 7, "name": "Original", "followers": 5000,
+        "release_start": "2027-02-28", "release_precision": "day",
+        "release_display_precision": "date_full",
+        "language_support": {"tchinese": False, "english": True},
+        **evidence,
+    }
+    observed = datetime(2026, 10, 15, tzinfo=timezone.utc)
+    source.write_text(json.dumps({"games": [original]}))
+    builder.build(source, frontend, authoritative_future=True, now=observed)
+    # The official Followers publisher supplies only its own core evidence.
+    source.write_text(json.dumps({"games": [{
+        "appid": 7, "name": "Original", "followers": 6000,
+        "release_start": "2027-02-28", "release_precision": "day",
+        "release_display_precision": "date_full",
+    }]}))
+    builder.build(source, frontend, authoritative_future=True, now=observed)
+    for name in ("games/7.json", "catalog.json", "calendar/2027-02.json", "steam_upcoming.json"):
+        document = json.loads((frontend / "data" / name).read_text())
+        row = document if name.startswith("games/") else document["games"][0]
+        assert row["followers"] == 6000
+        assert {key: row[key] for key in evidence} == evidence
+        assert row["language_support"] == original["language_support"]
 
 
 def test_default_preview_category_port_uses_shared_catalog_without_legacy_bridge(monkeypatch):

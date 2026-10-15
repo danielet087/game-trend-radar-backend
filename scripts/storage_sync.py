@@ -19,6 +19,7 @@ from zoneinfo import ZoneInfo
 from radar_backend.storage.sql import D1Client, SqliteClient, StorageError, TursoClient
 from radar_backend.storage.sources import SOURCES, checkout_name, clone_source, remote_revision, snapshot_from_checkout, source_id
 from radar_backend.storage.documents import initialize, publish_snapshot, read_snapshot, sync_replica, export_sqlite, garbage_collect
+from radar_core.storage.primary_store import primary_status
 
 
 def _failure(report, stage, error):
@@ -37,6 +38,9 @@ def ingest(primary, *, local_root=None):
             identity = source_id(spec)
             previous = existing.get(identity)
             try:
+                if primary_status(primary, identity).get("active"):
+                    results.append({**previous, "import_status": "database_primary"})
+                    continue
                 if local_root is None and previous and remote_revision(spec) == previous["revision"]:
                     results.append({**previous, "import_status": "unchanged"})
                     continue
@@ -89,7 +93,8 @@ def _make_backup(primary, output):
             _, source_files = read_snapshot(restored, identity)
             files += len(source_files)
             raw_bytes += sum(map(len, source_files.values()))
-        manifest = {"schema_version": 1, "created_at": datetime.now(timezone.utc).isoformat(),
+        from radar_core.storage.documents import SCHEMA_VERSION
+        manifest = {"schema_version": SCHEMA_VERSION, "created_at": datetime.now(timezone.utc).isoformat(),
                     "format": "SQLite SQL dump, gzip compressed", "restore_verified": True,
                     "sources": list(expected.values()), "file_count": files, "raw_bytes": raw_bytes,
                     "export": export_report}

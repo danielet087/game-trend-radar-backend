@@ -15,6 +15,8 @@ concurrency:
 jobs:
   pilot:
     # Explicitly bounded hosted pilot; NOT the main 50-request worker.
+    # Legacy Git writers cannot bypass an activated database primary.
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1' && vars.RADAR_DATABASE_PRIMARY != '1'
     runs-on: ubuntu-latest
     timeout-minutes: 9
     steps:

@@ -32,6 +32,9 @@ concurrency:
 
 jobs:
   follower-catchup:
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    env:
+      RADAR_DATABASE_PRIMARY: ${{ vars.RADAR_DATABASE_PRIMARY || '0' }}
     runs-on: ubuntu-latest
     # Reserve 25 minutes for setup, queue preparation, checkpoint delivery and
     # finalization; collection itself is capped at 35 minutes below.
@@ -58,6 +61,8 @@ jobs:
 
       - name: Install dependencies and validate queue/admission behavior
         if: steps.window.outputs.proceed == 'true'
+        env:
+          RADAR_DATABASE_PRIMARY: '0'
         run: |
           python -m pip install --disable-pip-version-check -r requirements-dev.txt
           python -m pytest -q
@@ -73,18 +78,34 @@ jobs:
           print("CATCHUP_INPUT_OK original_cohort=1317 confirmed="+str(len(d["official_results"])))
           PY
 
+      - name: Load authoritative Steam state before queue preparation
+        id: primary_state
+        if: steps.window.outputs.proceed == 'true'
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: python -m radar_core.storage.primary hydrate --root . --source danielet087/game-trend-radar-backend@main
+
       - name: Read immutable Twitch discovery inputs
         if: steps.window.outputs.proceed == 'true'
         run: |
-          git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend-input
-          echo "TWITCH_INPUT_SHA=$(git -C frontend-input rev-parse HEAD)" >> "$GITHUB_ENV"
+          if [ "${RADAR_DATABASE_PRIMARY:-0}" = "1" ]; then
+            # The canonical intake freezes and pins its DB snapshot itself.
+            echo "TWITCH_INPUT_SHA=database-primary" >> "$GITHUB_ENV"
+          else
+            git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend-input
+            echo "TWITCH_INPUT_SHA=$(git -C frontend-input rev-parse HEAD)" >> "$GITHUB_ENV"
+          fi
 
       - name: Prepare Twitch priority candidates without Community requests
         id: prepare
         if: steps.window.outputs.proceed == 'true'
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           set -euo pipefail
-          python -u -m scripts.reconcile_twitch_official_queue --phase collect \
+          python -u -m radar_backend.jobs.reconcile_twitch_official_queue --phase collect \
             --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
             --batch output/steam_official_daily_catchup/twitch_prepare.json --max-seconds 300
           python -m radar_backend.jobs.publish_steam queue \
@@ -95,10 +116,12 @@ jobs:
         id: groups
         if: steps.window.outputs.proceed == 'true'
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
         run: |
           set -euo pipefail
-          python -u -m scripts.resolve_official_group_ids --phase collect \
+          python -u -m radar_backend.jobs.resolve_official_groups --phase collect \
             --batch output/steam_official_daily_catchup/group_resolution.json \
             --max-requests 20 --max-seconds 120
           python -m radar_backend.jobs.publish_steam queue \
@@ -117,6 +140,8 @@ jobs:
       - name: Fetch up to 90 official counts, Twitch first, with >=30s pacing
         if: steps.query_window.outputs.proceed == 'true'
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
           REQUEST_LIMIT: "90"
@@ -125,12 +150,15 @@ jobs:
         run: |
           args=()
           if [ "$SKIP_COOLDOWN" = "true" ]; then args+=(--skip-cooldown); fi
-          python -u -m scripts.experiment_official_daily_catchup_250 \
+          python -u -m radar_backend.jobs.official_followers \
             --max-requests "$REQUEST_LIMIT" --interval 30 --max-seconds 2100 \
             --save-every 10 "${args[@]}"
 
       - name: Final checkpoint save, including error and cooldown
-        if: always() && steps.window.outputs.proceed == 'true'
+        if: always() && steps.window.outputs.proceed == 'true' && steps.primary_state.outcome == 'success'
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           if [ -s output/steam_official_daily_catchup/checkpoint-pending.json ] || [ -s experiments/steam_official_daily_catchup/checkpoint.json ]; then
             python -m radar_backend.jobs.persist_official_checkpoint \
@@ -151,11 +179,15 @@ jobs:
 
       - name: Finalize Twitch admissions from persisted official counts
         if: always() && steps.window.outputs.proceed == 'true' && steps.prepare.outcome == 'success'
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
         run: |
           set -euo pipefail
           git fetch origin main
           git reset --hard origin/main
-          python -u -m scripts.reconcile_twitch_official_queue --phase collect \
+          python -m radar_core.storage.primary hydrate --root . --source danielet087/game-trend-radar-backend@main
+          python -u -m radar_backend.jobs.reconcile_twitch_official_queue --phase collect \
             --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
             --batch output/steam_official_daily_catchup/twitch_finalize.json --max-seconds 300
           python -m radar_backend.jobs.publish_steam queue \
@@ -165,11 +197,14 @@ jobs:
       - name: Dispatch persisted Twitch admissions and save receipts
         if: always() && steps.window.outputs.proceed == 'true' && steps.prepare.outcome == 'success'
         env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
         run: |
           set -euo pipefail
-          python -u -m scripts.reconcile_twitch_official_queue --phase dispatch \
+          python -m radar_core.storage.primary hydrate --root . --source danielet087/game-trend-radar-backend@main
+          python -u -m radar_backend.jobs.reconcile_twitch_official_queue --phase dispatch \
             --batch output/steam_official_daily_catchup/twitch_dispatch.json --max-seconds 300
           python -m radar_backend.jobs.publish_steam queue \
             --kind dispatch --batch output/steam_official_daily_catchup/twitch_dispatch.json \

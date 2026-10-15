@@ -60,6 +60,43 @@ def snapshot():
 
 
 class AdmissionTests(unittest.TestCase):
+    def database_proof(self):
+        result = proof()
+        result.pop("source_frontend_commit")
+        result.update(source_database_revision="b" * 64, source_database_generation=7,
+                      source_database_namespace="danielet087/game-trend-radar@main")
+        return result
+
+    def test_database_admission_preserves_immutable_locator_without_inventing_git_sha(self):
+        evidence = self.database_proof()
+        normalized = normalize_twitch_admission(evidence, 123)
+        self.assertEqual(normalized, evidence)
+        self.assertNotIn("source_frontend_commit", normalized)
+        registry, discovery = snapshot()
+        self.assertTrue(validate_twitch_snapshot(evidence, registry, discovery))
+        game = row(); game["twitch_admission"] = evidence
+        self.assertTrue(is_twitch_qualified(game))
+        self.assertEqual(preserve_twitch_admission(game, {"appid": 123, "followers": 100})["twitch_admission"], evidence)
+        normalized["source_enrollment"]["viewer_count"] = 9000
+        self.assertEqual(evidence["source_enrollment"]["viewer_count"], 8000)
+
+    def test_database_source_requires_all_fields_and_rejects_mixed_git_proof(self):
+        for field, value in (("source_database_revision", "a" * 40),
+                             ("source_database_revision", "g" * 64),
+                             ("source_database_generation", True),
+                             ("source_database_generation", 0),
+                             ("source_database_generation", "7"),
+                             ("source_database_namespace", "danielet087/another-repo@main"),
+                             ("source_database_namespace", "danielet087/game-trend-radar@other"),
+                             ("source_frontend_commit", "a" * 40),
+                             ("source_frontend_commit", None)):
+            evidence = self.database_proof(); evidence[field] = value
+            with self.subTest(field=field, value=value):
+                self.assertIsNone(normalize_twitch_admission(evidence, 123))
+        for field in ("source_database_revision", "source_database_generation", "source_database_namespace"):
+            evidence = self.database_proof(); evidence.pop(field)
+            self.assertIsNone(normalize_twitch_admission(evidence, 123))
+
     def test_identifiers_reject_booleans_zero_and_non_ascii_digits(self):
         self.assertEqual(decimal_id(123), "123")
         self.assertEqual(decimal_id("123"), "123")

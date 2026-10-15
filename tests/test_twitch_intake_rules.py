@@ -54,6 +54,28 @@ def validate(discovery, tracking, catalog, commit=SHA, now=NOW, **overrides):
     return rules.validate_snapshot(discovery, tracking, catalog, commit, now, **(ports | overrides))
 
 
+def test_database_snapshot_provenance_is_preserved_without_fabricated_git_commit():
+    database = {"source_database_revision": "b" * 64, "source_database_generation": 4,
+                "source_database_namespace": "danielet087/game-trend-radar@main"}
+    rows = validate(*snapshot(), commit=database)
+    assert len(rows) == 1
+    admission = rows[0][1]
+    assert all(admission[key] == value for key, value in database.items())
+    assert "source_frontend_commit" not in admission
+    assert rules.identity_signature(admission) == rules.identity_signature(proof())
+
+
+@pytest.mark.parametrize("changes", [
+    {"source_database_generation": True}, {"source_database_revision": "a" * 40},
+    {"source_database_namespace": "untrusted/repo@main"}, {"source_frontend_commit": SHA},
+])
+def test_invalid_or_mixed_database_provenance_is_rejected(changes):
+    database = {"source_database_revision": "b" * 64, "source_database_generation": 4,
+                "source_database_namespace": "danielet087/game-trend-radar@main", **changes}
+    with pytest.raises(ValueError, match="immutable database"):
+        validate(*snapshot(), commit=database)
+
+
 def steam(day=None):
     day = day or NOW.astimezone(TAIPEI).date()
     instant = datetime.combine(day, datetime.min.time(), tzinfo=TAIPEI).astimezone(timezone.utc)

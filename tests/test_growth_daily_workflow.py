@@ -95,7 +95,7 @@ def advance_state(writer, *, broken=None, removed=None):
 def test_daily_budget_covers_the_observed_cold_cohort_and_a_bounded_cooldown():
     command = step("collect")["run"].replace("\\\n", " ")
     argv = shlex.split(next(line for line in command.splitlines()
-                           if line.strip().startswith("python -m scripts.collect_public_growth")))
+                           if line.strip().startswith("python -m radar_backend.jobs.growth")))
     option = lambda flag: argv[argv.index(flag) + 1]
     requests = int(option("--max-requests"))
     seconds = int(option("--max-seconds"))
@@ -129,7 +129,7 @@ def test_latest_inputs_are_frozen_before_baseline_without_changing_unowned_track
     for tracked, frozen in FROZEN_PATHS.items():
         assert read_state(runner / tracked) == {"marker": "queued-old", "path": tracked}
         assert read_state(runner / frozen) == {"marker": "latest-after-lock", "path": tracked}
-    argv = shlex.split(step("collect")["run"].split("python -m scripts.collect_public_growth", 1)[1].replace("\\\n", " "))
+    argv = shlex.split(step("collect")["run"].split("python -m radar_backend.jobs.growth", 1)[1].replace("\\\n", " "))
     for flag, frozen in (
         ("--official-cache", FROZEN_PATHS[STATE_PATHS[3]]),
         ("--legacy-checkpoint", FROZEN_PATHS[STATE_PATHS[1]]),
@@ -137,7 +137,7 @@ def test_latest_inputs_are_frozen_before_baseline_without_changing_unowned_track
         ("--original-checkpoint", FROZEN_PATHS[STATE_PATHS[2]]),
     ):
         assert argv[argv.index(flag) + 1] == frozen
-    collect_setup = step("collect")["run"].split("python -m scripts.collect_public_growth", 1)[0]
+    collect_setup = step("collect")["run"].split("python -m radar_backend.jobs.growth", 1)[0]
     prepared = subprocess.run(["bash", "-c", collect_setup], cwd=runner,
                               capture_output=True, text=True)
     assert prepared.returncode == 0, prepared.stderr

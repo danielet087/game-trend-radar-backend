@@ -253,6 +253,7 @@ class SteamUpcomingCollector:
         self.github_repository = os.environ.get("GITHUB_REPOSITORY", "").strip()
         self.checkpoint_token = os.environ.get("STEAM_CHECKPOINT_TOKEN", "").strip()
         self._checkpoint_dirty_count = 0
+        self.database_primary = checkpoint_transport.database_primary_enabled()
 
         self.session = requests.Session()
         self.session.headers.update({
@@ -261,14 +262,27 @@ class SteamUpcomingCollector:
             "Accept-Language": "en-US,en;q=0.8",
         })
 
-        main_cache = self._load_follower_cache()
-        local_checkpoint = self._load_checkpoint_file()
+        if self.database_primary:
+            # Local files remain resumable cache artifacts. Only acknowledged
+            # database sources supply the initial authoritative observations.
+            checkpoint_state.validate_checkpoint_locations(self.follower_cache_path)
+            checkpoint_state.validate_checkpoint_locations(self.checkpoint_path)
+            main_cache = checkpoint_transport.load_database_follower_cache(
+                repository=self.github_repository, path=self.follower_cache_path,
+            )
+            local_checkpoint = {}
+        else:
+            main_cache = self._load_follower_cache()
+            local_checkpoint = self._load_checkpoint_file()
         remote_checkpoint = self._load_remote_checkpoint()
         self.follower_cache = merge_follower_records(
             main_cache,
             local_checkpoint,
             remote_checkpoint,
         )
+        if self.database_primary:
+            self._save_follower_cache()
+            self._save_checkpoint_local()
         if remote_checkpoint:
             LOGGER.info(
                 "Loaded %d follower records from persistent checkpoint branch %s",
@@ -316,6 +330,11 @@ class SteamUpcomingCollector:
         return checkpoint_transport.checkpoint_headers(self.checkpoint_token)
 
     def _load_remote_checkpoint(self) -> dict[str, dict[str, Any]]:
+        if self.database_primary:
+            return checkpoint_transport.load_database_follower_checkpoint(
+                repository=self.github_repository, path=self.checkpoint_path,
+                branch=self.checkpoint_branch,
+            )
         url = self._checkpoint_api_url()
         if not url or not self.checkpoint_token:
             return {}
@@ -350,11 +369,25 @@ class SteamUpcomingCollector:
         finally:
             del self._checkpoint_frozen_payload
 
-        if not self.checkpoint_token or not self.github_repository:
+        if not self.database_primary and (not self.checkpoint_token or not self.github_repository):
             return
         if not force and self._checkpoint_dirty_count < self.checkpoint_every:
             return
         if self._checkpoint_dirty_count <= 0 and not force:
+            return
+
+        if self.database_primary:
+            # A primary read/write error must abort the collector. Never turn
+            # unavailable authoritative state into a best-effort Git fallback.
+            persisted = checkpoint_transport.persist_database_follower_checkpoint(
+                frozen, repository=self.github_repository, path=self.checkpoint_path,
+                branch=self.checkpoint_branch, merge_records=merge_follower_records,
+            )
+            checkpoint_state.save_checkpoint_file(self.checkpoint_path, persisted.payload)
+            self.follower_cache.clear()
+            self.follower_cache.update(persisted.payload["games"])
+            self._checkpoint_dirty_count = 0
+            LOGGER.info("Persisted Steam follower checkpoint to database primary (%s)", reason)
             return
 
         url = self._checkpoint_api_url()
@@ -475,7 +508,16 @@ class SteamUpcomingCollector:
                         attempt + 1,
                     )
                     if endpoint_name == "followers":
-                        self._persist_checkpoint_remote(reason="steam-429", force=True)
+                        try:
+                            self._persist_checkpoint_remote(reason="steam-429", force=True)
+                        except Exception:
+                            if self.database_primary:
+                                # qualify() treats normal Steam request errors
+                                # as per-game failures; durability is a run gate.
+                                raise checkpoint_transport.DatabaseCheckpointError(
+                                    "Authoritative follower checkpoint was not acknowledged."
+                                ) from None
+                            raise
                     time.sleep(delay)
                     continue
 
@@ -729,6 +771,8 @@ class SteamUpcomingCollector:
 
                 try:
                     followers = self.fetch_followers(game.appid)
+                except checkpoint_transport.DatabaseCheckpointError:
+                    raise
                 except Exception as exc:
                     self.follower_failures += 1
                     self.failed_follower_appids.append(game.appid)

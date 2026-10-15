@@ -13,9 +13,21 @@ from radar_backend.state.follower_checkpoint import (
 
 
 @dataclass(frozen=True)
+class DatabaseFollowerCheckpointAcknowledgement:
+    """Database evidence is distinct from a Git commit or Contents blob."""
+    source_id: str
+    generation: int
+    revision: str
+    manifest_digest: str
+    operation_id: str
+    payload_revision: str
+    observed_at: str
+
+
+@dataclass(frozen=True)
 class PersistedFollowerCheckpoint:
     payload: dict[str, Any]
-    acknowledgement: FollowerCheckpointAcknowledgement
+    acknowledgement: FollowerCheckpointAcknowledgement | DatabaseFollowerCheckpointAcknowledgement
     attempts: int
 
 

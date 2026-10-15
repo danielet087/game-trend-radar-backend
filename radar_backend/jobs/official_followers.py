@@ -51,13 +51,23 @@ def default_services(paths):
         )
 
     publisher = None
+    current_master = None
 
     def begin(checkpoint_state, master_state):
-        nonlocal publisher
+        nonlocal publisher, current_master
+        current_master = master_state
         publisher = checkpoint.begin_persistence(
             checkpoint=paths.checkpoint, master=paths.master,
             checkpoint_state=checkpoint_state, master_state=master_state, clock=clock,
         )
+
+    def dispatch(data, result):
+        from radar_core.storage import primary
+        if not primary.enabled():
+            return catalog.dispatch_content_event(data, result, clock=clock)
+        from radar_backend.publication.database_intents import persist_dispatch_state
+        return catalog.dispatch_content_event(data, result, clock=clock,
+            persist=lambda state: persist_dispatch_state(publisher, state, current_master))
 
     def persist():
         output = catalog.dashboard_output()
@@ -75,12 +85,12 @@ def default_services(paths):
         clock=clock, monotonic=time.monotonic, sleep=time.sleep,
         session_factory=requests.Session, make_queue=queue, git_push=persist,
         reverify_pending_store_dates=lambda data, master: catalog.reverify_pending_store_dates(
-            data, master, clock=clock, session_factory=requests.Session,
+            data, master, clock=clock, session_factory=requests.Session, dispatch=dispatch,
         ),
-        retry_pending_content_dispatches=lambda data: catalog.retry_pending_content_dispatches(data, clock=clock),
+        retry_pending_content_dispatches=lambda data: catalog.retry_pending_content_dispatches(data, clock=clock, dispatch=dispatch),
         verify_store_date_for_result=lambda result, session: catalog.verify_store_date_for_result(result, session, clock=clock),
         upsert_qualified_master=lambda master, result: catalog.upsert_qualified_master(master, result, clock=clock),
-        dispatch_content_event=lambda data, result: catalog.dispatch_content_event(data, result, clock=clock),
+        dispatch_content_event=dispatch,
         follower_client_factory=OfficialFollowerClient,
         follower_cache_factory=OfficialFollowerCache, cooldown_factory=CooldownStore,
         begin_persistence=begin,

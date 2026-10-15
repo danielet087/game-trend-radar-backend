@@ -3,16 +3,146 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import os
 import re
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable
 
 import requests
 
 from radar_backend.domain.follower_checkpoint import CheckpointConflict
+from radar_backend.application.follower_checkpoint import (
+    DatabaseFollowerCheckpointAcknowledgement, persist_follower_checkpoint,
+)
 from radar_backend.state.follower_checkpoint import (
     FollowerCheckpointAcknowledgement, RemoteFollowerCheckpoint,
     checkpoint_bytes, follower_records, git_blob_sha, strict_json_loads,
+    validate_checkpoint_locations,
 )
+
+
+def database_primary_enabled() -> bool:
+    if os.environ.get("RADAR_DATABASE_PRIMARY", "0") in {"0", ""}:
+        return False
+    from radar_core.storage.primary import enabled
+    return enabled()
+
+
+class DatabaseCheckpointError(RuntimeError):
+    """A primary durability failure must not become an ordinary Steam error."""
+
+
+def _database_client():
+    from radar_core.storage.sql import TursoClient
+    # A new deadline belongs to each bounded checkpoint operation, rather than
+    # expiring while the collector is pacing its Steam requests.
+    return TursoClient.from_env(budget_seconds=120)
+
+
+def _database_identity(repository: str, path: str | Path, branch: str) -> tuple[str, str]:
+    if (not isinstance(repository, str)
+            or re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository) is None
+            or any(part in {".", ".."} for part in repository.split("/"))):
+        raise ValueError("Database checkpoint requires a repository identity")
+    if (not isinstance(branch, str) or not branch
+            or re.fullmatch(r"[A-Za-z0-9_./-]+", branch) is None
+            or any(part in {"", ".", ".."} for part in branch.split("/"))
+            or ".." in branch):
+        raise ValueError("Database checkpoint requires a branch identity")
+    local, _ = validate_checkpoint_locations(Path(path))
+    try:
+        relative = local.relative_to(Path.cwd().resolve()).as_posix()
+    except ValueError:
+        raise ValueError("Database checkpoint cache must remain inside the checkout") from None
+    if (not relative.startswith("data/") or not relative.endswith(".json") or "\\" in relative
+            or any(part in {"", ".", ".."} for part in relative.split("/"))):
+        raise ValueError("Database checkpoint requires a data JSON path")
+    return f"{repository}@{branch}", relative
+
+
+@dataclass(frozen=True)
+class _DatabaseFollowerCheckpoint:
+    games: dict[str, dict[str, Any]]
+    metadata: dict[str, Any]
+    generation: int
+
+
+def _read_database_checkpoint(client, source_id: str, path: str) -> _DatabaseFollowerCheckpoint:
+    from radar_core.storage import primary_store
+    from radar_core.storage.sql import StorageError
+    status = primary_store.primary_status(client, source_id)
+    if status.get("active") is not True or status.get("mode") != "primary":
+        raise StorageError("PRIMARY_NOT_ACTIVE", "Follower checkpoint database primary is not active.")
+    head, files = primary_store.read_files(client, source_id, paths=[path])
+    if path not in files:
+        raise StorageError("SOURCE_FILE_NOT_FOUND", "Authoritative follower checkpoint is missing.")
+    if type(head.get("generation")) is not int or head["generation"] < 1:
+        raise ValueError("Database checkpoint requires an acknowledged generation")
+    payload = strict_json_loads(files[path].decode("utf-8"))
+    games = follower_records(payload, strict=True)
+    metadata = ({key: value for key, value in payload.items()
+                 if key not in {"version", "updated_at", "games"}}
+                if "games" in payload else {})
+    return _DatabaseFollowerCheckpoint(games, metadata, head["generation"])
+
+
+def load_database_follower_cache(*, repository: str, path: str | Path):
+    source_id, relative = _database_identity(repository, path, "main")
+    return _read_database_checkpoint(_database_client(), source_id, relative).games
+
+
+def load_database_follower_checkpoint(*, repository: str, path: str | Path, branch: str):
+    source_id, relative = _database_identity(repository, path, branch)
+    return _read_database_checkpoint(_database_client(), source_id, relative).games
+
+
+def persist_database_follower_checkpoint(frozen_payload, *, repository: str, path: str | Path,
+                                        branch: str, merge_records: Callable):
+    from radar_core.publication import snapshot_revision
+    from radar_core.storage import primary_store
+    from radar_core.storage.sql import StorageError
+    source_id, relative = _database_identity(repository, path, branch)
+    client = _database_client()
+    # The operation identifies the frozen observations, even when a conflict
+    # requires rebuilding their merge against a newer primary generation.
+    frozen_digest = snapshot_revision(frozen_payload)
+    operation_id = "steam-followers-" + hashlib.sha256(
+        f"{source_id}\n{relative}\n{frozen_digest}".encode("utf-8")
+    ).hexdigest()
+
+    def write(previous, payload):
+        raw = checkpoint_bytes(payload)
+        digest = hashlib.sha256(raw).hexdigest()
+        try:
+            receipt = primary_store.publish_patch(
+                client, source_id, base_generation=previous.generation,
+                changed={relative: raw}, deleted=[], operation_id=operation_id,
+                captured_at=payload["updated_at"], payload_revision=frozen_digest,
+            )
+        except StorageError as exc:
+            if exc.code == "STALE_GENERATION":
+                raise CheckpointConflict() from None
+            raise
+        if (not isinstance(receipt, dict) or receipt.get("source_id") != source_id
+                or type(receipt.get("generation")) is not int
+                or receipt["generation"] < previous.generation
+                or not isinstance(receipt.get("revision"), str) or not receipt["revision"]
+                or not isinstance(receipt.get("manifest_digest"), str)
+                or re.fullmatch(r"[0-9a-f]{64}", receipt["manifest_digest"]) is None
+                or receipt.get("operation_id") != operation_id
+                or receipt.get("file_digests") != {relative: digest}
+                or receipt.get("deleted") != []):
+            raise ValueError("Database follower checkpoint acknowledgement does not match its payload")
+        return DatabaseFollowerCheckpointAcknowledgement(
+            source_id, receipt["generation"], receipt["revision"], receipt["manifest_digest"],
+            operation_id, digest, payload["updated_at"],
+        )
+
+    return persist_follower_checkpoint(
+        frozen_payload, read_latest=lambda: _read_database_checkpoint(client, source_id, relative),
+        write_merged=write, merge_records=merge_records,
+    )
 
 
 class CheckpointTransportError(RuntimeError):

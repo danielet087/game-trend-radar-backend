@@ -18,6 +18,11 @@ EVIDENCE_SOURCES = frozenset({
 TAIPEI = ZoneInfo("Asia/Taipei")
 TW_STORE_DATE_AUTHORITY = "steam_taiwan_store_date_authoritative"
 TW_STORE_DATE_PROVIDER = "Steam Store appdetails cc=TW l=tchinese"
+UNAVAILABLE_GROUP_STATUS = "unavailable_group_id"
+UNKNOWN_FOLLOWER_FIELDS = (
+    "followers", "follower_checked_at", "follower_source", "official_ge5000",
+    "follower_status", "follower_unavailable_at",
+)
 
 
 def decimal_id(value: object) -> str | None:
@@ -194,6 +199,34 @@ def validate_twitch_snapshot(proof: object, registry: dict, discovery: dict,
     return linked == declared
 
 
+def has_unavailable_group_followers(row: object) -> bool:
+    """Recognize an explicit missing-group observation, never an invented zero.
+
+    This checks the follower evidence only. Admission still requires the full
+    identity, release-date and content checks in ``is_twitch_qualified``.
+    """
+    if not isinstance(row, dict) or not all(key in row for key in UNKNOWN_FOLLOWER_FIELDS):
+        return False
+    if (
+        row["followers"] is not None
+        or row["follower_checked_at"] is not None
+        or row["follower_source"] is not None
+        or row["official_ge5000"] is not False
+        or row["follower_status"] != UNAVAILABLE_GROUP_STATUS
+        or any(row.get(key) is not None for key in (
+            "group_id64", "official_group_id64", "group_short_id",
+        ))
+    ):
+        return False
+    unavailable = aware_time(row["follower_unavailable_at"])
+    admission = normalize_twitch_admission(row.get("twitch_admission"), row.get("appid"))
+    return (
+        unavailable is not None
+        and admission is not None
+        and unavailable >= aware_time(admission["checked_at"])
+    )
+
+
 def is_twitch_qualified(row: object) -> bool:
     """Require the same exact-date/content proof after admission is persisted."""
     if not has_twitch_admission(row):
@@ -214,15 +247,51 @@ def is_twitch_qualified(row: object) -> bool:
         and row.get("release_date_timezone") == "Asia/Taipei"
         and (consistent_timestamp_day or has_taiwan_store_date_authority(row))
         and row.get("release_end") == day
-        and type(row.get("followers")) is int
-        and row["followers"] >= 0
-        and aware_time(row.get("follower_checked_at")) is not None
+        and (
+            (
+                type(row.get("followers")) is int
+                and row["followers"] >= 0
+                and aware_time(row.get("follower_checked_at")) is not None
+                and row.get("follower_status") != UNAVAILABLE_GROUP_STATUS
+                and row.get("follower_unavailable_at") is None
+            )
+            or has_unavailable_group_followers(row)
+        )
     )
+
+
+def preserve_follower_measurement(existing: dict, incoming: dict) -> dict:
+    """Missing measurements never erase a real count for the same Steam AppID.
+
+    Numeric-versus-numeric freshness remains the consumer's existing policy.
+    """
+    result = dict(incoming)
+    aid = decimal_id(existing.get("appid"))
+    if aid is None or aid != decimal_id(incoming.get("appid")):
+        return result
+    measured = (
+        type(existing.get("followers")) is int
+        and existing["followers"] >= 0
+        and aware_time(existing.get("follower_checked_at")) is not None
+    )
+    if measured and incoming.get("followers") is None:
+        for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000",
+                    "group_id64", "official_group_id64", "group_short_id"):
+            if key in existing:
+                result[key] = existing[key]
+            else:
+                result.pop(key, None)
+    if (type(result.get("followers")) is int and result["followers"] >= 0
+            and aware_time(result.get("follower_checked_at")) is not None):
+        if result.get("follower_status") == UNAVAILABLE_GROUP_STATUS:
+            result.pop("follower_status")
+        result.pop("follower_unavailable_at", None)
+    return result
 
 
 def preserve_twitch_admission(existing: dict, incoming: dict) -> dict:
     """A normal Followers refresh cannot remove a separately accepted source."""
-    result = dict(incoming)
+    result = preserve_follower_measurement(existing, incoming)
     prior = normalize_twitch_admission(existing.get("twitch_admission"), existing.get("appid"))
     if prior is not None and decimal_id(existing.get("appid")) == decimal_id(incoming.get("appid")):
         newer = normalize_twitch_admission(incoming.get("twitch_admission"), incoming.get("appid"))
@@ -231,4 +300,15 @@ def preserve_twitch_admission(existing: dict, incoming: dict) -> dict:
         for key in ("steam_type", "sexual_content_screened"):
             if key not in result and key in existing:
                 result[key] = existing[key]
+        if (is_twitch_qualified(existing) and has_unavailable_group_followers(existing)
+              and not any(key in incoming for key in UNKNOWN_FOLLOWER_FIELDS)
+              and not any(incoming.get(key) is not None for key in (
+                  "group_id64", "official_group_id64", "group_short_id",
+              ))):
+            # A title-only refresh can retain an already accepted observation;
+            # an explicit null or malformed follower update cannot acquire it.
+            for key in UNKNOWN_FOLLOWER_FIELDS:
+                result[key] = existing[key]
+            if "group_id64" in existing:
+                result["group_id64"] = existing["group_id64"]
     return result

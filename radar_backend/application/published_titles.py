@@ -106,7 +106,7 @@ def refresh(
 
     rows = sorted(
         [updated_games.get(appid, row) for appid, row in original_games.items()],
-        key=lambda row: (row["release_start"], -int(row["followers"]), int(row["appid"])),
+        key=lambda row: (row["release_start"], -int(row.get("followers") or 0), int(row["appid"])),
     )
     now = clock().isoformat()
     projection = write_catalog_projection(data_dir, rows, now)

@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 from radar_backend.adapters.public_catalog import write_catalog_projection
+from radar_core.domain.twitch_admission import is_twitch_qualified
 import logging
 import re
 import time
@@ -278,13 +279,14 @@ def audit(
     upcoming = [
         int(row["appid"]) for row in kept.values()
         if str(row.get("release_start")) >= today_s
-        and int(row.get("followers") or 0) >= 5000
+        and (int(row.get("followers") or 0) >= 5000 or is_twitch_qualified(row))
     ]
     released = [
         int(row["appid"]) for row in kept.values()
         if released_from <= str(row.get("release_start")) < today_s
         and (
             int(row.get("followers") or 0) >= 5000
+            or is_twitch_qualified(row)
             or (
                 int(row.get("followers") or 0) > 3000
                 and row.get("recent_source") in {"tracked_release", "direct_release"}

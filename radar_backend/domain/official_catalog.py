@@ -121,6 +121,8 @@ def upsert_qualified_master(
     prior = by_id.get(appid, {})
     merged = dict(prior)
     merged.update({key: value for key, value in candidate.items() if value is not None})
+    merged.pop("follower_status", None)
+    merged.pop("follower_unavailable_at", None)
     changed = merged != prior
     by_id[appid] = merged
     master["games"] = sorted(

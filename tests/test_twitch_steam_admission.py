@@ -297,7 +297,7 @@ def test_previous_parser_pending_retries_once_without_resetting_cached_followers
         output = collect(root, "b"*40, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
         assert output["records"][0]["followers"] == 13
         assert session.get.call_count == 2
-        assert output["state_updates"]["123"]["validation_version"] == 4
+        assert output["state_updates"]["123"]["validation_version"] == 5
 
 
 def test_official_utc_store_day_crosses_midnight_in_taipei():
@@ -335,7 +335,7 @@ def test_date_conflict_migration_rechecks_metadata_with_official_cache():
         assert output["records"][0]["release_start"] == "2026-09-03"
         assert output["records"][0]["release_timestamp_taipei_date"] == "2026-09-04"
         assert output["records"][0]["release_date_conflict"] is True
-        assert output["state_updates"]["123"]["validation_version"] == 4
+        assert output["state_updates"]["123"]["validation_version"] == 5
         assert output["records"][0]["followers"] == 13
         assert session.get.call_count == 2
         state = {"games": output["state_updates"]}
@@ -359,7 +359,8 @@ def test_missing_followers_queues_while_next_cached_game_can_be_admitted():
         root = Path(tmp); fake_frontend(root); extend_frontend_appids(root, [123, 124])
         session = Mock()
         session.get.side_effect = [*metadata_responses(123), *metadata_responses(124)]
-        cache = {"games": {"124": {"followers": 88, "checked_at": "2026-10-02T06:00:00Z"}}}
+        cache = {"games": {"124": {"followers": 88, "checked_at": "2026-10-02T06:00:00Z"}},
+                 "pending_candidates": {"123": {"appid": 123, "group_id64": "103582791429521531"}}}
         delays = []
         output = collect(root, SHA, {"games": []}, {}, session=session, now=NOW, caches=[cache],
                          blocked=set(), sleep=delays.append)
@@ -375,7 +376,8 @@ def test_missing_followers_queues_while_next_cached_game_can_be_admitted():
         extend_frontend_appids(root, [123, 124, 125])
         session.reset_mock(); session.get.side_effect = [*metadata_responses(123), *metadata_responses(125)]
         again = collect(root, "b"*40, master, saved, session=session, now=NOW+timedelta(minutes=1),
-                        blocked=set(), sleep=lambda _: None)
+                        blocked=set(), sleep=lambda _: None,
+                        caches=[{"pending_candidates": {"125": {"appid": 125, "group_id64": "103582791429521533"}}}])
         assert session.get.call_count == 4
         assert again["state_updates"]["125"]["reason"] == "queued_official_followers"
         assert again["state_updates"]["125"]["retry_at"] is None

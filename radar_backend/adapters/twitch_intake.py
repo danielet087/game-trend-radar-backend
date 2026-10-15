@@ -33,7 +33,7 @@ from radar_backend.adapters.steam_twitch_intake import RateLimited
 TAIPEI = ZoneInfo("Asia/Taipei")
 STORE_BROWSE = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1/"
 APPDETAILS = "https://store.steampowered.com/api/appdetails"
-STATE_VALIDATION_VERSION = 4
+STATE_VALIDATION_VERSION = 5
 TWITCH_QUEUE_SOURCE = _queue_rules.TWITCH_QUEUE_SOURCE
 TWITCH_QUEUE_PRIORITY = _queue_rules.TWITCH_QUEUE_PRIORITY
 WITHDRAW_REASONS = _queue_rules.WITHDRAW_REASONS
@@ -83,8 +83,8 @@ def build_candidate(
     proof: dict,
     item: dict,
     details: dict,
-    followers: int,
-    checked_at: str,
+    followers: int | None,
+    checked_at: str | None,
     now: datetime,
     blocked: set[int],
 ) -> tuple[dict | None, str]:
@@ -358,4 +358,5 @@ def apply_queue_batch(master: dict, state: dict, checkpoint: dict, batch: dict):
         apply_batch=apply_batch,
         aware_time=aware_time,
         sync_twitch_queue=sync_twitch_queue,
+        fallback_allowed=lambda row: is_twitch_qualified(row) and not is_disallowed(row, excluded_appids()),
     )

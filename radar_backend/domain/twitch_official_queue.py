@@ -8,6 +8,8 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import date, datetime, timedelta
 
+from radar_core.domain.twitch_admission import aware_time, is_twitch_qualified, has_unavailable_group_followers
+
 
 TWITCH_QUEUE_SOURCE = "twitch_steam_discovery"
 TWITCH_QUEUE_PRIORITY = 100
@@ -19,6 +21,7 @@ WITHDRAW_REASONS = frozenset({
 FOLLOWER_FIELDS = frozenset({
     "followers", "follower_checked_at", "follower_source", "official_ge5000",
     "official_followers", "official_checked_at_taipei",
+    "follower_status", "follower_unavailable_at",
 })
 
 
@@ -114,6 +117,8 @@ def is_twitch_queue_candidate(
     # returned, persisted in the queue, or published as a verified count.
     eligibility = {**metadata, "appid": int(aid), "twitch_admission": proof,
                    "followers": 0, "follower_checked_at": proof["checked_at"]}
+    eligibility.pop("follower_status", None)
+    eligibility.pop("follower_unavailable_at", None)
     return is_twitch_qualified(eligibility)
 
 
@@ -168,6 +173,28 @@ def sync_twitch_queue(
             or state.get("reason") in withdraw_reasons
         )
     }
+    # Successful unknown-group admissions finish this AppID's normal work as
+    # well as its Twitch overlay. Keep separate evidence, never a fake count.
+    completed = result.get("twitch_admissions", {})
+    if not isinstance(completed, dict):
+        raise ValueError("Twitch admissions must be indexed by AppID")
+    for accepted in batch.get("records", []):
+        if (not isinstance(accepted, dict) or not is_twitch_qualified(accepted)
+                or not has_unavailable_group_followers(accepted)):
+            continue
+        aid = decimal_id(accepted.get("appid"))
+        update = updates.get(aid) or {}
+        if (aid is None or update.get("status") != "accepted"
+                or update.get("twitch_admission") != accepted.get("twitch_admission")):
+            continue
+        previous = completed.get(aid)
+        previous_time = aware_time(previous.get("follower_unavailable_at")) if isinstance(previous, dict) else None
+        if previous_time is None or previous_time <= aware_time(accepted["follower_unavailable_at"]):
+            completed[aid] = deepcopy_fn(accepted)
+            result["twitch_admissions"] = completed
+        pending.pop(aid, None)
+        result.get("unresolved_candidates", {}).pop(aid, None)
+
     incoming = batch.get("follower_candidates") or []
     if not isinstance(incoming, list):
         raise ValueError("Follower candidates must be a list")

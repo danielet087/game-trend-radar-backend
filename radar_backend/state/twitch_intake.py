@@ -44,11 +44,23 @@ def apply_batch(master: dict, state: dict, batch: dict, *,
             continue
         candidate = preserve_twitch_admission(current, keep_newer_release(current, row))
         current_follower_time = aware_time(current.get("follower_checked_at"))
-        if current_follower_time is not None and current_follower_time > aware_time(candidate["follower_checked_at"]):
-            for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000"):
+        candidate_follower_time = aware_time(candidate.get("follower_checked_at"))
+        known_current = type(current.get("followers")) is int and current["followers"] >= 0
+        if known_current and (candidate.get("followers") is None or (
+                current_follower_time is not None and candidate_follower_time is not None
+                and current_follower_time > candidate_follower_time)):
+            for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000",
+                        "group_id64", "official_group_id64", "group_short_id"):
                 if key in current:
                     candidate[key] = current[key]
+                elif row.get("followers") is None:
+                    candidate.pop(key, None)
+            candidate.pop("follower_status", None)
+            candidate.pop("follower_unavailable_at", None)
         merged = {**current, **candidate}
+        if type(merged.get("followers")) is int:
+            merged.pop("follower_status", None)
+            merged.pop("follower_unavailable_at", None)
         if not is_twitch_qualified(merged) or is_disallowed(merged, blocked):
             # A concurrent authoritative date/adult update wins; do not overwrite it.
             continue

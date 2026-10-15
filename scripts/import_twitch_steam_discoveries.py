@@ -33,7 +33,7 @@ from radar_backend.adapters.steam_twitch_intake import RateLimited
 TAIPEI = ZoneInfo('Asia/Taipei')
 STORE_BROWSE = 'https://api.steampowered.com/IStoreBrowseService/GetItems/v1/'
 APPDETAILS = 'https://store.steampowered.com/api/appdetails'
-STATE_VALIDATION_VERSION = 4
+STATE_VALIDATION_VERSION = 5
 
 def stamp(now: datetime) -> str:
     return _intake_rules.stamp(now, timezone_type=timezone)
@@ -71,8 +71,8 @@ def build_candidate(
     proof: dict,
     item: dict,
     details: dict,
-    followers: int,
-    checked_at: str,
+    followers: int | None,
+    checked_at: str | None,
     now: datetime,
     blocked: set[int],
 ) -> tuple[dict | None, str]:

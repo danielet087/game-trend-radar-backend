@@ -96,7 +96,7 @@ def validate_snapshot(
 
 def build_candidate(
     appid: int, proof: dict, item: dict, details: dict,
-    followers: int, checked_at: str, now: datetime, blocked: set[int], *,
+    followers: int | None, checked_at: str | None, now: datetime, blocked: set[int], *,
     decimal_id, is_disallowed, is_explicit_sex_game, parse_store_release_detail,
     parse_release_window, resolve_store_release_day, aware_time,
     is_twitch_qualified, stamp, taipei, tw_store_date_authority,
@@ -172,7 +172,8 @@ def build_candidate(
     taipei_day = datetime_type.fromisoformat(day).date()
     if not today - timedelta_type(days=30) <= taipei_day <= today + timedelta_type(days=365):
         return None, "outside_new_game_window"
-    if type(followers) is not int or followers < 0 or aware_time(checked_at) is None:
+    unavailable_group = followers is None and checked_at is None
+    if not unavailable_group and (type(followers) is not int or followers < 0 or aware_time(checked_at) is None):
         return None, "official_followers_unavailable"
     candidate = {
         "appid": appid, "name": item.get("name") or details.get("name") or f"Steam App {appid}",
@@ -189,13 +190,17 @@ def build_candidate(
         "release_date_verified_at": stamp(now), "post_followers_store_verified": True,
         "post_followers_store_verified_at": stamp(now),
         "followers": followers, "follower_checked_at": checked_at,
-        "follower_source": "Steam Community XML memberCount", "official_ge5000": followers >= 5000,
+        "follower_source": None if unavailable_group else "Steam Community XML memberCount",
+        "official_ge5000": False if unavailable_group else followers >= 5000,
         "sexual_content_screened": True, "steam_type": "game",
         "content_descriptorids": sorted(set(descriptors) | set(item.get("content_descriptorids") or [])),
         "store_url": f"https://store.steampowered.com/app/{appid}/",
         "community_url": f"https://steamcommunity.com/app/{appid}/",
         "twitch_admission": proof,
     }
+    if unavailable_group:
+        candidate.update(group_id64=None, follower_status="unavailable_group_id",
+                         follower_unavailable_at=stamp(now))
     return (candidate, "accepted") if is_twitch_qualified(candidate) else (None, "invalid_admission")
 
 
@@ -204,25 +209,58 @@ def cached_follower(
 ) -> tuple[int, str] | None:
     choices = []
     for doc in documents:
-        rows = doc.get("games") or doc.get("official_results") or doc.get("verified") or {}
-        if not isinstance(rows, dict):
-            continue
-        row = rows.get(str(appid))
-        if not isinstance(row, dict):
-            continue
-        count = row.get("followers", row.get("official_followers"))
-        checked = row.get("checked_at") or row.get("official_checked_at_taipei")
-        clock = aware_time(checked)
-        if type(count) is int and count >= 0 and clock is not None and clock <= now:
-            choices.append((clock, count, checked))
+        for field in ("games", "official_results", "verified", "official_growth_observations"):
+            rows = doc.get(field) or {}
+            if not isinstance(rows, dict):
+                continue
+            row = rows.get(str(appid))
+            if not isinstance(row, dict) or row.get("appid", appid) not in (appid, str(appid)):
+                continue
+            count = row.get("followers", row.get("official_followers"))
+            checked = row.get("checked_at") or row.get("official_checked_at_taipei") or row.get("follower_checked_at")
+            clock = aware_time(checked)
+            if type(count) is int and count >= 0 and clock is not None and clock <= now:
+                choices.append((clock, count, checked))
     if not choices:
         return None
     _, count, checked = max(choices, key=lambda x: x[0])
     return count, checked
 
 
+def cached_group(appid: int, documents: list[dict], *records: dict) -> str | None:
+    """Reuse an already validated group from every checkpoint and queued overlay."""
+    from radar_backend.domain.official_queue import valid_group_id64, group_to_gid
+
+    def group(row):
+        if not isinstance(row, dict) or row.get("appid", appid) not in (appid, str(appid)):
+            return None
+        for field in ("group_id64", "official_group_id64"):
+            if value := valid_group_id64(row.get(field)):
+                return value
+        short = row.get("group_short_id")
+        if type(short) is int and 0 < short <= 2 ** 32 - 1:
+            return group_to_gid(short)
+        for field in ("follower_candidate", "steam_candidate", "normal_candidate"):
+            if value := group(row.get(field)):
+                return value
+        return None
+
+    for row in records:
+        if value := group(row):
+            return value
+    for document in documents:
+        for field in ("games", "official_results", "verified", "official_growth_observations",
+                      "pending_candidates", "unresolved_candidates"):
+            rows = document.get(field) or {}
+            if isinstance(rows, dict) and (value := group(rows.get(str(appid)))):
+                return value
+    return None
+
+
 def signature(row: dict, *, json_module=json, hashlib_module=hashlib) -> str:
     value = [row["appid"], row["followers"], row["release_start"], row["twitch_admission"]]
+    if row.get("follower_status") == "unavailable_group_id":
+        value.extend([row["follower_status"], row.get("follower_unavailable_at")])
     return hashlib_module.sha256(json_module.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
@@ -234,7 +272,8 @@ def identity_signature(proof: dict, *, json_module=json, hashlib_module=hashlib)
 def follower_candidate(probe: dict, *, deepcopy=deepcopy) -> dict:
     """Store the metadata evidence without turning the probe's zero into a count."""
     metadata = deepcopy(probe)
-    for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000"):
+    for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000",
+                "follower_status", "follower_unavailable_at"):
         metadata.pop(key, None)
     return {
         "appid": metadata["appid"], "name": metadata["name"],
@@ -289,4 +328,8 @@ def retained_follower_candidate(
     metadata.update(twitch_admission=proof, followers=0, follower_checked_at=stamp(verified_at))
     if not is_twitch_qualified(metadata):
         return None
-    return follower_candidate(metadata)
+    result = follower_candidate(metadata)
+    group_id = cached_group(appid, [], candidate)
+    if group_id is not None:
+        result["group_id64"] = group_id
+    return result

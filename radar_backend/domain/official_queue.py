@@ -11,7 +11,9 @@ from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from zoneinfo import ZoneInfo
 
-from radar_core.domain.twitch_admission import aware_time as admission_aware_time
+from radar_core.domain.twitch_admission import (
+    aware_time as admission_aware_time, is_twitch_qualified, has_unavailable_group_followers,
+)
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 GROUP_BASE = 103582791429521408
@@ -111,6 +113,9 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         raise ValueError("Frozen original input changed")
     if legacy_cp.get("cohort") != "steam_fresh_20260922_post_adult_1317_near_release":
         raise ValueError("Legacy official checkpoint cohort mismatch")
+    completed_twitch = {str(aid) for aid, row in (cp.get("twitch_admissions") or {}).items()
+                       if isinstance(row, dict) and str(row.get("appid")) == str(aid)
+                       and is_twitch_qualified(row) and has_unavailable_group_followers(row)}
     existing_official = set(legacy_cp["official_results"]) | set(cp["official_results"])
     existing_official |= {
         str(k) for k, v in official_cache.get("games", {}).items()
@@ -124,6 +129,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
 
     for source in frozen_rows:
         aid = str(int(source["appid"]))
+        if aid in completed_twitch:
+            continue
         if not valid_date(source.get("release_date")):
             raise ValueError("Frozen candidate has no exact day")
         group = group_by_id.get(aid)
@@ -178,7 +185,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 source.get("sexual_content_screened") is not True
             ):
                 continue
-            if aid in existing_official:
+            if aid in existing_official or aid in completed_twitch:
                 continue
             new = {
                 "appid": int(aid),
@@ -224,6 +231,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
     }
     pending = []
     for aid, row in cp["pending_candidates"].items():
+        if aid in completed_twitch:
+            continue
         twitch = row.get("queue_source") == "twitch_steam_discovery"
         if twitch:
             if not is_twitch_queue_candidate(row, now=observed):

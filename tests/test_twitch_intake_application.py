@@ -111,7 +111,9 @@ def ports(*appids):
 
 
 def collect(p, master=None, previous=None, **kwargs):
-    supplied = {**p.kw, "now": NOW, **kwargs}
+    known = {"pending_candidates": {str(aid): {"appid": aid, "group_id64": str(103582791429521408 + aid)}
+             for aid, _proof in p.validate.return_value}}
+    supplied = {**p.kw, "now": NOW, "caches": [known], **kwargs}
     return app.collect(FRONTEND, SHA, master or {"games": []}, previous or {}, **supplied)
 
 
@@ -394,7 +396,7 @@ def test_queue_reconciliation_is_controlled_by_key_presence_and_follows_apply(ba
         trace.append(("sync", cp, value, now))
         return {"saved": "checkpoint"}
     checkpoint = {"original": True}
-    result = app.apply_queue_batch({}, {}, checkpoint, batch, apply_batch=apply, aware_time=parse, sync_twitch_queue=sync)
+    result = app.apply_queue_batch({}, {}, checkpoint, batch, apply_batch=apply, aware_time=parse, sync_twitch_queue=sync, fallback_allowed=lambda row: True)
     assert [step[0] for step in trace] == (["apply", "parse", "sync"] if "follower_candidates" in batch else ["apply", "parse"])
     assert result[:2] == ({"saved": "master"}, {"saved": "state"})
     assert result[2] == ({"saved": "checkpoint"} if "follower_candidates" in batch else checkpoint)
@@ -406,7 +408,7 @@ def test_failed_apply_does_not_parse_or_touch_checkpoint():
     fail = Mock(side_effect=ValueError("bad batch"))
     parse, sync = Mock(), Mock()
     with pytest.raises(ValueError, match="bad batch"):
-        app.apply_queue_batch({}, {}, {}, {}, apply_batch=fail, aware_time=parse, sync_twitch_queue=sync)
+        app.apply_queue_batch({}, {}, {}, {}, apply_batch=fail, aware_time=parse, sync_twitch_queue=sync, fallback_allowed=lambda row: True)
     parse.assert_not_called()
     sync.assert_not_called()
 

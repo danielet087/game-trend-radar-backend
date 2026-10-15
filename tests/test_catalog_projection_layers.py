@@ -83,10 +83,12 @@ def test_projection_keeps_order_none_and_nested_references_without_unknown_field
     assert row['unknown'] == 'hidden'
 
 
-def test_projection_fields_are_the_existing_45_fields_with_player_category_evidence():
-    assert len(FIELDS) == 45
-    assert len(set(FIELDS)) == 45
-    assert FIELDS[32:35] == ('categories', 'categories_source', 'categories_checked_at')
+def test_projection_fields_include_player_categories_and_unknown_follower_evidence():
+    assert len(FIELDS) == 50
+    assert {"follower_source", "official_ge5000", "group_id64", "follower_status", "follower_unavailable_at"} <= set(FIELDS)
+    assert len(set(FIELDS)) == 50
+    offset = FIELDS.index('categories')
+    assert FIELDS[offset:offset+3] == ('categories', 'categories_source', 'categories_checked_at')
     row = {key: None for key in reversed(FIELDS)}
     assert list(catalog_payload([row], 'now', 'r')['games'][0]) == list(FIELDS)
 

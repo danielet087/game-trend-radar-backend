@@ -1,5 +1,11 @@
 # Turso primary / Cloudflare D1 standby rollout
 
+The complete source-document ingestion, D1 replication, and daily portable SQL
+backup workflow is implemented in `source-storage-sync.yml`. See
+[database-storage.md](database-storage.md) for current coverage, recovery and
+operating instructions. Collectors still use Git as their ingestion/publication
+transport; direct collector-primary cutover has not been performed.
+
 ## Stage 1: connection validation
 
 Configure these **repository Actions secrets** in `game-trend-radar-backend`:

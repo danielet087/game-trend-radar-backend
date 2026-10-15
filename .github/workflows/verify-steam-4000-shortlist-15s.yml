@@ -16,7 +16,7 @@ jobs:
     # Shortlist is only 247 titles. GitHub-hosted is deliberately bounded.
     # This consumes private Actions minutes, unlike a self-hosted runner.
     # Legacy Git writers cannot bypass an activated database primary.
-    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1' && vars.RADAR_DATABASE_PRIMARY != '1'
+    if: github.event_name == 'workflow_dispatch' && vars.RADAR_DATABASE_MIGRATION_PAUSE != '1' && vars.RADAR_DATABASE_PRIMARY != '1'
     runs-on: ubuntu-latest
     timeout-minutes: 110
     steps:

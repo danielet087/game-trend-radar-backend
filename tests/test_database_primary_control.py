@@ -120,6 +120,16 @@ class DatabasePrimaryControlTests(unittest.TestCase):
         self.assertTrue(all(method == "GET" for method, *_ in self.github.calls))
         self.assertEqual({repo for _, repo, _, _ in self.github.calls}, set(control.RUNTIMES))
 
+    def test_dedicated_rollout_credential_precedes_existing_publication_tokens(self):
+        denied = GitHubFixture()
+        denied.fail_repository = control.RUNTIMES[0]
+        with patch.dict(os.environ, {"DATABASE_ROLLOUT_TOKEN": "rollout", "FRONTEND_REPO_TOKEN": "publication", "CONTENT_BACKEND_TOKEN": "content"}), \
+                patch.object(control, "GitHub", side_effect=lambda token: self.github if token == "rollout" else denied):
+            chosen, keys = control.clients()
+        self.assertTrue(all(client is self.github for client in chosen.values()))
+        self.assertEqual(set(keys), set(control.RUNTIMES))
+        self.assertEqual(denied.calls, [])
+
     def test_drain_rejects_truncated_or_malformed_inventory_before_ignoring_tests(self):
         cases = [
             {"total_count": 101, "workflow_runs": [{"id": i, "path": "test.yml"} for i in range(100)]},

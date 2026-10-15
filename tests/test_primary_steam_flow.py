@@ -204,3 +204,27 @@ def test_production_workflows_use_primary_entries_and_fence_old_writers():
         legacy = yaml.safe_load((root / filename).read_text())
         for value in legacy['jobs'].values():
             assert "vars.RADAR_DATABASE_PRIMARY != '1'" in value['if']
+
+
+def test_all_legacy_writer_jobs_require_manual_dispatch_even_with_primary_disabled():
+    root = Path(__file__).resolve().parents[1] / '.github/workflows'
+    filenames = (
+        'convert-eligible-names-script-once.yml', 'games-popularity-anonymous-salvage-once.yml',
+        'games-popularity-resumable-once.yml', 'localize-steam-candidates-once.yml',
+        'pilot-steam-prefilter-4000.yml', 'publish-steam-preview.yml',
+        'screen-entire-steam-year-third-party.yml', 'screen-steam-exact-day-once.yml',
+        'steam-adult-filter-experiment-once.yml', 'steam-audit-published-release-dates.yml',
+        'steam-candidate-supervisor.yml', 'steam-manual-sync-once.yml',
+        'steam-master-post-followers-date-repair-once.yml', 'steam-official-backlog-oneoff-20260923.yml',
+        'steam-official-followers-resumable-once.yml', 'steam-official-hour-stress-once.yml',
+        'steam-official-nearfirst-batch-once.yml', 'steam-refresh-all-qualified-content.yml',
+        'steam-refresh-published-chinese.yml', 'steam-refresh-releasing-soon-content.yml',
+        'sync-steam-release-times.yml', 'update-steam.yml', 'verify-steam-4000-shortlist-15s.yml',
+    )
+    expected = ("github.event_name == 'workflow_dispatch' && "
+                "vars.RADAR_DATABASE_MIGRATION_PAUSE != '1' && vars.RADAR_DATABASE_PRIMARY != '1'")
+    assert len(filenames) == 23
+    for filename in filenames:
+        workflow = yaml.safe_load((root / filename).read_text())
+        for job in workflow['jobs'].values():
+            assert job['if'] == expected, filename

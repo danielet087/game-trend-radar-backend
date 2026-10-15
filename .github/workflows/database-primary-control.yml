@@ -13,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: radar-database-cutover
@@ -23,6 +24,31 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:
+      - name: Stop the obsolete experiment triggered by the initial migration commit
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, subprocess
+          repo = 'danielet087/game-trend-radar-backend'
+          run_id = 38761923739
+          result = subprocess.run(['gh', 'api', f'repos/{repo}/actions/runs/{run_id}'],
+                                  check=True, capture_output=True, text=True)
+          run = json.loads(result.stdout)
+          expected = ('c894f89715100c233d01a9d76d293d84f304fe89', 'push',
+                      '.github/workflows/steam-official-hour-stress-once.yml')
+          if (run.get('head_sha'), run.get('event'), run.get('path')) != expected:
+              raise SystemExit('Unexpected historical run identity; no cancellation performed')
+          if run.get('status') != 'completed':
+              subprocess.run(['gh', 'api', '--method', 'POST',
+                              f'repos/{repo}/actions/runs/{run_id}/cancel'], check=True)
+              print('Requested cancellation of the obsolete one-off experiment')
+          else:
+              print('The obsolete one-off experiment is already stopped')
+          PY
       - uses: actions/checkout@v4
         with:
           ref: main
@@ -34,6 +60,7 @@ jobs:
         run: python -m pip install --disable-pip-version-check ./packages/radar-core 'PyNaCl>=1.6,<2'
       - name: Prepare credentials or perform the reviewed cutover
         env:
+          DATABASE_ROLLOUT_TOKEN: ${{ secrets.DATABASE_ROLLOUT_TOKEN }}
           FRONTEND_REPO_TOKEN: ${{ secrets.FRONTEND_REPO_TOKEN }}
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}

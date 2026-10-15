@@ -98,7 +98,7 @@ class GitHub:
 
 def clients():
     tokens = list(dict.fromkeys(os.environ.get(name, "").strip()
-                               for name in ("FRONTEND_REPO_TOKEN", "CONTENT_BACKEND_TOKEN")))
+                               for name in ("DATABASE_ROLLOUT_TOKEN", "FRONTEND_REPO_TOKEN", "CONTENT_BACKEND_TOKEN")))
     candidates = [GitHub(token) for token in tokens if token]
     if not candidates:
         raise ControlError("MISSING_GITHUB_CREDENTIAL")

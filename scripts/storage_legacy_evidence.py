@@ -49,6 +49,8 @@ def _json(raw, path):
 
 
 def _selected(path, scopes):
+    if path.startswith("data/games/"):
+        return "data/games/" in scopes and re.fullmatch(r"data/games/[1-9][0-9]*\.json", path) is not None
     return any(path == scope or (scope.endswith("/") and path.startswith(scope)) for scope in scopes)
 
 

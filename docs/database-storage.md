@@ -144,6 +144,12 @@ chunk payload 達 300 MiB 時，workflow 會明確回報容量警示並失敗提
 不要手動將已啟用的 runtime 改回 0；還原為 Git 權威來源需要獨立的資料遷移。
 人工設定檔仍可由 Git 維護；舊版人工資料 writer 在主庫模式下停用。
 
+若現有 publication Token 無法管理 Secrets／Variables（例如 HTTP 403），在 backend 新增
+`DATABASE_ROLLOUT_TOKEN`。使用使用者自己的 fine-grained PAT，選取本系統六個 repositories，
+Repository permissions 為 Contents: Read、Actions: Read、Secrets: Read and write、Variables: Read and write。
+用途僅為部署檢查、加密分發兩個 Turso Secrets、暫停與切換開關；不必授予 account-management 權限。
+切換及驗證完成後可以撤銷此臨時 Token；日常收集不依賴它。不要將 Token 貼到對話或公開檔案。
+
 ## 官方參考
 
 - https://docs.turso.tech/sdk/http/reference

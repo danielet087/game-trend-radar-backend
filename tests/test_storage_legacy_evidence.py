@@ -123,6 +123,16 @@ def test_database_proofs_are_not_reinterpreted_as_git_revisions(database):
     assert set(proofs) == {SHA}
 
 
+def test_frontend_inventory_only_selects_current_numeric_game_documents(database):
+    ignored = {"appid": 123, "twitch_admission": dict(proof(), source_frontend_commit="f" * 40)}
+    update_snapshot(database, migration.FRONTEND, {
+        path: raw(ignored) for path in ("data/games/archive/123.json", "data/games/123.jsonl",
+                                      "data/games/index.json", "data/games/0123.json")})
+    proofs, references = migration.inventory(database)
+    assert set(proofs) == {SHA}
+    assert references == 4  # master, accepted intake, current catalog row and game shard
+
+
 @pytest.mark.parametrize("change,code", [
     (lambda responses: responses["/git/commits/" + SHA].update(sha="f" * 40), "INVALID_GIT_EVIDENCE"),
     (lambda responses: responses["/git/trees/" + "b" * 40 + "?recursive=1"].update(truncated=True), "INCOMPLETE_GIT_EVIDENCE_TREE"),

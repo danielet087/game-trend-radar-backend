@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-16T23:04:06.219015Z",
+  "generated_at": "2026-10-16T23:04:37.368319Z",
   "today_taipei": "2026-10-17",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-16T23:04:06.073461Z",
+    "checkpoint_updated_at": "2026-10-16T23:04:37.228863Z",
     "group_resolution_updated_at": "2026-10-16T23:03:35.169014Z",
     "candidate_state_updated_at": "2026-10-16T17:09:01.665933Z",
     "prefilter_updated_at": "2026-10-16T17:09:01.652763Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-17T07:04:05.572634+08:00",
-    "last_updated_at": "2026-10-17T07:04:06.073461+08:00",
+    "last_updated_at": "2026-10-17T07:04:37.228863+08:00",
+    "finished_at": "2026-10-17T07:04:37.228863+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5283280,
     "last_name": "MEGAMINE",
     "requests_this_run": 1,

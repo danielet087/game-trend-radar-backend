@@ -26740,7 +26740,7 @@
       "name": "Enshrouded",
       "release_date": "2026-10-15",
       "steam_url": "https://store.steampowered.com/app/1203620/",
-      "group_id64": null,
+      "group_id64": "103582791473574969",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -26803,7 +26803,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-16T09:02:41.481685Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     }
   },
   "scheduler_batch": {
@@ -61605,11 +61613,11 @@
     }
   },
   "group_resolution_api_cooldown": {
-    "attempts": 0,
-    "observed_at": "2026-10-16T08:02:29.789485Z",
+    "status": "available",
     "retry_at": null,
-    "source": "Steam ISteamUser/ResolveVanityURL",
-    "status": "available"
+    "observed_at": "2026-10-16T09:02:41.765826Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "attempt_events": [
     {

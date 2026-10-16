@@ -2261,13 +2261,13 @@
         "queue_source": "fresh_daily_prefilter_unresolved",
         "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
         "group_resolution": {
-          "api_result": 42,
-          "attempted": true,
-          "checked_at": "2026-10-16T04:02:31.392803Z",
-          "http": 200,
-          "retry_at": "2026-10-16T07:02:31.392803Z",
+          "status": "not_found",
+          "checked_at": "2026-10-16T08:02:29.628343Z",
           "source": "Steam ISteamUser/ResolveVanityURL",
-          "status": "not_found"
+          "attempted": true,
+          "http": 200,
+          "retry_at": "2026-10-16T11:02:29.628343Z",
+          "api_result": 42
         }
       }
     },
@@ -26730,20 +26730,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "38864467986",
-    "active": false,
-    "status": "finished",
+    "run_id": "38870794091",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-16T15:02:38.886592+08:00",
-    "last_updated_at": "2026-10-16T15:04:05.050805+08:00",
-    "requests_this_run": 3,
-    "official_new_this_run": 2,
-    "http_429_this_run": 1,
-    "last_appid": 5174490,
-    "last_name": "Sole Mates: Tidy Up the Shoe Store",
-    "finished_at": "2026-10-16T15:04:05.050805+08:00",
-    "stop_reason": "first_http_429"
+    "started_at": "2026-10-16T16:02:55.840047+08:00",
+    "last_updated_at": "2026-10-16T16:07:26.178875+08:00",
+    "requests_this_run": 10,
+    "official_new_this_run": 10,
+    "http_429_this_run": 0,
+    "last_appid": 5329410,
+    "last_name": "Shark Tales: Reef Rogues"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -59602,21 +59600,143 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-16T15:03:09.322180+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5180330": {
+      "appid": 5180330,
+      "name": "Amanojaku Nightmare",
+      "release_date": "2026-10-16",
+      "group_id64": "103582791475808253",
+      "steam_url": "https://store.steampowered.com/app/5180330/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 14,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:02:56.336924+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5290600": {
+      "appid": 5290600,
+      "name": "Fresh Market Simulator",
+      "release_date": "2026-10-16",
+      "group_id64": "103582791476019855",
+      "steam_url": "https://store.steampowered.com/app/5290600/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 5,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:03:26.188420+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5376840": {
+      "appid": 5376840,
+      "name": "Alt Video - Personal Retro Video Store",
+      "release_date": "2026-10-17",
+      "group_id64": "103582791476110728",
+      "steam_url": "https://store.steampowered.com/app/5376840/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:03:56.206347+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4942310": {
+      "appid": 4942310,
+      "name": "Mix-shogi",
+      "release_date": "2026-10-19",
+      "group_id64": "103582791476108894",
+      "steam_url": "https://store.steampowered.com/app/4942310/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:04:26.233761+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5182640": {
+      "appid": 5182640,
+      "name": "Magic Draw: Chaos",
+      "release_date": "2026-10-20",
+      "group_id64": "103582791476108854",
+      "steam_url": "https://store.steampowered.com/app/5182640/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 4,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:04:56.189911+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5208900": {
+      "appid": 5208900,
+      "name": "Homegrown: Sports Agent Empire",
+      "release_date": "2026-10-20",
+      "group_id64": "103582791475892870",
+      "steam_url": "https://store.steampowered.com/app/5208900/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 11,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:05:26.207893+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5222620": {
+      "appid": 5222620,
+      "name": "EchoNet",
+      "release_date": "2026-10-20",
+      "group_id64": "103582791476054416",
+      "steam_url": "https://store.steampowered.com/app/5222620/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 6,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:05:56.182925+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5294600": {
+      "appid": 5294600,
+      "name": "SHOGITOON",
+      "release_date": "2026-10-20",
+      "group_id64": "103582791476052405",
+      "steam_url": "https://store.steampowered.com/app/5294600/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:06:26.191727+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5300220": {
+      "appid": 5300220,
+      "name": "Last Ember",
+      "release_date": "2026-10-20",
+      "group_id64": "103582791476108121",
+      "steam_url": "https://store.steampowered.com/app/5300220/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:06:56.200499+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5329410": {
+      "appid": 5329410,
+      "name": "Shark Tales: Reef Rogues",
+      "release_date": "2026-10-20",
+      "group_id64": "103582791476048159",
+      "steam_url": "https://store.steampowered.com/app/5329410/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-15T17:05:28.065688+00:00",
+      "official_followers": 6,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-16T16:07:26.178743+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 0,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-16T15:18:39.303243+08:00",
-  "community_cooldown": {
-    "retry_at": "2026-10-16T07:18:39.303243+00:00",
-    "observed_at": "2026-10-16T07:03:39.303243+00:00",
-    "updated_at": "2026-10-16T07:03:39.303243+00:00",
-    "retry_seconds": 900,
-    "retry_after": null,
-    "retry_source": "existing_queue_backoff",
-    "attempts": 1
-  },
-  "community_last_success_at": "2026-10-16T15:03:09.322180+08:00",
+  "next_request_after_taipei": null,
+  "community_cooldown": null,
+  "community_last_success_at": "2026-10-16T16:07:26.178743+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -79382,6 +79502,106 @@
       "status": "rate_limited",
       "github_run_id": "38864467986",
       "next_request_after_taipei": "2026-10-16T15:18:39.303243+08:00"
+    },
+    {
+      "appid": 5180330,
+      "when_taipei": "2026-10-16T16:02:56.060548+08:00",
+      "release_date": "2026-10-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 14
+    },
+    {
+      "appid": 5290600,
+      "when_taipei": "2026-10-16T16:03:26.060664+08:00",
+      "release_date": "2026-10-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 5
+    },
+    {
+      "appid": 5376840,
+      "when_taipei": "2026-10-16T16:03:56.060819+08:00",
+      "release_date": "2026-10-17",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 1
+    },
+    {
+      "appid": 4942310,
+      "when_taipei": "2026-10-16T16:04:26.060966+08:00",
+      "release_date": "2026-10-19",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 1
+    },
+    {
+      "appid": 5182640,
+      "when_taipei": "2026-10-16T16:04:56.061101+08:00",
+      "release_date": "2026-10-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 4
+    },
+    {
+      "appid": 5208900,
+      "when_taipei": "2026-10-16T16:05:26.061201+08:00",
+      "release_date": "2026-10-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 11
+    },
+    {
+      "appid": 5222620,
+      "when_taipei": "2026-10-16T16:05:56.061306+08:00",
+      "release_date": "2026-10-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 6
+    },
+    {
+      "appid": 5294600,
+      "when_taipei": "2026-10-16T16:06:26.061604+08:00",
+      "release_date": "2026-10-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 1
+    },
+    {
+      "appid": 5300220,
+      "when_taipei": "2026-10-16T16:06:56.061701+08:00",
+      "release_date": "2026-10-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 1
+    },
+    {
+      "appid": 5329410,
+      "when_taipei": "2026-10-16T16:07:26.061826+08:00",
+      "release_date": "2026-10-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38870794091",
+      "official_followers": 6
     }
   ]
 }

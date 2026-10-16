@@ -26816,17 +26816,19 @@
   },
   "scheduler_batch": {
     "run_id": "38877465864",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-16T17:03:11.884764+08:00",
-    "last_updated_at": "2026-10-16T17:03:42.380830+08:00",
+    "last_updated_at": "2026-10-16T17:04:12.391268+08:00",
     "requests_this_run": 2,
     "official_new_this_run": 1,
     "http_429_this_run": 1,
     "last_appid": 4715160,
-    "last_name": "Finals Week ✍🏻"
+    "last_name": "Finals Week ✍🏻",
+    "finished_at": "2026-10-16T17:04:12.391268+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

@@ -2244,13 +2244,13 @@
       },
       "priority": 100,
       "group_resolution": {
-        "api_result": 42,
-        "attempted": true,
-        "checked_at": "2026-10-16T04:02:31.392803Z",
-        "http": 200,
-        "retry_at": "2026-10-16T07:02:31.392803Z",
+        "status": "not_found",
+        "checked_at": "2026-10-16T08:02:29.628343Z",
         "source": "Steam ISteamUser/ResolveVanityURL",
-        "status": "not_found"
+        "attempted": true,
+        "http": 200,
+        "retry_at": "2026-10-16T11:02:29.628343Z",
+        "api_result": 42
       },
       "normal_candidate": {
         "appid": 4435490,
@@ -60642,11 +60642,11 @@
     }
   },
   "group_resolution_api_cooldown": {
-    "attempts": 0,
-    "observed_at": "2026-10-16T05:15:59.854002Z",
+    "status": "available",
     "retry_at": null,
-    "source": "Steam ISteamUser/ResolveVanityURL",
-    "status": "available"
+    "observed_at": "2026-10-16T08:02:29.789485Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "attempt_events": [
     {

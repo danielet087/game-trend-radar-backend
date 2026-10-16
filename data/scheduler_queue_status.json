@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-16T14:02:42.308658Z",
+  "generated_at": "2026-10-16T14:03:04.550176Z",
   "today_taipei": "2026-10-16",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-16T14:02:42.169471Z",
+    "checkpoint_updated_at": "2026-10-16T14:03:04.416319Z",
     "group_resolution_updated_at": "2026-10-16T13:02:04.557380Z",
     "candidate_state_updated_at": "2026-10-15T17:05:28.083568Z",
     "prefilter_updated_at": "2026-10-15T17:05:28.065688Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-16T22:02:41.694842+08:00",
-    "last_updated_at": "2026-10-16T22:02:42.169471+08:00",
+    "last_updated_at": "2026-10-16T22:03:04.416319+08:00",
+    "finished_at": "2026-10-16T22:03:04.416319+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5412540,
     "last_name": "Dave: Leg it",
     "requests_this_run": 1,

@@ -2556,7 +2556,7 @@
     },
     "4218620": {
       "status": "pending",
-      "updated_at": "2026-10-16T09:02:03.243256Z",
+      "updated_at": "2026-10-16T09:05:00.747846Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -2617,9 +2617,9 @@
           "release_date_conflict": false,
           "release_store_date": "2026-10-13",
           "release_date_normalization": "steam_store_date_matches_taipei",
-          "release_date_verified_at": "2026-10-16T09:02:03.243256Z",
+          "release_date_verified_at": "2026-10-16T09:05:00.747846Z",
           "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-16T09:02:03.243256Z",
+          "post_followers_store_verified_at": "2026-10-16T09:05:00.747846Z",
           "sexual_content_screened": true,
           "steam_type": "game",
           "content_descriptorids": [
@@ -2656,7 +2656,7 @@
     },
     "4435490": {
       "status": "pending",
-      "updated_at": "2026-10-16T09:02:03.243256Z",
+      "updated_at": "2026-10-16T09:05:00.747846Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -2717,9 +2717,9 @@
           "release_date_conflict": true,
           "release_store_date": "2026-10-22",
           "release_date_normalization": "steam_taiwan_store_date_authoritative",
-          "release_date_verified_at": "2026-10-16T09:02:03.243256Z",
+          "release_date_verified_at": "2026-10-16T09:05:00.747846Z",
           "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-16T09:02:03.243256Z",
+          "post_followers_store_verified_at": "2026-10-16T09:05:00.747846Z",
           "sexual_content_screened": true,
           "steam_type": "game",
           "content_descriptorids": [
@@ -2795,8 +2795,8 @@
       }
     },
     "1203620": {
-      "status": "pending",
-      "updated_at": "2026-10-16T09:02:03.243256Z",
+      "status": "accepted",
+      "updated_at": "2026-10-16T09:05:00.747846Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -2815,82 +2815,17 @@
         }
       },
       "validation_version": 4,
-      "follower_candidate": {
-        "appid": 1203620,
-        "name": "Enshrouded",
-        "release_date": "2026-10-15",
-        "steam_url": "https://store.steampowered.com/app/1203620/",
-        "group_id64": null,
-        "queue_source": "twitch_steam_discovery",
-        "twitch_admission": {
-          "schema_version": 1,
-          "method": "twitch_igdb_external_steam_v1",
-          "appid": 1203620,
-          "twitch_game_id": "737987407",
-          "igdb_id": "248643",
-          "checked_at": "2026-10-16T08:10:10Z",
-          "source_database_revision": "69b4e3baadb0d4329b2f1fe8e5eeb386b3edcd72f7499c22109fed0c0babbae3",
-          "source_database_generation": 31,
-          "source_database_namespace": "danielet087/game-trend-radar@main",
-          "source_enrollment": {
-            "source": "igdb_first_release_date",
-            "observed_at": "2026-10-15T08:09:22Z",
-            "viewer_count": 8375,
-            "min_viewers": 7000
-          }
-        },
-        "steam_candidate": {
-          "appid": 1203620,
-          "name": "Enshrouded",
-          "name_en": "Enshrouded",
-          "release_raw": "2026-10-15",
-          "release_start": "2026-10-15",
-          "release_end": "2026-10-15",
-          "release_precision": "day",
-          "release_display_precision": "date_full",
-          "release_display_provider": "Steam IStoreBrowseService/GetItems",
-          "release_date_basis": "steam_store_browse_verified_full_date",
-          "release_date_timezone": "Asia/Taipei",
-          "release_time_utc": "2026-10-15T15:03:53Z",
-          "release_time_source": "Steam IStoreBrowseService/GetItems",
-          "release_timestamp_taipei_date": "2026-10-15",
-          "release_date_conflict": false,
-          "release_store_date": "2026-10-15",
-          "release_date_normalization": "steam_store_date_matches_taipei",
-          "release_date_verified_at": "2026-10-16T09:02:03.243256Z",
-          "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-16T09:02:03.243256Z",
-          "sexual_content_screened": true,
-          "steam_type": "game",
-          "content_descriptorids": [],
-          "store_url": "https://store.steampowered.com/app/1203620/",
-          "community_url": "https://steamcommunity.com/app/1203620/",
-          "twitch_admission": {
-            "schema_version": 1,
-            "method": "twitch_igdb_external_steam_v1",
-            "appid": 1203620,
-            "twitch_game_id": "737987407",
-            "igdb_id": "248643",
-            "checked_at": "2026-10-16T08:10:10Z",
-            "source_database_revision": "69b4e3baadb0d4329b2f1fe8e5eeb386b3edcd72f7499c22109fed0c0babbae3",
-            "source_database_generation": 31,
-            "source_database_namespace": "danielet087/game-trend-radar@main",
-            "source_enrollment": {
-              "source": "igdb_first_release_date",
-              "observed_at": "2026-10-15T08:09:22Z",
-              "viewer_count": 8375,
-              "min_viewers": 7000
-            }
-          }
-        }
-      },
-      "reason": "queued_official_followers",
+      "follower_candidate": null,
+      "reason": "steam_verified",
       "retry_at": null,
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null,
       "retry_source": null,
-      "retry_attempts": 0
+      "retry_attempts": 0,
+      "content_signature": "2846ad0512cd970c24507d0840df0451dd1c1f40c245711bae106b06c63fa90c",
+      "followers": 396361,
+      "follower_checked_at": "2026-10-16T17:03:12.458502+08:00"
     },
     "4024440": {
       "status": "accepted",
@@ -3012,6 +2947,6 @@
       }
     }
   },
-  "updated_at": "2026-10-16T09:02:03.243256Z",
+  "updated_at": "2026-10-16T09:05:00.747846Z",
   "api_cooldowns": {}
 }

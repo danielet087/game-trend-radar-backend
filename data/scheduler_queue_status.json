@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-16T07:03:39.440147Z",
+  "generated_at": "2026-10-16T07:04:05.183867Z",
   "today_taipei": "2026-10-16",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-16T07:03:39.303322Z",
+    "checkpoint_updated_at": "2026-10-16T07:04:05.050805Z",
     "group_resolution_updated_at": "2026-10-16T05:15:59.854002Z",
     "candidate_state_updated_at": "2026-10-15T17:05:28.083568Z",
     "prefilter_updated_at": "2026-10-15T17:05:28.065688Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-16T15:02:38.886592+08:00",
-    "last_updated_at": "2026-10-16T15:03:39.303322+08:00",
+    "last_updated_at": "2026-10-16T15:04:05.050805+08:00",
+    "finished_at": "2026-10-16T15:04:05.050805+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5174490,
     "last_name": "Sole Mates: Tidy Up the Shoe Store",
     "requests_this_run": 3,

@@ -26811,17 +26811,19 @@
   },
   "scheduler_batch": {
     "run_id": "38864467986",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-16T15:02:38.886592+08:00",
-    "last_updated_at": "2026-10-16T15:03:39.303322+08:00",
+    "last_updated_at": "2026-10-16T15:04:05.050805+08:00",
     "requests_this_run": 3,
     "official_new_this_run": 2,
     "http_429_this_run": 1,
     "last_appid": 5174490,
-    "last_name": "Sole Mates: Tidy Up the Shoe Store"
+    "last_name": "Sole Mates: Tidy Up the Shoe Store",
+    "finished_at": "2026-10-16T15:04:05.050805+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

@@ -2276,11 +2276,11 @@
         "daily_source_updated_at": "2026-10-16T17:09:01.652763+00:00",
         "group_resolution": {
           "status": "not_found",
-          "checked_at": "2026-10-16T19:02:40.382216Z",
+          "checked_at": "2026-10-16T23:03:34.989905Z",
           "source": "Steam ISteamUser/ResolveVanityURL",
           "attempted": true,
           "http": 200,
-          "retry_at": "2026-10-16T22:02:40.382216Z",
+          "retry_at": "2026-10-17T02:03:34.989905Z",
           "api_result": 42
         }
       }
@@ -27731,20 +27731,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "38973055691",
-    "active": false,
-    "status": "finished",
+    "run_id": "38979013422",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-17T06:02:57.830750+08:00",
-    "last_updated_at": "2026-10-17T06:03:23.565836+08:00",
+    "started_at": "2026-10-17T07:04:05.572634+08:00",
+    "last_updated_at": "2026-10-17T07:04:06.073461+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 4310780,
-    "last_name": "Deep Space Starship Repair",
-    "finished_at": "2026-10-17T06:03:23.565836+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5283280,
+    "last_name": "MEGAMINE"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -64230,17 +64228,17 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 3,
+  "rate_limit_count": 4,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-17T07:02:58.438670+08:00",
+  "next_request_after_taipei": "2026-10-17T09:04:06.073356+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-16T23:02:58.438670+00:00",
-    "observed_at": "2026-10-16T22:02:58.438670+00:00",
-    "updated_at": "2026-10-16T22:02:58.438670+00:00",
-    "retry_seconds": 3600,
+    "retry_at": "2026-10-17T01:04:06.073356+00:00",
+    "observed_at": "2026-10-16T23:04:06.073356+00:00",
+    "updated_at": "2026-10-16T23:04:06.073356+00:00",
+    "retry_seconds": 7200,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 3
+    "attempts": 4
   },
   "community_last_success_at": "2026-10-17T03:37:22.609217+08:00",
   "official_growth_observations": {
@@ -82330,6 +82328,16 @@
       "status": "rate_limited",
       "github_run_id": "38973055691",
       "next_request_after_taipei": "2026-10-17T07:02:58.438670+08:00"
+    },
+    {
+      "appid": 5283280,
+      "when_taipei": "2026-10-17T07:04:05.939362+08:00",
+      "release_date": "2026-11-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "38979013422",
+      "next_request_after_taipei": "2026-10-17T09:04:06.073356+08:00"
     }
   ]
 }

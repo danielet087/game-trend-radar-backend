@@ -129,7 +129,10 @@ class PrimaryStoreTests(unittest.TestCase):
             self.addCleanup(second.close)
             d.initialize(first)
             p.bootstrap_primary(first, "source", {"x.json": b"{}"}, "git")
-            with p.maintenance(first, "write"), patch.object(p.time, "sleep"):
+            elapsed = [0.0]
+            second.clock = lambda: elapsed[0]
+            second.sleep = lambda delay: elapsed.__setitem__(0, elapsed[0] + delay)
+            with p.maintenance(first, "write"), patch.object(p, "LEASE_WAIT_SECONDS", 1):
                 d._ensure_raw_objects(first, {d._sha(b"in-flight"): b"in-flight"})
                 self.code("LEASE_BUSY", lambda: d.garbage_collect(second, exclusive=True))
                 self.assertTrue(first.execute("SELECT digest FROM radar_objects WHERE digest=?", (d._sha(b"in-flight"),)))

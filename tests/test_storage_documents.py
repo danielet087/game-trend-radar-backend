@@ -178,6 +178,59 @@ class StorageDocumentsTests(unittest.TestCase):
         self.assertEqual(store.sync_replica(self.primary, self.replica)["status"], "passed")
         self.assertEqual(store.read_snapshot(self.replica, self.source)[1], self.files)
 
+    def test_publication_during_d1_copy_is_deferred_beyond_captured_target(self):
+        from radar_core.storage import primary_store
+        first = self.publish()
+        primary_store.activate_primary(self.primary, self.source)
+        published = False
+
+        def publish_during_copy(sql, params):
+            nonlocal published
+            if sql.startswith("INSERT OR IGNORE INTO radar_objects") and not published:
+                published = True
+                # An actual primary write must acquire its own fenced lease
+                # while the replica is copying. No cross-database lock is held.
+                self.assertEqual(self.primary.execute("SELECT expires_at FROM radar_leases WHERE name='global'")[0]["expires_at"], 0)
+                primary_store.publish_patch(self.primary, self.source, base_generation=1,
+                    changed={"data/new.json": b"new"}, operation_id="during-d1-copy",
+                    captured_at=first["captured_at"])
+
+        report = store.sync_replica(self.primary, InterceptClient(self.replica, before=publish_during_copy))
+        self.assertTrue(published)
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["target_heads"], [first])
+        self.assertEqual(report["events_pending_at_start"], 1)
+        self.assertEqual(report["events_pending"], 1)
+        self.assertEqual(report["events_pending_in_target"], 0)
+        self.assertEqual(report["events_deferred"], 1)
+        self.assertEqual(store.read_snapshot(self.replica, self.source)[0], first)
+        next_pass = store.sync_replica(self.primary, self.replica)
+        self.assertEqual(next_pass["status"], "passed")
+        self.assertEqual(next_pass["events_pending"], 0)
+        self.assertEqual(store.read_snapshot(self.replica, self.source)[0]["generation"], 2)
+
+    def test_event_limit_never_labels_initial_backlog_as_new_arrivals(self):
+        self.publish()
+        self.publish("b", {"second.json": b"second"}, captured="2026-10-15T09:01:00Z")
+        newest = self.publish("c", {"third.json": b"third"}, captured="2026-10-15T09:02:00Z")
+        report = store.sync_replica(self.primary, self.replica, max_events=1)
+        self.assertEqual(report["status"], "partial")
+        self.assertEqual(report["target_heads"], [newest])
+        self.assertEqual(report["events_pending_at_start"], 3)
+        self.assertEqual(report["events_selected"], 1)
+        self.assertEqual(report["events_pending_in_target"], 2)
+        self.assertEqual(report["events_deferred"], 0)
+
+    def test_same_generation_different_digest_still_fails(self):
+        self.publish()
+        store.publish_snapshot(self.replica, self.source, "rogue", {"rogue.json": b"divergent"},
+                               "2026-10-15T09:00:00Z")
+        report = store.sync_replica(self.primary, self.replica)
+        self.assertEqual(report["status"], "failed")
+        self.assertEqual(report["errors"][0]["code"], "REPLICA_CONFLICT")
+        self.assertEqual(report["events_pending_in_target"], 1)
+        self.assertEqual(report["events_deferred"], 0)
+
     def test_newer_divergent_replica_cannot_ack_an_older_event(self):
         self.publish()
         store.sync_replica(self.primary, self.replica)

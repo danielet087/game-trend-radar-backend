@@ -10,6 +10,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 from contextvars import ContextVar
 import json
+import random
 import time
 import uuid
 
@@ -17,6 +18,10 @@ from .sql import StorageError
 
 _LEASES = ContextVar("radar_storage_leases", default={})
 _CLOCK = "CAST(strftime('%s','now') AS INTEGER)"
+# Full snapshot reads and GC legitimately take longer than the old six-second
+# retry window. Bound queueing independently of the renewable writer TTL, and
+# always stop sooner when the HTTP client's overall operation budget expires.
+LEASE_WAIT_SECONDS = 180
 _PROOF_COLUMNS = {"writer_owner": "TEXT NOT NULL DEFAULT ''", "writer_fence": "INTEGER NOT NULL DEFAULT 0",
                   "writer_nonce": "TEXT NOT NULL DEFAULT ''"}
 
@@ -157,6 +162,20 @@ class Lease:
         self.client, self.purpose, self.ttl = client, purpose, ttl
         self.owner, self.fence = uuid.uuid4().hex, None
         self.last_renewed = 0.0
+        self.clock = getattr(client, "clock", time.monotonic)
+        self.sleep = getattr(client, "sleep", time.sleep)
+
+    def _remaining_wait(self, deadline):
+        now = self.clock()
+        client_deadline = getattr(self.client, "deadline", None)
+        if client_deadline is not None:
+            if now >= client_deadline:
+                raise StorageError("TIME_BUDGET_EXCEEDED", "The storage time budget was exhausted while waiting for its lease.")
+            deadline = min(deadline, client_deadline)
+        remaining = deadline - now
+        if remaining <= 0:
+            raise StorageError("LEASE_BUSY", "Storage lease contention exceeded the bounded wait budget.")
+        return remaining
 
     def acquire(self):
         sql = f"""INSERT INTO radar_leases (name,owner,fence,expires_at,purpose)
@@ -165,7 +184,10 @@ class Lease:
               fence=radar_leases.fence+1,expires_at=excluded.expires_at,purpose=excluded.purpose
             WHERE radar_leases.expires_at<={_CLOCK}
             RETURNING owner,fence,expires_at"""
-        for attempt in range(4):
+        deadline = self.clock() + LEASE_WAIT_SECONDS
+        attempt = 0
+        while True:
+            self._remaining_wait(deadline)
             try:
                 rows = self.client.execute(sql, (self.owner, self.ttl, self.purpose))
             except StorageError:
@@ -175,27 +197,29 @@ class Lease:
                     raise
             if rows:
                 self.fence = rows[0]["fence"]
-                self.last_renewed = time.monotonic()
+                self.last_renewed = self.clock()
                 return self
             owned = self.client.execute(f"SELECT owner,fence,expires_at FROM radar_leases "
                                         f"WHERE name='global' AND owner=? AND expires_at>{_CLOCK}", (self.owner,))
             if owned:
                 self.fence = owned[0]["fence"]
-                self.last_renewed = time.monotonic()
+                self.last_renewed = self.clock()
                 return self
-            if attempt < 3:
-                time.sleep(attempt + 1)
-        raise StorageError("LEASE_BUSY", "Another storage publication or maintenance operation is active.")
+            # Jitter prevents independent repositories from retrying together;
+            # no sleep or further SQL request may outlive the client's budget.
+            delay = random.uniform(0.5, 1.0) * min(5.0, 2 ** min(attempt, 3))
+            self.sleep(min(delay, self._remaining_wait(deadline)))
+            attempt += 1
 
     def renew(self, force=False):
-        if not force and time.monotonic() - self.last_renewed < self.ttl / 3:
+        if not force and self.clock() - self.last_renewed < self.ttl / 3:
             return
         rows = self.client.execute(f"""UPDATE radar_leases SET expires_at={_CLOCK}+?
             WHERE name='global' AND owner=? AND fence=? AND expires_at>{_CLOCK}
             RETURNING fence""", (self.ttl, self.owner, self.fence))
         if not rows:
             raise StorageError("LEASE_LOST", "The storage writer lease expired or was fenced by another writer.")
-        self.last_renewed = time.monotonic()
+        self.last_renewed = self.clock()
 
     def release(self):
         self.client.execute("UPDATE radar_leases SET expires_at=0 WHERE name='global' AND owner=? AND fence=?",

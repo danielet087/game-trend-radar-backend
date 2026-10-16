@@ -33,8 +33,8 @@ jobs:
     env:
       RADAR_DATABASE_PRIMARY: ${{ vars.RADAR_DATABASE_PRIMARY || '0' }}
     runs-on: ubuntu-latest
-    # 150 minutes collection budget, including bounded cooldown waiting, plus
-    # setup and acknowledged checkpoint/publication delivery.
+    # Collection retains its request budget, but releases the shared workflow
+    # slot immediately during Community cooldown instead of sleeping in a runner.
     timeout-minutes: 170
     steps:
       - uses: actions/checkout@v4
@@ -120,11 +120,12 @@ jobs:
           cp experiments/steam_official_daily_catchup/checkpoint.json output/growth-checkpoint-baseline.json
           python -m radar_backend.jobs.growth --data-dir frontend/data --output output/public-growth.json \
             --interval 30 --max-requests 250 --max-seconds 9000 \
-            --wait-for-cooldown --max-cooldown-wait 3600 \
+            --wait-for-cooldown --max-cooldown-wait 0 \
             --official-cache output/growth-inputs/official-cache.json \
             --legacy-checkpoint output/growth-inputs/legacy-checkpoint.json \
             --group-state output/growth-inputs/group-state.json \
             --original-checkpoint output/growth-inputs/original-checkpoint.json
+          cp output/public-growth.json output/growth-collection-original.json
       - name: Persist official observations and cooldown against the latest queue
         id: checkpoint
         if: always() && !cancelled() && steps.collect.outcome != 'skipped'
@@ -146,6 +147,7 @@ jobs:
             --input-revision "${{ steps.catalog.outputs.revision }}" \
             --receipt output/steam-growth-publication.json
       - name: Record durable state and publication acknowledgements
+        id: delivery
         if: always() && !cancelled()
         env:
           STATE_PERSISTED: ${{ steps.checkpoint.outputs.state_persisted || 'false' }}
@@ -156,8 +158,17 @@ jobs:
           python -m scripts.persist_growth_checkpoint stamp --report output/public-growth.json \
             --state-persisted "$STATE_PERSISTED" --published "$PUBLISHED" \
             --target-slot "$TARGET_SLOT" --input-revision "$INPUT_REVISION"
-      - name: Require complete growth coverage
+      - name: Classify acknowledged Community cooldown
+        id: growth_attempt
         if: always() && !cancelled()
+        env:
+          STEPS_SUCCEEDED: ${{ steps.collect.outcome == 'success' && steps.checkpoint.outcome == 'success' && steps.publish.outcome == 'success' && steps.delivery.outcome == 'success' }}
+        run: |
+          python -m scripts.classify_growth_attempt \
+            --original output/growth-collection-original.json --report output/public-growth.json \
+            --steps-succeeded "$STEPS_SUCCEEDED"
+      - name: Require complete growth coverage
+        if: always() && !cancelled() && steps.growth_attempt.outputs.deferred != 'true'
         run: |
           python - <<'PY'
           from datetime import datetime, timezone
@@ -195,6 +206,8 @@ jobs:
           print(f"官方 GroupID 解析請求：{d.get('group_resolution_requests', 0)}；全部取得 Followers 量測：{d.get('measurement_complete', d.get('collection_complete', False))}")
           job = d.get('job_result', {})
           print(f"工作狀態：{job.get('status', 'failed')}；狀態已保存：{job.get('state_persisted', False)}；發布完成：{job.get('published', False)}")
+          if deferred := d.get('schedule_deferred'):
+              print(f"本輪延後：Steam Community 冷卻至 {deferred['retry_after']}；已保存進度並釋放排程，下一個六小時檢查接續。本日收集尚未完成。")
           for item in d.get('unavailable', []):
               print(f"- AppID {item['appid']}：官方確認目前無 GroupID；保留既有 Followers，未產生新量測。")
           for item in d.get('pending', []):
@@ -209,6 +222,7 @@ jobs:
           name: steam-public-growth-result
           path: |
             output/public-growth.json
+            output/growth-collection-original.json
             output/growth-database-pending.json
             output/growth-checkpoint-baseline.json
             output/steam-growth-checkpoint-publication.json

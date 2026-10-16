@@ -55,17 +55,66 @@ def ingest(primary, *, local_root=None):
     return results, errors
 
 
-def verify_heads(primary, replica, *, require_complete=False):
-    left, right = _heads(primary), _heads(replica)
+def verify_heads(primary, replica, *, require_complete=False, target_heads=None):
+    """Verify captured replication targets, or an exact static pair of stores.
+
+    A replica beyond a captured target is accepted only when its complete head
+    matches authoritative primary history. Equal generations may never differ.
+    """
+    left = _heads(primary) if target_heads is None else {row["source_id"]: row for row in target_heads}
+    right = _heads(replica)
     if require_complete and set(left) != {source_id(spec) for spec in SOURCES}:
         raise StorageError("INCOMPLETE_SOURCES", "All configured sources must be present before full-system verification.")
     if set(left) != set(right):
         raise StorageError("REPLICA_MISMATCH", "Primary and standby source coverage differs.")
-    fields = ("revision", "manifest_digest", "generation")
+    fields = ("revision", "manifest_digest", "generation", "captured_at")
     for name, head in left.items():
+        if target_heads is not None and right[name]["generation"] > head["generation"]:
+            # Read D1 before taking this short primary lease; D1 network waits
+            # must never retain the primary's publication lock.
+            from radar_core.storage.primary_store import maintenance
+            with maintenance(primary, "read"):
+                authoritative = primary.execute("SELECT revision,manifest_digest,generation,captured_at FROM radar_outbox "
+                                                "WHERE source_id=? AND generation=?", (name, right[name]["generation"]))
+                if not authoritative:
+                    authoritative = primary.execute("SELECT revision,manifest_digest,generation,captured_at FROM radar_sources "
+                                                    "WHERE source_id=? AND generation=?", (name, right[name]["generation"]))
+                if not authoritative:
+                    # GC can remove an acknowledged outbox row after the
+                    # primary advances again. Committed operation receipts
+                    # retain that generation's authoritative head independently.
+                    authoritative = primary.execute("SELECT revision,manifest_digest,generation,captured_at FROM radar_operations "
+                                                    "WHERE source_id=? AND generation=? LIMIT 1", (name, right[name]["generation"]))
+            if not authoritative or any(authoritative[0][field] != right[name][field] for field in fields):
+                raise StorageError("REPLICA_MISMATCH", "Standby progress differs from authoritative primary history.")
+            continue
         if any(head[field] != right[name][field] for field in fields):
             raise StorageError("REPLICA_MISMATCH", "Primary and standby snapshots differ.")
-    return {"status": "passed", "source_count": len(left)}
+    return {"status": "passed", "source_count": len(left),
+            "scope": "captured_replication_targets" if target_heads is not None else "current_heads"}
+
+
+def verify_snapshots(primary, replica, *, require_complete=False):
+    """Compare bytes together with the immutable generation actually read.
+
+    Independent databases cannot guarantee a simultaneous capture while writers
+    are active. Distinguish that inconclusive case from same-generation damage.
+    """
+    names, replica_names = set(_heads(primary)), set(_heads(replica))
+    if require_complete and names != {source_id(spec) for spec in SOURCES}:
+        raise StorageError("INCOMPLETE_SOURCES", "All configured sources must be present before full-system verification.")
+    if names != replica_names:
+        raise StorageError("REPLICA_MISMATCH", "Primary and standby source coverage differs.")
+    files = 0
+    for identity in sorted(names):
+        left_head, left = read_snapshot(primary, identity)
+        right_head, right = read_snapshot(replica, identity)
+        if left_head["generation"] != right_head["generation"]:
+            raise StorageError("REPLICA_GENERATION_CHANGED", "Independent snapshot captures differ in generation; verify again after replication catches up.")
+        if left_head != right_head or left != right:
+            raise StorageError("REPLICA_MISMATCH", "Same-generation primary and standby snapshot bytes differ.")
+        files += len(left)
+    return {"status": "passed", "source_count": len(names), "scope": "matching_immutable_snapshots"}, files
 
 
 def _make_backup(primary, output):
@@ -169,21 +218,15 @@ def run(args):
                 report["replication"] = sync_replica(primary, replica, max_events=100)
                 for error in report["replication"].get("errors", []):
                     report["errors"].append({"stage": "replication", **error})
-                if report["replication"].get("events_pending", 0):
+                if report["replication"].get("events_pending_in_target", 0):
                     report["errors"].append({"stage": "replication", "code": "REPLICATION_PENDING"})
-                report["consistency"] = verify_heads(primary, replica, require_complete=True)
+                report["consistency"] = verify_heads(primary, replica, require_complete=True,
+                                                     target_heads=report["replication"]["target_heads"])
             except Exception as error:
                 _failure(report, "replication", error)
         if args.mode == "verify":
             replica = SqliteClient(args.replica_sqlite) if args.replica_sqlite else D1Client.from_env(budget_seconds=600)
-            report["consistency"] = verify_heads(primary, replica, require_complete=True)
-            count = 0
-            for identity in _heads(primary):
-                left, right = read_snapshot(primary, identity)[1], read_snapshot(replica, identity)[1]
-                if left != right:
-                    raise StorageError("REPLICA_MISMATCH", "Restored primary and standby bytes differ.")
-                count += len(left)
-            report["verified_files"] = count
+            report["consistency"], report["verified_files"] = verify_snapshots(primary, replica, require_complete=True)
         if args.mode in {"sync", "replicate"}:
             for name, client, is_replica in (("primary", primary, False), ("replica", replica, True)):
                 if client is None:

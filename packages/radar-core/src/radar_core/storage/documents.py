@@ -431,21 +431,32 @@ def _ack(client, source_id, generation):
 
 
 def sync_replica(primary: SqlClient, replica: SqlClient, max_events=100) -> dict:
-    """Replay complete snapshots; a failed replica never advances primary state."""
+    """Replay a bounded capture; later publications belong to the next pass.
+
+    The target heads and event selection share one primary lease. A collector
+    may publish while D1 is being copied, so pending events after this capture
+    must not turn an otherwise verified pass into a moving-target failure.
+    """
     if type(max_events) is not int or not 1 <= max_events <= 10000:
         _error("INVALID_EVENT_LIMIT", "Replication requires an event limit between 1 and 10000.")
-    events = primary.execute("""SELECT * FROM radar_outbox WHERE acked_at IS NULL
-        ORDER BY captured_at,source_id,generation LIMIT ?""", (max_events,))
+    from .primary_store import maintenance
+    with maintenance(primary, "read"):
+        target_heads = _heads(primary)
+        events_at_start = primary.execute(
+            "SELECT COUNT(*) AS count FROM radar_outbox WHERE acked_at IS NULL")[0]["count"]
+        events = primary.execute("""SELECT * FROM radar_outbox WHERE acked_at IS NULL
+            ORDER BY captured_at,source_id,generation LIMIT ?""", (max_events,))
     latest = {}
     for event in events:
         if event["generation"] > latest.get(event["source_id"], {}).get("generation", 0):
             latest[event["source_id"]] = event
-    report = {"status": "passed", "sources_synced": 0, "events_acked": 0, "errors": []}
+    report = {"status": "passed", "sources_synced": 0, "events_acked": 0, "errors": [],
+              "target_heads": target_heads, "events_pending_at_start": events_at_start,
+              "events_selected": len(events)}
     for source_id, event in latest.items():
         target = {key: event[key] for key in
                   ("source_id", "revision", "manifest_digest", "generation", "captured_at")}
         try:
-            from .primary_store import maintenance
             with maintenance(primary, "read"):
                 _, objects, chunks = _graph(primary, [target["manifest_digest"]])
             with maintenance(replica, "replicate"):
@@ -469,9 +480,17 @@ def sync_replica(primary: SqlClient, replica: SqlClient, max_events=100) -> dict
             install_metadata(replica, metadata, replica=True)
     except StorageError as error:
         report["errors"].append({"source_id": "metadata", "code": error.code})
-    report["events_pending"] = primary.execute(
-        "SELECT COUNT(*) AS count FROM radar_outbox WHERE acked_at IS NULL")[0]["count"]
-    if report["errors"]:
+    # Count each captured source boundary independently of wall-clock times:
+    # source capture clocks can be reused and are not queue arrival timestamps.
+    boundaries = " OR ".join("(source_id=? AND generation<=?)" for _ in target_heads) or "0"
+    parameters = tuple(value for head in target_heads for value in (head["source_id"], head["generation"]))
+    pending = primary.execute(f"""SELECT COUNT(*) AS total,
+        COALESCE(SUM(CASE WHEN {boundaries} THEN 1 ELSE 0 END),0) AS captured
+        FROM radar_outbox WHERE acked_at IS NULL""", parameters)[0]
+    report["events_pending"] = pending["total"]
+    report["events_pending_in_target"] = pending["captured"]
+    report["events_deferred"] = pending["total"] - pending["captured"]
+    if report["errors"] or report["events_pending_in_target"]:
         report["status"] = "partial" if report["sources_synced"] else "failed"
     return report
 
@@ -488,6 +507,13 @@ def _replicate_one(primary, replica, source_id, target, objects, chunks):
             evidence = primary.execute("SELECT source_id,revision,manifest_digest,generation,captured_at "
                                        "FROM radar_outbox WHERE source_id=? AND generation=?",
                                        (source_id, existing["generation"]))
+            if not evidence:
+                # An already acknowledged outbox row can be reclaimed while
+                # another pass is copying D1. Primary operation receipts retain
+                # the complete canonical head, including generation and clock.
+                evidence = primary.execute("SELECT source_id,revision,manifest_digest,generation,captured_at "
+                                           "FROM radar_operations WHERE source_id=? AND generation=? LIMIT 1",
+                                           (source_id, existing["generation"]))
             authoritative = dict(evidence[0]) if evidence else primary_head
             if authoritative != existing:
                 _error("REPLICA_CONFLICT", "Replica history differs from the authoritative event.")

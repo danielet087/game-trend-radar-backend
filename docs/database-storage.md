@@ -71,14 +71,25 @@ Actions workflow：**Sync radar data to Turso and D1**。
 - 主庫模式的跨 repo 更新直接提交 Turso，D1 由維運工作追上。
 - 不依賴 `GITHUB_TOKEN` 提交觸發 push；這類提交通常不會建立後續 push workflow。
 - HTTP 每次最多 15 秒、最多 3 次；維運 job 上限 45 分鐘。
+- 跨 repository 租約競爭採帶抖動的重試，輪詢等待上限 180 秒，且受客戶端剩餘時間預算限制；
+  不再只等約 6 秒就將正常重疊工作判為失敗。超時仍明確失敗，不無限占用排程。
 - 每日備份先於 D1 同步執行，避免 D1 故障拖延主庫的獨立備份。
 - 收集器必須確認 Turso 已保存才宣告保存成功，主庫錯誤會中止該工作，不以 Git 舊資料代替。
 - D1 失敗不回滾 Turso；待同步事件保留。Git 補發布每輪最多 8 分鐘、每來源 3 次，
   未成功 push 不確認 ACK；失敗不使後續排程無限等待。
 
 報告包含每個來源 commit / generation、同步 pending 數、主備一致性、容量與備份結果。
-`events_pending = 0` 代表當輪已保存於 Turso 的事件都已同步，不代表跨來源同時刻的全域交易。
+每輪先固定 `target_heads`，完成後驗證這批目標，不追逐同步途中持續新增的主庫版本。
+`events_pending_in_target` 必須歸零；`events_deferred` 表示擷取目標後新增、留待下輪的事件。
+初始待同步量超過本輪上限、同版本內容不符或傳輸失敗仍會報錯。
+`events_pending = 0` 代表查詢當下已無待同步事件，不代表跨來源同時刻的全域交易。
 各 repo 的快照有各自擷取時間；不偽稱同一瞬間的全系統狀態。
+完整 bytes 驗證若讀到不同 generation，回報 `REPLICA_GENERATION_CHANGED`，待追上後重試；
+同 generation 的內容不符仍回報 `REPLICA_MISMATCH`。
+
+成長追蹤遇到 Steam Community 冷卻時，不在共用 Followers workflow slot 內長時間等待。
+只有收集、持久保存、發布與回執都成功，且所有缺項皆有有效冷卻證據時，才標為延後。
+此時仍保留 `collection_complete=false`，下一個六小時檢查可繼續；資料庫或發布錯誤不會被改成成功。
 
 手動 `Run workflow` 模式：
 

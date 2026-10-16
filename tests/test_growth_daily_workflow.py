@@ -92,7 +92,7 @@ def advance_state(writer, *, broken=None, removed=None):
     return git(writer, "rev-parse", "HEAD")
 
 
-def test_daily_budget_covers_the_observed_cold_cohort_and_a_bounded_cooldown():
+def test_daily_budget_covers_the_cold_cohort_without_holding_a_slot_for_cooldown():
     command = step("collect")["run"].replace("\\\n", " ")
     argv = shlex.split(next(line for line in command.splitlines()
                            if line.strip().startswith("python -m radar_backend.jobs.growth")))
@@ -105,7 +105,9 @@ def test_daily_budget_covers_the_observed_cold_cohort_and_a_bounded_cooldown():
     cold_cohort = 138
     assert requests == 250 and requests >= cold_cohort
     assert interval >= 30
-    assert "--wait-for-cooldown" in argv and cooldown_wait == 3600
+    # Keep the resumable report wrapper, but defer an active shared cooldown
+    # to the next six-hour check instead of sleeping while holding the slot.
+    assert "--wait-for-cooldown" in argv and cooldown_wait == 0
     assert seconds == 9000 and (cold_cohort - 1) * interval + cooldown_wait < seconds
     assert workflow()["jobs"]["observe"]["timeout-minutes"] * 60 >= seconds + 15 * 60
     assert workflow()["concurrency"] == {

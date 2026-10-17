@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-17T19:03:06.647771Z",
+  "generated_at": "2026-10-17T19:03:37.966204Z",
   "today_taipei": "2026-10-18",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-17T19:03:06.492846Z",
+    "checkpoint_updated_at": "2026-10-17T19:03:37.822050Z",
     "group_resolution_updated_at": "2026-10-17T19:02:35.759596Z",
     "candidate_state_updated_at": "2026-10-17T17:10:36.610212Z",
     "prefilter_updated_at": "2026-10-17T17:10:36.588178Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-18T03:03:05.976310+08:00",
-    "last_updated_at": "2026-10-18T03:03:06.492846+08:00",
+    "last_updated_at": "2026-10-18T03:03:37.822050+08:00",
+    "finished_at": "2026-10-18T03:03:37.822050+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4928360,
     "last_name": "My friend pig",
     "requests_this_run": 1,

@@ -28310,17 +28310,19 @@
   },
   "scheduler_batch": {
     "run_id": "39060550722",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-18T03:03:05.976310+08:00",
-    "last_updated_at": "2026-10-18T03:03:06.492846+08:00",
+    "last_updated_at": "2026-10-18T03:03:37.822050+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 4928360,
-    "last_name": "My friend pig"
+    "last_name": "My friend pig",
+    "finished_at": "2026-10-18T03:03:37.822050+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

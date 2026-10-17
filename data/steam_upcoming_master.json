@@ -1,14 +1,4 @@
 {
-  "post_followers_store_gate_checked_at": "2026-10-16T11:10:58.471056+00:00",
-  "post_followers_store_gate_version": 1,
-  "restored_dynamic_exact_appids": [
-    3846830,
-    2087540,
-    3960600,
-    4814120
-  ],
-  "updated_at": "2026-10-16T19:02:03.343758Z",
-  "version": 1,
   "games": [
     {
       "appid": 2638890,
@@ -3687,15 +3677,20 @@
       "appid": 2121510,
       "capsule_image": "03a5c65bccf278414a7111265b6b4b1b2fac564c/capsule_231x87.jpg",
       "community_url": "https://steamcommunity.com/app/2121510/",
+      "content_descriptorids": [],
       "discovered_by": "IStoreQueryService/Query",
       "follower_checked_at": "2026-09-22T16:04:43.568469+08:00",
+      "follower_source": "Steam Community XML memberCount",
       "followers": 13547,
       "name": "Tenebris Somnia",
       "name_en": "Tenebris Somnia",
       "name_zh_tw": null,
+      "official_ge5000": true,
       "post_followers_store_verified": true,
       "post_followers_store_verified_at": "2026-10-16T19:02:03.343758Z",
       "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_normalization": "steam_utc_date_normalized_to_taipei",
       "release_date_timezone": "Asia/Taipei",
       "release_date_verified_at": "2026-10-16T19:02:03.343758Z",
       "release_display_precision": "date_full",
@@ -3704,34 +3699,29 @@
       "release_precision": "day",
       "release_raw": "2026-10-17",
       "release_start": "2026-10-17",
+      "release_store_date": "2026-10-16",
       "release_time_source": "Steam IStoreBrowseService/GetItems",
       "release_time_utc": "2026-10-16T16:54:01Z",
       "release_timestamp_taipei_date": "2026-10-17",
-      "store_url": "https://store.steampowered.com/app/2121510/",
-      "release_date_conflict": false,
-      "release_store_date": "2026-10-16",
-      "release_date_normalization": "steam_utc_date_normalized_to_taipei",
-      "follower_source": "Steam Community XML memberCount",
-      "official_ge5000": true,
       "sexual_content_screened": true,
       "steam_type": "game",
-      "content_descriptorids": [],
+      "store_url": "https://store.steampowered.com/app/2121510/",
       "twitch_admission": {
-        "schema_version": 1,
-        "method": "twitch_igdb_external_steam_v1",
         "appid": 2121510,
-        "twitch_game_id": "31355766",
-        "igdb_id": "216692",
         "checked_at": "2026-10-16T18:26:22Z",
-        "source_database_revision": "440cdeffb21bb4306a1b4eab6b76f5a770cd165a7268e32f49b00fd43e350a3e",
+        "igdb_id": "216692",
+        "method": "twitch_igdb_external_steam_v1",
+        "schema_version": 1,
         "source_database_generation": 59,
         "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_database_revision": "440cdeffb21bb4306a1b4eab6b76f5a770cd165a7268e32f49b00fd43e350a3e",
         "source_enrollment": {
-          "source": "igdb_first_release_date",
+          "min_viewers": 7000,
           "observed_at": "2026-10-16T18:26:22Z",
-          "viewer_count": 10176,
-          "min_viewers": 7000
-        }
+          "source": "igdb_first_release_date",
+          "viewer_count": 10176
+        },
+        "twitch_game_id": "31355766"
       }
     },
     {
@@ -4789,6 +4779,31 @@
       "store_url": "https://store.steampowered.com/app/3161310/"
     },
     {
+      "appid": 1209970,
+      "follower_checked_at": "2026-10-17T10:08:09.312214+08:00",
+      "follower_source": "Steam Community XML memberCount",
+      "followers": 26759,
+      "name": "Blind Descent",
+      "name_en": "Blind Descent",
+      "official_ge5000": true,
+      "post_followers_store_verified": true,
+      "post_followers_store_verified_at": "2026-10-17T02:08:09.484625+00:00",
+      "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_timezone": "Asia/Taipei",
+      "release_date_verified_at": "2026-10-17T02:08:09.484625+00:00",
+      "release_display_precision": "date_full",
+      "release_display_provider": "Steam IStoreBrowseService/GetItems",
+      "release_end": "2026-12-03",
+      "release_precision": "day",
+      "release_raw": "2026-12-03",
+      "release_start": "2026-12-03",
+      "release_time_source": "Steam IStoreBrowseService/GetItems",
+      "release_time_utc": "2026-12-02T16:00:00Z",
+      "release_timestamp_taipei_date": "2026-12-03",
+      "store_url": "https://store.steampowered.com/app/1209970/"
+    },
+    {
       "appid": 4084710,
       "capsule_image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/4084710/4e959416504e6b658554bd8f7614282442879627/capsule_231x87.jpg?t=1789636143",
       "community_url": "https://steamcommunity.com/app/4084710/",
@@ -5571,5 +5586,15 @@
       "release_timestamp_taipei_date": "2027-04-28",
       "store_url": "https://store.steampowered.com/app/2017940/"
     }
-  ]
+  ],
+  "post_followers_store_gate_checked_at": "2026-10-17T02:08:09.484625+00:00",
+  "post_followers_store_gate_version": 1,
+  "restored_dynamic_exact_appids": [
+    3846830,
+    2087540,
+    3960600,
+    4814120
+  ],
+  "updated_at": "2026-10-17T02:08:09.484625+00:00",
+  "version": 1
 }

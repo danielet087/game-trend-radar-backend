@@ -27739,17 +27739,19 @@
   },
   "scheduler_batch": {
     "run_id": "38997090039",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-17T11:02:47.701186+08:00",
-    "last_updated_at": "2026-10-17T11:07:18.148314+08:00",
-    "requests_this_run": 10,
-    "official_new_this_run": 10,
+    "last_updated_at": "2026-10-17T11:08:18.284536+08:00",
+    "requests_this_run": 12,
+    "official_new_this_run": 12,
     "http_429_this_run": 0,
-    "last_appid": 4279300,
-    "last_name": "The Red Bells Lament"
+    "last_appid": 5283280,
+    "last_name": "MEGAMINE",
+    "finished_at": "2026-10-17T11:08:18.284536+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -65397,13 +65399,39 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-17T11:07:18.148118+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4310780": {
+      "appid": 4310780,
+      "name": "Deep Space Starship Repair",
+      "release_date": "2026-11-19",
+      "group_id64": "103582791476112291",
+      "steam_url": "https://store.steampowered.com/app/4310780/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-16T17:09:01.652763+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-17T11:07:48.152269+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5283280": {
+      "appid": 5283280,
+      "name": "MEGAMINE",
+      "release_date": "2026-11-20",
+      "group_id64": "103582791476114064",
+      "steam_url": "https://store.steampowered.com/app/5283280/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-16T17:09:01.652763+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-17T11:08:18.223821+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-17T11:07:18.148118+08:00",
+  "community_last_success_at": "2026-10-17T11:08:18.223821+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -84284,6 +84312,26 @@
       "status": "ok",
       "github_run_id": "38997090039",
       "official_followers": 73
+    },
+    {
+      "appid": 4310780,
+      "when_taipei": "2026-10-17T11:07:48.072826+08:00",
+      "release_date": "2026-11-19",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38997090039",
+      "official_followers": 1
+    },
+    {
+      "appid": 5283280,
+      "when_taipei": "2026-10-17T11:08:18.072991+08:00",
+      "release_date": "2026-11-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "38997090039",
+      "official_followers": 3
     }
   ]
 }

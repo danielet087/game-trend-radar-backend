@@ -28312,7 +28312,7 @@
       "name": "Who's Cheating?",
       "release_date": "2026-10-17",
       "steam_url": "https://store.steampowered.com/app/5127370/",
-      "group_id64": null,
+      "group_id64": "103582791475835515",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -28375,7 +28375,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-18T05:02:29.468363Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     }
   },
   "scheduler_batch": {
@@ -68207,7 +68215,7 @@
   "group_resolution_api_cooldown": {
     "status": "available",
     "retry_at": null,
-    "observed_at": "2026-10-18T03:02:26.539118Z",
+    "observed_at": "2026-10-18T05:02:29.671288Z",
     "attempts": 0,
     "source": "Steam ISteamUser/ResolveVanityURL"
   },

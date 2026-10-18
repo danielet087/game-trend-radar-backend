@@ -18810,11 +18810,11 @@
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "group_resolution_api_cooldown": {
-    "attempts": 0,
-    "observed_at": "2026-10-18T13:02:44.762584Z",
+    "status": "available",
     "retry_at": null,
-    "source": "Steam ISteamUser/ResolveVanityURL",
-    "status": "available"
+    "observed_at": "2026-10-18T19:02:31.742948Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "next_request_after_taipei": null,
   "official_growth_group_resolutions": {
@@ -60955,18 +60955,22 @@
       },
       "priority": 100,
       "group_resolution": {
-        "api_result": 42,
-        "attempted": true,
-        "checked_at": "2026-10-18T13:02:44.595352Z",
-        "http": 200,
-        "retry_at": "2026-10-18T16:02:44.595352Z",
+        "status": "not_found",
+        "checked_at": "2026-10-18T19:02:31.548826Z",
         "source": "Steam ISteamUser/ResolveVanityURL",
-        "status": "not_found"
+        "attempted": true,
+        "http": 200,
+        "retry_at": "2026-10-18T22:02:31.548826Z",
+        "api_result": 42
       },
       "normal_candidate": {
         "appid": 4435490,
-        "daily_source_updated_at": "2026-10-17T17:10:36.588178+00:00",
+        "name": "Call of Duty®: Modern Warfare® 4",
+        "release_date": "2026-10-23",
         "group_id64": null,
+        "steam_url": "https://store.steampowered.com/app/4435490/",
+        "queue_source": "fresh_daily_prefilter_unresolved",
+        "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00",
         "group_resolution": {
           "api_result": 42,
           "attempted": true,
@@ -60975,11 +60979,7 @@
           "retry_at": "2026-10-18T16:02:44.595352Z",
           "source": "Steam ISteamUser/ResolveVanityURL",
           "status": "not_found"
-        },
-        "name": "Call of Duty®: Modern Warfare® 4",
-        "queue_source": "fresh_daily_prefilter_unresolved",
-        "release_date": "2026-10-23",
-        "steam_url": "https://store.steampowered.com/app/4435490/"
+        }
       }
     },
     "4442360": {
@@ -86905,6 +86905,537 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-05",
       "steam_url": "https://store.steampowered.com/app/910550/"
+    },
+    "824530": {
+      "appid": 824530,
+      "name": "Duck Casino: Gambling Simulator",
+      "release_date": "2026-10-19",
+      "group_id64": "103582791476125629",
+      "steam_url": "https://store.steampowered.com/app/824530/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "3996350": {
+      "appid": 3996350,
+      "name": "Sawad | سواد",
+      "release_date": "2026-10-22",
+      "group_id64": "103582791475988734",
+      "steam_url": "https://store.steampowered.com/app/3996350/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "4607340": {
+      "appid": 4607340,
+      "name": "Princess Ilyana: Night of Falling Grace",
+      "release_date": "2026-10-22",
+      "group_id64": "103582791475757554",
+      "steam_url": "https://store.steampowered.com/app/4607340/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5341000": {
+      "appid": 5341000,
+      "name": "Ashnar's Lair",
+      "release_date": "2026-10-22",
+      "group_id64": "103582791476064993",
+      "steam_url": "https://store.steampowered.com/app/5341000/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5377190": {
+      "appid": 5377190,
+      "name": "Halloweenies Candy Run",
+      "release_date": "2026-10-23",
+      "group_id64": "103582791476071189",
+      "steam_url": "https://store.steampowered.com/app/5377190/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5231880": {
+      "appid": 5231880,
+      "name": "Blind Night",
+      "release_date": "2026-10-26",
+      "group_id64": "103582791476127552",
+      "steam_url": "https://store.steampowered.com/app/5231880/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5431210": {
+      "appid": 5431210,
+      "name": "Boa Survival",
+      "release_date": "2026-10-26",
+      "group_id64": "103582791476124420",
+      "steam_url": "https://store.steampowered.com/app/5431210/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5112450": {
+      "appid": 5112450,
+      "name": "PACKING SHIFT",
+      "release_date": "2026-10-28",
+      "group_id64": "103582791475930367",
+      "steam_url": "https://store.steampowered.com/app/5112450/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5183200": {
+      "appid": 5183200,
+      "name": "Mossu",
+      "release_date": "2026-10-29",
+      "group_id64": "103582791475802668",
+      "steam_url": "https://store.steampowered.com/app/5183200/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5214750": {
+      "appid": 5214750,
+      "name": "Usurper",
+      "release_date": "2026-10-30",
+      "group_id64": "103582791475999790",
+      "steam_url": "https://store.steampowered.com/app/5214750/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5413680": {
+      "appid": 5413680,
+      "name": "Sort Coins Together",
+      "release_date": "2026-10-30",
+      "group_id64": "103582791476126593",
+      "steam_url": "https://store.steampowered.com/app/5413680/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5351850": {
+      "appid": 5351850,
+      "name": "Breaking Intelligence",
+      "release_date": "2026-10-31",
+      "group_id64": "103582791476072220",
+      "steam_url": "https://store.steampowered.com/app/5351850/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5371080": {
+      "appid": 5371080,
+      "name": "Gloamfall",
+      "release_date": "2026-10-31",
+      "group_id64": "103582791476119001",
+      "steam_url": "https://store.steampowered.com/app/5371080/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5380660": {
+      "appid": 5380660,
+      "name": "Lumenfall",
+      "release_date": "2026-10-31",
+      "group_id64": "103582791476066138",
+      "steam_url": "https://store.steampowered.com/app/5380660/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5062950": {
+      "appid": 5062950,
+      "name": "Guild of the Tower",
+      "release_date": "2026-11-02",
+      "group_id64": "103582791475777790",
+      "steam_url": "https://store.steampowered.com/app/5062950/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "4595460": {
+      "appid": 4595460,
+      "name": "Make the World Great Again",
+      "release_date": "2026-11-03",
+      "group_id64": "103582791475807188",
+      "steam_url": "https://store.steampowered.com/app/4595460/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5106940": {
+      "appid": 5106940,
+      "name": "Rind Town",
+      "release_date": "2026-11-03",
+      "group_id64": "103582791476062918",
+      "steam_url": "https://store.steampowered.com/app/5106940/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5291360": {
+      "appid": 5291360,
+      "name": "Solo Cards",
+      "release_date": "2026-11-03",
+      "group_id64": "103582791475898800",
+      "steam_url": "https://store.steampowered.com/app/5291360/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5395140": {
+      "appid": 5395140,
+      "name": "Have you seen my knife?",
+      "release_date": "2026-11-03",
+      "group_id64": "103582791476126768",
+      "steam_url": "https://store.steampowered.com/app/5395140/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5015250": {
+      "appid": 5015250,
+      "name": "Hearts Extreme",
+      "release_date": "2026-11-04",
+      "group_id64": "103582791475766786",
+      "steam_url": "https://store.steampowered.com/app/5015250/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5110170": {
+      "appid": 5110170,
+      "name": "50-50-50",
+      "release_date": "2026-11-04",
+      "group_id64": "103582791476122061",
+      "steam_url": "https://store.steampowered.com/app/5110170/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5042190": {
+      "appid": 5042190,
+      "name": "Retail Nation: My Supermarket",
+      "release_date": "2026-11-05",
+      "group_id64": "103582791475785886",
+      "steam_url": "https://store.steampowered.com/app/5042190/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5047110": {
+      "appid": 5047110,
+      "name": "Wardspire",
+      "release_date": "2026-11-05",
+      "group_id64": "103582791475771851",
+      "steam_url": "https://store.steampowered.com/app/5047110/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "4922150": {
+      "appid": 4922150,
+      "name": "Dungeon Node",
+      "release_date": "2026-11-06",
+      "group_id64": "103582791476127155",
+      "steam_url": "https://store.steampowered.com/app/4922150/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5391250": {
+      "appid": 5391250,
+      "name": "Tidy Up Ltd.: A Cozy Co-op Cleanup",
+      "release_date": "2026-11-06",
+      "group_id64": "103582791476105878",
+      "steam_url": "https://store.steampowered.com/app/5391250/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "3451250": {
+      "appid": 3451250,
+      "name": "Homemaking: Build & Decorate",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791475835805",
+      "steam_url": "https://store.steampowered.com/app/3451250/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5360900": {
+      "appid": 5360900,
+      "name": "Flopball",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476048064",
+      "steam_url": "https://store.steampowered.com/app/5360900/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5398160": {
+      "appid": 5398160,
+      "name": "Gopher It",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476103176",
+      "steam_url": "https://store.steampowered.com/app/5398160/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5096100": {
+      "appid": 5096100,
+      "name": "Siegecrawler",
+      "release_date": "2026-11-12",
+      "group_id64": "103582791475793988",
+      "steam_url": "https://store.steampowered.com/app/5096100/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5378030": {
+      "appid": 5378030,
+      "name": "La Muraille 1806",
+      "release_date": "2026-11-12",
+      "group_id64": "103582791476118257",
+      "steam_url": "https://store.steampowered.com/app/5378030/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5395030": {
+      "appid": 5395030,
+      "name": "I Was Reincarnated with the [Idle] Skill, and Now I Do Nothing",
+      "release_date": "2026-11-12",
+      "group_id64": "103582791476124568",
+      "steam_url": "https://store.steampowered.com/app/5395030/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5336340": {
+      "appid": 5336340,
+      "name": "Conaganda",
+      "release_date": "2026-11-13",
+      "group_id64": "103582791476122097",
+      "steam_url": "https://store.steampowered.com/app/5336340/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5363430": {
+      "appid": 5363430,
+      "name": "Boing Fight",
+      "release_date": "2026-11-13",
+      "group_id64": "103582791476059311",
+      "steam_url": "https://store.steampowered.com/app/5363430/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5377770": {
+      "appid": 5377770,
+      "name": "Rustlers Online",
+      "release_date": "2026-11-13",
+      "group_id64": "103582791476123439",
+      "steam_url": "https://store.steampowered.com/app/5377770/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5438730": {
+      "appid": 5438730,
+      "name": "Fishing Shop: Tidy Up",
+      "release_date": "2026-11-14",
+      "group_id64": "103582791476126707",
+      "steam_url": "https://store.steampowered.com/app/5438730/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5441910": {
+      "appid": 5441910,
+      "name": "Tiny Forge",
+      "release_date": "2026-11-14",
+      "group_id64": "103582791476122233",
+      "steam_url": "https://store.steampowered.com/app/5441910/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5389970": {
+      "appid": 5389970,
+      "name": "Woodturning Simulator",
+      "release_date": "2026-11-16",
+      "group_id64": "103582791476126576",
+      "steam_url": "https://store.steampowered.com/app/5389970/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5411150": {
+      "appid": 5411150,
+      "name": "Sort Memes Together",
+      "release_date": "2026-11-16",
+      "group_id64": "103582791476126609",
+      "steam_url": "https://store.steampowered.com/app/5411150/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5433690": {
+      "appid": 5433690,
+      "name": "Anime Shop Sort Together",
+      "release_date": "2026-11-16",
+      "group_id64": "103582791476125602",
+      "steam_url": "https://store.steampowered.com/app/5433690/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5439200": {
+      "appid": 5439200,
+      "name": "Firewheels Tidy Up Sort Together",
+      "release_date": "2026-11-17",
+      "group_id64": "103582791476125513",
+      "steam_url": "https://store.steampowered.com/app/5439200/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5318160": {
+      "appid": 5318160,
+      "name": "Cable Management Simulator",
+      "release_date": "2026-11-18",
+      "group_id64": "103582791476058472",
+      "steam_url": "https://store.steampowered.com/app/5318160/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5059250": {
+      "appid": 5059250,
+      "name": "Thoth's Riddle",
+      "release_date": "2026-11-19",
+      "group_id64": "103582791476126271",
+      "steam_url": "https://store.steampowered.com/app/5059250/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5398560": {
+      "appid": 5398560,
+      "name": "Iron Reactor",
+      "release_date": "2026-11-21",
+      "group_id64": "103582791476114311",
+      "steam_url": "https://store.steampowered.com/app/5398560/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5169710": {
+      "appid": 5169710,
+      "name": "Witchkeeping",
+      "release_date": "2026-11-24",
+      "group_id64": "103582791475813802",
+      "steam_url": "https://store.steampowered.com/app/5169710/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5202040": {
+      "appid": 5202040,
+      "name": "Monsters Can Cook",
+      "release_date": "2026-11-26",
+      "group_id64": "103582791475827395",
+      "steam_url": "https://store.steampowered.com/app/5202040/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5408930": {
+      "appid": 5408930,
+      "name": "Horde Below",
+      "release_date": "2026-11-30",
+      "group_id64": "103582791476127066",
+      "steam_url": "https://store.steampowered.com/app/5408930/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5358720": {
+      "appid": 5358720,
+      "name": "Bleep Wildlife",
+      "release_date": "2026-12-01",
+      "group_id64": "103582791476124603",
+      "steam_url": "https://store.steampowered.com/app/5358720/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5405420": {
+      "appid": 5405420,
+      "name": "Dragon's Treasure Tidy Up",
+      "release_date": "2026-12-03",
+      "group_id64": "103582791476098569",
+      "steam_url": "https://store.steampowered.com/app/5405420/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5011450": {
+      "appid": 5011450,
+      "name": "Check Please!",
+      "release_date": "2026-12-08",
+      "group_id64": "103582791475819237",
+      "steam_url": "https://store.steampowered.com/app/5011450/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5265640": {
+      "appid": 5265640,
+      "name": "Click or Wait",
+      "release_date": "2026-12-09",
+      "group_id64": "103582791476125780",
+      "steam_url": "https://store.steampowered.com/app/5265640/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5424560": {
+      "appid": 5424560,
+      "name": "SqueeGee: Window Cleaning Simulator",
+      "release_date": "2026-12-09",
+      "group_id64": "103582791476107481",
+      "steam_url": "https://store.steampowered.com/app/5424560/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "4735330": {
+      "appid": 4735330,
+      "name": "The Divided",
+      "release_date": "2026-12-12",
+      "group_id64": "103582791475756014",
+      "steam_url": "https://store.steampowered.com/app/4735330/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5418790": {
+      "appid": 5418790,
+      "name": "MAZE RUSH",
+      "release_date": "2027-01-06",
+      "group_id64": "103582791476109708",
+      "steam_url": "https://store.steampowered.com/app/5418790/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5295080": {
+      "appid": 5295080,
+      "name": "Silent Frequency",
+      "release_date": "2027-01-29",
+      "group_id64": "103582791476118140",
+      "steam_url": "https://store.steampowered.com/app/5295080/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5344530": {
+      "appid": 5344530,
+      "name": "WarFront",
+      "release_date": "2027-01-29",
+      "group_id64": "103582791476103726",
+      "steam_url": "https://store.steampowered.com/app/5344530/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "4509620": {
+      "appid": 4509620,
+      "name": "Ovis Mollis",
+      "release_date": "2027-02-08",
+      "group_id64": "103582791475800687",
+      "steam_url": "https://store.steampowered.com/app/4509620/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5445260": {
+      "appid": 5445260,
+      "name": "Who's the Biggest Degen?",
+      "release_date": "2027-03-01",
+      "group_id64": "103582791476127479",
+      "steam_url": "https://store.steampowered.com/app/5445260/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5124450": {
+      "appid": 5124450,
+      "name": "Maid Mech : Backpack TD",
+      "release_date": "2027-03-05",
+      "group_id64": "103582791475796632",
+      "steam_url": "https://store.steampowered.com/app/5124450/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
+    },
+    "5412870": {
+      "appid": 5412870,
+      "name": "Ten Kingdoms Courier",
+      "release_date": "2027-03-05",
+      "group_id64": "103582791476125252",
+      "steam_url": "https://store.steampowered.com/app/5412870/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-18T17:08:03.660691+00:00"
     }
   },
   "rate_limit_count": 0,

@@ -28310,17 +28310,19 @@
   },
   "scheduler_batch": {
     "run_id": "39088506465",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-18T10:02:37.887085+08:00",
-    "last_updated_at": "2026-10-18T10:07:09.008151+08:00",
-    "requests_this_run": 10,
-    "official_new_this_run": 10,
+    "last_updated_at": "2026-10-18T10:08:38.558067+08:00",
+    "requests_this_run": 13,
+    "official_new_this_run": 13,
     "http_429_this_run": 0,
-    "last_appid": 4928360,
-    "last_name": "My friend pig"
+    "last_appid": 5169220,
+    "last_name": "Campsite",
+    "finished_at": "2026-10-18T10:08:38.558067+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -67008,13 +67010,52 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-18T10:07:09.007975+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5327190": {
+      "appid": 5327190,
+      "name": "Sloptoberfest",
+      "release_date": "2026-10-21",
+      "group_id64": "103582791475943975",
+      "steam_url": "https://store.steampowered.com/app/5327190/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-17T17:10:36.588178+00:00",
+      "official_followers": 5,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-18T10:07:38.349180+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5341070": {
+      "appid": 5341070,
+      "name": "The Wrong Way",
+      "release_date": "2026-10-22",
+      "group_id64": "103582791476062853",
+      "steam_url": "https://store.steampowered.com/app/5341070/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-17T17:10:36.588178+00:00",
+      "official_followers": 79,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-18T10:08:08.394186+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5169220": {
+      "appid": 5169220,
+      "name": "Campsite",
+      "release_date": "2026-10-23",
+      "group_id64": "103582791476076843",
+      "steam_url": "https://store.steampowered.com/app/5169220/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-17T17:10:36.588178+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-18T10:08:38.494609+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-18T10:07:09.007975+08:00",
+  "community_last_success_at": "2026-10-18T10:08:38.494609+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -86756,6 +86797,36 @@
       "status": "ok",
       "github_run_id": "39088506465",
       "official_followers": 5
+    },
+    {
+      "appid": 5327190,
+      "when_taipei": "2026-10-18T10:07:38.260930+08:00",
+      "release_date": "2026-10-21",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39088506465",
+      "official_followers": 5
+    },
+    {
+      "appid": 5341070,
+      "when_taipei": "2026-10-18T10:08:08.261072+08:00",
+      "release_date": "2026-10-22",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39088506465",
+      "official_followers": 79
+    },
+    {
+      "appid": 5169220,
+      "when_taipei": "2026-10-18T10:08:38.261198+08:00",
+      "release_date": "2026-10-23",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39088506465",
+      "official_followers": 1
     }
   ]
 }

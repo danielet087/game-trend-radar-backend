@@ -2338,11 +2338,11 @@
         "daily_source_updated_at": "2026-10-17T17:10:36.588178+00:00",
         "group_resolution": {
           "status": "not_found",
-          "checked_at": "2026-10-17T23:02:40.508656Z",
+          "checked_at": "2026-10-18T03:02:25.113992Z",
           "source": "Steam ISteamUser/ResolveVanityURL",
           "attempted": true,
           "http": 200,
-          "retry_at": "2026-10-18T02:02:40.508656Z",
+          "retry_at": "2026-10-18T06:02:25.113992Z",
           "api_result": 42
         }
       }
@@ -28309,20 +28309,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "39088506465",
+    "run_id": "39092066102",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-18T10:02:37.887085+08:00",
-    "last_updated_at": "2026-10-18T10:08:38.558067+08:00",
-    "requests_this_run": 13,
-    "official_new_this_run": 13,
+    "started_at": "2026-10-18T11:02:50.865170+08:00",
+    "last_updated_at": "2026-10-18T11:02:51.244483+08:00",
+    "requests_this_run": 0,
+    "official_new_this_run": 0,
     "http_429_this_run": 0,
-    "last_appid": 5169220,
-    "last_name": "Campsite",
-    "finished_at": "2026-10-18T10:08:38.558067+08:00",
-    "stop_reason": "batch_request_limit"
+    "finished_at": "2026-10-18T11:02:51.244483+08:00",
+    "stop_reason": "awaiting_group_resolution_no_request"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

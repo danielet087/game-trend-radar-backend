@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-19T20:03:10.523711Z",
+  "generated_at": "2026-10-19T20:03:41.966221Z",
   "today_taipei": "2026-10-20",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-19T20:03:10.360651Z",
+    "checkpoint_updated_at": "2026-10-19T20:03:41.819162Z",
     "group_resolution_updated_at": "2026-10-19T19:02:38.842391Z",
     "candidate_state_updated_at": "2026-10-19T17:13:53.416913Z",
     "prefilter_updated_at": "2026-10-19T17:13:53.392473Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-20T04:03:09.390036+08:00",
-    "last_updated_at": "2026-10-20T04:03:10.360651+08:00",
+    "last_updated_at": "2026-10-20T04:03:41.819162+08:00",
+    "finished_at": "2026-10-20T04:03:41.819162+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4977840,
     "last_name": "Otherside Tapes: Favela",
     "requests_this_run": 1,

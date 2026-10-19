@@ -29731,20 +29731,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "39315648088",
-    "active": false,
-    "status": "finished",
+    "run_id": "39323994055",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-20T04:03:09.390036+08:00",
-    "last_updated_at": "2026-10-20T04:03:41.819162+08:00",
-    "requests_this_run": 1,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-20T05:02:22.489006+08:00",
+    "last_updated_at": "2026-10-20T05:04:52.795048+08:00",
+    "requests_this_run": 6,
+    "official_new_this_run": 5,
     "http_429_this_run": 1,
-    "last_appid": 4977840,
-    "last_name": "Otherside Tapes: Favela",
-    "finished_at": "2026-10-20T04:03:41.819162+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5408150,
+    "last_name": "Taskbar Parade"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -69320,21 +69318,86 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-05",
       "steam_url": "https://store.steampowered.com/app/910550/"
+    },
+    "5260110": {
+      "appid": 5260110,
+      "name": "Second Source",
+      "release_date": "2026-10-23",
+      "group_id64": "103582791475945833",
+      "steam_url": "https://store.steampowered.com/app/5260110/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 5,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T05:02:22.898627+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5298190": {
+      "appid": 5298190,
+      "name": "Frontier",
+      "release_date": "2026-10-23",
+      "group_id64": "103582791475984602",
+      "steam_url": "https://store.steampowered.com/app/5298190/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T05:02:52.819972+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5303370": {
+      "appid": 5303370,
+      "name": "Suspencil",
+      "release_date": "2026-10-23",
+      "group_id64": "103582791475947660",
+      "steam_url": "https://store.steampowered.com/app/5303370/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T05:03:23.291242+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5381250": {
+      "appid": 5381250,
+      "name": "Grim Guild",
+      "release_date": "2026-10-26",
+      "group_id64": "103582791476067753",
+      "steam_url": "https://store.steampowered.com/app/5381250/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T05:03:52.800577+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5395940": {
+      "appid": 5395940,
+      "name": "What Remains Inside",
+      "release_date": "2026-10-26",
+      "group_id64": "103582791476098132",
+      "steam_url": "https://store.steampowered.com/app/5395940/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T05:04:22.807035+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-20T04:33:10.360562+08:00",
+  "next_request_after_taipei": "2026-10-20T05:19:52.794434+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-19T20:33:10.360562+00:00",
-    "observed_at": "2026-10-19T20:03:10.360562+00:00",
-    "updated_at": "2026-10-19T20:03:10.360562+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-10-19T21:19:52.794434+00:00",
+    "observed_at": "2026-10-19T21:04:52.794434+00:00",
+    "updated_at": "2026-10-19T21:04:52.794434+00:00",
+    "retry_seconds": 900,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 1
   },
-  "community_last_success_at": "2026-10-20T02:35:29.990742+08:00",
+  "community_last_success_at": "2026-10-20T05:04:22.807035+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -89760,6 +89823,66 @@
       "status": "rate_limited",
       "github_run_id": "39315648088",
       "next_request_after_taipei": "2026-10-20T04:33:10.360562+08:00"
+    },
+    {
+      "appid": 5260110,
+      "when_taipei": "2026-10-20T05:02:22.749806+08:00",
+      "release_date": "2026-10-23",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39323994055",
+      "official_followers": 5
+    },
+    {
+      "appid": 5298190,
+      "when_taipei": "2026-10-20T05:02:52.749919+08:00",
+      "release_date": "2026-10-23",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39323994055",
+      "official_followers": 3
+    },
+    {
+      "appid": 5303370,
+      "when_taipei": "2026-10-20T05:03:22.750043+08:00",
+      "release_date": "2026-10-23",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39323994055",
+      "official_followers": 2
+    },
+    {
+      "appid": 5381250,
+      "when_taipei": "2026-10-20T05:03:52.750201+08:00",
+      "release_date": "2026-10-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39323994055",
+      "official_followers": 1
+    },
+    {
+      "appid": 5395940,
+      "when_taipei": "2026-10-20T05:04:22.750352+08:00",
+      "release_date": "2026-10-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39323994055",
+      "official_followers": 2
+    },
+    {
+      "appid": 5408150,
+      "when_taipei": "2026-10-20T05:04:52.750481+08:00",
+      "release_date": "2026-10-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "39323994055",
+      "next_request_after_taipei": "2026-10-20T05:19:52.794434+08:00"
     }
   ]
 }

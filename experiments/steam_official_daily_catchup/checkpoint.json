@@ -29731,20 +29731,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "39323994055",
-    "active": false,
-    "status": "finished",
+    "run_id": "39331803601",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-20T05:02:22.489006+08:00",
-    "last_updated_at": "2026-10-20T05:05:14.959200+08:00",
-    "requests_this_run": 6,
-    "official_new_this_run": 5,
+    "started_at": "2026-10-20T06:02:54.121240+08:00",
+    "last_updated_at": "2026-10-20T06:02:55.026397+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5408150,
-    "last_name": "Taskbar Parade",
-    "finished_at": "2026-10-20T05:05:14.959200+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 3873760,
+    "last_name": "Football Manager: Auto Chess"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -69387,17 +69385,17 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-20T05:19:52.794434+08:00",
+  "next_request_after_taipei": "2026-10-20T06:32:55.026315+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-19T21:19:52.794434+00:00",
-    "observed_at": "2026-10-19T21:04:52.794434+00:00",
-    "updated_at": "2026-10-19T21:04:52.794434+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-10-19T22:32:55.026315+00:00",
+    "observed_at": "2026-10-19T22:02:55.026315+00:00",
+    "updated_at": "2026-10-19T22:02:55.026315+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-10-20T05:04:22.807035+08:00",
   "official_growth_observations": {
@@ -89885,6 +89883,16 @@
       "status": "rate_limited",
       "github_run_id": "39323994055",
       "next_request_after_taipei": "2026-10-20T05:19:52.794434+08:00"
+    },
+    {
+      "appid": 3873760,
+      "when_taipei": "2026-10-20T06:02:54.422719+08:00",
+      "release_date": "2026-10-27",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "39331803601",
+      "next_request_after_taipei": "2026-10-20T06:32:55.026315+08:00"
     }
   ]
 }

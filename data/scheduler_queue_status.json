@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-19T22:02:55.158512Z",
+  "generated_at": "2026-10-19T22:03:23.358433Z",
   "today_taipei": "2026-10-20",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-19T22:02:55.026397Z",
+    "checkpoint_updated_at": "2026-10-19T22:03:23.240810Z",
     "group_resolution_updated_at": "2026-10-19T19:02:38.842391Z",
     "candidate_state_updated_at": "2026-10-19T17:13:53.416913Z",
     "prefilter_updated_at": "2026-10-19T17:13:53.392473Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-20T06:02:54.121240+08:00",
-    "last_updated_at": "2026-10-20T06:02:55.026397+08:00",
+    "last_updated_at": "2026-10-20T06:03:23.240810+08:00",
+    "finished_at": "2026-10-20T06:03:23.240810+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 3873760,
     "last_name": "Football Manager: Auto Chess",
     "requests_this_run": 1,

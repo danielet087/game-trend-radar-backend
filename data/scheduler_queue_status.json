@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-19T19:02:12.873746Z",
+  "generated_at": "2026-10-19T19:02:39.025667Z",
   "today_taipei": "2026-10-20",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
     "checkpoint_updated_at": "2026-10-19T15:02:42.591777Z",
-    "group_resolution_updated_at": "2026-10-19T13:02:37.319741Z",
+    "group_resolution_updated_at": "2026-10-19T19:02:38.842391Z",
     "candidate_state_updated_at": "2026-10-19T17:13:53.416913Z",
     "prefilter_updated_at": "2026-10-19T17:13:53.392473Z",
     "eligible_screened_at": "2026-10-19T17:13:54.231486Z",
@@ -18,7 +18,7 @@
     "status": "current_day_prefilter_complete",
     "daily_prefilter_updated_at": "2026-10-19T17:13:53.392473+00:00",
     "eligible_screened_at": "2026-10-19T17:13:54.231486+00:00",
-    "added_from_daily": 99,
+    "added_from_daily": 0,
     "eligible_count": 4366,
     "parked_group_xml_appids": [],
     "combined_pending_now": 100,
@@ -39,11 +39,11 @@
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
-    "attempts": 0,
-    "observed_at": "2026-10-19T13:02:37.319741Z",
+    "status": "available",
     "retry_at": null,
-    "source": "Steam ISteamUser/ResolveVanityURL",
-    "status": "available"
+    "observed_at": "2026-10-19T19:02:38.842391Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "cooldown": {
     "active": false,
@@ -79,13 +79,13 @@
       "state": "awaiting_group",
       "group_id64": null,
       "group_resolution": {
-        "api_result": 42,
-        "attempted": true,
-        "checked_at": "2026-10-19T13:02:37.156951Z",
-        "http": 200,
-        "retry_at": "2026-10-19T16:02:37.156951Z",
+        "status": "not_found",
+        "checked_at": "2026-10-19T19:02:38.570036Z",
         "source": "Steam ISteamUser/ResolveVanityURL",
-        "status": "not_found"
+        "attempted": true,
+        "http": 200,
+        "retry_at": "2026-10-19T22:02:38.570036Z",
+        "api_result": 42
       },
       "last_attempt_at": null,
       "last_attempt_status": null

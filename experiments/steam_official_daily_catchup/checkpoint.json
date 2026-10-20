@@ -2479,12 +2479,13 @@
         "queue_source": "fresh_daily_prefilter_unresolved",
         "daily_source_updated_at": "2026-10-20T17:12:19.804691+00:00",
         "group_resolution": {
-          "status": "api_error",
-          "checked_at": "2026-10-20T22:02:43.448156Z",
+          "status": "not_found",
+          "checked_at": "2026-10-20T23:02:29.515675Z",
           "source": "Steam ISteamUser/ResolveVanityURL",
           "attempted": true,
-          "http": 502,
-          "retry_at": "2026-10-20T22:17:44.097235Z"
+          "http": 200,
+          "retry_at": "2026-10-21T02:02:29.515675Z",
+          "api_result": 42
         }
       }
     },
@@ -30952,18 +30953,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "39504827192",
-    "active": false,
-    "status": "finished",
+    "run_id": "39512062268",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-21T06:03:14.851468+08:00",
-    "last_updated_at": "2026-10-21T06:03:15.237455+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-10-21T07:02:57.854405+08:00",
+    "last_updated_at": "2026-10-21T07:02:58.419008+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-10-21T06:03:15.237455+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 4253570,
+    "last_name": "Reshine"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -71922,17 +71923,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 3,
+  "rate_limit_count": 4,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-21T06:03:16.259026+08:00",
+  "next_request_after_taipei": "2026-10-21T09:02:58.418927+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-20T22:03:16.259026+00:00",
-    "observed_at": "2026-10-20T21:03:16.259026+00:00",
-    "updated_at": "2026-10-20T21:03:16.259026+00:00",
-    "retry_seconds": 3600,
+    "retry_at": "2026-10-21T01:02:58.418927+00:00",
+    "observed_at": "2026-10-20T23:02:58.418927+00:00",
+    "updated_at": "2026-10-20T23:02:58.418927+00:00",
+    "retry_seconds": 7200,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 3
+    "attempts": 4
   },
   "community_last_success_at": "2026-10-21T02:34:03.103668+08:00",
   "official_growth_observations": {
@@ -88868,6 +88869,16 @@
       "status": "rate_limited",
       "github_run_id": "39496775596",
       "next_request_after_taipei": "2026-10-21T06:03:16.259026+08:00"
+    },
+    {
+      "appid": 4253570,
+      "when_taipei": "2026-10-21T07:02:58.083284+08:00",
+      "release_date": "2026-11-27",
+      "queue_source": "twitch_steam_discovery",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "39512062268",
+      "next_request_after_taipei": "2026-10-21T09:02:58.418927+08:00"
     }
   ]
 }

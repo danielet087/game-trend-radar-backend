@@ -29739,17 +29739,19 @@
   },
   "scheduler_batch": {
     "run_id": "39350959886",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-20T09:03:09.262616+08:00",
-    "last_updated_at": "2026-10-20T09:13:13.703055+08:00",
-    "requests_this_run": 20,
-    "official_new_this_run": 20,
+    "last_updated_at": "2026-10-20T09:16:35.158231+08:00",
+    "requests_this_run": 26,
+    "official_new_this_run": 26,
     "http_429_this_run": 0,
-    "last_appid": 4819690,
-    "last_name": "DWARFS AND? SKELETONS"
+    "last_appid": 4605840,
+    "last_name": "江湖大镖客",
+    "finished_at": "2026-10-20T09:16:35.158231+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -70544,13 +70546,91 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-20T09:13:13.702883+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5433410": {
+      "appid": 5433410,
+      "name": "LynchMakesGames",
+      "release_date": "2027-03-11",
+      "group_id64": "103582791476130816",
+      "steam_url": "https://store.steampowered.com/app/5433410/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T09:14:05.067643+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5324690": {
+      "appid": 5324690,
+      "name": "Slime Playgrounds",
+      "release_date": "2026-10-21",
+      "group_id64": "103582791475990561",
+      "steam_url": "https://store.steampowered.com/app/5324690/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T09:14:35.064290+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4977840": {
+      "appid": 4977840,
+      "name": "Otherside Tapes: Favela",
+      "release_date": "2026-10-22",
+      "group_id64": "103582791475820644",
+      "steam_url": "https://store.steampowered.com/app/4977840/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 420,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T09:15:05.109814+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5408150": {
+      "appid": 5408150,
+      "name": "Taskbar Parade",
+      "release_date": "2026-10-26",
+      "group_id64": "103582791476085890",
+      "steam_url": "https://store.steampowered.com/app/5408150/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 5,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T09:15:35.104233+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "3873760": {
+      "appid": 3873760,
+      "name": "Football Manager: Auto Chess",
+      "release_date": "2026-10-27",
+      "group_id64": "103582791475776931",
+      "steam_url": "https://store.steampowered.com/app/3873760/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 38,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T09:16:05.068101+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4605840": {
+      "appid": 4605840,
+      "name": "江湖大镖客",
+      "release_date": "2026-10-27",
+      "group_id64": "103582791475777769",
+      "steam_url": "https://store.steampowered.com/app/4605840/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-19T17:13:53.392473+00:00",
+      "official_followers": 11,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-20T09:16:35.089452+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-20T09:13:13.702883+08:00",
+  "community_last_success_at": "2026-10-20T09:16:35.089452+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -87370,6 +87450,66 @@
       "status": "ok",
       "github_run_id": "39350959886",
       "official_followers": 5
+    },
+    {
+      "appid": 5433410,
+      "when_taipei": "2026-10-20T09:14:04.960336+08:00",
+      "release_date": "2027-03-11",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39350959886",
+      "official_followers": 2
+    },
+    {
+      "appid": 5324690,
+      "when_taipei": "2026-10-20T09:14:34.960477+08:00",
+      "release_date": "2026-10-21",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39350959886",
+      "official_followers": 1
+    },
+    {
+      "appid": 4977840,
+      "when_taipei": "2026-10-20T09:15:04.960625+08:00",
+      "release_date": "2026-10-22",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39350959886",
+      "official_followers": 420
+    },
+    {
+      "appid": 5408150,
+      "when_taipei": "2026-10-20T09:15:34.960768+08:00",
+      "release_date": "2026-10-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39350959886",
+      "official_followers": 5
+    },
+    {
+      "appid": 3873760,
+      "when_taipei": "2026-10-20T09:16:04.960895+08:00",
+      "release_date": "2026-10-27",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39350959886",
+      "official_followers": 38
+    },
+    {
+      "appid": 4605840,
+      "when_taipei": "2026-10-20T09:16:34.961019+08:00",
+      "release_date": "2026-10-27",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39350959886",
+      "official_followers": 11
     }
   ]
 }

@@ -29741,7 +29741,7 @@
       "name": "Borrowed Sight",
       "release_date": "2026-10-07",
       "steam_url": "https://store.steampowered.com/app/5000040/",
-      "group_id64": null,
+      "group_id64": "103582791475767540",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -29806,7 +29806,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-20T04:02:56.081015Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     }
   },
   "scheduler_batch": {
@@ -71798,7 +71806,7 @@
   "group_resolution_api_cooldown": {
     "status": "available",
     "retry_at": null,
-    "observed_at": "2026-10-20T03:02:46.019780Z",
+    "observed_at": "2026-10-20T04:02:56.258765Z",
     "attempts": 0,
     "source": "Steam ISteamUser/ResolveVanityURL"
   },

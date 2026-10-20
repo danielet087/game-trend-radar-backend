@@ -30954,17 +30954,19 @@
   },
   "scheduler_batch": {
     "run_id": "39512062268",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-21T07:02:57.854405+08:00",
-    "last_updated_at": "2026-10-21T07:02:58.419008+08:00",
+    "last_updated_at": "2026-10-21T07:03:24.756317+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 4253570,
-    "last_name": "Reshine"
+    "last_name": "Reshine",
+    "finished_at": "2026-10-21T07:03:24.756317+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

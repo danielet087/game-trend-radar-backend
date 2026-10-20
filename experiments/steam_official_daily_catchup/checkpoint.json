@@ -30798,17 +30798,19 @@
   },
   "scheduler_batch": {
     "run_id": "39488254129",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-21T04:02:42.071276+08:00",
-    "last_updated_at": "2026-10-21T04:02:42.594518+08:00",
+    "last_updated_at": "2026-10-21T04:03:09.096235+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 5081300,
-    "last_name": "MECCHA LIAR"
+    "last_name": "MECCHA LIAR",
+    "finished_at": "2026-10-21T04:03:09.096235+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

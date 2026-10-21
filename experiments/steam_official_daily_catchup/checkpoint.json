@@ -30953,18 +30953,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "39552771322",
-    "active": false,
-    "status": "finished",
+    "run_id": "39558997728",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-21T14:02:46.174158+08:00",
-    "last_updated_at": "2026-10-21T14:02:46.503462+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-10-21T15:03:08.711218+08:00",
+    "last_updated_at": "2026-10-21T15:03:09.287802+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-10-21T14:02:46.503462+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 3665700,
+    "last_name": "Myrridon"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -71923,17 +71923,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 5,
+  "rate_limit_count": 6,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-21T14:03:33.809458+08:00",
+  "next_request_after_taipei": "2026-10-21T23:03:09.287029+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-21T06:03:33.809458+00:00",
-    "observed_at": "2026-10-21T02:03:33.809458+00:00",
-    "updated_at": "2026-10-21T02:03:33.809458+00:00",
-    "retry_seconds": 14400,
+    "retry_at": "2026-10-21T15:03:09.287029+00:00",
+    "observed_at": "2026-10-21T07:03:09.287029+00:00",
+    "updated_at": "2026-10-21T07:03:09.287029+00:00",
+    "retry_seconds": 28800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 5
+    "attempts": 6
   },
   "community_last_success_at": "2026-10-21T02:34:03.103668+08:00",
   "official_growth_observations": {
@@ -88889,6 +88889,16 @@
       "status": "rate_limited",
       "github_run_id": "39530542903",
       "next_request_after_taipei": "2026-10-21T14:03:33.809458+08:00"
+    },
+    {
+      "appid": 3665700,
+      "when_taipei": "2026-10-21T15:03:09.149709+08:00",
+      "release_date": "2026-10-22",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "39558997728",
+      "next_request_after_taipei": "2026-10-21T23:03:09.287029+08:00"
     }
   ]
 }

@@ -32051,20 +32051,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "39657783572",
-    "active": false,
-    "status": "finished",
+    "run_id": "39666514978",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-22T03:03:03.536820+08:00",
-    "last_updated_at": "2026-10-22T03:03:32.082881+08:00",
+    "started_at": "2026-10-22T04:03:21.708842+08:00",
+    "last_updated_at": "2026-10-22T04:03:22.287781+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5306540,
-    "last_name": "Groundwork Simulator",
-    "finished_at": "2026-10-22T03:03:32.082881+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 2906990,
+    "last_name": "MoonTraum"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -73023,17 +73021,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-22T03:18:04.024620+08:00",
+  "next_request_after_taipei": "2026-10-22T04:33:22.287003+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-21T19:18:04.024620+00:00",
-    "observed_at": "2026-10-21T19:03:04.024620+00:00",
-    "updated_at": "2026-10-21T19:03:04.024620+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-10-21T20:33:22.287003+00:00",
+    "observed_at": "2026-10-21T20:03:22.287003+00:00",
+    "updated_at": "2026-10-21T20:03:22.287003+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-10-22T02:30:54.779725+08:00",
   "official_growth_observations": {
@@ -90016,6 +90014,16 @@
       "status": "rate_limited",
       "github_run_id": "39657783572",
       "next_request_after_taipei": "2026-10-22T03:18:04.024620+08:00"
+    },
+    {
+      "appid": 2906990,
+      "when_taipei": "2026-10-22T04:03:22.139927+08:00",
+      "release_date": "2026-10-23",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "39666514978",
+      "next_request_after_taipei": "2026-10-22T04:33:22.287003+08:00"
     }
   ]
 }

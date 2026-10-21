@@ -32052,17 +32052,19 @@
   },
   "scheduler_batch": {
     "run_id": "39657783572",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-22T03:03:03.536820+08:00",
-    "last_updated_at": "2026-10-22T03:03:04.024697+08:00",
+    "last_updated_at": "2026-10-22T03:03:32.082881+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 5306540,
-    "last_name": "Groundwork Simulator"
+    "last_name": "Groundwork Simulator",
+    "finished_at": "2026-10-22T03:03:32.082881+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

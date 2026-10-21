@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-21T20:03:22.475122Z",
+  "generated_at": "2026-10-21T20:03:54.428890Z",
   "today_taipei": "2026-10-22",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-21T20:03:22.287781Z",
+    "checkpoint_updated_at": "2026-10-21T20:03:54.269023Z",
     "group_resolution_updated_at": "2026-10-21T19:02:36.369193Z",
     "candidate_state_updated_at": "2026-10-21T17:14:52.479178Z",
     "prefilter_updated_at": "2026-10-21T17:14:52.453252Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-22T04:03:21.708842+08:00",
-    "last_updated_at": "2026-10-22T04:03:22.287781+08:00",
+    "last_updated_at": "2026-10-22T04:03:54.269023+08:00",
+    "finished_at": "2026-10-22T04:03:54.269023+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 2906990,
     "last_name": "MoonTraum",
     "requests_this_run": 1,

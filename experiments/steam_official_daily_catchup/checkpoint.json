@@ -32894,20 +32894,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "39853649831",
-    "active": false,
-    "status": "finished",
+    "run_id": "39861668154",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-23T05:02:54.787096+08:00",
-    "last_updated_at": "2026-10-23T05:03:51.028178+08:00",
-    "requests_this_run": 2,
-    "official_new_this_run": 1,
+    "started_at": "2026-10-23T06:02:29.381107+08:00",
+    "last_updated_at": "2026-10-23T06:02:30.456926+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 4170680,
-    "last_name": "Survidle Knight",
-    "finished_at": "2026-10-23T05:03:51.028178+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5461650,
+    "last_name": "退租清算公司"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -78169,17 +78167,17 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-23T05:18:25.277928+08:00",
+  "next_request_after_taipei": "2026-10-23T06:32:30.456839+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-22T21:18:25.277928+00:00",
-    "observed_at": "2026-10-22T21:03:25.277928+00:00",
-    "updated_at": "2026-10-22T21:03:25.277928+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-10-22T22:32:30.456839+00:00",
+    "observed_at": "2026-10-22T22:02:30.456839+00:00",
+    "updated_at": "2026-10-22T22:02:30.456839+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-10-23T05:02:55.495011+08:00",
   "official_growth_observations": {
@@ -98281,6 +98279,16 @@
       "status": "rate_limited",
       "github_run_id": "39853649831",
       "next_request_after_taipei": "2026-10-23T05:18:25.277928+08:00"
+    },
+    {
+      "appid": 5461650,
+      "when_taipei": "2026-10-23T06:02:29.619987+08:00",
+      "release_date": "2026-11-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "39861668154",
+      "next_request_after_taipei": "2026-10-23T06:32:30.456839+08:00"
     }
   ]
 }

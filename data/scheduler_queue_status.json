@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-22T00:02:48.385691Z",
+  "generated_at": "2026-10-22T00:07:49.362233Z",
   "today_taipei": "2026-10-22",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-21T23:36:47.374480Z",
+    "checkpoint_updated_at": "2026-10-22T00:07:49.173141Z",
     "group_resolution_updated_at": "2026-10-22T00:02:48.183411Z",
     "candidate_state_updated_at": "2026-10-21T17:14:52.479178Z",
     "prefilter_updated_at": "2026-10-21T17:14:52.453252Z",
     "eligible_screened_at": "2026-10-21T17:14:53.180567Z",
     "twitch_import_updated_at": "2026-10-22T00:02:04.044527Z",
-    "last_official_success_at": "2026-10-21T23:40:48.727575Z",
+    "last_official_success_at": "2026-10-22T00:07:49.173003Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -21,21 +21,21 @@
     "added_from_daily": 0,
     "eligible_count": 4544,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 30,
+    "combined_pending_now": 20,
     "completed_legacy": 408,
-    "completed_new": 3236,
-    "twitch_priority_pending": 5
+    "completed_new": 3246,
+    "twitch_priority_pending": 4
   },
   "summary": {
-    "normal_pending": 25,
-    "twitch_priority_pending": 5,
+    "normal_pending": 16,
+    "twitch_priority_pending": 4,
     "parked": 0,
-    "ready_pending": 30,
-    "followers_ready_pending": 29,
+    "ready_pending": 20,
+    "followers_ready_pending": 19,
     "awaiting_group_pending": 1,
-    "total_pending": 30,
-    "today_attempts": 208,
-    "today_successes": 206,
+    "total_pending": 20,
+    "today_attempts": 218,
+    "today_successes": 216,
     "today_429": 2
   },
   "group_resolution_api_cooldown": {
@@ -53,21 +53,19 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": false,
-    "status": "finished",
-    "started_at": "2026-10-22T07:02:45.982315+08:00",
-    "last_updated_at": "2026-10-22T07:36:47.374480+08:00",
-    "finished_at": "2026-10-22T07:36:47.374480+08:00",
-    "stop_reason": "hour_time_budget",
-    "last_appid": 2885160,
-    "last_name": "The Sea Is Broken",
-    "requests_this_run": 69,
-    "official_new_this_run": 69,
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-10-22T08:03:18.602523+08:00",
+    "last_updated_at": "2026-10-22T08:07:49.173141+08:00",
+    "last_appid": 5463940,
+    "last_name": "Crash Agency",
+    "requests_this_run": 10,
+    "official_new_this_run": 10,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "run_id": "39690469849",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39690469849"
+    "run_id": "39696988659",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
   },
   "queue": [
     {
@@ -94,153 +92,6 @@
     },
     {
       "position": 2,
-      "appid": 1761910,
-      "name": "Athanasia",
-      "steam_url": "https://store.steampowered.com/app/1761910/",
-      "release_date": "2026-10-19",
-      "source": "twitch_steam_discovery",
-      "priority": true,
-      "state": "waiting",
-      "group_id64": "103582791471027909",
-      "group_resolution": {
-        "status": "resolved",
-        "checked_at": "2026-10-22T00:02:47.907563Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "attempted": true,
-        "http": 200,
-        "api_result": 1
-      },
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5181050,
-      "name": "Head Miner",
-      "steam_url": "https://store.steampowered.com/app/5181050/",
-      "release_date": "2026-12-19",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475889655",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5427160,
-      "name": "Tower Fight",
-      "steam_url": "https://store.steampowered.com/app/5427160/",
-      "release_date": "2026-12-22",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476138194",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 4969750,
-      "name": "Space Circle",
-      "steam_url": "https://store.steampowered.com/app/4969750/",
-      "release_date": "2027-01-15",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475754506",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5234810,
-      "name": "The Official's Path",
-      "steam_url": "https://store.steampowered.com/app/5234810/",
-      "release_date": "2027-01-18",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476139730",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 4459640,
-      "name": "Spell Cage",
-      "steam_url": "https://store.steampowered.com/app/4459640/",
-      "release_date": "2027-01-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476132406",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5132390,
-      "name": "Hunting Contract",
-      "steam_url": "https://store.steampowered.com/app/5132390/",
-      "release_date": "2027-02-16",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475817007",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5394830,
-      "name": "Gnomebody Told You To Climb",
-      "steam_url": "https://store.steampowered.com/app/5394830/",
-      "release_date": "2027-02-26",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476140311",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 5451710,
-      "name": "Bedtime Battalion",
-      "steam_url": "https://store.steampowered.com/app/5451710/",
-      "release_date": "2027-03-01",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476132658",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
-      "appid": 5463940,
-      "name": "Crash Agency",
-      "steam_url": "https://store.steampowered.com/app/5463940/",
-      "release_date": "2027-03-01",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476138024",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 12,
       "appid": 5246530,
       "name": "Forge to Stars",
       "steam_url": "https://store.steampowered.com/app/5246530/",
@@ -254,7 +105,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 5335950,
       "name": "Fantasy Guild Manager",
       "steam_url": "https://store.steampowered.com/app/5335950/",
@@ -268,7 +119,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 5335970,
       "name": "Ostinato",
       "steam_url": "https://store.steampowered.com/app/5335970/",
@@ -282,7 +133,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 5332100,
       "name": "Ukraine Under Fire",
       "steam_url": "https://store.steampowered.com/app/5332100/",
@@ -296,7 +147,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 5384300,
       "name": "Over or Under",
       "steam_url": "https://store.steampowered.com/app/5384300/",
@@ -310,7 +161,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 5030310,
       "name": "Scrivo: The World Maker",
       "steam_url": "https://store.steampowered.com/app/5030310/",
@@ -324,7 +175,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 5448910,
       "name": "Godsever",
       "steam_url": "https://store.steampowered.com/app/5448910/",
@@ -338,7 +189,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5167360,
       "name": "Tiny Kopitiam",
       "steam_url": "https://store.steampowered.com/app/5167360/",
@@ -352,7 +203,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5465970,
       "name": "Gunmetal Switchyard – Tower Defense",
       "steam_url": "https://store.steampowered.com/app/5465970/",
@@ -366,7 +217,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5262750,
       "name": "RIFTW ARDEN",
       "steam_url": "https://store.steampowered.com/app/5262750/",
@@ -380,7 +231,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 2955610,
       "name": "Gun Wizard",
       "steam_url": "https://store.steampowered.com/app/2955610/",
@@ -394,7 +245,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 3826670,
       "name": "Flipping is Hard",
       "steam_url": "https://store.steampowered.com/app/3826670/",
@@ -415,7 +266,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 5081300,
       "name": "MECCHA LIAR",
       "steam_url": "https://store.steampowered.com/app/5081300/",
@@ -429,7 +280,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 2757440,
       "name": "TCG: FANTASY Card Collection",
       "steam_url": "https://store.steampowered.com/app/2757440/",
@@ -443,7 +294,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 4253570,
       "name": "Reshine",
       "steam_url": "https://store.steampowered.com/app/4253570/",
@@ -464,7 +315,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 4071650,
       "name": "Stream Train",
       "steam_url": "https://store.steampowered.com/app/4071650/",
@@ -485,7 +336,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 28,
+      "position": 18,
       "appid": 3665700,
       "name": "Myrridon",
       "steam_url": "https://store.steampowered.com/app/3665700/",
@@ -499,7 +350,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 29,
+      "position": 19,
       "appid": 5306540,
       "name": "Groundwork Simulator",
       "steam_url": "https://store.steampowered.com/app/5306540/",
@@ -513,7 +364,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 30,
+      "position": 20,
       "appid": 2906990,
       "name": "MoonTraum",
       "steam_url": "https://store.steampowered.com/app/2906990/",
@@ -529,136 +380,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-10-21T22:22:28.010197Z",
-      "kind": "official_attempt",
-      "appid": 4743040,
-      "name": "Tiny Village",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 30,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:22:58.010336Z",
-      "kind": "official_attempt",
-      "appid": 4879470,
-      "name": "A Needle In a Haystack",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 24,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:23:30.071457Z",
-      "kind": "official_attempt",
-      "appid": 5060780,
-      "name": "Twin-stick Japanese",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 8,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:24:00.071594Z",
-      "kind": "official_attempt",
-      "appid": 5061890,
-      "name": "Scramshaw",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:24:30.071736Z",
-      "kind": "official_attempt",
-      "appid": 5111280,
-      "name": "Dear My Son",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:25:00.071871Z",
-      "kind": "official_attempt",
-      "appid": 5351930,
-      "name": "Against Heroes",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 6,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:25:30.071991Z",
-      "kind": "official_attempt",
-      "appid": 5385950,
-      "name": "阿飛 AFEI",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:26:00.072118Z",
-      "kind": "official_attempt",
-      "appid": 5461550,
-      "name": "Containment Shift Company",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:26:30.072252Z",
-      "kind": "official_attempt",
-      "appid": 5464620,
-      "name": "Terrified Gorillas",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
-    {
-      "at": "2026-10-21T22:27:00.072380Z",
-      "kind": "official_attempt",
-      "appid": 5467060,
-      "name": "Score Circuit",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "39683223942",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39683223942"
-    },
     {
       "at": "2026-10-21T22:27:30.072512Z",
       "kind": "official_attempt",
@@ -1828,6 +1549,136 @@
       "retry_at": null,
       "run_id": "39690469849",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39690469849"
+    },
+    {
+      "at": "2026-10-22T00:03:19.052015Z",
+      "kind": "official_attempt",
+      "appid": 1761910,
+      "name": "Athanasia",
+      "status": "ok",
+      "http": 200,
+      "source": "twitch_steam_discovery",
+      "official_followers": 4051,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:03:49.052161Z",
+      "kind": "official_attempt",
+      "appid": 5181050,
+      "name": "Head Miner",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 14,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:04:19.052285Z",
+      "kind": "official_attempt",
+      "appid": 5427160,
+      "name": "Tower Fight",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:04:49.052417Z",
+      "kind": "official_attempt",
+      "appid": 4969750,
+      "name": "Space Circle",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 808,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:05:19.052554Z",
+      "kind": "official_attempt",
+      "appid": 5234810,
+      "name": "The Official's Path",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:05:49.052680Z",
+      "kind": "official_attempt",
+      "appid": 4459640,
+      "name": "Spell Cage",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:06:19.052805Z",
+      "kind": "official_attempt",
+      "appid": 5132390,
+      "name": "Hunting Contract",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 13,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:06:49.052925Z",
+      "kind": "official_attempt",
+      "appid": 5394830,
+      "name": "Gnomebody Told You To Climb",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:07:19.053054Z",
+      "kind": "official_attempt",
+      "appid": 5451710,
+      "name": "Bedtime Battalion",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
+    },
+    {
+      "at": "2026-10-22T00:07:49.053184Z",
+      "kind": "official_attempt",
+      "appid": 5463940,
+      "name": "Crash Agency",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "39696988659",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/39696988659"
     }
   ],
   "events_limit": 100

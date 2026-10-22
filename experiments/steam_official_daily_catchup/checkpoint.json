@@ -18051,11 +18051,11 @@
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "group_resolution_api_cooldown": {
-    "attempts": 0,
-    "observed_at": "2026-10-21T22:02:46.866453Z",
+    "status": "available",
     "retry_at": null,
-    "source": "Steam ISteamUser/ResolveVanityURL",
-    "status": "available"
+    "observed_at": "2026-10-22T00:02:48.183411Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "next_request_after_taipei": null,
   "official_growth_group_resolutions": {
@@ -63057,7 +63057,7 @@
       "name": "Athanasia",
       "release_date": "2026-10-19",
       "steam_url": "https://store.steampowered.com/app/1761910/",
-      "group_id64": null,
+      "group_id64": "103582791471027909",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -63123,7 +63123,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-22T00:02:47.907563Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     },
     "1782800": {
       "appid": 1782800,
@@ -63511,12 +63519,12 @@
     },
     "2757440": {
       "appid": 2757440,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476035843",
       "name": "TCG: FANTASY Card Collection",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-22",
-      "steam_url": "https://store.steampowered.com/app/2757440/"
+      "group_id64": "103582791476035843",
+      "steam_url": "https://store.steampowered.com/app/2757440/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "2780850": {
       "appid": 2780850,
@@ -63632,12 +63640,12 @@
     },
     "2906990": {
       "appid": 2906990,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476079405",
       "name": "MoonTraum",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-23",
-      "steam_url": "https://store.steampowered.com/app/2906990/"
+      "group_id64": "103582791476079405",
+      "steam_url": "https://store.steampowered.com/app/2906990/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "2920710": {
       "appid": 2920710,
@@ -63650,12 +63658,12 @@
     },
     "2955610": {
       "appid": 2955610,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476113933",
       "name": "Gun Wizard",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-10-20",
-      "steam_url": "https://store.steampowered.com/app/2955610/"
+      "group_id64": "103582791476113933",
+      "steam_url": "https://store.steampowered.com/app/2955610/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "2966240": {
       "appid": 2966240,
@@ -65624,8 +65632,12 @@
       },
       "normal_candidate": {
         "appid": 4435490,
-        "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
+        "name": "Call of Duty®: Modern Warfare® 4",
+        "release_date": "2026-10-23",
         "group_id64": null,
+        "steam_url": "https://store.steampowered.com/app/4435490/",
+        "queue_source": "fresh_daily_prefilter_unresolved",
+        "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
         "group_resolution": {
           "api_result": 42,
           "attempted": true,
@@ -65634,11 +65646,7 @@
           "retry_at": "2026-10-22T01:02:46.394046Z",
           "source": "Steam ISteamUser/ResolveVanityURL",
           "status": "not_found"
-        },
-        "name": "Call of Duty®: Modern Warfare® 4",
-        "queue_source": "fresh_daily_prefilter_unresolved",
-        "release_date": "2026-10-23",
-        "steam_url": "https://store.steampowered.com/app/4435490/"
+        }
       }
     },
     "4442360": {
@@ -65696,12 +65704,12 @@
     },
     "4459640": {
       "appid": 4459640,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476132406",
       "name": "Spell Cage",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-27",
-      "steam_url": "https://store.steampowered.com/app/4459640/"
+      "group_id64": "103582791476132406",
+      "steam_url": "https://store.steampowered.com/app/4459640/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "4461260": {
       "appid": 4461260,
@@ -69551,12 +69559,12 @@
     },
     "4969750": {
       "appid": 4969750,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791475754506",
       "name": "Space Circle",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-15",
-      "steam_url": "https://store.steampowered.com/app/4969750/"
+      "group_id64": "103582791475754506",
+      "steam_url": "https://store.steampowered.com/app/4969750/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "4970000": {
       "appid": 4970000,
@@ -71774,12 +71782,12 @@
     },
     "5030310": {
       "appid": 5030310,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476138081",
       "name": "Scrivo: The World Maker",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-04-07",
-      "steam_url": "https://store.steampowered.com/app/5030310/"
+      "group_id64": "103582791476138081",
+      "steam_url": "https://store.steampowered.com/app/5030310/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5030500": {
       "appid": 5030500,
@@ -77225,12 +77233,12 @@
     },
     "5132390": {
       "appid": 5132390,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791475817007",
       "name": "Hunting Contract",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-02-16",
-      "steam_url": "https://store.steampowered.com/app/5132390/"
+      "group_id64": "103582791475817007",
+      "steam_url": "https://store.steampowered.com/app/5132390/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5132550": {
       "appid": 5132550,
@@ -78754,12 +78762,12 @@
     },
     "5167360": {
       "appid": 5167360,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791475812186",
       "name": "Tiny Kopitiam",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-04-15",
-      "steam_url": "https://store.steampowered.com/app/5167360/"
+      "group_id64": "103582791475812186",
+      "steam_url": "https://store.steampowered.com/app/5167360/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5167420": {
       "appid": 5167420,
@@ -79635,12 +79643,12 @@
     },
     "5181050": {
       "appid": 5181050,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791475889655",
       "name": "Head Miner",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-19",
-      "steam_url": "https://store.steampowered.com/app/5181050/"
+      "group_id64": "103582791475889655",
+      "steam_url": "https://store.steampowered.com/app/5181050/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5181280": {
       "appid": 5181280,
@@ -83169,12 +83177,12 @@
     },
     "5234810": {
       "appid": 5234810,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476139730",
       "name": "The Official's Path",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-18",
-      "steam_url": "https://store.steampowered.com/app/5234810/"
+      "group_id64": "103582791476139730",
+      "steam_url": "https://store.steampowered.com/app/5234810/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5234920": {
       "appid": 5234920,
@@ -83898,12 +83906,12 @@
     },
     "5246530": {
       "appid": 5246530,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476141645",
       "name": "Forge to Stars",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-03-05",
-      "steam_url": "https://store.steampowered.com/app/5246530/"
+      "group_id64": "103582791476141645",
+      "steam_url": "https://store.steampowered.com/app/5246530/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5246800": {
       "appid": 5246800,
@@ -84811,12 +84819,12 @@
     },
     "5262750": {
       "appid": 5262750,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476140189",
       "name": "RIFTW ARDEN",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-10-01",
-      "steam_url": "https://store.steampowered.com/app/5262750/"
+      "group_id64": "103582791476140189",
+      "steam_url": "https://store.steampowered.com/app/5262750/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5262940": {
       "appid": 5262940,
@@ -87293,12 +87301,12 @@
     },
     "5306540": {
       "appid": 5306540,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791475928006",
       "name": "Groundwork Simulator",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-22",
-      "steam_url": "https://store.steampowered.com/app/5306540/"
+      "group_id64": "103582791475928006",
+      "steam_url": "https://store.steampowered.com/app/5306540/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5306660": {
       "appid": 5306660,
@@ -88913,12 +88921,12 @@
     },
     "5332100": {
       "appid": 5332100,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476137422",
       "name": "Ukraine Under Fire",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-03-31",
-      "steam_url": "https://store.steampowered.com/app/5332100/"
+      "group_id64": "103582791476137422",
+      "steam_url": "https://store.steampowered.com/app/5332100/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5332250": {
       "appid": 5332250,
@@ -89192,21 +89200,21 @@
     },
     "5335950": {
       "appid": 5335950,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476138638",
       "name": "Fantasy Guild Manager",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-03-05",
-      "steam_url": "https://store.steampowered.com/app/5335950/"
+      "group_id64": "103582791476138638",
+      "steam_url": "https://store.steampowered.com/app/5335950/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5335970": {
       "appid": 5335970,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476138462",
       "name": "Ostinato",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-03-26",
-      "steam_url": "https://store.steampowered.com/app/5335970/"
+      "group_id64": "103582791476138462",
+      "steam_url": "https://store.steampowered.com/app/5335970/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5336080": {
       "appid": 5336080,
@@ -91973,12 +91981,12 @@
     },
     "5384300": {
       "appid": 5384300,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476093396",
       "name": "Over or Under",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-04-02",
-      "steam_url": "https://store.steampowered.com/app/5384300/"
+      "group_id64": "103582791476093396",
+      "steam_url": "https://store.steampowered.com/app/5384300/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5384450": {
       "appid": 5384450,
@@ -92459,12 +92467,12 @@
     },
     "5394830": {
       "appid": 5394830,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476140311",
       "name": "Gnomebody Told You To Climb",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-02-26",
-      "steam_url": "https://store.steampowered.com/app/5394830/"
+      "group_id64": "103582791476140311",
+      "steam_url": "https://store.steampowered.com/app/5394830/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5394850": {
       "appid": 5394850,
@@ -93701,12 +93709,12 @@
     },
     "5427160": {
       "appid": 5427160,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476138194",
       "name": "Tower Fight",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-22",
-      "steam_url": "https://store.steampowered.com/app/5427160/"
+      "group_id64": "103582791476138194",
+      "steam_url": "https://store.steampowered.com/app/5427160/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5427290": {
       "appid": 5427290,
@@ -94394,12 +94402,12 @@
     },
     "5448910": {
       "appid": 5448910,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476137919",
       "name": "Godsever",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-04-10",
-      "steam_url": "https://store.steampowered.com/app/5448910/"
+      "group_id64": "103582791476137919",
+      "steam_url": "https://store.steampowered.com/app/5448910/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5448940": {
       "appid": 5448940,
@@ -94475,12 +94483,12 @@
     },
     "5451710": {
       "appid": 5451710,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476132658",
       "name": "Bedtime Battalion",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-03-01",
-      "steam_url": "https://store.steampowered.com/app/5451710/"
+      "group_id64": "103582791476132658",
+      "steam_url": "https://store.steampowered.com/app/5451710/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5451750": {
       "appid": 5451750,
@@ -94700,12 +94708,12 @@
     },
     "5463940": {
       "appid": 5463940,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476138024",
       "name": "Crash Agency",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-03-01",
-      "steam_url": "https://store.steampowered.com/app/5463940/"
+      "group_id64": "103582791476138024",
+      "steam_url": "https://store.steampowered.com/app/5463940/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5464620": {
       "appid": 5464620,
@@ -94754,12 +94762,12 @@
     },
     "5465970": {
       "appid": 5465970,
-      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00",
-      "group_id64": "103582791476138080",
       "name": "Gunmetal Switchyard – Tower Defense",
-      "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-04-16",
-      "steam_url": "https://store.steampowered.com/app/5465970/"
+      "group_id64": "103582791476138080",
+      "steam_url": "https://store.steampowered.com/app/5465970/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-21T17:14:52.453252+00:00"
     },
     "5466130": {
       "appid": 5466130,

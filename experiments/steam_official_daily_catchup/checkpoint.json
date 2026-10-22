@@ -32902,17 +32902,19 @@
   },
   "scheduler_batch": {
     "run_id": "39868890024",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-23T07:02:57.429378+08:00",
-    "last_updated_at": "2026-10-23T07:22:33.701119+08:00",
-    "requests_this_run": 40,
-    "official_new_this_run": 40,
+    "last_updated_at": "2026-10-23T07:24:46.256275+08:00",
+    "requests_this_run": 44,
+    "official_new_this_run": 44,
     "http_429_this_run": 0,
-    "last_appid": 5316250,
-    "last_name": "Grimlane"
+    "last_appid": 5461650,
+    "last_name": "退租清算公司",
+    "finished_at": "2026-10-23T07:24:46.256275+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -78702,13 +78704,134 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-23T07:22:33.700953+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5441000": {
+      "appid": 5441000,
+      "name": "Alchemill: A Witch's Workshop",
+      "release_date": "2027-04-16",
+      "group_id64": "103582791476144708",
+      "steam_url": "https://store.steampowered.com/app/5441000/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-22T17:13:05.859769+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-23T07:23:16.030858+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4098030": {
+      "appid": 4098030,
+      "name": "Shipping Store Simulator 2037",
+      "release_date": "2026-10-14",
+      "steam_url": "https://store.steampowered.com/app/4098030/",
+      "group_id64": "103582791475411389",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4098030,
+        "twitch_game_id": "815159477",
+        "igdb_id": "396796",
+        "checked_at": "2026-10-22T19:21:50Z",
+        "source_database_revision": "08f49a05c273b3ce09b0799e02889bf6e256289af851fb629dbb5ec26c8431d3",
+        "source_database_generation": 446,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-22T19:21:50Z",
+          "viewer_count": 8406,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 4098030,
+        "name": "Shipping Store Simulator 2037",
+        "name_en": "Shipping Store Simulator 2037",
+        "release_raw": "2026-10-14",
+        "release_start": "2026-10-14",
+        "release_end": "2026-10-14",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-10-14T13:50:45Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-10-14",
+        "release_date_conflict": false,
+        "release_store_date": "2026-10-14",
+        "release_date_normalization": "steam_store_date_matches_taipei",
+        "release_date_verified_at": "2026-10-22T23:02:03.223915Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-22T23:02:03.223915Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [],
+        "store_url": "https://store.steampowered.com/app/4098030/",
+        "community_url": "https://steamcommunity.com/app/4098030/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4098030,
+          "twitch_game_id": "815159477",
+          "igdb_id": "396796",
+          "checked_at": "2026-10-22T19:21:50Z",
+          "source_database_revision": "08f49a05c273b3ce09b0799e02889bf6e256289af851fb629dbb5ec26c8431d3",
+          "source_database_generation": 446,
+          "source_database_namespace": "danielet087/game-trend-radar@main",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-22T19:21:50Z",
+            "viewer_count": 8406,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-22T20:02:25.645722Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 3220,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-23T07:23:46.168780+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4170680": {
+      "appid": 4170680,
+      "name": "Survidle Knight",
+      "release_date": "2026-11-16",
+      "group_id64": "103582791476143161",
+      "steam_url": "https://store.steampowered.com/app/4170680/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-22T17:13:05.859769+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-23T07:24:16.034563+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5461650": {
+      "appid": 5461650,
+      "name": "退租清算公司",
+      "release_date": "2026-11-16",
+      "group_id64": "103582791476144417",
+      "steam_url": "https://store.steampowered.com/app/5461650/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-22T17:13:05.859769+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-23T07:24:46.178233+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-23T07:22:33.700953+08:00",
+  "community_last_success_at": "2026-10-23T07:24:46.178233+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -99221,6 +99344,46 @@
       "status": "ok",
       "github_run_id": "39868890024",
       "official_followers": 3
+    },
+    {
+      "appid": 5441000,
+      "when_taipei": "2026-10-23T07:23:15.948024+08:00",
+      "release_date": "2027-04-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39868890024",
+      "official_followers": 1
+    },
+    {
+      "appid": 4098030,
+      "when_taipei": "2026-10-23T07:23:45.948144+08:00",
+      "release_date": "2026-10-14",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39868890024",
+      "official_followers": 3220
+    },
+    {
+      "appid": 4170680,
+      "when_taipei": "2026-10-23T07:24:15.948268+08:00",
+      "release_date": "2026-11-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39868890024",
+      "official_followers": 2
+    },
+    {
+      "appid": 5461650,
+      "when_taipei": "2026-10-23T07:24:45.948399+08:00",
+      "release_date": "2026-11-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "39868890024",
+      "official_followers": 1
     }
   ]
 }

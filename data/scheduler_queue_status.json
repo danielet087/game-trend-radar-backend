@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-22T21:03:25.431214Z",
+  "generated_at": "2026-10-22T21:03:51.166947Z",
   "today_taipei": "2026-10-23",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-22T21:03:25.278001Z",
+    "checkpoint_updated_at": "2026-10-22T21:03:51.028178Z",
     "group_resolution_updated_at": "2026-10-22T20:02:25.810211Z",
     "candidate_state_updated_at": "2026-10-22T17:13:05.874204Z",
     "prefilter_updated_at": "2026-10-22T17:13:05.859769Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-23T05:02:54.787096+08:00",
-    "last_updated_at": "2026-10-23T05:03:25.278001+08:00",
+    "last_updated_at": "2026-10-23T05:03:51.028178+08:00",
+    "finished_at": "2026-10-23T05:03:51.028178+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4170680,
     "last_name": "Survidle Knight",
     "requests_this_run": 2,

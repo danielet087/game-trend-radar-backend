@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-23T21:03:00.356465Z",
+  "generated_at": "2026-10-23T21:03:29.232882Z",
   "today_taipei": "2026-10-24",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-23T21:03:00.167043Z",
+    "checkpoint_updated_at": "2026-10-23T21:03:29.060793Z",
     "group_resolution_updated_at": "2026-10-23T19:02:46.986027Z",
     "candidate_state_updated_at": "2026-10-23T17:15:44.414506Z",
     "prefilter_updated_at": "2026-10-23T17:15:44.390031Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-24T05:02:59.331232+08:00",
-    "last_updated_at": "2026-10-24T05:03:00.167043+08:00",
+    "last_updated_at": "2026-10-24T05:03:29.060793+08:00",
+    "finished_at": "2026-10-24T05:03:29.060793+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5424330,
     "last_name": "Catch Me If You Seoul",
     "requests_this_run": 1,

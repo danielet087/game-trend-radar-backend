@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-23T17:15:46.351272Z",
+  "generated_at": "2026-10-23T19:02:24.109214Z",
   "today_taipei": "2026-10-24",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,8 +10,8 @@
     "candidate_state_updated_at": "2026-10-23T17:15:44.414506Z",
     "prefilter_updated_at": "2026-10-23T17:15:44.390031Z",
     "eligible_screened_at": "2026-10-23T17:15:45.157405Z",
-    "twitch_import_updated_at": "2026-10-23T15:04:08.006390Z",
-    "last_official_success_at": "2026-10-22T23:24:46.178233Z",
+    "twitch_import_updated_at": "2026-10-23T19:02:19.321417Z",
+    "last_official_success_at": "2026-10-23T18:34:27.123240Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -39,17 +39,17 @@
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
-    "status": "available",
-    "retry_at": null,
-    "observed_at": "2026-10-23T14:02:33.152521Z",
     "attempts": 0,
-    "source": "Steam ISteamUser/ResolveVanityURL"
+    "observed_at": "2026-10-23T14:02:33.152521Z",
+    "retry_at": null,
+    "source": "Steam ISteamUser/ResolveVanityURL",
+    "status": "available"
   },
   "cooldown": {
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-10-23T19:00:00Z",
+    "next_eligible_slot": "2026-10-23T20:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -79,13 +79,13 @@
       "state": "awaiting_group",
       "group_id64": null,
       "group_resolution": {
-        "status": "not_found",
-        "checked_at": "2026-10-23T14:02:32.820716Z",
-        "source": "Steam ISteamUser/ResolveVanityURL",
+        "api_result": 42,
         "attempted": true,
+        "checked_at": "2026-10-23T14:02:32.820716Z",
         "http": 200,
         "retry_at": "2026-10-23T17:02:32.820716Z",
-        "api_result": 42
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "status": "not_found"
       },
       "last_attempt_at": null,
       "last_attempt_status": null

@@ -33858,20 +33858,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40015817260",
-    "active": false,
-    "status": "finished",
+    "run_id": "40023521063",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-24T04:02:52.789949+08:00",
-    "last_updated_at": "2026-10-24T04:03:17.639572+08:00",
+    "started_at": "2026-10-24T05:02:59.331232+08:00",
+    "last_updated_at": "2026-10-24T05:03:00.167043+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 4903770,
-    "last_name": "OIL & HORROR",
-    "finished_at": "2026-10-24T04:03:17.639572+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5424330,
+    "last_name": "Catch Me If You Seoul"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -79784,17 +79782,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-24T04:32:53.407719+08:00",
+  "next_request_after_taipei": "2026-10-24T06:03:00.166952+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-23T20:32:53.407719+00:00",
-    "observed_at": "2026-10-23T20:02:53.407719+00:00",
-    "updated_at": "2026-10-23T20:02:53.407719+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-10-23T22:03:00.166952+00:00",
+    "observed_at": "2026-10-23T21:03:00.166952+00:00",
+    "updated_at": "2026-10-23T21:03:00.166952+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-10-24T02:34:27.123240+08:00",
   "official_growth_observations": {
@@ -100390,6 +100388,16 @@
       "status": "rate_limited",
       "github_run_id": "40015817260",
       "next_request_after_taipei": "2026-10-24T04:32:53.407719+08:00"
+    },
+    {
+      "appid": 5424330,
+      "when_taipei": "2026-10-24T05:02:59.714948+08:00",
+      "release_date": "2026-10-27",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "40023521063",
+      "next_request_after_taipei": "2026-10-24T06:03:00.166952+08:00"
     }
   ]
 }

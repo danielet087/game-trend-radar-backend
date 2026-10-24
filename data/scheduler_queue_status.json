@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-24T22:02:53.239503Z",
+  "generated_at": "2026-10-24T22:03:16.744111Z",
   "today_taipei": "2026-10-25",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-24T22:02:53.087375Z",
+    "checkpoint_updated_at": "2026-10-24T22:03:16.608037Z",
     "group_resolution_updated_at": "2026-10-24T19:02:37.370241Z",
     "candidate_state_updated_at": "2026-10-24T17:21:32.212887Z",
     "prefilter_updated_at": "2026-10-24T17:21:32.192873Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-25T06:02:52.559837+08:00",
-    "last_updated_at": "2026-10-25T06:02:53.087375+08:00",
+    "last_updated_at": "2026-10-25T06:03:16.608037+08:00",
+    "finished_at": "2026-10-25T06:03:16.608037+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5316210,
     "last_name": "Metromino",
     "requests_this_run": 1,

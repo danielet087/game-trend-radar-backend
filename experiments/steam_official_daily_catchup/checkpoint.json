@@ -34891,20 +34891,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40123289018",
-    "active": false,
-    "status": "finished",
+    "run_id": "40127826451",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-25T03:03:07.008764+08:00",
-    "last_updated_at": "2026-10-25T03:03:39.065072+08:00",
+    "started_at": "2026-10-25T04:02:47.414152+08:00",
+    "last_updated_at": "2026-10-25T04:02:48.012120+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5366400,
-    "last_name": "Prism Core",
-    "finished_at": "2026-10-25T03:03:39.065072+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5428790,
+    "last_name": "Supercilious"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -82322,17 +82320,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-25T03:18:07.563063+08:00",
+  "next_request_after_taipei": "2026-10-25T04:32:48.012034+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-24T19:18:07.563063+00:00",
-    "observed_at": "2026-10-24T19:03:07.563063+00:00",
-    "updated_at": "2026-10-24T19:03:07.563063+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-10-24T20:32:48.012034+00:00",
+    "observed_at": "2026-10-24T20:02:48.012034+00:00",
+    "updated_at": "2026-10-24T20:02:48.012034+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-10-25T02:29:19.531957+08:00",
   "official_growth_observations": {
@@ -99117,6 +99115,16 @@
       "status": "rate_limited",
       "github_run_id": "40123289018",
       "next_request_after_taipei": "2026-10-25T03:18:07.563063+08:00"
+    },
+    {
+      "appid": 5428790,
+      "when_taipei": "2026-10-25T04:02:47.746153+08:00",
+      "release_date": "2026-10-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "40127826451",
+      "next_request_after_taipei": "2026-10-25T04:32:48.012034+08:00"
     }
   ]
 }

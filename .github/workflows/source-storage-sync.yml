@@ -36,6 +36,8 @@ permissions:
 
 jobs:
   sync:
+    # Keep the real job/step failures; the notification job owns the email threshold.
+    continue-on-error: true
     if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -98,3 +100,18 @@ jobs:
             ${{ runner.temp }}/storage-backup/SHA256SUMS
           if-no-files-found: error
           retention-days: 1
+
+  notification:
+    needs: [sync]
+    if: always() && !cancelled() && vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: danielet087/game-trend-radar-backend/.github/actions/scheduled-failure-notice@202d8a9945c5cb0a2f182a327dd533ac98d8178e
+        with:
+          workflow-key: source-storage-sync.yml
+          job-name: sync
+          completion-step: "Ingest complete sources, replicate and keep a daily portable backup"

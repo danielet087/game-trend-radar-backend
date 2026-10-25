@@ -32,6 +32,8 @@ concurrency:
 
 jobs:
   follower-catchup:
+    # Keep the real job/step failures; the notification job owns the email threshold.
+    continue-on-error: true
     if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
     env:
       RADAR_DATABASE_PRIMARY: ${{ vars.RADAR_DATABASE_PRIMARY || '0' }}
@@ -247,3 +249,18 @@ jobs:
           path: output/steam_official_daily_catchup/
           if-no-files-found: warn
           retention-days: 30
+
+  notification:
+    needs: [follower-catchup]
+    if: always() && !cancelled() && vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: danielet087/game-trend-radar-backend/.github/actions/scheduled-failure-notice@202d8a9945c5cb0a2f182a327dd533ac98d8178e
+        with:
+          workflow-key: steam-official-daily-catchup-250.yml
+          job-name: follower-catchup
+          completion-step: "Fetch up to 90 official counts, Twitch first, with >=30s pacing"

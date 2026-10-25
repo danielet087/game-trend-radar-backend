@@ -1,0 +1,19 @@
+name: Verify scheduled notification threshold
+on:
+  pull_request:
+    paths: ['.github/actions/scheduled-failure-notice/**', '.github/workflows/**']
+  push:
+    branches: [main]
+    paths: ['.github/actions/scheduled-failure-notice/**', '.github/workflows/test-scheduled-failure-notice.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test .github/actions/scheduled-failure-notice/index.test.cjs

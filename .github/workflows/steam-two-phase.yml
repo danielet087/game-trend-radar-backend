@@ -31,6 +31,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   batch:
+    # Keep the real job/step failures; the notification job owns the email threshold.
+    continue-on-error: true
     if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
     env:
       RADAR_DATABASE_PRIMARY: ${{ vars.RADAR_DATABASE_PRIMARY || '0' }}
@@ -265,3 +267,18 @@ jobs:
           path: output/steam-catalog-publication.json
           if-no-files-found: ignore
           retention-days: 7
+
+  notification:
+    needs: [batch]
+    if: always() && !cancelled() && vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - uses: danielet087/game-trend-radar-backend/.github/actions/scheduled-failure-notice@202d8a9945c5cb0a2f182a327dd533ac98d8178e
+        with:
+          workflow-key: steam-two-phase.yml
+          job-name: batch
+          completion-step: "Publish updated site JSON after EVERY Followers batch"

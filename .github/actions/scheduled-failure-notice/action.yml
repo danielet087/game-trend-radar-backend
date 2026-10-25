@@ -1,0 +1,49 @@
+name: Notify after 100 consecutive scheduled failures
+description: Keep durable per-workflow failure counts without changing collection results.
+inputs:
+  workflow-key:
+    description: Stable workflow filename, used only for the notification counter.
+    required: true
+  job-name:
+    description: Exact GitHub job name whose real result is monitored.
+    required: true
+  completion-step:
+    description: A successful step proving useful completion; skipped work preserves the counter.
+    required: true
+outputs:
+  consecutive-failures:
+    description: Durable failure count for this workflow.
+    value: ${{ steps.record.outputs.consecutive_failures }}
+runs:
+  using: composite
+  steps:
+    - name: Record actual scheduled job result
+      id: record
+      # A transient GitHub API/state error must not generate another email.
+      # Existing state is never replaced by an assumed zero on a read error.
+      continue-on-error: true
+      uses: actions/github-script@v7
+      env:
+        NOTICE_MODULE: ${{ github.action_path }}/index.cjs
+        NOTICE_WORKFLOW_KEY: ${{ inputs.workflow-key }}
+        NOTICE_JOB_NAME: ${{ inputs.job-name }}
+        NOTICE_COMPLETION_STEP: ${{ inputs.completion-step }}
+      with:
+        script: |
+          const { record } = require(process.env.NOTICE_MODULE);
+          await record({ github, context, core,
+            workflowKey: process.env.NOTICE_WORKFLOW_KEY,
+            jobName: process.env.NOTICE_JOB_NAME,
+            completionStep: process.env.NOTICE_COMPLETION_STEP });
+    - name: Explain unavailable notification state
+      if: steps.record.outcome == 'failure'
+      shell: bash
+      run: |
+        echo '::warning::Notification counter unavailable; original job diagnostics remain available. No failure email was requested.'
+        echo '通知計數暫時無法保存；本輪保留原始錯誤紀錄，不額外觸發失敗通知。' >> "$GITHUB_STEP_SUMMARY"
+    - name: Notify once at 100 consecutive failures
+      if: steps.record.outputs.alert == 'true'
+      shell: bash
+      run: |
+        echo '::error::This scheduled workflow has failed 100 consecutive times. One notification is emitted for this streak; further failures stay quiet until recovery.'
+        exit 1

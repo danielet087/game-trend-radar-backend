@@ -36243,20 +36243,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40382789732",
-    "active": false,
-    "status": "finished",
+    "run_id": "40391755628",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-27T03:02:49.682930+08:00",
-    "last_updated_at": "2026-10-27T03:03:19.134056+08:00",
+    "started_at": "2026-10-27T04:03:24.758971+08:00",
+    "last_updated_at": "2026-10-27T04:03:25.454227+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 3310570,
-    "last_name": "Night Plane",
-    "finished_at": "2026-10-27T03:03:19.134056+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 1566200,
+    "last_name": "Tape to Tape"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -86226,17 +86224,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-27T03:17:50.138434+08:00",
+  "next_request_after_taipei": "2026-10-27T04:33:25.454132+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-26T19:17:50.138434+00:00",
-    "observed_at": "2026-10-26T19:02:50.138434+00:00",
-    "updated_at": "2026-10-26T19:02:50.138434+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-10-26T20:33:25.454132+00:00",
+    "observed_at": "2026-10-26T20:03:25.454132+00:00",
+    "updated_at": "2026-10-26T20:03:25.454132+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-10-27T02:28:04.836741+08:00",
   "official_growth_observations": {
@@ -105006,6 +105004,16 @@
       "status": "rate_limited",
       "github_run_id": "40382789732",
       "next_request_after_taipei": "2026-10-27T03:17:50.138434+08:00"
+    },
+    {
+      "appid": 1566200,
+      "when_taipei": "2026-10-27T04:03:25.199840+08:00",
+      "release_date": "2026-10-24",
+      "queue_source": "twitch_steam_discovery",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "40391755628",
+      "next_request_after_taipei": "2026-10-27T04:33:25.454132+08:00"
     }
   ]
 }

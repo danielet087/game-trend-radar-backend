@@ -35665,18 +35665,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40247245545",
-    "active": false,
-    "status": "finished",
+    "run_id": "40252053893",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-26T08:05:00.868558+08:00",
-    "last_updated_at": "2026-10-26T08:05:01.295667+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-10-26T09:03:15.858744+08:00",
+    "last_updated_at": "2026-10-26T09:03:16.466478+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-10-26T08:05:01.295667+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 4876650,
+    "last_name": "Never Sort By Color"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -84576,17 +84576,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-26T08:07:43.077994+08:00",
+  "next_request_after_taipei": "2026-10-26T09:33:16.466411+08:00",
   "community_cooldown": {
-    "attempts": 1,
-    "observed_at": "2026-10-25T23:52:43.077994+00:00",
+    "retry_at": "2026-10-26T01:33:16.466411+00:00",
+    "observed_at": "2026-10-26T01:03:16.466411+00:00",
+    "updated_at": "2026-10-26T01:03:16.466411+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
-    "retry_at": "2026-10-26T00:07:43.077994+00:00",
-    "retry_seconds": 900,
     "retry_source": "existing_queue_backoff",
-    "updated_at": "2026-10-25T23:52:43.077994+00:00"
+    "attempts": 2
   },
   "community_last_success_at": "2026-10-26T07:52:13.026355+08:00",
   "official_growth_observations": {
@@ -102552,6 +102552,16 @@
       "release_date": "2026-11-24",
       "status": "ok",
       "when_taipei": "2026-10-25T07:26:20.242879+08:00"
+    },
+    {
+      "appid": 4876650,
+      "when_taipei": "2026-10-26T09:03:16.283471+08:00",
+      "release_date": "2026-11-11",
+      "queue_source": "twitch_steam_discovery",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "40252053893",
+      "next_request_after_taipei": "2026-10-26T09:33:16.466411+08:00"
     }
   ]
 }

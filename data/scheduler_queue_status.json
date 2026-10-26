@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-26T21:03:10.410535Z",
+  "generated_at": "2026-10-26T21:03:39.391911Z",
   "today_taipei": "2026-10-27",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-26T21:03:10.238815Z",
+    "checkpoint_updated_at": "2026-10-26T21:03:39.231595Z",
     "group_resolution_updated_at": "2026-10-26T20:02:53.526051Z",
     "candidate_state_updated_at": "2026-10-26T17:15:59.647388Z",
     "prefilter_updated_at": "2026-10-26T17:15:59.621986Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-27T05:03:09.619425+08:00",
-    "last_updated_at": "2026-10-27T05:03:10.238815+08:00",
+    "last_updated_at": "2026-10-27T05:03:39.231595+08:00",
+    "finished_at": "2026-10-27T05:03:39.231595+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5044960,
     "last_name": "Archives of Disorder - Pasture Without Light",
     "requests_this_run": 1,

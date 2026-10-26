@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-26T01:03:16.653460Z",
+  "generated_at": "2026-10-26T01:03:48.521736Z",
   "today_taipei": "2026-10-26",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-26T01:03:16.466478Z",
+    "checkpoint_updated_at": "2026-10-26T01:03:48.346758Z",
     "group_resolution_updated_at": "2026-10-26T00:04:29.235239Z",
     "candidate_state_updated_at": "2026-10-25T23:13:18.012561Z",
     "prefilter_updated_at": "2026-10-25T23:13:17.987152Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-26T09:03:15.858744+08:00",
-    "last_updated_at": "2026-10-26T09:03:16.466478+08:00",
+    "last_updated_at": "2026-10-26T09:03:48.346758+08:00",
+    "finished_at": "2026-10-26T09:03:48.346758+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4876650,
     "last_name": "Never Sort By Color",
     "requests_this_run": 1,

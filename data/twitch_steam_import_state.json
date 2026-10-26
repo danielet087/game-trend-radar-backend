@@ -693,7 +693,7 @@
     },
     "3948460": {
       "status": "pending",
-      "updated_at": "2026-10-24T23:27:17.122913Z",
+      "updated_at": "2026-10-26T00:02:24.948392Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -701,8 +701,8 @@
         "twitch_game_id": "501028374",
         "igdb_id": "373092",
         "checked_at": "2026-10-24T23:17:29Z",
-        "source_database_revision": "138316e9114009ea68e788dc31f89a25c8d56d4bd6b38d48808f13c5deaf8f11",
-        "source_database_generation": 560,
+        "source_database_revision": "8f7aaa5b5cb5156496d49ef79545d90f35cff82e9dbbbb15fb365b739403b36f",
+        "source_database_generation": 622,
         "source_database_namespace": "danielet087/game-trend-radar@main",
         "source_enrollment": {
           "source": "igdb_first_release_date",
@@ -712,7 +712,7 @@
         }
       },
       "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-10-25T23:27:18.803190Z",
+      "retry_at": "2026-10-27T00:02:26.646254Z",
       "validation_version": 4,
       "follower_candidate": null,
       "rate_limit_stage": null,
@@ -2609,7 +2609,7 @@
     },
     "4435490": {
       "status": "pending",
-      "updated_at": "2026-10-25T21:03:18.619658Z",
+      "updated_at": "2026-10-26T00:02:24.948392Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -2617,8 +2617,8 @@
         "twitch_game_id": "1478650472",
         "igdb_id": "403310",
         "checked_at": "2026-10-25T03:15:34Z",
-        "source_database_revision": "b4628a2de5d5c67b88437f226cbd144bb8fbd827947a4df568f8a16b1129aab6",
-        "source_database_generation": 612,
+        "source_database_revision": "8f7aaa5b5cb5156496d49ef79545d90f35cff82e9dbbbb15fb365b739403b36f",
+        "source_database_generation": 622,
         "source_database_namespace": "danielet087/game-trend-radar@main",
         "source_enrollment": {
           "source": "igdb_first_release_date",
@@ -2642,8 +2642,8 @@
           "twitch_game_id": "1478650472",
           "igdb_id": "403310",
           "checked_at": "2026-10-25T03:15:34Z",
-          "source_database_revision": "b4628a2de5d5c67b88437f226cbd144bb8fbd827947a4df568f8a16b1129aab6",
-          "source_database_generation": 612,
+          "source_database_revision": "8f7aaa5b5cb5156496d49ef79545d90f35cff82e9dbbbb15fb365b739403b36f",
+          "source_database_generation": 622,
           "source_database_namespace": "danielet087/game-trend-radar@main",
           "source_enrollment": {
             "source": "igdb_first_release_date",
@@ -2670,9 +2670,9 @@
           "release_date_conflict": true,
           "release_store_date": "2026-10-22",
           "release_date_normalization": "steam_taiwan_store_date_authoritative",
-          "release_date_verified_at": "2026-10-25T21:03:18.619658Z",
+          "release_date_verified_at": "2026-10-26T00:02:24.948392Z",
           "post_followers_store_verified": true,
-          "post_followers_store_verified_at": "2026-10-25T21:03:18.619658Z",
+          "post_followers_store_verified_at": "2026-10-26T00:02:24.948392Z",
           "sexual_content_screened": true,
           "steam_type": "game",
           "content_descriptorids": [
@@ -2688,8 +2688,8 @@
             "twitch_game_id": "1478650472",
             "igdb_id": "403310",
             "checked_at": "2026-10-25T03:15:34Z",
-            "source_database_revision": "b4628a2de5d5c67b88437f226cbd144bb8fbd827947a4df568f8a16b1129aab6",
-            "source_database_generation": 612,
+            "source_database_revision": "8f7aaa5b5cb5156496d49ef79545d90f35cff82e9dbbbb15fb365b739403b36f",
+            "source_database_generation": 622,
             "source_database_namespace": "danielet087/game-trend-radar@main",
             "source_enrollment": {
               "source": "igdb_first_release_date",
@@ -4030,8 +4030,106 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "4876650": {
+      "status": "pending",
+      "updated_at": "2026-10-26T00:02:24.948392Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4876650,
+        "twitch_game_id": "173822689",
+        "igdb_id": "411710",
+        "checked_at": "2026-10-25T21:15:51Z",
+        "source_database_revision": "8f7aaa5b5cb5156496d49ef79545d90f35cff82e9dbbbb15fb365b739403b36f",
+        "source_database_generation": 622,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-25T21:15:51Z",
+          "viewer_count": 8065,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": {
+        "appid": 4876650,
+        "name": "Never Sort By Color",
+        "release_date": "2026-11-11",
+        "steam_url": "https://store.steampowered.com/app/4876650/",
+        "group_id64": null,
+        "queue_source": "twitch_steam_discovery",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 4876650,
+          "twitch_game_id": "173822689",
+          "igdb_id": "411710",
+          "checked_at": "2026-10-25T21:15:51Z",
+          "source_database_revision": "8f7aaa5b5cb5156496d49ef79545d90f35cff82e9dbbbb15fb365b739403b36f",
+          "source_database_generation": 622,
+          "source_database_namespace": "danielet087/game-trend-radar@main",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-25T21:15:51Z",
+            "viewer_count": 8065,
+            "min_viewers": 7000
+          }
+        },
+        "steam_candidate": {
+          "appid": 4876650,
+          "name": "Never Sort By Color",
+          "name_en": "Never Sort By Color",
+          "release_raw": "2026-11-11",
+          "release_start": "2026-11-11",
+          "release_end": "2026-11-11",
+          "release_precision": "day",
+          "release_display_precision": "date_full",
+          "release_display_provider": "Steam IStoreBrowseService/GetItems",
+          "release_date_basis": "steam_store_browse_verified_full_date",
+          "release_date_timezone": "Asia/Taipei",
+          "release_time_utc": "2026-11-10T16:55:00Z",
+          "release_time_source": "Steam IStoreBrowseService/GetItems",
+          "release_timestamp_taipei_date": "2026-11-11",
+          "release_date_conflict": false,
+          "release_store_date": "2026-11-10",
+          "release_date_normalization": "steam_utc_date_normalized_to_taipei",
+          "release_date_verified_at": "2026-10-26T00:02:24.948392Z",
+          "post_followers_store_verified": true,
+          "post_followers_store_verified_at": "2026-10-26T00:02:24.948392Z",
+          "sexual_content_screened": true,
+          "steam_type": "game",
+          "content_descriptorids": [],
+          "store_url": "https://store.steampowered.com/app/4876650/",
+          "community_url": "https://steamcommunity.com/app/4876650/",
+          "twitch_admission": {
+            "schema_version": 1,
+            "method": "twitch_igdb_external_steam_v1",
+            "appid": 4876650,
+            "twitch_game_id": "173822689",
+            "igdb_id": "411710",
+            "checked_at": "2026-10-25T21:15:51Z",
+            "source_database_revision": "8f7aaa5b5cb5156496d49ef79545d90f35cff82e9dbbbb15fb365b739403b36f",
+            "source_database_generation": 622,
+            "source_database_namespace": "danielet087/game-trend-radar@main",
+            "source_enrollment": {
+              "source": "igdb_first_release_date",
+              "observed_at": "2026-10-25T21:15:51Z",
+              "viewer_count": 8065,
+              "min_viewers": 7000
+            }
+          }
+        }
+      },
+      "reason": "queued_official_followers",
+      "rate_limit_stage": null,
+      "retry_at": null,
+      "retry_source": null,
+      "retry_after": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0
     }
   },
-  "updated_at": "2026-10-25T21:03:18.619658Z",
+  "updated_at": "2026-10-26T00:02:24.948392Z",
   "api_cooldowns": {}
 }

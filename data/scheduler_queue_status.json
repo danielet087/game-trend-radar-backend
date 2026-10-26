@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-26T23:31:59.854554Z",
+  "generated_at": "2026-10-26T23:33:14.009945Z",
   "today_taipei": "2026-10-27",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -10,7 +10,7 @@
     "candidate_state_updated_at": "2026-10-26T17:15:59.647388Z",
     "prefilter_updated_at": "2026-10-26T17:15:59.621986Z",
     "eligible_screened_at": "2026-10-26T17:16:00.391958Z",
-    "twitch_import_updated_at": "2026-10-26T23:02:00.439185Z",
+    "twitch_import_updated_at": "2026-10-26T23:33:03.093296Z",
     "last_official_success_at": "2026-10-26T23:31:59.578575Z",
     "queue_projection": "official_collector_make_queue"
   },
@@ -21,19 +21,19 @@
     "added_from_daily": 0,
     "eligible_count": 4822,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 1,
+    "combined_pending_now": 2,
     "completed_legacy": 408,
     "completed_new": 3740,
-    "twitch_priority_pending": 1
+    "twitch_priority_pending": 2
   },
   "summary": {
     "normal_pending": 0,
-    "twitch_priority_pending": 1,
+    "twitch_priority_pending": 2,
     "parked": 0,
-    "ready_pending": 1,
+    "ready_pending": 2,
     "followers_ready_pending": 0,
-    "awaiting_group_pending": 1,
-    "total_pending": 1,
+    "awaiting_group_pending": 2,
+    "total_pending": 2,
     "today_attempts": 59,
     "today_successes": 56,
     "today_429": 3
@@ -72,6 +72,20 @@
   "queue": [
     {
       "position": 1,
+      "appid": 5356470,
+      "name": "Playable Archive",
+      "steam_url": "https://store.steampowered.com/app/5356470/",
+      "release_date": "2026-10-26",
+      "source": "twitch_steam_discovery",
+      "priority": true,
+      "state": "awaiting_group",
+      "group_id64": null,
+      "group_resolution": null,
+      "last_attempt_at": null,
+      "last_attempt_status": null
+    },
+    {
+      "position": 2,
       "appid": 4435490,
       "name": "Call of Duty®: Modern Warfare® 4",
       "steam_url": "https://store.steampowered.com/app/4435490/",

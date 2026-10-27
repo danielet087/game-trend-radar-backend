@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-27T20:02:45.029974Z",
+  "generated_at": "2026-10-27T20:03:10.159331Z",
   "today_taipei": "2026-10-28",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-27T20:02:44.836225Z",
+    "checkpoint_updated_at": "2026-10-27T20:03:09.980557Z",
     "group_resolution_updated_at": "2026-10-27T19:02:36.829773Z",
     "candidate_state_updated_at": "2026-10-27T17:20:19.019793Z",
     "prefilter_updated_at": "2026-10-27T17:20:18.995385Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-28T04:02:43.833895+08:00",
-    "last_updated_at": "2026-10-28T04:02:44.836225+08:00",
+    "last_updated_at": "2026-10-28T04:03:09.980557+08:00",
+    "finished_at": "2026-10-28T04:03:09.980557+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4780520,
     "last_name": "MaMills",
     "requests_this_run": 1,

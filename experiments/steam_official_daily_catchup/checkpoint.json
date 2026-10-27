@@ -37140,17 +37140,19 @@
   },
   "scheduler_batch": {
     "run_id": "40574132257",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-28T04:02:43.833895+08:00",
-    "last_updated_at": "2026-10-28T04:02:44.836225+08:00",
+    "last_updated_at": "2026-10-28T04:03:09.980557+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 4780520,
-    "last_name": "MaMills"
+    "last_name": "MaMills",
+    "finished_at": "2026-10-28T04:03:09.980557+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

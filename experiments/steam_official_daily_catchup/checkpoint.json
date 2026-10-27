@@ -37220,17 +37220,19 @@
   },
   "scheduler_batch": {
     "run_id": "40591362426",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-28T06:02:58.984280+08:00",
-    "last_updated_at": "2026-10-28T06:05:29.526131+08:00",
+    "last_updated_at": "2026-10-28T06:05:57.352761+08:00",
     "requests_this_run": 6,
     "official_new_this_run": 5,
     "http_429_this_run": 0,
     "last_appid": 4984560,
-    "last_name": "Waveguard"
+    "last_name": "Waveguard",
+    "finished_at": "2026-10-28T06:05:57.352761+08:00",
+    "stop_reason": "http_access_or_server_error"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

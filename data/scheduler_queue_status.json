@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-27T22:05:29.713150Z",
+  "generated_at": "2026-10-27T22:05:57.532795Z",
   "today_taipei": "2026-10-28",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-27T22:05:29.526131Z",
+    "checkpoint_updated_at": "2026-10-27T22:05:57.352761Z",
     "group_resolution_updated_at": "2026-10-27T22:02:33.663034Z",
     "candidate_state_updated_at": "2026-10-27T17:20:19.019793Z",
     "prefilter_updated_at": "2026-10-27T17:20:18.995385Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-28T06:02:58.984280+08:00",
-    "last_updated_at": "2026-10-28T06:05:29.526131+08:00",
+    "last_updated_at": "2026-10-28T06:05:57.352761+08:00",
+    "finished_at": "2026-10-28T06:05:57.352761+08:00",
+    "stop_reason": "http_access_or_server_error",
     "last_appid": 4984560,
     "last_name": "Waveguard",
     "requests_this_run": 6,

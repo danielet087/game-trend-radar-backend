@@ -36166,19 +36166,19 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40416651412",
+    "run_id": "40423525386",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-27T07:03:10.967970+08:00",
-    "last_updated_at": "2026-10-27T07:31:59.660802+08:00",
-    "requests_this_run": 56,
-    "official_new_this_run": 56,
+    "started_at": "2026-10-27T08:02:43.145222+08:00",
+    "last_updated_at": "2026-10-27T08:02:44.002169+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "last_appid": 5044960,
-    "last_name": "Archives of Disorder - Pasture Without Light",
-    "finished_at": "2026-10-27T07:31:59.660802+08:00",
+    "last_appid": 5356470,
+    "last_name": "Playable Archive",
+    "finished_at": "2026-10-27T08:02:44.002169+08:00",
     "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
@@ -87015,13 +87015,98 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-27T07:31:59.578575+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5356470": {
+      "appid": 5356470,
+      "name": "Playable Archive",
+      "release_date": "2026-10-26",
+      "steam_url": "https://store.steampowered.com/app/5356470/",
+      "group_id64": "103582791476165962",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 5356470,
+        "twitch_game_id": "671595268",
+        "igdb_id": "425848",
+        "checked_at": "2026-10-26T23:19:46Z",
+        "source_database_revision": "447442ecf3b40764cf43da93edc5c020e4fb029c3ca1390c879ebd07350ca259",
+        "source_database_generation": 687,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-26T23:19:46Z",
+          "viewer_count": 11215,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 5356470,
+        "name": "Playable Archive",
+        "name_en": "Playable Archive",
+        "release_raw": "2026-10-26",
+        "release_start": "2026-10-26",
+        "release_end": "2026-10-26",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-10-26T14:44:08Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-10-26",
+        "release_date_conflict": false,
+        "release_store_date": "2026-10-26",
+        "release_date_normalization": "steam_store_date_matches_taipei",
+        "release_date_verified_at": "2026-10-27T00:01:51.347493Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-27T00:01:51.347493Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [
+          2,
+          5
+        ],
+        "store_url": "https://store.steampowered.com/app/5356470/",
+        "community_url": "https://steamcommunity.com/app/5356470/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 5356470,
+          "twitch_game_id": "671595268",
+          "igdb_id": "425848",
+          "checked_at": "2026-10-26T23:19:46Z",
+          "source_database_revision": "447442ecf3b40764cf43da93edc5c020e4fb029c3ca1390c879ebd07350ca259",
+          "source_database_generation": 687,
+          "source_database_namespace": "danielet087/game-trend-radar@main",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-26T23:19:46Z",
+            "viewer_count": 11215,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-27T00:02:20.320857Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 78,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-27T08:02:43.923534+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-27T07:31:59.578575+08:00",
+  "community_last_success_at": "2026-10-27T08:02:43.923534+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -106369,6 +106454,16 @@
       "status": "ok",
       "github_run_id": "40416651412",
       "official_followers": 8
+    },
+    {
+      "appid": 5356470,
+      "when_taipei": "2026-10-27T08:02:43.562595+08:00",
+      "release_date": "2026-10-26",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40423525386",
+      "official_followers": 78
     }
   ]
 }

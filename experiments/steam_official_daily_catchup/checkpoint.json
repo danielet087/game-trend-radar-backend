@@ -37219,20 +37219,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40583003596",
-    "active": false,
-    "status": "finished",
+    "run_id": "40591362426",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-28T05:02:45.584698+08:00",
-    "last_updated_at": "2026-10-28T05:03:40.093381+08:00",
-    "requests_this_run": 2,
-    "official_new_this_run": 1,
-    "http_429_this_run": 1,
-    "last_appid": 5175600,
-    "last_name": "Sports Club Live",
-    "finished_at": "2026-10-28T05:03:40.093381+08:00",
-    "stop_reason": "first_http_429"
+    "started_at": "2026-10-28T06:02:58.984280+08:00",
+    "last_updated_at": "2026-10-28T06:05:29.526131+08:00",
+    "requests_this_run": 6,
+    "official_new_this_run": 5,
+    "http_429_this_run": 0,
+    "last_appid": 4984560,
+    "last_name": "Waveguard"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -88166,21 +88164,149 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-28T05:02:46.334694+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "3218230": {
+      "appid": 3218230,
+      "name": "ArcheAge Chronicles",
+      "release_date": "2026-11-04",
+      "steam_url": "https://store.steampowered.com/app/3218230/",
+      "group_id64": "103582791474738199",
+      "queue_source": "twitch_steam_discovery",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 3218230,
+        "twitch_game_id": "1312907092",
+        "igdb_id": "317622",
+        "checked_at": "2026-10-27T21:18:02Z",
+        "source_database_revision": "6d9042997a26d18a9fbc90420812c9459570e2ea23bf2c8ab6566e83a1839e29",
+        "source_database_generation": 737,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-19T17:22:18Z",
+          "viewer_count": 45887,
+          "min_viewers": 7000
+        }
+      },
+      "steam_candidate": {
+        "appid": 3218230,
+        "name": "ArcheAge Chronicles",
+        "name_en": "ArcheAge Chronicles",
+        "release_raw": "2026-11-04",
+        "release_start": "2026-11-04",
+        "release_end": "2026-11-04",
+        "release_precision": "day",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_timezone": "Asia/Taipei",
+        "release_time_utc": "2026-11-03T23:00:00Z",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_timestamp_taipei_date": "2026-11-04",
+        "release_date_conflict": false,
+        "release_store_date": "2026-11-03",
+        "release_date_normalization": "steam_utc_date_normalized_to_taipei",
+        "release_date_verified_at": "2026-10-27T22:01:59.326883Z",
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-10-27T22:01:59.326883Z",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "content_descriptorids": [
+          5
+        ],
+        "store_url": "https://store.steampowered.com/app/3218230/",
+        "community_url": "https://steamcommunity.com/app/3218230/",
+        "twitch_admission": {
+          "schema_version": 1,
+          "method": "twitch_igdb_external_steam_v1",
+          "appid": 3218230,
+          "twitch_game_id": "1312907092",
+          "igdb_id": "317622",
+          "checked_at": "2026-10-27T21:18:02Z",
+          "source_database_revision": "6d9042997a26d18a9fbc90420812c9459570e2ea23bf2c8ab6566e83a1839e29",
+          "source_database_generation": 737,
+          "source_database_namespace": "danielet087/game-trend-radar@main",
+          "source_enrollment": {
+            "source": "igdb_first_release_date",
+            "observed_at": "2026-10-19T17:22:18Z",
+            "viewer_count": 45887,
+            "min_viewers": 7000
+          }
+        }
+      },
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-27T22:02:33.407238Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
+      "official_followers": 61887,
+      "official_ge5000": true,
+      "official_checked_at_taipei": "2026-10-28T06:02:59.650319+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5271480": {
+      "appid": 5271480,
+      "name": "Racefoot Manager",
+      "release_date": "2026-10-28",
+      "group_id64": "103582791476001870",
+      "steam_url": "https://store.steampowered.com/app/5271480/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-27T17:20:18.995385+00:00",
+      "official_followers": 10,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-28T06:03:29.527939+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5279240": {
+      "appid": 5279240,
+      "name": "FarmLife",
+      "release_date": "2026-10-28",
+      "group_id64": "103582791475845884",
+      "steam_url": "https://store.steampowered.com/app/5279240/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-27T17:20:18.995385+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-28T06:03:59.543162+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5372090": {
+      "appid": 5372090,
+      "name": "Heretics Amulet",
+      "release_date": "2026-10-28",
+      "group_id64": "103582791476066674",
+      "steam_url": "https://store.steampowered.com/app/5372090/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-27T17:20:18.995385+00:00",
+      "official_followers": 7,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-28T06:04:29.543467+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4938170": {
+      "appid": 4938170,
+      "name": "Ostfriesland Games",
+      "release_date": "2026-10-30",
+      "group_id64": "103582791475948929",
+      "steam_url": "https://store.steampowered.com/app/4938170/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-27T17:20:18.995385+00:00",
+      "official_followers": 15,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-28T06:04:59.565916+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 0,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-28T05:18:16.097030+08:00",
-  "community_cooldown": {
-    "retry_at": "2026-10-27T21:18:16.097030+00:00",
-    "observed_at": "2026-10-27T21:03:16.097030+00:00",
-    "updated_at": "2026-10-27T21:03:16.097030+00:00",
-    "retry_seconds": 900,
-    "retry_after": null,
-    "retry_source": "existing_queue_backoff",
-    "attempts": 1
-  },
-  "community_last_success_at": "2026-10-28T05:02:46.334694+08:00",
+  "next_request_after_taipei": "2026-10-29T06:05:29.526075+08:00",
+  "community_cooldown": null,
+  "community_last_success_at": "2026-10-28T06:04:59.565916+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -107606,6 +107732,66 @@
       "status": "rate_limited",
       "github_run_id": "40583003596",
       "next_request_after_taipei": "2026-10-28T05:18:16.097030+08:00"
+    },
+    {
+      "appid": 3218230,
+      "when_taipei": "2026-10-28T06:02:59.417920+08:00",
+      "release_date": "2026-11-04",
+      "queue_source": "twitch_steam_discovery",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40591362426",
+      "official_followers": 61887
+    },
+    {
+      "appid": 5271480,
+      "when_taipei": "2026-10-28T06:03:29.418084+08:00",
+      "release_date": "2026-10-28",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40591362426",
+      "official_followers": 10
+    },
+    {
+      "appid": 5279240,
+      "when_taipei": "2026-10-28T06:03:59.418204+08:00",
+      "release_date": "2026-10-28",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40591362426",
+      "official_followers": 3
+    },
+    {
+      "appid": 5372090,
+      "when_taipei": "2026-10-28T06:04:29.418330+08:00",
+      "release_date": "2026-10-28",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40591362426",
+      "official_followers": 7
+    },
+    {
+      "appid": 4938170,
+      "when_taipei": "2026-10-28T06:04:59.418455+08:00",
+      "release_date": "2026-10-30",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40591362426",
+      "official_followers": 15
+    },
+    {
+      "appid": 4984560,
+      "when_taipei": "2026-10-28T06:05:29.418594+08:00",
+      "release_date": "2026-10-30",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 503,
+      "status": "access_or_server_error",
+      "github_run_id": "40591362426",
+      "next_request_after_taipei": "2026-10-29T06:05:29.526075+08:00"
     }
   ]
 }

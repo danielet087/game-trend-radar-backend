@@ -37139,20 +37139,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40574132257",
-    "active": false,
-    "status": "finished",
+    "run_id": "40583003596",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-28T04:02:43.833895+08:00",
-    "last_updated_at": "2026-10-28T04:03:09.980557+08:00",
-    "requests_this_run": 1,
-    "official_new_this_run": 0,
+    "started_at": "2026-10-28T05:02:45.584698+08:00",
+    "last_updated_at": "2026-10-28T05:03:16.097133+08:00",
+    "requests_this_run": 2,
+    "official_new_this_run": 1,
     "http_429_this_run": 1,
-    "last_appid": 4780520,
-    "last_name": "MaMills",
-    "finished_at": "2026-10-28T04:03:09.980557+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5175600,
+    "last_name": "Sports Club Live"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -88073,21 +88071,34 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-05",
       "steam_url": "https://store.steampowered.com/app/910550/"
+    },
+    "4997370": {
+      "appid": 4997370,
+      "name": "CHESS2",
+      "release_date": "2026-10-28",
+      "group_id64": "103582791475807385",
+      "steam_url": "https://store.steampowered.com/app/4997370/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-27T17:20:18.995385+00:00",
+      "official_followers": 23,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-28T05:02:46.334694+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-28T04:32:44.836126+08:00",
+  "next_request_after_taipei": "2026-10-28T05:18:16.097030+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-27T20:32:44.836126+00:00",
-    "observed_at": "2026-10-27T20:02:44.836126+00:00",
-    "updated_at": "2026-10-27T20:02:44.836126+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-10-27T21:18:16.097030+00:00",
+    "observed_at": "2026-10-27T21:03:16.097030+00:00",
+    "updated_at": "2026-10-27T21:03:16.097030+00:00",
+    "retry_seconds": 900,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 1
   },
-  "community_last_success_at": "2026-10-28T02:32:20.019055+08:00",
+  "community_last_success_at": "2026-10-28T05:02:46.334694+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -107493,6 +107504,26 @@
       "status": "rate_limited",
       "github_run_id": "40574132257",
       "next_request_after_taipei": "2026-10-28T04:32:44.836126+08:00"
+    },
+    {
+      "appid": 4997370,
+      "when_taipei": "2026-10-28T05:02:46.019966+08:00",
+      "release_date": "2026-10-28",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40583003596",
+      "official_followers": 23
+    },
+    {
+      "appid": 5175600,
+      "when_taipei": "2026-10-28T05:03:16.020108+08:00",
+      "release_date": "2026-10-28",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "40583003596",
+      "next_request_after_taipei": "2026-10-28T05:18:16.097030+08:00"
     }
   ]
 }

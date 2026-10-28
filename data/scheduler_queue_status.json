@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-28T19:02:15.102061Z",
+  "generated_at": "2026-10-28T19:02:48.860789Z",
   "today_taipei": "2026-10-29",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
     "checkpoint_updated_at": "2026-10-28T15:03:19.886630Z",
-    "group_resolution_updated_at": "2026-10-28T15:02:47.428135Z",
+    "group_resolution_updated_at": "2026-10-28T19:02:48.661903Z",
     "candidate_state_updated_at": null,
     "prefilter_updated_at": null,
     "eligible_screened_at": "2026-10-27T17:20:19.880402Z",
@@ -31,19 +31,19 @@
     "twitch_priority_pending": 5,
     "parked": 0,
     "ready_pending": 108,
-    "followers_ready_pending": 106,
-    "awaiting_group_pending": 2,
+    "followers_ready_pending": 107,
+    "awaiting_group_pending": 1,
     "total_pending": 108,
     "today_attempts": 0,
     "today_successes": 0,
     "today_429": 0
   },
   "group_resolution_api_cooldown": {
-    "attempts": 0,
-    "observed_at": "2026-10-28T15:02:47.428135Z",
+    "status": "available",
     "retry_at": null,
-    "source": "Steam ISteamUser/ResolveVanityURL",
-    "status": "available"
+    "observed_at": "2026-10-28T19:02:48.661903Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "cooldown": {
     "active": true,
@@ -97,9 +97,16 @@
       "release_date": "2026-10-28",
       "source": "twitch_steam_discovery",
       "priority": true,
-      "state": "awaiting_group",
-      "group_id64": null,
-      "group_resolution": null,
+      "state": "cooldown",
+      "group_id64": "103582791475747582",
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-28T19:02:47.559112Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      },
       "last_attempt_at": null,
       "last_attempt_status": null
     },
@@ -135,13 +142,13 @@
       "state": "awaiting_group",
       "group_id64": null,
       "group_resolution": {
-        "api_result": 42,
-        "attempted": true,
-        "checked_at": "2026-10-28T15:02:47.203274Z",
-        "http": 200,
-        "retry_at": "2026-10-28T18:02:47.203274Z",
+        "status": "not_found",
+        "checked_at": "2026-10-28T19:02:48.559240Z",
         "source": "Steam ISteamUser/ResolveVanityURL",
-        "status": "not_found"
+        "attempted": true,
+        "http": 200,
+        "retry_at": "2026-10-28T22:02:48.559240Z",
+        "api_result": 42
       },
       "last_attempt_at": null,
       "last_attempt_status": null

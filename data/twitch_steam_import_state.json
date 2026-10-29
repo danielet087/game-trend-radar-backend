@@ -4681,7 +4681,7 @@
     },
     "4115450": {
       "status": "accepted",
-      "updated_at": "2026-10-29T03:02:02.237710Z",
+      "updated_at": "2026-10-29T03:05:17.763580Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -4710,9 +4710,17 @@
       "rate_limit_attempts": 0,
       "rate_limit_stage": null,
       "retry_source": null,
-      "retry_after": null
+      "retry_after": null,
+      "content_dispatch": {
+        "status": "dispatched",
+        "signature": "d7adacef7d43cc9a00feb1030ce684e04e5440750d2c46bde63e04b6322ab678",
+        "attempted_at": "2026-10-29T03:05:17.763580Z",
+        "target_repository": "danielet087/game-trend-radar-content-backend",
+        "event_type": "steam_game_twitch_discovered",
+        "http": 204
+      }
     }
   },
-  "updated_at": "2026-10-29T03:04:37.687637Z",
+  "updated_at": "2026-10-29T03:05:17.763580Z",
   "api_cooldowns": {}
 }

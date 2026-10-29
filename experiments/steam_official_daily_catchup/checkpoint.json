@@ -19157,11 +19157,11 @@
   "cooldown_policy": "exponential_15m_to_24h_honor_retry_after",
   "created_at_taipei": "2026-09-23T14:30:00.108283+08:00",
   "group_resolution_api_cooldown": {
-    "attempts": 0,
-    "observed_at": "2026-10-29T15:02:30.401592Z",
+    "status": "available",
     "retry_at": null,
-    "source": "Steam ISteamUser/ResolveVanityURL",
-    "status": "available"
+    "observed_at": "2026-10-29T19:02:46.764983Z",
+    "attempts": 0,
+    "source": "Steam ISteamUser/ResolveVanityURL"
   },
   "next_request_after_taipei": null,
   "official_growth_group_resolutions": {
@@ -75777,13 +75777,13 @@
       },
       "priority": 100,
       "group_resolution": {
-        "api_result": 42,
-        "attempted": true,
-        "checked_at": "2026-10-29T15:02:30.199748Z",
-        "http": 200,
-        "retry_at": "2026-10-29T18:02:30.199748Z",
+        "status": "not_found",
+        "checked_at": "2026-10-29T19:02:46.596144Z",
         "source": "Steam ISteamUser/ResolveVanityURL",
-        "status": "not_found"
+        "attempted": true,
+        "http": 200,
+        "retry_at": "2026-10-29T22:02:46.596144Z",
+        "api_result": 42
       },
       "normal_candidate": {
         "appid": 4435490,

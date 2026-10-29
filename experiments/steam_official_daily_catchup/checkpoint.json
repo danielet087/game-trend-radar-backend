@@ -38414,20 +38414,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40797689966",
-    "active": false,
-    "status": "finished",
+    "run_id": "40803751789",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-29T09:03:10.631600+08:00",
-    "last_updated_at": "2026-10-29T09:37:00.946116+08:00",
-    "requests_this_run": 66,
-    "official_new_this_run": 66,
-    "http_429_this_run": 0,
-    "last_appid": 5298050,
-    "last_name": "Scrapline",
-    "finished_at": "2026-10-29T09:37:00.946116+08:00",
-    "stop_reason": "hour_time_budget"
+    "started_at": "2026-10-29T10:02:38.443018+08:00",
+    "last_updated_at": "2026-10-29T10:04:38.973524+08:00",
+    "requests_this_run": 5,
+    "official_new_this_run": 4,
+    "http_429_this_run": 1,
+    "last_appid": 5490440,
+    "last_name": "SKY REAVER"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -90667,13 +90665,73 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-10-29T09:37:00.760256+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5387220": {
+      "appid": 5387220,
+      "name": "Derelict Division, LLC",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476071927",
+      "steam_url": "https://store.steampowered.com/app/5387220/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 53,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T10:02:39.061714+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5469680": {
+      "appid": 5469680,
+      "name": "Seven Gates of Ur",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476168612",
+      "steam_url": "https://store.steampowered.com/app/5469680/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T10:03:08.977017+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5474650": {
+      "appid": 5474650,
+      "name": "The Horror",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476168706",
+      "steam_url": "https://store.steampowered.com/app/5474650/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T10:03:39.057080+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5482530": {
+      "appid": 5482530,
+      "name": "Shai & Shatta",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476166759",
+      "steam_url": "https://store.steampowered.com/app/5482530/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T10:04:09.242783+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
-  "community_last_success_at": "2026-10-29T09:37:00.760256+08:00",
+  "next_request_after_taipei": "2026-10-29T10:19:38.973451+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-10-29T02:19:38.973451+00:00",
+    "observed_at": "2026-10-29T02:04:38.973451+00:00",
+    "updated_at": "2026-10-29T02:04:38.973451+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
+  "community_last_success_at": "2026-10-29T10:04:09.242783+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -110822,6 +110880,56 @@
       "status": "ok",
       "github_run_id": "40797689966",
       "official_followers": 1
+    },
+    {
+      "appid": 5387220,
+      "when_taipei": "2026-10-29T10:02:38.820518+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40803751789",
+      "official_followers": 53
+    },
+    {
+      "appid": 5469680,
+      "when_taipei": "2026-10-29T10:03:08.820626+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40803751789",
+      "official_followers": 2
+    },
+    {
+      "appid": 5474650,
+      "when_taipei": "2026-10-29T10:03:38.820730+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40803751789",
+      "official_followers": 2
+    },
+    {
+      "appid": 5482530,
+      "when_taipei": "2026-10-29T10:04:08.820834+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40803751789",
+      "official_followers": 1
+    },
+    {
+      "appid": 5490440,
+      "when_taipei": "2026-10-29T10:04:38.820925+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "40803751789",
+      "next_request_after_taipei": "2026-10-29T10:19:38.973451+08:00"
     }
   ]
 }

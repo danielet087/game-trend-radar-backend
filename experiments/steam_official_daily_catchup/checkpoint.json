@@ -38736,17 +38736,19 @@
   },
   "scheduler_batch": {
     "run_id": "40797689966",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-29T09:03:10.631600+08:00",
-    "last_updated_at": "2026-10-29T09:33:56.691784+08:00",
-    "requests_this_run": 60,
-    "official_new_this_run": 60,
+    "last_updated_at": "2026-10-29T09:37:00.946116+08:00",
+    "requests_this_run": 66,
+    "official_new_this_run": 66,
     "http_429_this_run": 0,
-    "last_appid": 3218570,
-    "last_name": "TANUKI: Pon's Summer"
+    "last_appid": 5298050,
+    "last_name": "Scrapline",
+    "finished_at": "2026-10-29T09:37:00.946116+08:00",
+    "stop_reason": "hour_time_budget"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -90908,13 +90910,91 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-05",
       "steam_url": "https://store.steampowered.com/app/910550/"
+    },
+    "3823530": {
+      "appid": 3823530,
+      "name": "Emberbound: Three Pyres",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476170988",
+      "steam_url": "https://store.steampowered.com/app/3823530/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T09:34:30.770016+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4459320": {
+      "appid": 4459320,
+      "name": "Desktop Goofy Guys",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476168568",
+      "steam_url": "https://store.steampowered.com/app/4459320/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T09:35:00.793570+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4676120": {
+      "appid": 4676120,
+      "name": "Vestalborne",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791475754188",
+      "steam_url": "https://store.steampowered.com/app/4676120/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 69,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T09:35:30.763487+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5065500": {
+      "appid": 5065500,
+      "name": "Vinculum",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791475823870",
+      "steam_url": "https://store.steampowered.com/app/5065500/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 7,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T09:36:00.793529+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5175310": {
+      "appid": 5175310,
+      "name": "Worst Class Ever",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791475807969",
+      "steam_url": "https://store.steampowered.com/app/5175310/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 1512,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T09:36:30.761478+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5298050": {
+      "appid": 5298050,
+      "name": "Scrapline",
+      "release_date": "2026-11-10",
+      "group_id64": "103582791476172964",
+      "steam_url": "https://store.steampowered.com/app/5298050/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-10-28T23:16:51.737976+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-10-29T09:37:00.760256+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-10-29T09:33:24.473826+08:00",
+  "community_last_success_at": "2026-10-29T09:37:00.760256+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -111003,6 +111083,66 @@
       "store_date_exact": true,
       "store_date_status": "date_full",
       "content_dispatch": "dispatched"
+    },
+    {
+      "appid": 3823530,
+      "when_taipei": "2026-10-29T09:34:30.700236+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40797689966",
+      "official_followers": 1
+    },
+    {
+      "appid": 4459320,
+      "when_taipei": "2026-10-29T09:35:00.700394+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40797689966",
+      "official_followers": 1
+    },
+    {
+      "appid": 4676120,
+      "when_taipei": "2026-10-29T09:35:30.700508+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40797689966",
+      "official_followers": 69
+    },
+    {
+      "appid": 5065500,
+      "when_taipei": "2026-10-29T09:36:00.700624+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40797689966",
+      "official_followers": 7
+    },
+    {
+      "appid": 5175310,
+      "when_taipei": "2026-10-29T09:36:30.700763+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40797689966",
+      "official_followers": 1512
+    },
+    {
+      "appid": 5298050,
+      "when_taipei": "2026-10-29T09:37:00.700884+08:00",
+      "release_date": "2026-11-10",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "40797689966",
+      "official_followers": 1
     }
   ]
 }

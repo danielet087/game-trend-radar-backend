@@ -38417,7 +38417,7 @@
       "name": "Kimodameshi Online",
       "release_date": "2026-10-26",
       "steam_url": "https://store.steampowered.com/app/5321510/",
-      "group_id64": null,
+      "group_id64": "103582791476051524",
       "queue_source": "twitch_steam_discovery",
       "twitch_admission": {
         "schema_version": 1,
@@ -38480,7 +38480,15 @@
           }
         }
       },
-      "priority": 100
+      "priority": 100,
+      "group_resolution": {
+        "status": "resolved",
+        "checked_at": "2026-10-29T14:02:27.939640Z",
+        "source": "Steam ISteamUser/ResolveVanityURL",
+        "attempted": true,
+        "http": 200,
+        "api_result": 1
+      }
     }
   },
   "scheduler_batch": {
@@ -92069,7 +92077,7 @@
   "group_resolution_api_cooldown": {
     "status": "available",
     "retry_at": null,
-    "observed_at": "2026-10-29T12:02:28.531384Z",
+    "observed_at": "2026-10-29T14:02:28.152694Z",
     "attempts": 0,
     "source": "Steam ISteamUser/ResolveVanityURL"
   },

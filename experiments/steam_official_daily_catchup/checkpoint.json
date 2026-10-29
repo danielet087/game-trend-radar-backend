@@ -38415,17 +38415,19 @@
   },
   "scheduler_batch": {
     "run_id": "40869733525",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-10-29T20:02:51.888058+08:00",
-    "last_updated_at": "2026-10-29T20:02:52.450524+08:00",
+    "last_updated_at": "2026-10-29T20:03:17.949732+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
     "last_appid": 4932310,
-    "last_name": "SUSPECIES"
+    "last_name": "SUSPECIES",
+    "finished_at": "2026-10-29T20:03:17.949732+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},

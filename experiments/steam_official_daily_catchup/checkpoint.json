@@ -38414,20 +38414,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "40869733525",
-    "active": false,
-    "status": "finished",
+    "run_id": "40878003452",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-10-29T20:02:51.888058+08:00",
-    "last_updated_at": "2026-10-29T20:03:17.949732+08:00",
+    "started_at": "2026-10-29T21:03:07.188419+08:00",
+    "last_updated_at": "2026-10-29T21:03:07.988741+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 4932310,
-    "last_name": "SUSPECIES",
-    "finished_at": "2026-10-29T20:03:17.949732+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 4989920,
+    "last_name": "Thorn Beach"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "unresolved_candidates": {},
@@ -90721,17 +90719,17 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-10-29T20:17:52.450450+08:00",
+  "next_request_after_taipei": "2026-10-29T21:33:07.988655+08:00",
   "community_cooldown": {
-    "retry_at": "2026-10-29T12:17:52.450450+00:00",
-    "observed_at": "2026-10-29T12:02:52.450450+00:00",
-    "updated_at": "2026-10-29T12:02:52.450450+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-10-29T13:33:07.988655+00:00",
+    "observed_at": "2026-10-29T13:03:07.988655+00:00",
+    "updated_at": "2026-10-29T13:03:07.988655+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-10-29T19:17:07.942106+08:00",
   "official_growth_observations": {
@@ -110996,6 +110994,16 @@
       "status": "rate_limited",
       "github_run_id": "40869733525",
       "next_request_after_taipei": "2026-10-29T20:17:52.450450+08:00"
+    },
+    {
+      "appid": 4989920,
+      "when_taipei": "2026-10-29T21:03:07.582875+08:00",
+      "release_date": "2026-11-11",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "40878003452",
+      "next_request_after_taipei": "2026-10-29T21:33:07.988655+08:00"
     }
   ]
 }

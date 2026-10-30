@@ -4721,8 +4721,69 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "4096830": {
+      "status": "accepted",
+      "updated_at": "2026-10-30T19:01:57.609281Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4096830,
+        "twitch_game_id": "2144016909",
+        "igdb_id": "410320",
+        "checked_at": "2026-10-30T15:14:22Z",
+        "source_database_revision": "b8f0d41ffada76f1328dbfc3c03d34ea89eb5871b052f3ce87420df9a6138a38",
+        "source_database_generation": 891,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-30T15:14:22Z",
+          "viewer_count": 11054,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "twitch_verified",
+      "content_signature": "d3973bd1bc42c4e369c5a469c28f9e0f9cfd1d0607a56aec8c18f2ce17b64644",
+      "followers": null,
+      "follower_checked_at": null,
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
+    },
+    "4262460": {
+      "status": "pending",
+      "updated_at": "2026-10-30T19:01:57.609281Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4262460,
+        "twitch_game_id": "1753787976",
+        "igdb_id": "416015",
+        "checked_at": "2026-10-30T17:21:00Z",
+        "source_database_revision": "b8f0d41ffada76f1328dbfc3c03d34ea89eb5871b052f3ce87420df9a6138a38",
+        "source_database_generation": 891,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-10-30T17:21:00Z",
+          "viewer_count": 22773,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "uncertain_taiwan_store_date",
+      "retry_at": "2026-10-31T19:02:02.319524Z",
+      "rate_limit_stage": null,
+      "rate_limit_attempts": 0,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-10-30T07:47:04.441216Z",
+  "updated_at": "2026-10-30T19:01:57.609281Z",
   "api_cooldowns": {}
 }

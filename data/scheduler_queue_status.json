@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-30T06:32:25.130881Z",
+  "generated_at": "2026-10-30T06:36:53.607862Z",
   "today_taipei": "2026-10-30",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-10-30T06:32:24.921241Z",
+    "checkpoint_updated_at": "2026-10-30T06:36:53.393920Z",
     "group_resolution_updated_at": "2026-10-30T04:02:41.973092Z",
     "candidate_state_updated_at": "2026-10-29T23:15:48.872109Z",
     "prefilter_updated_at": "2026-10-29T23:15:48.850736Z",
     "eligible_screened_at": "2026-10-29T23:15:49.657123Z",
     "twitch_import_updated_at": "2026-10-30T06:01:56.679566Z",
-    "last_official_success_at": "2026-10-30T06:32:24.921053Z",
+    "last_official_success_at": "2026-10-30T06:36:53.301020Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -21,21 +21,21 @@
     "added_from_daily": 0,
     "eligible_count": 4565,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 28,
+    "combined_pending_now": 19,
     "completed_legacy": 408,
-    "completed_new": 4084,
+    "completed_new": 4093,
     "twitch_priority_pending": 4
   },
   "summary": {
-    "normal_pending": 24,
+    "normal_pending": 15,
     "twitch_priority_pending": 4,
     "parked": 0,
-    "ready_pending": 28,
-    "followers_ready_pending": 27,
+    "ready_pending": 19,
+    "followers_ready_pending": 18,
     "awaiting_group_pending": 1,
-    "total_pending": 28,
-    "today_attempts": 271,
-    "today_successes": 267,
+    "total_pending": 19,
+    "today_attempts": 280,
+    "today_successes": 276,
     "today_429": 4
   },
   "group_resolution_api_cooldown": {
@@ -53,14 +53,16 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-10-30T14:02:52.735070+08:00",
-    "last_updated_at": "2026-10-30T14:32:24.921241+08:00",
-    "last_appid": 4153310,
-    "last_name": "Plants One Shot!",
-    "requests_this_run": 60,
-    "official_new_this_run": 60,
+    "last_updated_at": "2026-10-30T14:36:53.393920+08:00",
+    "finished_at": "2026-10-30T14:36:53.393920+08:00",
+    "stop_reason": "hour_time_budget",
+    "last_appid": 5302430,
+    "last_name": "Foturians: Myth and Reality",
+    "requests_this_run": 69,
+    "official_new_this_run": 69,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
@@ -92,132 +94,6 @@
     },
     {
       "position": 2,
-      "appid": 5381390,
-      "name": "Shot",
-      "steam_url": "https://store.steampowered.com/app/5381390/",
-      "release_date": "2027-04-02",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476181584",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5503820,
-      "name": "Kaiju Ace",
-      "steam_url": "https://store.steampowered.com/app/5503820/",
-      "release_date": "2027-04-05",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476171900",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5363170,
-      "name": "REFLECT89",
-      "steam_url": "https://store.steampowered.com/app/5363170/",
-      "release_date": "2027-04-09",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476070795",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 4614990,
-      "name": "Desert Struggle",
-      "steam_url": "https://store.steampowered.com/app/4614990/",
-      "release_date": "2027-04-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475776995",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5330590,
-      "name": "Beyond 90: A Footballer's Life",
-      "steam_url": "https://store.steampowered.com/app/5330590/",
-      "release_date": "2027-04-14",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476053832",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5490530,
-      "name": "Dangerline",
-      "steam_url": "https://store.steampowered.com/app/5490530/",
-      "release_date": "2027-05-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476179609",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5135170,
-      "name": "The Grimm Reapress and the Drearytale Monster",
-      "steam_url": "https://store.steampowered.com/app/5135170/",
-      "release_date": "2027-05-13",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476179245",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5434320,
-      "name": "Heartland",
-      "steam_url": "https://store.steampowered.com/app/5434320/",
-      "release_date": "2027-05-14",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476169560",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 5302430,
-      "name": "Foturians: Myth and Reality",
-      "steam_url": "https://store.steampowered.com/app/5302430/",
-      "release_date": "2027-06-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476174196",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 5019770,
       "name": "Kwun Tong: The Origin",
       "steam_url": "https://store.steampowered.com/app/5019770/",
@@ -231,7 +107,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 3,
       "appid": 5371220,
       "name": "Aequorea Victoria: The Museum",
       "steam_url": "https://store.steampowered.com/app/5371220/",
@@ -245,7 +121,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 4,
       "appid": 3335310,
       "name": "Remothered: Red Nun's Legacy",
       "steam_url": "https://store.steampowered.com/app/3335310/",
@@ -266,7 +142,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 14,
+      "position": 5,
       "appid": 4780520,
       "name": "MaMills",
       "steam_url": "https://store.steampowered.com/app/4780520/",
@@ -280,7 +156,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 15,
+      "position": 6,
       "appid": 5175600,
       "name": "Sports Club Live",
       "steam_url": "https://store.steampowered.com/app/5175600/",
@@ -294,7 +170,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 16,
+      "position": 7,
       "appid": 4984560,
       "name": "Waveguard",
       "steam_url": "https://store.steampowered.com/app/4984560/",
@@ -308,7 +184,7 @@
       "last_attempt_status": "access_or_server_error"
     },
     {
-      "position": 17,
+      "position": 8,
       "appid": 5490440,
       "name": "SKY REAVER",
       "steam_url": "https://store.steampowered.com/app/5490440/",
@@ -322,7 +198,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 18,
+      "position": 9,
       "appid": 766270,
       "name": "Block Garden",
       "steam_url": "https://store.steampowered.com/app/766270/",
@@ -336,7 +212,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 19,
+      "position": 10,
       "appid": 2054440,
       "name": "The Intruder",
       "steam_url": "https://store.steampowered.com/app/2054440/",
@@ -350,7 +226,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 20,
+      "position": 11,
       "appid": 2665070,
       "name": "Skifa",
       "steam_url": "https://store.steampowered.com/app/2665070/",
@@ -364,7 +240,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 21,
+      "position": 12,
       "appid": 4341570,
       "name": "Hold My Cargo",
       "steam_url": "https://store.steampowered.com/app/4341570/",
@@ -378,7 +254,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 22,
+      "position": 13,
       "appid": 4932310,
       "name": "SUSPECIES",
       "steam_url": "https://store.steampowered.com/app/4932310/",
@@ -392,7 +268,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 23,
+      "position": 14,
       "appid": 4989920,
       "name": "Thorn Beach",
       "steam_url": "https://store.steampowered.com/app/4989920/",
@@ -406,7 +282,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 24,
+      "position": 15,
       "appid": 5321510,
       "name": "Kimodameshi Online",
       "steam_url": "https://store.steampowered.com/app/5321510/",
@@ -427,7 +303,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 25,
+      "position": 16,
       "appid": 5047230,
       "name": "Combustor",
       "steam_url": "https://store.steampowered.com/app/5047230/",
@@ -441,7 +317,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 26,
+      "position": 17,
       "appid": 972450,
       "name": "The Zibbo Show",
       "steam_url": "https://store.steampowered.com/app/972450/",
@@ -462,7 +338,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 27,
+      "position": 18,
       "appid": 5057050,
       "name": "Rulebound",
       "steam_url": "https://store.steampowered.com/app/5057050/",
@@ -476,7 +352,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 28,
+      "position": 19,
       "appid": 5009380,
       "name": "Butterfly Project",
       "steam_url": "https://store.steampowered.com/app/5009380/",
@@ -492,123 +368,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-10-30T05:17:02.504910Z",
-      "kind": "official_attempt",
-      "appid": 5461460,
-      "name": "BazaarBorn",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:17:32.505057Z",
-      "kind": "official_attempt",
-      "appid": 5487270,
-      "name": "Metal Simulator",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:18:02.505198Z",
-      "kind": "official_attempt",
-      "appid": 5505440,
-      "name": "MUKIMUKI NYANKOS",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:18:32.505302Z",
-      "kind": "official_attempt",
-      "appid": 5507430,
-      "name": "Survivors",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:19:02.505404Z",
-      "kind": "official_attempt",
-      "appid": 4885090,
-      "name": "LEVELS",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 27,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:19:32.505505Z",
-      "kind": "official_attempt",
-      "appid": 5410650,
-      "name": "Westward Once More",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:20:02.505592Z",
-      "kind": "official_attempt",
-      "appid": 5480240,
-      "name": "Throw The Snot",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:20:32.505699Z",
-      "kind": "official_attempt",
-      "appid": 3660370,
-      "name": "Absorber 2",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
-    {
-      "at": "2026-10-30T05:21:02.505804Z",
-      "kind": "official_attempt",
-      "appid": 5069580,
-      "name": "Spray to Grail",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 12,
-      "retry_at": null,
-      "run_id": "41005969970",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41005969970"
-    },
     {
       "at": "2026-10-30T05:21:32.505907Z",
       "kind": "official_attempt",
@@ -1788,6 +1547,123 @@
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",
       "official_followers": 3,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:32:53.238803Z",
+      "kind": "official_attempt",
+      "appid": 5381390,
+      "name": "Shot",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:33:23.238937Z",
+      "kind": "official_attempt",
+      "appid": 5503820,
+      "name": "Kaiju Ace",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 59,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:33:53.239065Z",
+      "kind": "official_attempt",
+      "appid": 5363170,
+      "name": "REFLECT89",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:34:23.239189Z",
+      "kind": "official_attempt",
+      "appid": 4614990,
+      "name": "Desert Struggle",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 5,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:34:53.239337Z",
+      "kind": "official_attempt",
+      "appid": 5330590,
+      "name": "Beyond 90: A Footballer's Life",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 27,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:35:23.239471Z",
+      "kind": "official_attempt",
+      "appid": 5490530,
+      "name": "Dangerline",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 5,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:35:53.239596Z",
+      "kind": "official_attempt",
+      "appid": 5135170,
+      "name": "The Grimm Reapress and the Drearytale Monster",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 29,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:36:23.239716Z",
+      "kind": "official_attempt",
+      "appid": 5434320,
+      "name": "Heartland",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "41011538950",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"
+    },
+    {
+      "at": "2026-10-30T06:36:53.239855Z",
+      "kind": "official_attempt",
+      "appid": 5302430,
+      "name": "Foturians: Myth and Reality",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
       "retry_at": null,
       "run_id": "41011538950",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41011538950"

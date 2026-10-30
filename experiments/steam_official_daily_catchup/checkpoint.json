@@ -16971,8 +16971,16 @@
   ],
   "checkpoint_migration_note": "Clear transient XML-error cooldown only for confirmed AppID 4435490 without group ID; preserve HTTP 429 history and official results.",
   "cohort": "steam_official_daily_catchup_dynamic_v1",
-  "community_cooldown": null,
-  "community_last_success_at": "2026-10-31T01:19:26.132692+08:00",
+  "community_cooldown": {
+    "attempts": 1,
+    "observed_at": "2026-10-30T18:01:36.755121+00:00",
+    "retry_after": null,
+    "retry_at": "2026-10-30T18:16:36.755121+00:00",
+    "retry_seconds": 900,
+    "retry_source": "existing_queue_backoff",
+    "updated_at": "2026-10-30T18:01:36.755121+00:00"
+  },
+  "community_last_success_at": "2026-10-31T02:01:06.400444+08:00",
   "content_dispatches": {
     "1209970": {
       "dispatched_at_taipei": "2026-10-17T10:08:09.487626+08:00",
@@ -17118,7 +17126,7 @@
     "source": "Steam ISteamUser/ResolveVanityURL",
     "status": "available"
   },
-  "next_request_after_taipei": null,
+  "next_request_after_taipei": "2026-10-31T02:16:36.755121+08:00",
   "official_growth_group_resolutions": {
     "2562390": {
       "appid": 2562390,
@@ -17348,8 +17356,8 @@
     "1173980": {
       "appid": 1173980,
       "group_id64": "103582791465515992",
-      "official_checked_at_taipei": "2026-10-29T17:28:48Z",
-      "official_followers": 25763,
+      "official_checked_at_taipei": "2026-10-30T17:34:36Z",
+      "official_followers": 25769,
       "official_source": "Steam Community XML memberCount"
     },
     "1203620": {
@@ -17411,15 +17419,15 @@
     "1637460": {
       "appid": 1637460,
       "group_id64": "103582791475413240",
-      "official_checked_at_taipei": "2026-10-29T17:36:48Z",
-      "official_followers": 17876,
+      "official_checked_at_taipei": "2026-10-30T17:42:36Z",
+      "official_followers": 17887,
       "official_source": "Steam Community XML memberCount"
     },
     "1675260": {
       "appid": 1675260,
       "group_id64": "103582791471921706",
-      "official_checked_at_taipei": "2026-10-29T17:33:18Z",
-      "official_followers": 17544,
+      "official_checked_at_taipei": "2026-10-30T17:39:06Z",
+      "official_followers": 17539,
       "official_source": "Steam Community XML memberCount"
     },
     "1706510": {
@@ -17453,15 +17461,15 @@
     "1799840": {
       "appid": 1799840,
       "group_id64": "103582791473791597",
-      "official_checked_at_taipei": "2026-10-29T17:54:18Z",
-      "official_followers": 16523,
+      "official_checked_at_taipei": "2026-10-30T18:00:06Z",
+      "official_followers": 17282,
       "official_source": "Steam Community XML memberCount"
     },
     "1853440": {
       "appid": 1853440,
       "group_id64": "103582791475269207",
-      "official_checked_at_taipei": "2026-10-29T17:32:48Z",
-      "official_followers": 18468,
+      "official_checked_at_taipei": "2026-10-30T17:38:36Z",
+      "official_followers": 18517,
       "official_source": "Steam Community XML memberCount"
     },
     "1867240": {
@@ -17474,8 +17482,8 @@
     "1892100": {
       "appid": 1892100,
       "group_id64": "103582791471417650",
-      "official_checked_at_taipei": "2026-10-29T17:47:48Z",
-      "official_followers": 5645,
+      "official_checked_at_taipei": "2026-10-30T17:53:36Z",
+      "official_followers": 5650,
       "official_source": "Steam Community XML memberCount"
     },
     "1912410": {
@@ -17488,15 +17496,15 @@
     "1963680": {
       "appid": 1963680,
       "group_id64": "103582791475674086",
-      "official_checked_at_taipei": "2026-10-29T17:38:48Z",
-      "official_followers": 19172,
+      "official_checked_at_taipei": "2026-10-30T17:44:36Z",
+      "official_followers": 19214,
       "official_source": "Steam Community XML memberCount"
     },
     "2017940": {
       "appid": 2017940,
       "group_id64": "103582791474302708",
-      "official_checked_at_taipei": "2026-10-29T17:37:48Z",
-      "official_followers": 14445,
+      "official_checked_at_taipei": "2026-10-30T17:43:36Z",
+      "official_followers": 14463,
       "official_source": "Steam Community XML memberCount"
     },
     "2067820": {
@@ -17509,29 +17517,29 @@
     "2087540": {
       "appid": 2087540,
       "group_id64": "103582791475772508",
-      "official_checked_at_taipei": "2026-10-29T17:52:18Z",
-      "official_followers": 16258,
+      "official_checked_at_taipei": "2026-10-30T17:58:06Z",
+      "official_followers": 16398,
       "official_source": "Steam Community XML memberCount"
     },
     "2121510": {
       "appid": 2121510,
       "group_id64": "103582791472445699",
-      "official_checked_at_taipei": "2026-10-29T17:36:18Z",
-      "official_followers": 18830,
+      "official_checked_at_taipei": "2026-10-30T17:42:06Z",
+      "official_followers": 18885,
       "official_source": "Steam Community XML memberCount"
     },
     "2141130": {
       "appid": 2141130,
       "group_id64": "103582791475268120",
-      "official_checked_at_taipei": "2026-10-29T17:29:18Z",
-      "official_followers": 28284,
+      "official_checked_at_taipei": "2026-10-30T17:35:06Z",
+      "official_followers": 28315,
       "official_source": "Steam Community XML memberCount"
     },
     "2223980": {
       "appid": 2223980,
       "group_id64": "103582791474585448",
-      "official_checked_at_taipei": "2026-10-29T17:40:18Z",
-      "official_followers": 18976,
+      "official_checked_at_taipei": "2026-10-30T17:46:06Z",
+      "official_followers": 19712,
       "official_source": "Steam Community XML memberCount"
     },
     "2254990": {
@@ -17551,36 +17559,36 @@
     "2288340": {
       "appid": 2288340,
       "group_id64": "103582791475413357",
-      "official_checked_at_taipei": "2026-10-29T17:24:48Z",
-      "official_followers": 71398,
+      "official_checked_at_taipei": "2026-10-30T17:30:36Z",
+      "official_followers": 71539,
       "official_source": "Steam Community XML memberCount"
     },
     "2295060": {
       "appid": 2295060,
       "group_id64": "103582791473167039",
-      "official_checked_at_taipei": "2026-10-29T17:31:18Z",
-      "official_followers": 24994,
+      "official_checked_at_taipei": "2026-10-30T17:37:06Z",
+      "official_followers": 25004,
       "official_source": "Steam Community XML memberCount"
     },
     "2295170": {
       "appid": 2295170,
       "group_id64": "103582791474230814",
-      "official_checked_at_taipei": "2026-10-29T17:27:18Z",
-      "official_followers": 50133,
+      "official_checked_at_taipei": "2026-10-30T17:33:06Z",
+      "official_followers": 50246,
       "official_source": "Steam Community XML memberCount"
     },
     "2315050": {
       "appid": 2315050,
       "group_id64": "103582791474808703",
-      "official_checked_at_taipei": "2026-10-29T17:39:18Z",
-      "official_followers": 15884,
+      "official_checked_at_taipei": "2026-10-30T17:45:06Z",
+      "official_followers": 15914,
       "official_source": "Steam Community XML memberCount"
     },
     "2320980": {
       "appid": 2320980,
       "group_id64": "103582791474861432",
-      "official_checked_at_taipei": "2026-10-29T17:30:48Z",
-      "official_followers": 27717,
+      "official_checked_at_taipei": "2026-10-30T17:36:36Z",
+      "official_followers": 27929,
       "official_source": "Steam Community XML memberCount"
     },
     "2333000": {
@@ -17593,22 +17601,22 @@
     "2365790": {
       "appid": 2365790,
       "group_id64": "103582791474669031",
-      "official_checked_at_taipei": "2026-10-29T17:35:48Z",
+      "official_checked_at_taipei": "2026-10-30T17:41:36Z",
       "official_followers": 13463,
       "official_source": "Steam Community XML memberCount"
     },
     "2376260": {
       "appid": 2376260,
       "group_id64": "103582791473761770",
-      "official_checked_at_taipei": "2026-10-29T17:31:48Z",
-      "official_followers": 21181,
+      "official_checked_at_taipei": "2026-10-30T17:37:36Z",
+      "official_followers": 21212,
       "official_source": "Steam Community XML memberCount"
     },
     "2411200": {
       "appid": 2411200,
       "group_id64": "103582791474733658",
-      "official_checked_at_taipei": "2026-10-29T17:46:18Z",
-      "official_followers": 8207,
+      "official_checked_at_taipei": "2026-10-30T17:52:06Z",
+      "official_followers": 8316,
       "official_source": "Steam Community XML memberCount"
     },
     "2420580": {
@@ -17621,15 +17629,15 @@
     "2487190": {
       "appid": 2487190,
       "group_id64": "103582791474863018",
-      "official_checked_at_taipei": "2026-10-29T17:54:48Z",
-      "official_followers": 13843,
+      "official_checked_at_taipei": "2026-10-30T18:00:36Z",
+      "official_followers": 13977,
       "official_source": "Steam Community XML memberCount"
     },
     "2522120": {
       "appid": 2522120,
       "group_id64": "103582791473919426",
-      "official_checked_at_taipei": "2026-10-29T17:45:18Z",
-      "official_followers": 7765,
+      "official_checked_at_taipei": "2026-10-30T17:51:06Z",
+      "official_followers": 7789,
       "official_source": "Steam Community XML memberCount"
     },
     "2543830": {
@@ -17642,8 +17650,8 @@
     "2548880": {
       "appid": 2548880,
       "group_id64": "103582791474185930",
-      "official_checked_at_taipei": "2026-10-29T17:53:48Z",
-      "official_followers": 7656,
+      "official_checked_at_taipei": "2026-10-30T17:59:36Z",
+      "official_followers": 7886,
       "official_source": "Steam Community XML memberCount"
     },
     "2562390": {
@@ -17656,15 +17664,15 @@
     "2590240": {
       "appid": 2590240,
       "group_id64": "103582791475607232",
-      "official_checked_at_taipei": "2026-10-29T17:22:18Z",
-      "official_followers": 85055,
+      "official_checked_at_taipei": "2026-10-30T17:28:06Z",
+      "official_followers": 85189,
       "official_source": "Steam Community XML memberCount"
     },
     "2659410": {
       "appid": 2659410,
       "group_id64": "103582791475798373",
-      "official_checked_at_taipei": "2026-10-29T17:55:18Z",
-      "official_followers": 4656,
+      "official_checked_at_taipei": "2026-10-30T18:01:06Z",
+      "official_followers": 4672,
       "official_source": "Steam Community XML memberCount"
     },
     "2680280": {
@@ -17691,15 +17699,15 @@
     "2738170": {
       "appid": 2738170,
       "group_id64": "103582791475035911",
-      "official_checked_at_taipei": "2026-10-29T17:42:48Z",
-      "official_followers": 9224,
+      "official_checked_at_taipei": "2026-10-30T17:48:36Z",
+      "official_followers": 9237,
       "official_source": "Steam Community XML memberCount"
     },
     "2769570": {
       "appid": 2769570,
       "group_id64": "103582791474574962",
-      "official_checked_at_taipei": "2026-10-29T17:21:48Z",
-      "official_followers": 142926,
+      "official_checked_at_taipei": "2026-10-30T17:27:36Z",
+      "official_followers": 143028,
       "official_source": "Steam Community XML memberCount"
     },
     "2796640": {
@@ -17712,15 +17720,15 @@
     "2826790": {
       "appid": 2826790,
       "group_id64": "103582791474569865",
-      "official_checked_at_taipei": "2026-10-29T17:20:48Z",
-      "official_followers": 8939,
+      "official_checked_at_taipei": "2026-10-30T17:26:36Z",
+      "official_followers": 9002,
       "official_source": "Steam Community XML memberCount"
     },
     "2828710": {
       "appid": 2828710,
       "group_id64": "103582791475268092",
-      "official_checked_at_taipei": "2026-10-29T17:26:48Z",
-      "official_followers": 49397,
+      "official_checked_at_taipei": "2026-10-30T17:32:36Z",
+      "official_followers": 49486,
       "official_source": "Steam Community XML memberCount"
     },
     "2849490": {
@@ -17740,8 +17748,8 @@
     "2871520": {
       "appid": 2871520,
       "group_id64": "103582791474505065",
-      "official_checked_at_taipei": "2026-10-29T17:30:18Z",
-      "official_followers": 29124,
+      "official_checked_at_taipei": "2026-10-30T17:36:06Z",
+      "official_followers": 29170,
       "official_source": "Steam Community XML memberCount"
     },
     "2887580": {
@@ -17775,8 +17783,8 @@
     "2929250": {
       "appid": 2929250,
       "group_id64": "103582791474978558",
-      "official_checked_at_taipei": "2026-10-29T17:23:18Z",
-      "official_followers": 74112,
+      "official_checked_at_taipei": "2026-10-30T17:29:06Z",
+      "official_followers": 74331,
       "official_source": "Steam Community XML memberCount"
     },
     "2938460": {
@@ -17789,36 +17797,36 @@
     "2963950": {
       "appid": 2963950,
       "group_id64": "103582791475225120",
-      "official_checked_at_taipei": "2026-10-29T17:24:18Z",
-      "official_followers": 58224,
+      "official_checked_at_taipei": "2026-10-30T17:30:06Z",
+      "official_followers": 58414,
       "official_source": "Steam Community XML memberCount"
     },
     "2967950": {
       "appid": 2967950,
       "group_id64": "103582791474540234",
-      "official_checked_at_taipei": "2026-10-29T17:41:48Z",
-      "official_followers": 12968,
+      "official_checked_at_taipei": "2026-10-30T17:47:36Z",
+      "official_followers": 12991,
       "official_source": "Steam Community XML memberCount"
     },
     "2988120": {
       "appid": 2988120,
       "group_id64": "103582791474551075",
-      "official_checked_at_taipei": "2026-10-29T17:39:48Z",
-      "official_followers": 13816,
+      "official_checked_at_taipei": "2026-10-30T17:45:36Z",
+      "official_followers": 13904,
       "official_source": "Steam Community XML memberCount"
     },
     "3010850": {
       "appid": 3010850,
       "group_id64": "103582791474574980",
-      "official_checked_at_taipei": "2026-10-29T17:25:18Z",
-      "official_followers": 62033,
+      "official_checked_at_taipei": "2026-10-30T17:31:06Z",
+      "official_followers": 62111,
       "official_source": "Steam Community XML memberCount"
     },
     "3024130": {
       "appid": 3024130,
       "group_id64": "103582791474587867",
-      "official_checked_at_taipei": "2026-10-29T17:38:18Z",
-      "official_followers": 14353,
+      "official_checked_at_taipei": "2026-10-30T17:44:06Z",
+      "official_followers": 14518,
       "official_source": "Steam Community XML memberCount"
     },
     "3031880": {
@@ -17845,15 +17853,15 @@
     "3115160": {
       "appid": 3115160,
       "group_id64": "103582791475151230",
-      "official_checked_at_taipei": "2026-10-29T17:37:18Z",
-      "official_followers": 17516,
+      "official_checked_at_taipei": "2026-10-30T17:43:06Z",
+      "official_followers": 17577,
       "official_source": "Steam Community XML memberCount"
     },
     "3161310": {
       "appid": 3161310,
       "group_id64": "103582791474680173",
-      "official_checked_at_taipei": "2026-10-29T17:25:48Z",
-      "official_followers": 39004,
+      "official_checked_at_taipei": "2026-10-30T17:31:36Z",
+      "official_followers": 39050,
       "official_source": "Steam Community XML memberCount"
     },
     "3195440": {
@@ -17873,8 +17881,8 @@
     "3204330": {
       "appid": 3204330,
       "group_id64": "103582791474745785",
-      "official_checked_at_taipei": "2026-10-29T17:35:18Z",
-      "official_followers": 16891,
+      "official_checked_at_taipei": "2026-10-30T17:41:06Z",
+      "official_followers": 17035,
       "official_source": "Steam Community XML memberCount"
     },
     "3218230": {
@@ -17884,11 +17892,18 @@
       "official_followers": 63952,
       "official_source": "Steam Community XML memberCount"
     },
+    "3218570": {
+      "appid": 3218570,
+      "group_id64": "103582791474739947",
+      "official_checked_at_taipei": "2026-10-30T17:22:36Z",
+      "official_followers": 6610,
+      "official_source": "Steam Community XML memberCount"
+    },
     "3219030": {
       "appid": 3219030,
       "group_id64": "103582791475662649",
-      "official_checked_at_taipei": "2026-10-29T17:29:48Z",
-      "official_followers": 50965,
+      "official_checked_at_taipei": "2026-10-30T17:35:36Z",
+      "official_followers": 51180,
       "official_source": "Steam Community XML memberCount"
     },
     "3222640": {
@@ -17901,15 +17916,15 @@
     "3224600": {
       "appid": 3224600,
       "group_id64": "103582791474737994",
-      "official_checked_at_taipei": "2026-10-29T17:44:18Z",
-      "official_followers": 8378,
+      "official_checked_at_taipei": "2026-10-30T17:50:06Z",
+      "official_followers": 8402,
       "official_source": "Steam Community XML memberCount"
     },
     "3230960": {
       "appid": 3230960,
       "group_id64": "103582791475340775",
-      "official_checked_at_taipei": "2026-10-29T17:26:18Z",
-      "official_followers": 45026,
+      "official_checked_at_taipei": "2026-10-30T17:32:06Z",
+      "official_followers": 45221,
       "official_source": "Steam Community XML memberCount"
     },
     "3255500": {
@@ -17922,8 +17937,8 @@
     "3259780": {
       "appid": 3259780,
       "group_id64": "103582791475679020",
-      "official_checked_at_taipei": "2026-10-29T17:32:18Z",
-      "official_followers": 50853,
+      "official_checked_at_taipei": "2026-10-30T17:38:06Z",
+      "official_followers": 51470,
       "official_source": "Steam Community XML memberCount"
     },
     "3295000": {
@@ -17936,8 +17951,8 @@
     "3299050": {
       "appid": 3299050,
       "group_id64": "103582791475109056",
-      "official_checked_at_taipei": "2026-10-29T17:21:18Z",
-      "official_followers": 12142,
+      "official_checked_at_taipei": "2026-10-30T17:27:06Z",
+      "official_followers": 12153,
       "official_source": "Steam Community XML memberCount"
     },
     "3310570": {
@@ -17950,8 +17965,8 @@
     "3314580": {
       "appid": 3314580,
       "group_id64": "103582791475536790",
-      "official_checked_at_taipei": "2026-10-29T17:48:18Z",
-      "official_followers": 11736,
+      "official_checked_at_taipei": "2026-10-30T17:54:06Z",
+      "official_followers": 11777,
       "official_source": "Steam Community XML memberCount"
     },
     "3328490": {
@@ -17978,22 +17993,22 @@
     "3462190": {
       "appid": 3462190,
       "group_id64": "103582791475060665",
-      "official_checked_at_taipei": "2026-10-29T17:43:48Z",
-      "official_followers": 8147,
+      "official_checked_at_taipei": "2026-10-30T17:49:36Z",
+      "official_followers": 8152,
       "official_source": "Steam Community XML memberCount"
     },
     "3469910": {
       "appid": 3469910,
       "group_id64": "103582791475676661",
-      "official_checked_at_taipei": "2026-10-29T17:47:18Z",
-      "official_followers": 11001,
+      "official_checked_at_taipei": "2026-10-30T17:53:06Z",
+      "official_followers": 11028,
       "official_source": "Steam Community XML memberCount"
     },
     "3486530": {
       "appid": 3486530,
       "group_id64": "103582791475413252",
-      "official_checked_at_taipei": "2026-10-29T17:43:18Z",
-      "official_followers": 15368,
+      "official_checked_at_taipei": "2026-10-30T17:49:06Z",
+      "official_followers": 15455,
       "official_source": "Steam Community XML memberCount"
     },
     "3492120": {
@@ -18020,8 +18035,8 @@
     "3509420": {
       "appid": 3509420,
       "group_id64": "103582791475065696",
-      "official_checked_at_taipei": "2026-10-29T17:34:18Z",
-      "official_followers": 14885,
+      "official_checked_at_taipei": "2026-10-30T17:40:06Z",
+      "official_followers": 14892,
       "official_source": "Steam Community XML memberCount"
     },
     "3510740": {
@@ -18034,8 +18049,8 @@
     "3558670": {
       "appid": 3558670,
       "group_id64": "103582791475413308",
-      "official_checked_at_taipei": "2026-10-29T17:23:48Z",
-      "official_followers": 58611,
+      "official_checked_at_taipei": "2026-10-30T17:29:36Z",
+      "official_followers": 58691,
       "official_source": "Steam Community XML memberCount"
     },
     "3560670": {
@@ -18048,15 +18063,15 @@
     "3569420": {
       "appid": 3569420,
       "group_id64": "103582791475150628",
-      "official_checked_at_taipei": "2026-10-29T17:44:48Z",
-      "official_followers": 13579,
+      "official_checked_at_taipei": "2026-10-30T17:50:36Z",
+      "official_followers": 13651,
       "official_source": "Steam Community XML memberCount"
     },
     "3581230": {
       "appid": 3581230,
       "group_id64": "103582791475142442",
-      "official_checked_at_taipei": "2026-10-29T17:42:18Z",
-      "official_followers": 10435,
+      "official_checked_at_taipei": "2026-10-30T17:48:06Z",
+      "official_followers": 10503,
       "official_source": "Steam Community XML memberCount"
     },
     "3640200": {
@@ -18069,8 +18084,8 @@
     "3660710": {
       "appid": 3660710,
       "group_id64": "103582791475386958",
-      "official_checked_at_taipei": "2026-10-29T17:34:48Z",
-      "official_followers": 15093,
+      "official_checked_at_taipei": "2026-10-30T17:40:36Z",
+      "official_followers": 15101,
       "official_source": "Steam Community XML memberCount"
     },
     "3669870": {
@@ -18090,22 +18105,22 @@
     "3727090": {
       "appid": 3727090,
       "group_id64": "103582791475358543",
-      "official_checked_at_taipei": "2026-10-29T17:50:48Z",
-      "official_followers": 5818,
+      "official_checked_at_taipei": "2026-10-30T17:56:36Z",
+      "official_followers": 5847,
       "official_source": "Steam Community XML memberCount"
     },
     "3740090": {
       "appid": 3740090,
       "group_id64": "103582791475142302",
-      "official_checked_at_taipei": "2026-10-29T17:17:36Z",
-      "official_followers": 4825,
+      "official_checked_at_taipei": "2026-10-30T17:23:36Z",
+      "official_followers": 4854,
       "official_source": "Steam Community XML memberCount"
     },
     "3743140": {
       "appid": 3743140,
       "group_id64": "103582791475214835",
-      "official_checked_at_taipei": "2026-10-29T17:46:48Z",
-      "official_followers": 10174,
+      "official_checked_at_taipei": "2026-10-30T17:52:36Z",
+      "official_followers": 10201,
       "official_source": "Steam Community XML memberCount"
     },
     "3749580": {
@@ -18153,8 +18168,8 @@
     "3846830": {
       "appid": 3846830,
       "group_id64": "103582791475827756",
-      "official_checked_at_taipei": "2026-10-29T17:51:48Z",
-      "official_followers": 16832,
+      "official_checked_at_taipei": "2026-10-30T17:57:36Z",
+      "official_followers": 16826,
       "official_source": "Steam Community XML memberCount"
     },
     "3883570": {
@@ -18178,11 +18193,18 @@
       "official_followers": 400,
       "official_source": "Steam Community XML memberCount"
     },
+    "3927170": {
+      "appid": 3927170,
+      "group_id64": "103582791475258051",
+      "official_checked_at_taipei": "2026-10-30T17:19:56Z",
+      "official_followers": 1043,
+      "official_source": "Steam Community XML memberCount"
+    },
     "3960600": {
       "appid": 3960600,
       "group_id64": "103582791475768984",
-      "official_checked_at_taipei": "2026-10-29T17:52:48Z",
-      "official_followers": 18125,
+      "official_checked_at_taipei": "2026-10-30T17:58:36Z",
+      "official_followers": 18199,
       "official_source": "Steam Community XML memberCount"
     },
     "4019220": {
@@ -18216,8 +18238,8 @@
     "4078430": {
       "appid": 4078430,
       "group_id64": "103582791475413355",
-      "official_checked_at_taipei": "2026-10-29T17:27:48Z",
-      "official_followers": 58456,
+      "official_checked_at_taipei": "2026-10-30T17:33:36Z",
+      "official_followers": 58610,
       "official_source": "Steam Community XML memberCount"
     },
     "4080220": {
@@ -18237,8 +18259,8 @@
     "4094350": {
       "appid": 4094350,
       "group_id64": "103582791475377071",
-      "official_checked_at_taipei": "2026-10-29T17:41:18Z",
-      "official_followers": 18457,
+      "official_checked_at_taipei": "2026-10-30T17:47:06Z",
+      "official_followers": 18492,
       "official_source": "Steam Community XML memberCount"
     },
     "4094660": {
@@ -18258,8 +18280,8 @@
     "4115450": {
       "appid": 4115450,
       "group_id64": "103582791475412777",
-      "official_checked_at_taipei": "2026-10-29T17:22:48Z",
-      "official_followers": 152697,
+      "official_checked_at_taipei": "2026-10-30T17:28:36Z",
+      "official_followers": 160263,
       "official_source": "Steam Community XML memberCount"
     },
     "4126040": {
@@ -18286,8 +18308,8 @@
     "4171850": {
       "appid": 4171850,
       "group_id64": "103582791475413853",
-      "official_checked_at_taipei": "2026-10-29T17:40:48Z",
-      "official_followers": 9996,
+      "official_checked_at_taipei": "2026-10-30T17:46:36Z",
+      "official_followers": 9998,
       "official_source": "Steam Community XML memberCount"
     },
     "4182430": {
@@ -18307,8 +18329,8 @@
     "4231820": {
       "appid": 4231820,
       "group_id64": "103582791475507613",
-      "official_checked_at_taipei": "2026-10-29T17:28:18Z",
-      "official_followers": 46992,
+      "official_checked_at_taipei": "2026-10-30T17:34:06Z",
+      "official_followers": 47116,
       "official_source": "Steam Community XML memberCount"
     },
     "4247840": {
@@ -18321,8 +18343,8 @@
     "4251460": {
       "appid": 4251460,
       "group_id64": "103582791475675333",
-      "official_checked_at_taipei": "2026-10-29T17:50:18Z",
-      "official_followers": 9372,
+      "official_checked_at_taipei": "2026-10-30T17:56:06Z",
+      "official_followers": 9558,
       "official_source": "Steam Community XML memberCount"
     },
     "4253570": {
@@ -18335,8 +18357,8 @@
     "4253770": {
       "appid": 4253770,
       "group_id64": "103582791475678968",
-      "official_checked_at_taipei": "2026-10-29T17:45:48Z",
-      "official_followers": 9399,
+      "official_checked_at_taipei": "2026-10-30T17:51:36Z",
+      "official_followers": 9407,
       "official_source": "Steam Community XML memberCount"
     },
     "4259190": {
@@ -18363,22 +18385,29 @@
     "4312190": {
       "appid": 4312190,
       "group_id64": "103582791475811168",
-      "official_checked_at_taipei": "2026-10-29T17:17:07Z",
-      "official_followers": 5569,
+      "official_checked_at_taipei": "2026-10-30T17:23:06Z",
+      "official_followers": 5970,
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4348910": {
+      "appid": 4348910,
+      "group_id64": "103582791475747582",
+      "official_checked_at_taipei": "2026-10-30T17:21:36Z",
+      "official_followers": 31951,
       "official_source": "Steam Community XML memberCount"
     },
     "4354570": {
       "appid": 4354570,
       "group_id64": "103582791475681887",
-      "official_checked_at_taipei": "2026-10-29T17:33:48Z",
-      "official_followers": 28294,
+      "official_checked_at_taipei": "2026-10-30T17:39:36Z",
+      "official_followers": 28366,
       "official_source": "Steam Community XML memberCount"
     },
     "4358660": {
       "appid": 4358660,
       "group_id64": "103582791475616891",
-      "official_checked_at_taipei": "2026-10-29T17:49:18Z",
-      "official_followers": 20423,
+      "official_checked_at_taipei": "2026-10-30T17:55:06Z",
+      "official_followers": 23721,
       "official_source": "Steam Community XML memberCount"
     },
     "4358690": {
@@ -18461,15 +18490,15 @@
     "4761550": {
       "appid": 4761550,
       "group_id64": "103582791475660251",
-      "official_checked_at_taipei": "2026-10-29T17:48:48Z",
-      "official_followers": 593,
+      "official_checked_at_taipei": "2026-10-30T17:54:36Z",
+      "official_followers": 598,
       "official_source": "Steam Community XML memberCount"
     },
     "4814120": {
       "appid": 4814120,
       "group_id64": "103582791475798465",
-      "official_checked_at_taipei": "2026-10-29T17:53:18Z",
-      "official_followers": 27800,
+      "official_checked_at_taipei": "2026-10-30T17:59:06Z",
+      "official_followers": 27861,
       "official_source": "Steam Community XML memberCount"
     },
     "4876650": {
@@ -18496,8 +18525,8 @@
     "4968640": {
       "appid": 4968640,
       "group_id64": "103582791475791305",
-      "official_checked_at_taipei": "2026-10-29T17:51:18Z",
-      "official_followers": 9377,
+      "official_checked_at_taipei": "2026-10-30T17:57:06Z",
+      "official_followers": 9412,
       "official_source": "Steam Community XML memberCount"
     },
     "499170": {
@@ -18524,8 +18553,8 @@
     "5037510": {
       "appid": 5037510,
       "group_id64": "103582791475812982",
-      "official_checked_at_taipei": "2026-10-29T17:19:18Z",
-      "official_followers": 670,
+      "official_checked_at_taipei": "2026-10-30T17:25:06Z",
+      "official_followers": 725,
       "official_source": "Steam Community XML memberCount"
     },
     "5070190": {
@@ -18559,29 +18588,43 @@
     "5155360": {
       "appid": 5155360,
       "group_id64": "103582791475829503",
-      "official_checked_at_taipei": "2026-10-29T17:20:18Z",
-      "official_followers": 11614,
+      "official_checked_at_taipei": "2026-10-30T17:26:06Z",
+      "official_followers": 11696,
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5160800": {
+      "appid": 5160800,
+      "group_id64": "103582791475802209",
+      "official_checked_at_taipei": "2026-10-30T17:20:26Z",
+      "official_followers": 8314,
       "official_source": "Steam Community XML memberCount"
     },
     "5258340": {
       "appid": 5258340,
       "group_id64": "103582791475832899",
-      "official_checked_at_taipei": "2026-10-29T17:19:48Z",
-      "official_followers": 1293,
+      "official_checked_at_taipei": "2026-10-30T17:25:36Z",
+      "official_followers": 1346,
       "official_source": "Steam Community XML memberCount"
     },
     "5279620": {
       "appid": 5279620,
       "group_id64": "103582791476016516",
-      "official_checked_at_taipei": "2026-10-29T17:18:48Z",
-      "official_followers": 91,
+      "official_checked_at_taipei": "2026-10-30T17:24:36Z",
+      "official_followers": 95,
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5327150": {
+      "appid": 5327150,
+      "group_id64": "103582791476015524",
+      "official_checked_at_taipei": "2026-10-30T17:22:06Z",
+      "official_followers": 8,
       "official_source": "Steam Community XML memberCount"
     },
     "5335510": {
       "appid": 5335510,
       "group_id64": "103582791476057682",
-      "official_checked_at_taipei": "2026-10-29T17:18:06Z",
-      "official_followers": 7988,
+      "official_checked_at_taipei": "2026-10-30T17:24:06Z",
+      "official_followers": 8921,
       "official_source": "Steam Community XML memberCount"
     },
     "5341070": {
@@ -18608,7 +18651,7 @@
     "744200": {
       "appid": 744200,
       "group_id64": "103582791462731337",
-      "official_checked_at_taipei": "2026-10-29T17:49:48Z",
+      "official_checked_at_taipei": "2026-10-30T17:55:36Z",
       "official_followers": 5107,
       "official_source": "Steam Community XML memberCount"
     }
@@ -113871,7 +113914,7 @@
       "steam_url": "https://store.steampowered.com/app/910550/"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "scheduler_batch": {
     "active": false,
     "finished_at": "2026-10-30T15:11:20.270028+08:00",

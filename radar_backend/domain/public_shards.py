@@ -28,7 +28,7 @@ def valid_record(
         return False
     try:
         appid = int(row.get("appid"))
-        followers = int(row.get("followers"))
+        followers = int(row.get("followers") or 0)
     except (TypeError, ValueError):
         return False
     day = row.get("release_start") or row.get("release_date")
@@ -94,7 +94,7 @@ def publishable(
     ):
         return False
     if str(game["release_start"]) >= today_s:
-        if int(game["followers"]) < 5000 and not is_twitch_qualified(game):
+        if int(game["followers"] or 0) < 5000 and not is_twitch_qualified(game):
             return False
         if audit_active:
             return game.get("release_display_precision") == "date_full"

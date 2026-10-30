@@ -111,7 +111,7 @@ def filter_confirmed_master_games(
         try:
             appid = int(row["appid"])
             day = date.fromisoformat(row["release_start"])
-            followers = int(row["followers"])
+            followers = int(row["followers"] or 0)
         except (KeyError, ValueError, TypeError):
             continue
         twitch_qualified = is_twitch_qualified(row)

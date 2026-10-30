@@ -73,9 +73,12 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
             break
         prior = (previous.get("games") or {}).get(str(appid), {})
         record = by_id.get(appid)
+        count = (cached_follower(appid, caches or [], now)
+                 if isinstance(record, dict) and record.get("followers") is None else None)
         # Persistent membership outlives Twitch expiry. No Steam fetch is needed
         # on every subsequent import; the normal content reconciler owns refresh.
-        if isinstance(record, dict) and is_twitch_qualified(record):
+        if (isinstance(record, dict) and is_twitch_qualified(record)
+                and not (record.get("followers") is None and count is not None)):
             queued.pop(appid, None)
             content_signature = signature(record)
             if (prior.get("status") == "accepted" and prior.get("retry_at") is None
@@ -96,7 +99,7 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                 "follower_candidate": None,
             }
             continue
-        count = cached_follower(appid, caches or [], now)
+        count = count or cached_follower(appid, caches or [], now)
         if count is None and isinstance(record, dict):
             count = cached_follower(appid, [{"games": {str(appid): {
                 "followers": record.get("followers"), "checked_at": record.get("follower_checked_at"),
@@ -149,21 +152,18 @@ def collect(frontend: Path, commit: str, master: dict, previous: dict, *,
                     queued.pop(appid, None)
                     state["follower_candidate"] = None
                 continue
-            if count is None:
-                queued[appid] = follower_candidate(probe)
-                state.update(reason="queued_official_followers", rate_limit_stage=None,
-                             retry_at=None, retry_source=None, retry_after=None,
-                             retry_attempts=0, rate_limit_attempts=0,
-                             follower_candidate=deepcopy_fn(queued[appid]))
-                continue
-            row, reason = build_candidate(appid, proof, item, details, *count, now, blocked)
+            # Twitch is an independent admission source. Missing Community
+            # groups/counts cannot block a verified identity/date/content chain.
+            row, reason = build_candidate(appid, proof, item, details,
+                                          *(count or (None, None)), now, blocked)
             if row is None:
                 state.update(reason=reason, **transient_retry_policy(prior, clock()),
                              rate_limit_stage=None, rate_limit_attempts=0, retry_after=None)
                 continue
             batch["records"].append(row)
             queued.pop(appid, None)
-            state.update(status="accepted", reason="steam_verified", content_signature=signature(row),
+            state.update(status="accepted", reason="twitch_verified" if count is None else "steam_verified",
+                         content_signature=signature(row),
                          followers=row["followers"], follower_checked_at=row["follower_checked_at"],
                          retry_at=None, retry_attempts=0, rate_limit_attempts=0,
                          rate_limit_stage=None, retry_source=None, retry_after=None)

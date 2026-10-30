@@ -134,9 +134,10 @@ def test_collect_reads_one_immutable_snapshot_and_only_metadata_endpoints():
     assert first.kwargs["timeout"] == second.kwargs["timeout"] == 25
     assert p.time.sleeps == [1.5]
     assert batch["generated_at"] == stamp(NOW) and batch["source_frontend_commit"] == SHA
-    assert batch["records"] == [] and batch["active_twitch_appids"] == [7]
-    assert batch["state_updates"]["7"]["reason"] == "queued_official_followers"
-    assert "followers" not in batch["follower_candidates"][0]["steam_candidate"]
+    assert batch["records"][0]["followers"] is None and batch["active_twitch_appids"] == [7]
+    assert batch["records"][0]["follower_checked_at"] is None
+    assert batch["state_updates"]["7"]["reason"] == "twitch_verified"
+    assert batch["follower_candidates"] == []
 
 
 def test_explicit_observation_does_not_read_wall_clock_for_queue_and_probes():
@@ -145,7 +146,7 @@ def test_explicit_observation_does_not_read_wall_clock_for_queue_and_probes():
     output = collect(p, datetime_type=SimpleNamespace(now=wall))
     wall.assert_not_called()
     assert output["generated_at"] == stamp(NOW)
-    assert p.build.call_args.args[5:7] == (stamp(NOW), NOW)
+    assert p.build.call_args.args[5:7] == (None, NOW)
 
 
 def test_missing_observation_uses_the_same_clock_result_for_snapshot_and_generated_at():

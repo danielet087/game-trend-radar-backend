@@ -44,7 +44,10 @@ def apply_batch(master: dict, state: dict, batch: dict, *,
             continue
         candidate = preserve_twitch_admission(current, keep_newer_release(current, row))
         current_follower_time = aware_time(current.get("follower_checked_at"))
-        if current_follower_time is not None and current_follower_time > aware_time(candidate["follower_checked_at"]):
+        candidate_follower_time = aware_time(candidate.get("follower_checked_at"))
+        if current_follower_time is not None and (
+            candidate_follower_time is None or current_follower_time > candidate_follower_time
+        ):
             for key in ("followers", "follower_checked_at", "follower_source", "official_ge5000"):
                 if key in current:
                     candidate[key] = current[key]

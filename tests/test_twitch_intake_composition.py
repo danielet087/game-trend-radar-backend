@@ -85,14 +85,13 @@ def test_canonical_collect_and_queue_keep_real_counts_separate_from_pending_meta
     master, state, checkpoint = intake.apply_queue_batch({"games": []}, {}, original, batch)
     assert original["pending_candidates"]["123"] == normal and checkpoint["cursor"] == 17
     if count is None:
-        assert master["games"] == [] and batch["records"] == []
-        candidate = checkpoint["pending_candidates"]["123"]
-        assert candidate["normal_candidate"] == normal and candidate["group_id64"] == "999"
-        assert official_catalog.is_twitch_queue_candidate(candidate, now=NOW)
-        for field in queue.FOLLOWER_FIELDS:
-            assert field not in candidate and field not in candidate["steam_candidate"]
-        restored = intake.sync_twitch_queue(checkpoint, {"follower_candidates": []}, NOW)
-        assert restored["pending_candidates"]["123"] == normal
+        record, = master["games"]
+        assert record["followers"] is None and record["follower_checked_at"] is None
+        assert batch["follower_candidates"] == [] and state["games"]["123"]["status"] == "accepted"
+        assert "123" not in checkpoint["pending_candidates"]
+        assert official_catalog.is_twitch_queue_candidate(checkpoint["twitch_admitted_candidates"]["123"], now=NOW)
+        assert checkpoint["official_results"] == {}
+
     else:
         assert batch["follower_candidates"] == [] and master["games"][0]["followers"] == count
         assert master["games"][0]["follower_checked_at"] == "2026-10-08T08:00:00Z"

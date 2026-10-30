@@ -1,4 +1,4 @@
-"""Twitch metadata collection delegates all unknown Followers to one worker."""
+"""Twitch admission keeps missing counts distinct from verified XML observations."""
 from copy import deepcopy
 from datetime import timedelta
 import json
@@ -7,7 +7,7 @@ from unittest.mock import Mock
 import pytest
 import requests
 
-from scripts.import_twitch_steam_discoveries import apply_batch, collect, stamp
+from scripts.import_twitch_steam_discoveries import apply_batch, collect, stamp, follower_candidate
 from tests.test_twitch_steam_admission import (
     NOW, SHA, extend_frontend_appids, fake_frontend, metadata_responses,
 )
@@ -23,33 +23,32 @@ def seed(root, *appids):
     session = Mock()
     session.get.side_effect = [response for aid in appids for response in metadata_responses(aid)]
     batch = run(root, session=session)
+    # A saved pre-migration queue can still exist when metadata is unavailable.
+    for record in batch["records"]:
+        state = batch["state_updates"][str(record["appid"])]
+        state.update(status="pending", reason="queued_official_followers",
+                     follower_candidate=follower_candidate(record))
+    batch["records"] = []
     _, state = apply_batch({"games": []}, {}, batch)
     return state
 
 
-def test_unknown_count_is_queued_without_community_request(tmp_path):
+def test_unknown_count_is_admitted_without_community_request(tmp_path):
     fake_frontend(tmp_path)
     session = Mock()
     session.get.side_effect = list(metadata_responses(123))
-
     batch = run(tmp_path, session=session)
-
     assert session.get.call_count == 2
     assert all(not call.args[0].startswith("https://steamcommunity.com/") for call in session.get.call_args_list)
-    assert batch["records"] == []
+    record, = batch["records"]
     assert batch["active_twitch_appids"] == [123]
-    candidate, = batch["follower_candidates"]
-    assert candidate["appid"] == 123 and candidate["release_date"] == "2026-10-02"
-    assert candidate["queue_source"] == "twitch_steam_discovery"
-    assert candidate["group_id64"] is None
-    for field in ("followers", "follower_checked_at", "follower_source", "official_ge5000"):
-        assert field not in candidate["steam_candidate"]
-    pending = batch["state_updates"]["123"]
-    assert pending["reason"] == "queued_official_followers"
-    assert pending["retry_at"] is None and pending["rate_limit_stage"] is None
-    assert pending["retry_source"] is None and pending["retry_after"] is None
-    assert pending["rate_limit_attempts"] == 0
-    assert pending["follower_candidate"] == candidate
+    assert batch["follower_candidates"] == []
+    assert record["followers"] is None and record["follower_checked_at"] is None
+    assert record["follower_source"] is None and record["official_ge5000"] is False
+    state = batch["state_updates"]["123"]
+    assert state["status"] == "accepted" and state["reason"] == "twitch_verified"
+    assert state["follower_candidate"] is None
+    assert state["retry_at"] is None and state["rate_limit_stage"] is None
 
 
 def test_official_checkpoint_cache_publishes_true_count_and_removes_queue(tmp_path):
@@ -113,15 +112,15 @@ def test_confirmed_taiwan_date_change_replaces_pending_date_with_its_official_au
 
     batch = run(tmp_path, state, session=session)
 
-    candidate, = batch["follower_candidates"]
-    assert candidate["release_date"] == "2026-10-01"
-    metadata = candidate["steam_candidate"]
+    metadata, = batch["records"]
+    assert metadata["release_start"] == "2026-10-01"
+    assert metadata["followers"] is None
     assert metadata["release_date_normalization"] == "steam_taiwan_store_date_authoritative"
     assert metadata["release_timestamp_taipei_date"] == "2026-10-02"
     assert metadata["release_date_conflict"] is True
-    assert batch["records"] == []
-    assert batch["state_updates"]["123"]["reason"] == "queued_official_followers"
-    assert batch["state_updates"]["123"]["follower_candidate"] == candidate
+    assert batch["follower_candidates"] == []
+    assert batch["state_updates"]["123"]["reason"] == "twitch_verified"
+    assert batch["state_updates"]["123"]["follower_candidate"] is None
     assert session.get.call_count == 2
 
 

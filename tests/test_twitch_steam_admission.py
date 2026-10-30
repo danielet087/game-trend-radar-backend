@@ -354,7 +354,7 @@ def test_rate_limit_stops_and_saves_pending_without_fake_followers():
         assert "followers" not in output["state_updates"]["123"]
 
 
-def test_missing_followers_queues_while_next_cached_game_can_be_admitted():
+def test_missing_followers_and_cached_counts_can_both_be_admitted():
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp); fake_frontend(root); extend_frontend_appids(root, [123, 124])
         session = Mock()
@@ -363,24 +363,24 @@ def test_missing_followers_queues_while_next_cached_game_can_be_admitted():
         delays = []
         output = collect(root, SHA, {"games": []}, {}, session=session, now=NOW, caches=[cache],
                          blocked=set(), sleep=delays.append)
-        assert [(row["appid"], row["followers"]) for row in output["records"]] == [(124, 88)]
-        assert output["state_updates"]["123"]["reason"] == "queued_official_followers"
+        assert [(row["appid"], row["followers"]) for row in output["records"]] == [(123, None), (124, 88)]
+        assert output["state_updates"]["123"]["reason"] == "twitch_verified"
         assert output["state_updates"]["123"]["rate_limit_stage"] is None
-        assert [row["appid"] for row in output["follower_candidates"]] == [123]
+        assert output["follower_candidates"] == []
         assert output["cooldown_updates"] == {}
         assert all(not call.args[0].startswith("https://steamcommunity.com/") for call in session.get.call_args_list)
         assert any(delay > 1 for delay in delays)
         master, saved = apply_batch({"games": []}, {}, output)
-        # Later uncached matches join the same queue; accepted rows do no work.
+        # Later uncached matches are admitted; accepted rows do no work.
         extend_frontend_appids(root, [123, 124, 125])
-        session.reset_mock(); session.get.side_effect = [*metadata_responses(123), *metadata_responses(125)]
+        session.reset_mock(); session.get.side_effect = [*metadata_responses(125)]
         again = collect(root, "b"*40, master, saved, session=session, now=NOW+timedelta(minutes=1),
                         blocked=set(), sleep=lambda _: None)
-        assert session.get.call_count == 4
-        assert again["state_updates"]["125"]["reason"] == "queued_official_followers"
+        assert session.get.call_count == 2
+        assert again["state_updates"]["125"]["reason"] == "twitch_verified"
         assert again["state_updates"]["125"]["retry_at"] is None
-        assert [row["appid"] for row in again["follower_candidates"]] == [123, 125]
-        assert not again["records"]
+        assert again["follower_candidates"] == []
+        assert [(row["appid"], row["followers"]) for row in again["records"]] == [(125, None)]
 
 
 def test_per_game_metadata_retry_is_not_rewritten_as_a_global_cooldown():

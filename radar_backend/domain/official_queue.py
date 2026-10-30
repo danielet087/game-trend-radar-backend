@@ -160,9 +160,18 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         if isinstance(v, dict) and queue_checked_numeric(v.get("official_followers"))
     }
     group_by_id = {str(x["appid"]): x.get("group_short_id") for x in old_group_rows}
+    admitted = {
+        str(aid) for aid, row in cp.get("twitch_admitted_candidates", {}).items()
+        if is_twitch_queue_candidate(row) and str(row["appid"]) == str(aid)
+    }
+    for aid in admitted:
+        cp["pending_candidates"].pop(aid, None)
+        cp.get("unresolved_candidates", {}).pop(aid, None)
 
     for source in frozen_rows:
         aid = str(int(source["appid"]))
+        if aid in admitted:
+            continue
         if not valid_date(source.get("release_date")):
             raise ValueError("Frozen candidate has no exact day")
         group = group_by_id.get(aid)
@@ -217,7 +226,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 source.get("sexual_content_screened") is not True
             ):
                 continue
-            if aid in existing_official:
+            if aid in existing_official or aid in admitted:
                 continue
             new = {
                 "appid": int(aid),

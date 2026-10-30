@@ -60,6 +60,18 @@ def snapshot():
 
 
 class AdmissionTests(unittest.TestCase):
+    def test_unknown_followers_require_twitch_identity_and_remain_unknown(self):
+        game = row()
+        game.update(followers=None, follower_checked_at=None, follower_source=None)
+        self.assertTrue(is_twitch_qualified(game))
+        self.assertIsNone(game['followers'])
+        for changes in ({'twitch_admission': None}, {'steam_type': 'dlc'},
+                        {'sexual_content_screened': False},
+                        {'follower_checked_at': '2026-10-02T08:00:00Z'},
+                        {'follower_source': 'Steam Community XML memberCount'}):
+            with self.subTest(changes=changes):
+                self.assertFalse(is_twitch_qualified({**game, **changes}))
+
     def database_proof(self):
         result = proof()
         result.pop("source_frontend_commit")

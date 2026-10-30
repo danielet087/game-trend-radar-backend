@@ -69,120 +69,79 @@ def precollect(root, master=None, state=None, cp=None, *, now=NOW):
     return batch
 
 
-def test_precollect_merges_seven_priority_candidates_without_resetting_progress(tmp_path):
+def test_precollect_admits_unknown_counts_without_resetting_progress(tmp_path):
     fake_frontend(tmp_path)
     extend_frontend_appids(tmp_path, APPIDS)
     master = {"games": [], "candidate_progress": "keep", "other_state": {"cursor": 99}}
     state = {"schema_version": 1, "games": {"456": {"status": "excluded", "reason": "keep"}}}
     cp = checkpoint()
     originals = deepcopy((master, state, cp))
-
     prepared = precollect(tmp_path, master, state, cp)
-    assert prepared["records"] == []
+    assert [record["appid"] for record in prepared["records"]] == APPIDS
     assert prepared["active_twitch_appids"] == APPIDS
-    assert len(prepared["follower_candidates"]) == 7
-    for candidate in prepared["follower_candidates"]:
-        assert "followers" not in candidate["steam_candidate"]
-        assert candidate["steam_candidate"]["sexual_content_screened"] is True
+    assert prepared["follower_candidates"] == []
     final_master, final_state, final_cp = apply_queue_batch(master, state, cp, prepared)
-
     assert (master, state, cp) == originals
-    assert final_master == master
+    assert len(final_master["games"]) == 7
+    assert final_master["candidate_progress"] == "keep"
     assert final_state["games"]["456"] == state["games"]["456"]
     for key in ("cursor", "completed_cursor", "cohort_id", "rate_limit_count",
                 "official_results", "attempt_events", "next_request_after_taipei"):
         assert final_cp[key] == cp[key]
-    assert final_cp["pending_candidates"]["999"] == cp["pending_candidates"]["999"]
-    for aid in APPIDS:
-        queued = final_cp["pending_candidates"][str(aid)]
-        assert queued["priority"] == 100
-        assert queued["queue_source"] == "twitch_steam_discovery"
-        assert queued["twitch_admission"]["appid"] == aid
-    first = final_cp["pending_candidates"]["123"]
-    assert first["normal_candidate"] == cp["pending_candidates"]["123"]
-    assert first["group_id64"] == cp["pending_candidates"]["123"]["group_id64"]
-    assert first["release_date"] == "2026-09-09"
+    assert final_cp["pending_candidates"] == {"999": cp["pending_candidates"]["999"]}
+    assert set(final_cp["twitch_admitted_candidates"]) == set(map(str, APPIDS))
+    for record in final_master["games"]:
+        assert is_twitch_qualified(record)
+        assert record["followers"] is None and record["follower_checked_at"] is None
+        assert record["follower_source"] is None
+    first = final_cp["twitch_admitted_candidates"]["123"]["steam_candidate"]
+    assert first["release_start"] == "2026-09-09"
 
 
-def test_true_low_and_zero_counts_finalize_taiwan_dates_and_withdraw_overlay(tmp_path):
+def test_true_low_and_zero_counts_remain_verified_alongside_unknown_counts(tmp_path):
     fake_frontend(tmp_path)
     extend_frontend_appids(tmp_path, APPIDS)
-    original_cp = checkpoint()
-    prepared = precollect(tmp_path, cp=original_cp)
-    master, state, cp = apply_queue_batch({"games": []}, {}, original_cp, prepared)
-
-    checked = {123: NOW + timedelta(minutes=5), 124: NOW + timedelta(minutes=6)}
-    # These are the existing worker's genuine completed official XML results.
+    cp = checkpoint()
+    checked = {123: NOW - timedelta(minutes=5), 124: NOW - timedelta(minutes=4)}
     for aid, count in ((123, 120), (124, 0)):
         cp["official_results"][str(aid)] = {
-            **deepcopy(cp["pending_candidates"][str(aid)]),
-            "official_followers": count,
-            "official_checked_at_taipei": checked[aid].astimezone(
-                ZoneInfo("Asia/Taipei")).isoformat(),
+            "appid": aid, "official_followers": count,
+            "official_checked_at_taipei": checked[aid].astimezone(ZoneInfo("Asia/Taipei")).isoformat(),
             "official_source": "Steam Community XML memberCount",
         }
-    before_post = deepcopy(cp)
-    post = precollect(tmp_path, master, state, cp, now=NOW + timedelta(minutes=10))
-    assert [(record["appid"], record["followers"]) for record in post["records"]] == [(123, 120), (124, 0)]
-    assert len(post["follower_candidates"]) == 5
-    final_master, final_state, final_cp = apply_queue_batch(master, state, cp, post)
-
-    assert cp == before_post
-    games = {record["appid"]: record for record in final_master["games"]}
-    assert set(games) == {123, 124}
+    original = deepcopy(cp)
+    batch = precollect(tmp_path, cp=cp)
+    master, state, final_cp = apply_queue_batch({"games": []}, {}, cp, batch)
+    games = {record["appid"]: record for record in master["games"]}
+    assert set(games) == set(APPIDS) and batch["follower_candidates"] == []
     for aid, count in ((123, 120), (124, 0)):
-        record = games[aid]
-        assert is_twitch_qualified(record)
-        assert record["followers"] == count
-        assert record["follower_checked_at"] == before_post["official_results"][str(aid)]["official_checked_at_taipei"]
-        assert record["twitch_admission"]["appid"] == aid
-        assert record["official_ge5000"] is False
-        assert final_state["games"][str(aid)]["status"] == "accepted"
-        assert final_state["games"][str(aid)]["follower_candidate"] is None
-    assert games[123]["release_start"] == "2026-09-09"
-    assert games[123]["release_store_date"] == "2026-09-08"
-    assert games[123]["release_date_normalization"] == "steam_utc_date_normalized_to_taipei"
-    assert final_cp["pending_candidates"]["123"] == original_cp["pending_candidates"]["123"]
-    assert "124" not in final_cp["pending_candidates"]
-    assert final_cp["official_results"] == before_post["official_results"]
-    assert final_cp["cursor"] == original_cp["cursor"]
+        assert games[aid]["followers"] == count
+        assert games[aid]["follower_checked_at"] == original["official_results"][str(aid)]["official_checked_at_taipei"]
+        assert state["games"][str(aid)]["status"] == "accepted"
+    assert all(games[aid]["followers"] is None for aid in APPIDS[2:])
+    assert final_cp["official_results"] == original["official_results"]
+    assert final_cp["cursor"] == original["cursor"]
 
 
-def test_prepare_and_finalize_preserve_worker_cooldown_and_rate_count(tmp_path):
+def test_twitch_admission_ignores_community_cooldown_and_preserves_verified_counts(tmp_path):
     fake_frontend(tmp_path)
     extend_frontend_appids(tmp_path, APPIDS)
-    cooldown = {"retry_at": stamp(NOW + timedelta(hours=4)), "updated_at": stamp(NOW),
-                "observed_at": stamp(NOW), "retry_source": "steam_retry_after",
-                "retry_after": "14400", "retry_seconds": 14400, "attempts": 5}
-    state = {"games": {}}
     cp = checkpoint()
-    cp["community_cooldown"] = deepcopy(cooldown)
+    cp["community_cooldown"] = {"retry_at": stamp(NOW + timedelta(hours=4))}
     cp["next_request_after_taipei"] = "2026-10-02T21:00:00+08:00"
     cp["rate_limit_count"] = 5
-    cp["community_last_success_at"] = "2026-10-02T08:00:00+08:00"
     original = deepcopy(cp)
-    prepared = precollect(tmp_path, state=state, cp=cp)
-    master, saved, final_cp = apply_queue_batch({"games": []}, state, cp, prepared)
-    assert len(prepared["follower_candidates"]) == 7
-    assert master["games"] == []
-    for key in ("community_cooldown", "next_request_after_taipei", "rate_limit_count",
-                "community_last_success_at", "cursor", "official_results"):
+    prepared = precollect(tmp_path, cp=cp)
+    master, state, final_cp = apply_queue_batch({"games": []}, {}, cp, prepared)
+    assert len(master["games"]) == 7 and prepared["follower_candidates"] == []
+    for key in ("community_cooldown", "next_request_after_taipei", "rate_limit_count", "cursor", "official_results"):
         assert final_cp[key] == original[key]
-    assert "steam_community" not in saved.get("api_cooldowns", {})
-
-    # A previously verified result can finalize even while the worker waits.
-    final_cp["official_results"]["123"] = {
-        "appid": 123, "official_followers": 120,
-        "official_checked_at_taipei": "2026-10-02T17:05:00+08:00",
-    }
-    post = precollect(tmp_path, master, saved, final_cp, now=NOW + timedelta(minutes=10))
-    accepted_master, accepted_state, accepted_cp = apply_queue_batch(master, saved, final_cp, post)
-    assert accepted_master["games"][0]["followers"] == 120
-    assert accepted_state["games"]["123"]["status"] == "accepted"
-    for key in ("community_cooldown", "next_request_after_taipei", "rate_limit_count",
-                "community_last_success_at", "cursor"):
-        assert accepted_cp[key] == original[key]
-    assert "steam_community" not in accepted_state.get("api_cooldowns", {})
+    # Replaying an unknown-count admission cannot erase a later real XML count.
+    verified = deepcopy(master)
+    verified["games"][0].update(followers=120, follower_checked_at=stamp(NOW + timedelta(minutes=1)),
+                                follower_source="Steam Community XML memberCount")
+    replayed, _, _ = apply_queue_batch(verified, state, final_cp, prepared)
+    assert replayed["games"][0]["followers"] == 120
 
 
 def test_dispatch_only_receipt_does_not_touch_or_withdraw_pending_queue(tmp_path):
@@ -203,6 +162,6 @@ def test_dispatch_only_receipt_does_not_touch_or_withdraw_pending_queue(tmp_path
     assert final_cp == original
     assert final_master == master
     assert len([row for row in final_cp["pending_candidates"].values()
-                if row["queue_source"] == "twitch_steam_discovery"]) == 7
+                if row["queue_source"] == "twitch_steam_discovery"]) == 0
     assert saved["games"]["123"]["content_dispatch"] == generated["state_updates"]["123"]["content_dispatch"]
     assert saved["games"]["124"] == state["games"]["124"]

@@ -232,9 +232,14 @@ def is_twitch_qualified(row: object) -> bool:
         and row.get("release_date_timezone") == "Asia/Taipei"
         and (consistent_timestamp_day or has_taiwan_store_date_authority(row))
         and row.get("release_end") == day
-        and type(row.get("followers")) is int
-        and row["followers"] >= 0
-        and aware_time(row.get("follower_checked_at")) is not None
+        and (
+            ("followers" in row and row["followers"] is None
+             and row.get("follower_checked_at") is None
+             and row.get("follower_source") is None)
+            or (type(row.get("followers")) is int
+                and row["followers"] >= 0
+                and aware_time(row.get("follower_checked_at")) is not None)
+        )
     )
 
 

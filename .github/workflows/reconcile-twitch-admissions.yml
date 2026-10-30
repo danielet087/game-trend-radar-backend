@@ -1,0 +1,69 @@
+name: Recover verified Twitch admissions without Steam Followers
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/twitch-admission-recovery.txt']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: isolated-official-nearfirst-frozen-20260922
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RADAR_DATABASE_PRIMARY: ${{ vars.RADAR_DATABASE_PRIMARY || '0' }}
+      TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+      TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+      CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
+      CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and verify admission contracts
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-dev.txt
+          python -m pytest -q tests/test_twitch_missing_followers_recovery.py tests/test_twitch_steam_admission.py tests/test_reconcile_twitch_official_queue.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Load authoritative state
+        run: python -m radar_core.storage.primary hydrate --root . --source danielet087/game-trend-radar-backend@main
+      - name: Read Twitch evidence
+        run: |
+          if [ "${RADAR_DATABASE_PRIMARY:-0}" = '1' ]; then
+            echo 'TWITCH_INPUT_SHA=database-primary' >> "$GITHUB_ENV"
+          else
+            git clone --depth 1 https://github.com/danielet087/game-trend-radar.git frontend-input
+            echo "TWITCH_INPUT_SHA=$(git -C frontend-input rev-parse HEAD)" >> "$GITHUB_ENV"
+          fi
+      - name: Admit verified Twitch identities and persist queue completion
+        run: |
+          python -m radar_backend.jobs.reconcile_twitch_official_queue --phase collect \
+            --frontend-path frontend-input --frontend-commit "$TWITCH_INPUT_SHA" \
+            --batch output/twitch-recovery/admissions.json --max-seconds 300
+          python -m radar_backend.jobs.publish_steam queue --kind twitch \
+            --batch output/twitch-recovery/admissions.json \
+            --receipt output/twitch-recovery/admissions-receipt.json
+      - name: Dispatch content enrichment and persist receipts
+        run: |
+          python -m radar_backend.jobs.reconcile_twitch_official_queue --phase dispatch \
+            --batch output/twitch-recovery/dispatch.json --max-seconds 300
+          python -m radar_backend.jobs.publish_steam queue --kind dispatch \
+            --batch output/twitch-recovery/dispatch.json \
+            --receipt output/twitch-recovery/dispatch-receipt.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: twitch-admission-recovery
+          path: output/twitch-recovery/
+          if-no-files-found: ignore
+          retention-days: 7

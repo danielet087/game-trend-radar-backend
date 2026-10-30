@@ -153,6 +153,23 @@ def sync_twitch_queue(
     pending = result.setdefault("pending_candidates", {})
     if not isinstance(pending, dict):
         raise ValueError("Pending candidates must be indexed by AppID")
+    # Retain the accepted metadata proof separately from official counts. This
+    # receipt prevents the frozen/daily sources from re-enqueuing the same game.
+    for record in batch.get("records", []):
+        if not isinstance(record, dict) or record.get("followers") is not None:
+            continue
+        aid = decimal_id(record.get("appid"))
+        completed = {
+            "appid": record.get("appid"), "name": record.get("name"),
+            "release_date": record.get("release_start"),
+            "steam_url": record.get("store_url"), "queue_source": queue_source,
+            "twitch_admission": record.get("twitch_admission"),
+            "steam_candidate": deepcopy_fn(record),
+        }
+        if aid is not None and is_twitch_queue_candidate(completed, now):
+            result.setdefault("twitch_admitted_candidates", {})[aid] = completed
+            pending.pop(aid, None)
+            result.get("unresolved_candidates", {}).pop(aid, None)
     active = batch.get("active_twitch_appids")
     if active is not None:
         if not isinstance(active, list) or any(decimal_id(aid) is None for aid in active):
@@ -184,6 +201,8 @@ def sync_twitch_queue(
             restore_normal(pending, str(aid), row)
 
     for aid, candidate in eligible.items():
+        if aid in result.get("twitch_admitted_candidates", {}):
+            continue
         if aid in withdrawn or (active is not None and aid not in active):
             continue
         prior = pending.get(aid)

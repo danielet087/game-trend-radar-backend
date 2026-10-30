@@ -106,7 +106,7 @@ def validate_snapshot(
 
 def build_candidate(
     appid: int, proof: dict, item: dict, details: dict,
-    followers: int, checked_at: str, now: datetime, blocked: set[int], *,
+    followers: int | None, checked_at: str | None, now: datetime, blocked: set[int], *,
     decimal_id, is_disallowed, is_explicit_sex_game, parse_store_release_detail,
     parse_release_window, resolve_store_release_day, aware_time,
     is_twitch_qualified, stamp, taipei, tw_store_date_authority,
@@ -182,7 +182,11 @@ def build_candidate(
     taipei_day = datetime_type.fromisoformat(day).date()
     if not today - timedelta_type(days=30) <= taipei_day <= today + timedelta_type(days=365):
         return None, "outside_new_game_window"
-    if type(followers) is not int or followers < 0 or aware_time(checked_at) is None:
+    if followers is not None and (
+        type(followers) is not int or followers < 0 or aware_time(checked_at) is None
+    ):
+        return None, "official_followers_unavailable"
+    if followers is None and checked_at is not None:
         return None, "official_followers_unavailable"
     candidate = {
         "appid": appid, "name": item.get("name") or details.get("name") or f"Steam App {appid}",
@@ -199,7 +203,8 @@ def build_candidate(
         "release_date_verified_at": stamp(now), "post_followers_store_verified": True,
         "post_followers_store_verified_at": stamp(now),
         "followers": followers, "follower_checked_at": checked_at,
-        "follower_source": "Steam Community XML memberCount", "official_ge5000": followers >= 5000,
+        "follower_source": "Steam Community XML memberCount" if followers is not None else None,
+        "official_ge5000": followers is not None and followers >= 5000,
         "sexual_content_screened": True, "steam_type": "game",
         "content_descriptorids": sorted(set(descriptors) | set(item.get("content_descriptorids") or [])),
         "store_url": f"https://store.steampowered.com/app/{appid}/",

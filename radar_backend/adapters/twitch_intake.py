@@ -83,8 +83,8 @@ def build_candidate(
     proof: dict,
     item: dict,
     details: dict,
-    followers: int,
-    checked_at: str,
+    followers: int | None,
+    checked_at: str | None,
     now: datetime,
     blocked: set[int],
 ) -> tuple[dict | None, str]:

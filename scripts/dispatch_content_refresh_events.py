@@ -64,7 +64,7 @@ def select_games(payload: dict, window_days: int | None) -> list[dict]:
             continue
         try:
             appid = int(row["appid"])
-            followers = int(row["followers"])
+            followers = int(row["followers"] or 0)
         except (KeyError, TypeError, ValueError):
             continue
         release = row.get("release_start") or row.get("release_date")

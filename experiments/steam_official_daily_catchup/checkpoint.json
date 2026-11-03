@@ -41967,12 +41967,12 @@
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-03T20:03:01.635089+08:00",
-    "last_updated_at": "2026-11-03T20:07:32.288665+08:00",
-    "requests_this_run": 10,
-    "official_new_this_run": 10,
+    "last_updated_at": "2026-11-03T20:08:40.140461+08:00",
+    "requests_this_run": 12,
+    "official_new_this_run": 11,
     "http_429_this_run": 0,
-    "last_appid": 5426000,
-    "last_name": "HELIX ARK"
+    "last_appid": 5484400,
+    "last_name": "Military Base Tidy Up"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -99341,13 +99341,26 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-03T20:07:32.288501+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5433870": {
+      "appid": 5433870,
+      "name": "Ghosts Before Dawn",
+      "release_date": "2026-11-11",
+      "group_id64": "103582791476134699",
+      "steam_url": "https://store.steampowered.com/app/5433870/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-02T17:15:54.246416+00:00",
+      "official_followers": 16,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-03T20:08:09.850303+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
-  "temporary_error_count": 0,
-  "next_request_after_taipei": null,
+  "temporary_error_count": 1,
+  "next_request_after_taipei": "2026-11-03T20:23:40.140388+08:00",
   "community_cooldown": null,
-  "community_last_success_at": "2026-11-03T20:07:32.288501+08:00",
+  "community_last_success_at": "2026-11-03T20:08:09.850303+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -118171,6 +118184,30 @@
       "status": "ok",
       "github_run_id": "41632061102",
       "official_followers": 4
+    },
+    {
+      "appid": 5433870,
+      "when_taipei": "2026-11-03T20:08:09.717837+08:00",
+      "release_date": "2026-11-11",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "41632061102",
+      "official_followers": 16
+    },
+    {
+      "appid": 5484400,
+      "when_taipei": "2026-11-03T20:08:39.717971+08:00",
+      "release_date": "2026-11-11",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "transport_or_xml_error",
+      "github_run_id": "41632061102",
+      "error_type": "ParseError",
+      "content_type": "text/html; charset=UTF-8",
+      "response_bytes": 22755,
+      "response_prefix": "<!DOCTYPE html>\n<html class=\" responsive DesktopUI\" lang=\"en\"  >\n<head>\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n\t\t\t<meta name=\"viewport\" content=\"width",
+      "next_request_after_taipei": "2026-11-03T20:23:40.140388+08:00"
     }
   ]
 }

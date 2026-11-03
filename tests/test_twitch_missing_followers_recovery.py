@@ -2,12 +2,17 @@
 from copy import deepcopy
 from datetime import timedelta
 
+import pytest
+
 from radar_backend.domain.official_queue import make_queue
+from radar_backend.jobs import official_followers as job
 from scripts.twitch_official_queue import is_twitch_queue_candidate, sync_twitch_queue
 from tests.test_twitch_steam_admission import NOW, row
 
 
-def test_completed_twitch_admission_survives_frozen_rebuild_and_tracking_expiry():
+@pytest.mark.parametrize("production", [False, True], ids=["compatibility", "production"])
+def test_completed_twitch_admission_survives_frozen_rebuild_and_tracking_expiry(
+        monkeypatch, production):
     record = row()
     record.update(followers=None, follower_checked_at=None, follower_source=None)
     old = {'appid': 123, 'release_date': record['release_start'],
@@ -26,10 +31,16 @@ def test_completed_twitch_admission_survives_frozen_rebuild_and_tracking_expiry(
     legacy = {'cohort': 'steam_fresh_20260922_post_adult_1317_near_release',
               'official_results': {str(aid): {} for aid in range(10000, 11316)}}
     for clock in (NOW, NOW + timedelta(days=45)):
-        queue, _ = make_queue(recovered, frozen, legacy, groups, {'games': []}, {},
-            {'games': {}}, {'verified': {}}, now=clock,
-            is_twitch_queue_candidate=is_twitch_queue_candidate,
-            cached_follower=lambda *args: None)
+        sources = (recovered, frozen, legacy, groups, {'games': []}, {},
+                   {'games': {}}, {'verified': {}})
+        if production:
+            monkeypatch.setattr(job, "clock", lambda: clock)
+            services = job.default_services(job.default_paths())
+            queue, _ = services.make_queue(*sources)
+        else:
+            queue, _ = make_queue(*sources, now=clock,
+                is_twitch_queue_candidate=is_twitch_queue_candidate,
+                cached_follower=lambda *args: None)
         assert not queue
         assert '123' not in recovered['pending_candidates']
         assert recovered['official_results'] == {}

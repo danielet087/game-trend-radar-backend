@@ -160,9 +160,11 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         if isinstance(v, dict) and queue_checked_numeric(v.get("official_followers"))
     }
     group_by_id = {str(x["appid"]): x.get("group_short_id") for x in old_group_rows}
+    # Accepted receipts remain valid after tracking expires; explicitly pass
+    # no rolling date window through the production admission port.
     admitted = {
         str(aid) for aid, row in cp.get("twitch_admitted_candidates", {}).items()
-        if is_twitch_queue_candidate(row) and str(row["appid"]) == str(aid)
+        if is_twitch_queue_candidate(row, now=None) and str(row["appid"]) == str(aid)
     }
     for aid in admitted:
         cp["pending_candidates"].pop(aid, None)

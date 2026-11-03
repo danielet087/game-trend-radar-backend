@@ -42933,18 +42933,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "41717746026",
-    "active": false,
-    "status": "finished",
+    "run_id": "41735580098",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-04T05:03:01.308524+08:00",
-    "last_updated_at": "2026-11-04T05:03:01.773903+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-11-04T07:02:42.300392+08:00",
+    "last_updated_at": "2026-11-04T07:02:42.897405+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-11-04T05:03:01.773903+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 5235010,
+    "last_name": "TURF FIGHT"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -100658,17 +100658,17 @@
       }
     }
   },
-  "rate_limit_count": 3,
+  "rate_limit_count": 4,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-04T05:03:21.921658+08:00",
+  "next_request_after_taipei": "2026-11-04T09:02:42.897322+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-03T21:03:21.921658+00:00",
-    "observed_at": "2026-11-03T20:03:21.921658+00:00",
-    "updated_at": "2026-11-03T20:03:21.921658+00:00",
-    "retry_seconds": 3600,
+    "retry_at": "2026-11-04T01:02:42.897322+00:00",
+    "observed_at": "2026-11-03T23:02:42.897322+00:00",
+    "updated_at": "2026-11-03T23:02:42.897322+00:00",
+    "retry_seconds": 7200,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 3
+    "attempts": 4
   },
   "community_last_success_at": "2026-11-04T01:50:59.342633+08:00",
   "official_growth_observations": {
@@ -119708,6 +119708,16 @@
       "status": "rate_limited",
       "github_run_id": "41708504394",
       "next_request_after_taipei": "2026-11-04T05:03:21.921658+08:00"
+    },
+    {
+      "appid": 5235010,
+      "when_taipei": "2026-11-04T07:02:42.698805+08:00",
+      "release_date": "2026-11-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "41735580098",
+      "next_request_after_taipei": "2026-11-04T09:02:42.897322+08:00"
     }
   ]
 }

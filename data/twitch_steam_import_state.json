@@ -4764,17 +4764,17 @@
       }
     },
     "4262460": {
-      "status": "pending",
-      "updated_at": "2026-11-02T21:02:02.228182Z",
+      "status": "accepted",
+      "updated_at": "2026-11-03T21:02:00.852791Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
         "appid": 4262460,
         "twitch_game_id": "1753787976",
         "igdb_id": "416015",
-        "checked_at": "2026-11-02T20:21:02Z",
-        "source_database_revision": "380de73a80e52a1c612901ef70094bb6dd105073094fdf33bad238a37b5b3c5c",
-        "source_database_generation": 1071,
+        "checked_at": "2026-11-03T20:25:07Z",
+        "source_database_revision": "c14655dce0be4c4f4be7df507374a7613e0180cbbfbafd4c7a7c25ebc582c4c3",
+        "source_database_generation": 1128,
         "source_database_namespace": "danielet087/game-trend-radar@main",
         "source_enrollment": {
           "source": "igdb_first_release_date",
@@ -4785,11 +4785,16 @@
       },
       "validation_version": 4,
       "follower_candidate": null,
-      "reason": "uncertain_taiwan_store_date",
-      "retry_at": "2026-11-03T21:02:03.934184Z",
+      "reason": "twitch_verified",
+      "retry_at": null,
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
-      "retry_after": null
+      "retry_after": null,
+      "content_signature": "4d0199bcd964b16ffaa8688df822a33ba79fe2e85de479f4329a2328305be6bb",
+      "followers": null,
+      "follower_checked_at": null,
+      "retry_attempts": 0,
+      "retry_source": null
     },
     "2257440": {
       "status": "accepted",
@@ -5105,8 +5110,69 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "4715160": {
+      "status": "accepted",
+      "updated_at": "2026-11-03T21:02:00.852791Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4715160,
+        "twitch_game_id": "1032872922",
+        "igdb_id": "423593",
+        "checked_at": "2026-11-03T20:25:07Z",
+        "source_database_revision": "c14655dce0be4c4f4be7df507374a7613e0180cbbfbafd4c7a7c25ebc582c4c3",
+        "source_database_generation": 1128,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-11-03T20:25:07Z",
+          "viewer_count": 13856,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "steam_verified",
+      "content_signature": "7acc74933f9dccd2f6db920aab5ab0aff01eda56e9c2874577b59dc6d68026bf",
+      "followers": 1523,
+      "follower_checked_at": "2026-10-17T11:04:48.177818+08:00",
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
+    },
+    "5117550": {
+      "status": "pending",
+      "updated_at": "2026-11-03T21:02:00.852791Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 5117550,
+        "twitch_game_id": "321313344",
+        "igdb_id": "421011",
+        "checked_at": "2026-11-03T20:25:07Z",
+        "source_database_revision": "c14655dce0be4c4f4be7df507374a7613e0180cbbfbafd4c7a7c25ebc582c4c3",
+        "source_database_generation": 1128,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-11-03T20:25:07Z",
+          "viewer_count": 10509,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "uncertain_taiwan_store_date",
+      "retry_at": "2026-11-04T21:02:08.525893Z",
+      "rate_limit_stage": null,
+      "rate_limit_attempts": 0,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-11-03T19:05:31.215717Z",
+  "updated_at": "2026-11-03T21:02:00.852791Z",
   "api_cooldowns": {}
 }

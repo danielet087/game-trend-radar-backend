@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-03T15:03:07.248762Z",
+  "generated_at": "2026-11-03T15:03:40.543862Z",
   "today_taipei": "2026-11-03",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-03T15:03:07.006844Z",
+    "checkpoint_updated_at": "2026-11-03T15:03:40.340844Z",
     "group_resolution_updated_at": "2026-11-02T05:17:05.502158Z",
     "candidate_state_updated_at": "2026-11-02T17:15:54.266677Z",
     "prefilter_updated_at": "2026-11-02T17:15:54.246416Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-03T23:03:06.343435+08:00",
-    "last_updated_at": "2026-11-03T23:03:07.006844+08:00",
+    "last_updated_at": "2026-11-03T23:03:40.340844+08:00",
+    "finished_at": "2026-11-03T23:03:40.340844+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 3086430,
     "last_name": "Fox in a Field",
     "requests_this_run": 1,

@@ -41961,20 +41961,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "41649447106",
-    "active": false,
-    "status": "finished",
+    "run_id": "41659311492",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-03T22:02:47.760771+08:00",
-    "last_updated_at": "2026-11-03T22:03:12.472114+08:00",
+    "started_at": "2026-11-03T23:03:06.343435+08:00",
+    "last_updated_at": "2026-11-03T23:03:07.006844+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5530490,
-    "last_name": "HachaMettcha Reversi",
-    "finished_at": "2026-11-03T22:03:12.472114+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 3086430,
+    "last_name": "Fox in a Field"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -99540,17 +99538,17 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-03T22:32:48.358542+08:00",
+  "next_request_after_taipei": "2026-11-04T00:03:07.006755+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-03T14:32:48.358542+00:00",
-    "observed_at": "2026-11-03T14:02:48.358542+00:00",
-    "updated_at": "2026-11-03T14:02:48.358542+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-03T16:03:07.006755+00:00",
+    "observed_at": "2026-11-03T15:03:07.006755+00:00",
+    "updated_at": "2026-11-03T15:03:07.006755+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-03T21:09:10.987230+08:00",
   "official_growth_observations": {
@@ -118560,6 +118558,16 @@
       "status": "rate_limited",
       "github_run_id": "41649447106",
       "next_request_after_taipei": "2026-11-03T22:32:48.358542+08:00"
+    },
+    {
+      "appid": 3086430,
+      "when_taipei": "2026-11-03T23:03:06.854912+08:00",
+      "release_date": "2026-11-13",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "41659311492",
+      "next_request_after_taipei": "2026-11-04T00:03:07.006755+08:00"
     }
   ]
 }

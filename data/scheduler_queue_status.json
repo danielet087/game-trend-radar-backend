@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T23:02:45.628852Z",
+  "generated_at": "2026-11-04T23:03:12.973671Z",
   "today_taipei": "2026-11-05",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-04T23:02:45.370154Z",
+    "checkpoint_updated_at": "2026-11-04T23:03:12.751423Z",
     "group_resolution_updated_at": "2026-11-04T05:16:52.170234Z",
     "candidate_state_updated_at": "2026-11-04T17:08:21.587986Z",
     "prefilter_updated_at": "2026-11-04T17:08:21.566313Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-05T07:02:44.663041+08:00",
-    "last_updated_at": "2026-11-05T07:02:45.370154+08:00",
+    "last_updated_at": "2026-11-05T07:03:12.751423+08:00",
+    "finished_at": "2026-11-05T07:03:12.751423+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5119610,
     "last_name": "Trust Me, It Binds",
     "requests_this_run": 1,

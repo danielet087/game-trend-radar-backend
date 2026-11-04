@@ -42978,20 +42978,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "41834143883",
-    "active": false,
-    "status": "finished",
+    "run_id": "41843275433",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-04T21:02:49.615843+08:00",
-    "last_updated_at": "2026-11-04T21:03:19.129380+08:00",
+    "started_at": "2026-11-04T22:03:07.396504+08:00",
+    "last_updated_at": "2026-11-04T22:03:08.029741+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5451870,
-    "last_name": "Midnight 42",
-    "finished_at": "2026-11-04T21:03:19.129380+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5473280,
+    "last_name": "Pigeon Gang"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -104297,17 +104295,17 @@
       }
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-04T21:17:50.291192+08:00",
+  "next_request_after_taipei": "2026-11-04T22:33:08.029639+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-04T13:17:50.291192+00:00",
-    "observed_at": "2026-11-04T13:02:50.291192+00:00",
-    "updated_at": "2026-11-04T13:02:50.291192+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-11-04T14:33:08.029639+00:00",
+    "observed_at": "2026-11-04T14:03:08.029639+00:00",
+    "updated_at": "2026-11-04T14:03:08.029639+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-11-04T20:08:06.004491+08:00",
   "official_growth_observations": {
@@ -121041,6 +121039,16 @@
       "status": "rate_limited",
       "github_run_id": "41834143883",
       "next_request_after_taipei": "2026-11-04T21:17:50.291192+08:00"
+    },
+    {
+      "appid": 5473280,
+      "when_taipei": "2026-11-04T22:03:07.910367+08:00",
+      "release_date": "2027-01-21",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "41843275433",
+      "next_request_after_taipei": "2026-11-04T22:33:08.029639+08:00"
     }
   ]
 }

@@ -43887,20 +43887,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "41902379286",
-    "active": false,
-    "status": "finished",
+    "run_id": "41911922086",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-05T04:02:46.893219+08:00",
-    "last_updated_at": "2026-11-05T04:03:17.782716+08:00",
+    "started_at": "2026-11-05T05:02:40.584505+08:00",
+    "last_updated_at": "2026-11-05T05:02:41.213033+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 4992940,
-    "last_name": "Rogue Belt",
-    "finished_at": "2026-11-05T04:03:17.782716+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5018790,
+    "last_name": "Lazy Drawer: Line Survivors"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -105206,17 +105204,17 @@
       }
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-05T04:32:47.613309+08:00",
+  "next_request_after_taipei": "2026-11-05T06:02:41.212944+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-04T20:32:47.613309+00:00",
-    "observed_at": "2026-11-04T20:02:47.613309+00:00",
-    "updated_at": "2026-11-04T20:02:47.613309+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-04T22:02:41.212944+00:00",
+    "observed_at": "2026-11-04T21:02:41.212944+00:00",
+    "updated_at": "2026-11-04T21:02:41.212944+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-05T02:32:24.394999+08:00",
   "official_growth_observations": {
@@ -122011,6 +122009,16 @@
       "status": "rate_limited",
       "github_run_id": "41902379286",
       "next_request_after_taipei": "2026-11-05T04:32:47.613309+08:00"
+    },
+    {
+      "appid": 5018790,
+      "when_taipei": "2026-11-05T05:02:40.992668+08:00",
+      "release_date": "2026-11-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "41911922086",
+      "next_request_after_taipei": "2026-11-05T06:02:41.212944+08:00"
     }
   ]
 }

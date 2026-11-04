@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T13:02:50.524613Z",
+  "generated_at": "2026-11-04T13:03:19.329532Z",
   "today_taipei": "2026-11-04",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-04T13:02:50.291290Z",
+    "checkpoint_updated_at": "2026-11-04T13:03:19.129380Z",
     "group_resolution_updated_at": "2026-11-04T05:16:52.170234Z",
     "candidate_state_updated_at": "2026-11-03T17:14:31.479023Z",
     "prefilter_updated_at": "2026-11-03T17:14:31.456682Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-04T21:02:49.615843+08:00",
-    "last_updated_at": "2026-11-04T21:02:50.291290+08:00",
+    "last_updated_at": "2026-11-04T21:03:19.129380+08:00",
+    "finished_at": "2026-11-04T21:03:19.129380+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5451870,
     "last_name": "Midnight 42",
     "requests_this_run": 1,

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T02:02:31.567354Z",
+  "generated_at": "2026-11-04T02:02:57.963156Z",
   "today_taipei": "2026-11-04",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-04T02:02:31.426810Z",
+    "checkpoint_updated_at": "2026-11-04T02:02:57.833335Z",
     "group_resolution_updated_at": "2026-11-03T17:19:27.948692Z",
     "candidate_state_updated_at": "2026-11-03T17:14:31.479023Z",
     "prefilter_updated_at": "2026-11-03T17:14:31.456682Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-04T10:02:30.863333+08:00",
-    "last_updated_at": "2026-11-04T10:02:31.426810+08:00",
+    "last_updated_at": "2026-11-04T10:02:57.833335+08:00",
+    "finished_at": "2026-11-04T10:02:57.833335+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5411480,
     "last_name": "Holdopolis",
     "requests_this_run": 1,

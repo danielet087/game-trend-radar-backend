@@ -43888,17 +43888,19 @@
   },
   "scheduler_batch": {
     "run_id": "41984171391",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-05T15:02:58.353586+08:00",
-    "last_updated_at": "2026-11-05T15:33:53.897197+08:00",
-    "requests_this_run": 60,
-    "official_new_this_run": 60,
+    "last_updated_at": "2026-11-05T15:36:57.375559+08:00",
+    "requests_this_run": 66,
+    "official_new_this_run": 66,
     "http_429_this_run": 0,
-    "last_appid": 5381570,
-    "last_name": "Scrapmiles"
+    "last_appid": 5070740,
+    "last_name": "Main Street Operator",
+    "finished_at": "2026-11-05T15:36:57.375559+08:00",
+    "stop_reason": "hour_time_budget"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -105982,13 +105984,91 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-05T15:33:53.897018+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5418630": {
+      "appid": 5418630,
+      "name": "BOO & BONES: Bring the Village Back to Life",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791476201934",
+      "steam_url": "https://store.steampowered.com/app/5418630/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-04T17:08:21.566313+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-05T15:34:27.283188+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5502940": {
+      "appid": 5502940,
+      "name": "Drift After Dark",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791476203261",
+      "steam_url": "https://store.steampowered.com/app/5502940/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-04T17:08:21.566313+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-05T15:34:57.406821+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5002300": {
+      "appid": 5002300,
+      "name": "My Otaku Girlfriend",
+      "release_date": "2026-12-05",
+      "group_id64": "103582791475790911",
+      "steam_url": "https://store.steampowered.com/app/5002300/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-04T17:08:21.566313+00:00",
+      "official_followers": 74,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-05T15:35:27.271538+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5085730": {
+      "appid": 5085730,
+      "name": "Innkeeping",
+      "release_date": "2026-12-05",
+      "group_id64": "103582791475801653",
+      "steam_url": "https://store.steampowered.com/app/5085730/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-04T17:08:21.566313+00:00",
+      "official_followers": 45,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-05T15:35:57.267969+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5535150": {
+      "appid": 5535150,
+      "name": "Dose of Order: Pharmacy Tidy Up",
+      "release_date": "2026-12-07",
+      "group_id64": "103582791476206082",
+      "steam_url": "https://store.steampowered.com/app/5535150/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-04T17:08:21.566313+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-05T15:36:27.276794+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5070740": {
+      "appid": 5070740,
+      "name": "Main Street Operator",
+      "release_date": "2026-12-09",
+      "group_id64": "103582791475826919",
+      "steam_url": "https://store.steampowered.com/app/5070740/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-04T17:08:21.566313+00:00",
+      "official_followers": 4,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-05T15:36:57.278947+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-11-05T15:33:53.897018+08:00",
+  "community_last_success_at": "2026-11-05T15:36:57.278947+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -123435,6 +123515,66 @@
       "status": "ok",
       "github_run_id": "41984171391",
       "official_followers": 14
+    },
+    {
+      "appid": 5418630,
+      "when_taipei": "2026-11-05T15:34:27.173816+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "41984171391",
+      "official_followers": 1
+    },
+    {
+      "appid": 5502940,
+      "when_taipei": "2026-11-05T15:34:57.173954+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "41984171391",
+      "official_followers": 2
+    },
+    {
+      "appid": 5002300,
+      "when_taipei": "2026-11-05T15:35:27.174087+08:00",
+      "release_date": "2026-12-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "41984171391",
+      "official_followers": 74
+    },
+    {
+      "appid": 5085730,
+      "when_taipei": "2026-11-05T15:35:57.174221+08:00",
+      "release_date": "2026-12-05",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "41984171391",
+      "official_followers": 45
+    },
+    {
+      "appid": 5535150,
+      "when_taipei": "2026-11-05T15:36:27.174351+08:00",
+      "release_date": "2026-12-07",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "41984171391",
+      "official_followers": 2
+    },
+    {
+      "appid": 5070740,
+      "when_taipei": "2026-11-05T15:36:57.174484+08:00",
+      "release_date": "2026-12-09",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "41984171391",
+      "official_followers": 4
     }
   ]
 }

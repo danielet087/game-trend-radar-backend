@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-05T08:27:27.548805Z",
+  "generated_at": "2026-11-05T08:32:27.463246Z",
   "today_taipei": "2026-11-05",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-05T08:27:27.304606Z",
+    "checkpoint_updated_at": "2026-11-05T08:32:27.254538Z",
     "group_resolution_updated_at": "2026-11-04T23:16:56.860428Z",
     "candidate_state_updated_at": "2026-11-04T17:08:21.587986Z",
     "prefilter_updated_at": "2026-11-04T17:08:21.566313Z",
     "eligible_screened_at": "2026-11-05T04:01:48.909785Z",
     "twitch_import_updated_at": "2026-11-05T07:37:54.285917Z",
-    "last_official_success_at": "2026-11-05T08:27:27.304454Z",
+    "last_official_success_at": "2026-11-05T08:32:27.254383Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -21,21 +21,21 @@
     "added_from_daily": 0,
     "eligible_count": 4275,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 48,
+    "combined_pending_now": 38,
     "completed_legacy": 408,
-    "completed_new": 4562,
+    "completed_new": 4572,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 48,
+    "normal_pending": 38,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 48,
-    "followers_ready_pending": 48,
+    "ready_pending": 38,
+    "followers_ready_pending": 38,
     "awaiting_group_pending": 0,
-    "total_pending": 48,
-    "today_attempts": 122,
-    "today_successes": 116,
+    "total_pending": 38,
+    "today_attempts": 132,
+    "today_successes": 126,
     "today_429": 6
   },
   "group_resolution_api_cooldown": {
@@ -56,11 +56,11 @@
     "active": true,
     "status": "querying",
     "started_at": "2026-11-05T16:02:49.065152+08:00",
-    "last_updated_at": "2026-11-05T16:27:27.304606+08:00",
-    "last_appid": 5259590,
-    "last_name": "TIC.EXE",
-    "requests_this_run": 50,
-    "official_new_this_run": 50,
+    "last_updated_at": "2026-11-05T16:32:27.254538+08:00",
+    "last_appid": 5519720,
+    "last_name": "Bach For More Words 3",
+    "requests_this_run": 60,
+    "official_new_this_run": 60,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
@@ -70,146 +70,6 @@
   "queue": [
     {
       "position": 1,
-      "appid": 5369580,
-      "name": "Roly-Poly Panda: Desktop Pet",
-      "steam_url": "https://store.steampowered.com/app/5369580/",
-      "release_date": "2027-03-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476061955",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5491850,
-      "name": "Inkblot: The Art Restorer",
-      "steam_url": "https://store.steampowered.com/app/5491850/",
-      "release_date": "2027-03-12",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476152052",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5531630,
-      "name": "HELLEVATOR",
-      "steam_url": "https://store.steampowered.com/app/5531630/",
-      "release_date": "2027-03-12",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476190802",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5543380,
-      "name": "Snowdrop Lane",
-      "steam_url": "https://store.steampowered.com/app/5543380/",
-      "release_date": "2027-03-12",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476206513",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5412110,
-      "name": "My Cozi Shop: Craft & Sell",
-      "steam_url": "https://store.steampowered.com/app/5412110/",
-      "release_date": "2027-03-13",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476088728",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 3556940,
-      "name": "Rune Runners",
-      "steam_url": "https://store.steampowered.com/app/3556940/",
-      "release_date": "2027-03-15",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476030327",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5365120,
-      "name": "Pyramid Scheme",
-      "steam_url": "https://store.steampowered.com/app/5365120/",
-      "release_date": "2027-03-16",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476078350",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5541360,
-      "name": "Ballochet",
-      "steam_url": "https://store.steampowered.com/app/5541360/",
-      "release_date": "2027-03-16",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476203102",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5519710,
-      "name": "Bach For More Words 2",
-      "steam_url": "https://store.steampowered.com/app/5519710/",
-      "release_date": "2027-03-23",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476184826",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 5519720,
-      "name": "Bach For More Words 3",
-      "steam_url": "https://store.steampowered.com/app/5519720/",
-      "release_date": "2027-03-23",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476185079",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 5516990,
       "name": "Salvo Spire",
       "steam_url": "https://store.steampowered.com/app/5516990/",
@@ -223,7 +83,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 2,
       "appid": 5136840,
       "name": "ChillTank",
       "steam_url": "https://store.steampowered.com/app/5136840/",
@@ -237,7 +97,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 4630010,
       "name": "Goblin Kaboom",
       "steam_url": "https://store.steampowered.com/app/4630010/",
@@ -251,7 +111,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 5154680,
       "name": "Little Colony",
       "steam_url": "https://store.steampowered.com/app/5154680/",
@@ -265,7 +125,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 5209260,
       "name": "DON’T CAMP ON BEAR ISLAND",
       "steam_url": "https://store.steampowered.com/app/5209260/",
@@ -279,7 +139,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 5390400,
       "name": "Draught King",
       "steam_url": "https://store.steampowered.com/app/5390400/",
@@ -293,7 +153,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 5523440,
       "name": "Stolen Frequencies",
       "steam_url": "https://store.steampowered.com/app/5523440/",
@@ -307,7 +167,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 5171120,
       "name": "Ridiculous Racing: Retro Arcade Racer",
       "steam_url": "https://store.steampowered.com/app/5171120/",
@@ -321,7 +181,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5361720,
       "name": "Fractokinesis",
       "steam_url": "https://store.steampowered.com/app/5361720/",
@@ -335,7 +195,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5420040,
       "name": "HANDBUILT: Korean Construction Simulator",
       "steam_url": "https://store.steampowered.com/app/5420040/",
@@ -349,7 +209,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5140400,
       "name": "Babel Rising Reborn",
       "steam_url": "https://store.steampowered.com/app/5140400/",
@@ -363,7 +223,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 5394700,
       "name": "JUST: REFLEX TEST",
       "steam_url": "https://store.steampowered.com/app/5394700/",
@@ -377,7 +237,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 5370490,
       "name": "ROOM 307",
       "steam_url": "https://store.steampowered.com/app/5370490/",
@@ -391,7 +251,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 5276180,
       "name": "Mission Nuts",
       "steam_url": "https://store.steampowered.com/app/5276180/",
@@ -405,7 +265,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 5453920,
       "name": "Hallow's Eve",
       "steam_url": "https://store.steampowered.com/app/5453920/",
@@ -419,7 +279,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 4971300,
       "name": "Touhou Smash",
       "steam_url": "https://store.steampowered.com/app/4971300/",
@@ -433,7 +293,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 5184450,
       "name": "Just Kill",
       "steam_url": "https://store.steampowered.com/app/5184450/",
@@ -447,7 +307,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 28,
+      "position": 18,
       "appid": 5340390,
       "name": "Oh My Balance!",
       "steam_url": "https://store.steampowered.com/app/5340390/",
@@ -461,7 +321,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 29,
+      "position": 19,
       "appid": 5398950,
       "name": "Poly Magic",
       "steam_url": "https://store.steampowered.com/app/5398950/",
@@ -475,7 +335,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 30,
+      "position": 20,
       "appid": 5448060,
       "name": "Sea Train",
       "steam_url": "https://store.steampowered.com/app/5448060/",
@@ -489,7 +349,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 31,
+      "position": 21,
       "appid": 5342150,
       "name": "Mazehold",
       "steam_url": "https://store.steampowered.com/app/5342150/",
@@ -503,7 +363,7 @@
       "last_attempt_status": "transport_or_xml_error"
     },
     {
-      "position": 32,
+      "position": 22,
       "appid": 5484400,
       "name": "Military Base Tidy Up",
       "steam_url": "https://store.steampowered.com/app/5484400/",
@@ -517,7 +377,7 @@
       "last_attempt_status": "transport_or_xml_error"
     },
     {
-      "position": 33,
+      "position": 23,
       "appid": 5528360,
       "name": "Bings",
       "steam_url": "https://store.steampowered.com/app/5528360/",
@@ -531,7 +391,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 34,
+      "position": 24,
       "appid": 5530490,
       "name": "HachaMettcha Reversi",
       "steam_url": "https://store.steampowered.com/app/5530490/",
@@ -545,7 +405,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 35,
+      "position": 25,
       "appid": 3086430,
       "name": "Fox in a Field",
       "steam_url": "https://store.steampowered.com/app/3086430/",
@@ -559,7 +419,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 36,
+      "position": 26,
       "appid": 5111890,
       "name": "Weeping Souls",
       "steam_url": "https://store.steampowered.com/app/5111890/",
@@ -573,7 +433,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 37,
+      "position": 27,
       "appid": 5052450,
       "name": "Desktop Wallet Heroes",
       "steam_url": "https://store.steampowered.com/app/5052450/",
@@ -587,7 +447,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 38,
+      "position": 28,
       "appid": 5235010,
       "name": "TURF FIGHT",
       "steam_url": "https://store.steampowered.com/app/5235010/",
@@ -601,7 +461,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 39,
+      "position": 29,
       "appid": 5411480,
       "name": "Holdopolis",
       "steam_url": "https://store.steampowered.com/app/5411480/",
@@ -615,7 +475,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 40,
+      "position": 30,
       "appid": 5451870,
       "name": "Midnight 42",
       "steam_url": "https://store.steampowered.com/app/5451870/",
@@ -629,7 +489,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 41,
+      "position": 31,
       "appid": 5473280,
       "name": "Pigeon Gang",
       "steam_url": "https://store.steampowered.com/app/5473280/",
@@ -643,7 +503,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 42,
+      "position": 32,
       "appid": 4526230,
       "name": "RUN!",
       "steam_url": "https://store.steampowered.com/app/4526230/",
@@ -657,7 +517,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 43,
+      "position": 33,
       "appid": 3301840,
       "name": "fanxiu",
       "steam_url": "https://store.steampowered.com/app/3301840/",
@@ -671,7 +531,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 44,
+      "position": 34,
       "appid": 4992940,
       "name": "Rogue Belt",
       "steam_url": "https://store.steampowered.com/app/4992940/",
@@ -685,7 +545,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 45,
+      "position": 35,
       "appid": 5018790,
       "name": "Lazy Drawer: Line Survivors",
       "steam_url": "https://store.steampowered.com/app/5018790/",
@@ -699,7 +559,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 46,
+      "position": 36,
       "appid": 5119610,
       "name": "Trust Me, It Binds",
       "steam_url": "https://store.steampowered.com/app/5119610/",
@@ -713,7 +573,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 47,
+      "position": 37,
       "appid": 2793020,
       "name": "No Way Back",
       "steam_url": "https://store.steampowered.com/app/2793020/",
@@ -727,7 +587,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 48,
+      "position": 38,
       "appid": 4793910,
       "name": "Speed Card Eatery",
       "steam_url": "https://store.steampowered.com/app/4793910/",
@@ -743,136 +603,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-05T07:11:03.688131Z",
-      "kind": "official_attempt",
-      "appid": 5191120,
-      "name": "PERI.CO",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 11,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:11:33.688260Z",
-      "kind": "official_attempt",
-      "appid": 5302550,
-      "name": "DEADWICK",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:12:03.688395Z",
-      "kind": "official_attempt",
-      "appid": 1419970,
-      "name": "ZULMARASH: Echoes of Zaltar",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:12:33.688515Z",
-      "kind": "official_attempt",
-      "appid": 5234650,
-      "name": "Hungry Hoist",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:13:06.444406Z",
-      "kind": "official_attempt",
-      "appid": 5484320,
-      "name": "FOG",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:13:36.444541Z",
-      "kind": "official_attempt",
-      "appid": 5503640,
-      "name": "Apartment 3502 | 3502号室",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:14:06.444666Z",
-      "kind": "official_attempt",
-      "appid": 5533800,
-      "name": "Free Lances: Blood for Profit",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:14:36.444801Z",
-      "kind": "official_attempt",
-      "appid": 5539440,
-      "name": "Collectible",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:15:06.444938Z",
-      "kind": "official_attempt",
-      "appid": 5542190,
-      "name": "Wuxiang Lake",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
-    {
-      "at": "2026-11-05T07:15:36.445064Z",
-      "kind": "official_attempt",
-      "appid": 5100770,
-      "name": "At Once, My Lord!",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 87,
-      "retry_at": null,
-      "run_id": "41984171391",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41984171391"
-    },
     {
       "at": "2026-11-05T07:16:06.445197Z",
       "kind": "official_attempt",
@@ -2039,6 +1769,136 @@
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",
       "official_followers": 3,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:27:57.165646Z",
+      "kind": "official_attempt",
+      "appid": 5369580,
+      "name": "Roly-Poly Panda: Desktop Pet",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:28:27.165761Z",
+      "kind": "official_attempt",
+      "appid": 5491850,
+      "name": "Inkblot: The Art Restorer",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:28:57.165875Z",
+      "kind": "official_attempt",
+      "appid": 5531630,
+      "name": "HELLEVATOR",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 28,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:29:27.166004Z",
+      "kind": "official_attempt",
+      "appid": 5543380,
+      "name": "Snowdrop Lane",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:29:57.166117Z",
+      "kind": "official_attempt",
+      "appid": 5412110,
+      "name": "My Cozi Shop: Craft & Sell",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 16,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:30:27.166228Z",
+      "kind": "official_attempt",
+      "appid": 3556940,
+      "name": "Rune Runners",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 17,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:30:57.166356Z",
+      "kind": "official_attempt",
+      "appid": 5365120,
+      "name": "Pyramid Scheme",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:31:27.166482Z",
+      "kind": "official_attempt",
+      "appid": 5541360,
+      "name": "Ballochet",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:31:57.166610Z",
+      "kind": "official_attempt",
+      "appid": 5519710,
+      "name": "Bach For More Words 2",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "41991191013",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"
+    },
+    {
+      "at": "2026-11-05T08:32:27.166722Z",
+      "kind": "official_attempt",
+      "appid": 5519720,
+      "name": "Bach For More Words 3",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
       "retry_at": null,
       "run_id": "41991191013",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/41991191013"

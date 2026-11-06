@@ -45429,20 +45429,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "42275751158",
-    "active": false,
-    "status": "finished",
+    "run_id": "42284552939",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-07T03:02:37.221183+08:00",
-    "last_updated_at": "2026-11-07T03:03:06.839294+08:00",
+    "started_at": "2026-11-07T04:02:48.672124+08:00",
+    "last_updated_at": "2026-11-07T04:02:49.566110+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 4750760,
-    "last_name": "La Agencia del Riel",
-    "finished_at": "2026-11-07T03:03:06.839294+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5446260,
+    "last_name": "Lestvitsa"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -110740,17 +110738,17 @@
       }
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-07T03:17:37.796056+08:00",
+  "next_request_after_taipei": "2026-11-07T04:32:49.565355+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-06T19:17:37.796056+00:00",
-    "observed_at": "2026-11-06T19:02:37.796056+00:00",
-    "updated_at": "2026-11-06T19:02:37.796056+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-11-06T20:32:49.565355+00:00",
+    "observed_at": "2026-11-06T20:02:49.565355+00:00",
+    "updated_at": "2026-11-06T20:02:49.565355+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-11-07T02:31:58.471711+08:00",
   "official_growth_observations": {
@@ -130586,6 +130584,16 @@
       "status": "rate_limited",
       "github_run_id": "42275751158",
       "next_request_after_taipei": "2026-11-07T03:17:37.796056+08:00"
+    },
+    {
+      "appid": 5446260,
+      "when_taipei": "2026-11-07T04:02:49.214089+08:00",
+      "release_date": "2026-11-11",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "42284552939",
+      "next_request_after_taipei": "2026-11-07T04:32:49.565355+08:00"
     }
   ]
 }

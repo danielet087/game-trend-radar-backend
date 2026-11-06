@@ -45093,12 +45093,12 @@
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-06T14:02:54.278898+08:00",
-    "last_updated_at": "2026-11-06T14:07:24.847630+08:00",
-    "requests_this_run": 10,
-    "official_new_this_run": 10,
-    "http_429_this_run": 0,
-    "last_appid": 5458260,
-    "last_name": "모야이게임"
+    "last_updated_at": "2026-11-06T14:09:59.442551+08:00",
+    "requests_this_run": 15,
+    "official_new_this_run": 14,
+    "http_429_this_run": 1,
+    "last_appid": 5133230,
+    "last_name": "Can You Beat The AI God?"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -108736,13 +108736,73 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-06T14:07:24.847492+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5518990": {
+      "appid": 5518990,
+      "name": "Cubetoria: Build. Think. Solve.",
+      "release_date": "2026-11-11",
+      "group_id64": "103582791476199995",
+      "steam_url": "https://store.steampowered.com/app/5518990/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-06T05:09:52.117281+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-06T14:07:58.994955+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5305400": {
+      "appid": 5305400,
+      "name": "GLYPHTRIP",
+      "release_date": "2026-11-12",
+      "group_id64": "103582791476032184",
+      "steam_url": "https://store.steampowered.com/app/5305400/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-06T05:09:52.117281+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-06T14:08:28.992115+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5480490": {
+      "appid": 5480490,
+      "name": "Assassination Contracts",
+      "release_date": "2026-11-12",
+      "group_id64": "103582791476150624",
+      "steam_url": "https://store.steampowered.com/app/5480490/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-06T05:09:52.117281+00:00",
+      "official_followers": 4,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-06T14:08:59.000380+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5521170": {
+      "appid": 5521170,
+      "name": "Impossible Road",
+      "release_date": "2026-11-12",
+      "group_id64": "103582791476210158",
+      "steam_url": "https://store.steampowered.com/app/5521170/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-06T05:09:52.117281+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-06T14:09:29.006007+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
-  "community_last_success_at": "2026-11-06T14:07:24.847492+08:00",
+  "next_request_after_taipei": "2026-11-06T14:24:59.442468+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-11-06T06:24:59.442468+00:00",
+    "observed_at": "2026-11-06T06:09:59.442468+00:00",
+    "updated_at": "2026-11-06T06:09:59.442468+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
+  "community_last_success_at": "2026-11-06T14:09:29.006007+08:00",
   "official_growth_observations": {
     "1167820": {
       "appid": 1167820,
@@ -127336,6 +127396,56 @@
       "status": "ok",
       "github_run_id": "42171715691",
       "official_followers": 1
+    },
+    {
+      "appid": 5518990,
+      "when_taipei": "2026-11-06T14:07:58.879273+08:00",
+      "release_date": "2026-11-11",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42171715691",
+      "official_followers": 2
+    },
+    {
+      "appid": 5305400,
+      "when_taipei": "2026-11-06T14:08:28.879378+08:00",
+      "release_date": "2026-11-12",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42171715691",
+      "official_followers": 2
+    },
+    {
+      "appid": 5480490,
+      "when_taipei": "2026-11-06T14:08:58.879473+08:00",
+      "release_date": "2026-11-12",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42171715691",
+      "official_followers": 4
+    },
+    {
+      "appid": 5521170,
+      "when_taipei": "2026-11-06T14:09:28.879563+08:00",
+      "release_date": "2026-11-12",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42171715691",
+      "official_followers": 1
+    },
+    {
+      "appid": 5133230,
+      "when_taipei": "2026-11-06T14:09:58.879664+08:00",
+      "release_date": "2026-11-13",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "42171715691",
+      "next_request_after_taipei": "2026-11-06T14:24:59.442468+08:00"
     }
   ]
 }

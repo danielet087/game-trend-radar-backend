@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-07T20:33:25.991945Z",
+  "generated_at": "2026-11-07T20:35:18.768763Z",
   "today_taipei": "2026-11-08",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-07T20:33:25.741621Z",
+    "checkpoint_updated_at": "2026-11-07T20:35:18.499659Z",
     "group_resolution_updated_at": "2026-11-06T23:16:58.012120Z",
     "candidate_state_updated_at": "2026-11-07T17:04:24.366699Z",
     "prefilter_updated_at": "2026-11-07T17:04:24.350352Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-08T04:02:44.262864+08:00",
-    "last_updated_at": "2026-11-08T04:33:25.741621+08:00",
+    "last_updated_at": "2026-11-08T04:35:18.499659+08:00",
+    "finished_at": "2026-11-08T04:35:18.499659+08:00",
+    "stop_reason": "batch_request_limit",
     "last_appid": 5438830,
     "last_name": "Pixel Go",
     "requests_this_run": 60,

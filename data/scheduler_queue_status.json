@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-07T20:12:15.189608Z",
+  "generated_at": "2026-11-07T20:17:22.573298Z",
   "today_taipei": "2026-11-08",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-07T20:12:14.949404Z",
+    "checkpoint_updated_at": "2026-11-07T20:17:22.333066Z",
     "group_resolution_updated_at": "2026-11-06T23:16:58.012120Z",
     "candidate_state_updated_at": "2026-11-07T17:04:24.366699Z",
     "prefilter_updated_at": "2026-11-07T17:04:24.350352Z",
     "eligible_screened_at": "2026-11-07T17:04:25.056879Z",
     "twitch_import_updated_at": "2026-11-07T11:01:38.545567Z",
-    "last_official_success_at": "2026-11-07T20:12:14.949248Z",
+    "last_official_success_at": "2026-11-07T20:17:22.332901Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -21,21 +21,21 @@
     "added_from_daily": 0,
     "eligible_count": 4030,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 40,
+    "combined_pending_now": 30,
     "completed_legacy": 408,
-    "completed_new": 4800,
+    "completed_new": 4810,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 40,
+    "normal_pending": 30,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 40,
-    "followers_ready_pending": 40,
+    "ready_pending": 30,
+    "followers_ready_pending": 30,
     "awaiting_group_pending": 0,
-    "total_pending": 40,
-    "today_attempts": 21,
-    "today_successes": 20,
+    "total_pending": 30,
+    "today_attempts": 31,
+    "today_successes": 30,
     "today_429": 1
   },
   "group_resolution_api_cooldown": {
@@ -56,11 +56,11 @@
     "active": true,
     "status": "querying",
     "started_at": "2026-11-08T04:02:44.262864+08:00",
-    "last_updated_at": "2026-11-08T04:12:14.949404+08:00",
-    "last_appid": 5556800,
-    "last_name": "Christmas Market: Tidy Up Together",
-    "requests_this_run": 20,
-    "official_new_this_run": 20,
+    "last_updated_at": "2026-11-08T04:17:22.333066+08:00",
+    "last_appid": 5536960,
+    "last_name": "Dinky Derby",
+    "requests_this_run": 30,
+    "official_new_this_run": 30,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
@@ -70,146 +70,6 @@
   "queue": [
     {
       "position": 1,
-      "appid": 5561850,
-      "name": "NEONOVA Puzzle: Red",
-      "steam_url": "https://store.steampowered.com/app/5561850/",
-      "release_date": "2026-11-23",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476214370",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5534880,
-      "name": "Battlecar Survivors",
-      "steam_url": "https://store.steampowered.com/app/5534880/",
-      "release_date": "2026-11-24",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476217042",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5555400,
-      "name": "Kingdomsweeper",
-      "steam_url": "https://store.steampowered.com/app/5555400/",
-      "release_date": "2026-11-24",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476217105",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5554910,
-      "name": "The Great Himalayan Noodle Descent",
-      "steam_url": "https://store.steampowered.com/app/5554910/",
-      "release_date": "2026-11-26",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476215874",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5461990,
-      "name": "Taskbar Fishing & Aquarium",
-      "steam_url": "https://store.steampowered.com/app/5461990/",
-      "release_date": "2026-11-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476174379",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5510860,
-      "name": "Soviet Prison: Red Winter",
-      "steam_url": "https://store.steampowered.com/app/5510860/",
-      "release_date": "2026-11-28",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476215797",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5546640,
-      "name": "Christmas Lot Simulator",
-      "steam_url": "https://store.steampowered.com/app/5546640/",
-      "release_date": "2026-11-28",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476214231",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5370760,
-      "name": "Dicellion",
-      "steam_url": "https://store.steampowered.com/app/5370760/",
-      "release_date": "2026-12-01",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476217266",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5459980,
-      "name": "Hit the Fly",
-      "steam_url": "https://store.steampowered.com/app/5459980/",
-      "release_date": "2026-12-01",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476178466",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 5536960,
-      "name": "Dinky Derby",
-      "steam_url": "https://store.steampowered.com/app/5536960/",
-      "release_date": "2026-12-02",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476215941",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 5506380,
       "name": "Santa's Shop Tidy Up",
       "steam_url": "https://store.steampowered.com/app/5506380/",
@@ -223,7 +83,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 2,
       "appid": 5552070,
       "name": "HexStermination",
       "steam_url": "https://store.steampowered.com/app/5552070/",
@@ -237,7 +97,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 5538240,
       "name": "Riders Of The Nine Planes",
       "steam_url": "https://store.steampowered.com/app/5538240/",
@@ -251,7 +111,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 5481150,
       "name": "Tiny Standup",
       "steam_url": "https://store.steampowered.com/app/5481150/",
@@ -265,7 +125,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 4520900,
       "name": "The City of Endless",
       "steam_url": "https://store.steampowered.com/app/4520900/",
@@ -279,7 +139,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 5087400,
       "name": "Colony on the Run",
       "steam_url": "https://store.steampowered.com/app/5087400/",
@@ -293,7 +153,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 4609450,
       "name": "Магический мир Константина Кадавра",
       "steam_url": "https://store.steampowered.com/app/4609450/",
@@ -307,7 +167,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 4943660,
       "name": "La Famiglia",
       "steam_url": "https://store.steampowered.com/app/4943660/",
@@ -321,7 +181,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5533220,
       "name": "Gloamsail: Captains of the Mist",
       "steam_url": "https://store.steampowered.com/app/5533220/",
@@ -335,7 +195,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5246700,
       "name": "Defilade",
       "steam_url": "https://store.steampowered.com/app/5246700/",
@@ -349,7 +209,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5044940,
       "name": "Aqua Factory Simulator",
       "steam_url": "https://store.steampowered.com/app/5044940/",
@@ -363,7 +223,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 5166370,
       "name": "Islandry",
       "steam_url": "https://store.steampowered.com/app/5166370/",
@@ -377,7 +237,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 5185340,
       "name": "Tidy Solve",
       "steam_url": "https://store.steampowered.com/app/5185340/",
@@ -391,7 +251,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 5537500,
       "name": "Fable of: Hero's Army",
       "steam_url": "https://store.steampowered.com/app/5537500/",
@@ -405,7 +265,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 5124000,
       "name": "太一剑歌",
       "steam_url": "https://store.steampowered.com/app/5124000/",
@@ -419,7 +279,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 5495940,
       "name": "White Line North: Dog Sled Racing",
       "steam_url": "https://store.steampowered.com/app/5495940/",
@@ -433,7 +293,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 5507440,
       "name": "Sort In Silence",
       "steam_url": "https://store.steampowered.com/app/5507440/",
@@ -447,7 +307,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 28,
+      "position": 18,
       "appid": 5110200,
       "name": "La Bidouillerie",
       "steam_url": "https://store.steampowered.com/app/5110200/",
@@ -461,7 +321,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 29,
+      "position": 19,
       "appid": 5531750,
       "name": "Hegemony",
       "steam_url": "https://store.steampowered.com/app/5531750/",
@@ -475,7 +335,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 30,
+      "position": 20,
       "appid": 3382130,
       "name": "Time Champions",
       "steam_url": "https://store.steampowered.com/app/3382130/",
@@ -489,7 +349,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 31,
+      "position": 21,
       "appid": 5554430,
       "name": "Butt Out!",
       "steam_url": "https://store.steampowered.com/app/5554430/",
@@ -503,7 +363,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 32,
+      "position": 22,
       "appid": 5551290,
       "name": "The Coven",
       "steam_url": "https://store.steampowered.com/app/5551290/",
@@ -517,7 +377,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 33,
+      "position": 23,
       "appid": 5270330,
       "name": "SNATCH & BETRAY",
       "steam_url": "https://store.steampowered.com/app/5270330/",
@@ -531,7 +391,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 34,
+      "position": 24,
       "appid": 5383930,
       "name": "Roomcopter",
       "steam_url": "https://store.steampowered.com/app/5383930/",
@@ -545,7 +405,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 35,
+      "position": 25,
       "appid": 5556380,
       "name": "Beam Them All",
       "steam_url": "https://store.steampowered.com/app/5556380/",
@@ -559,7 +419,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 36,
+      "position": 26,
       "appid": 5554720,
       "name": "Hollowmere: Seven Year Promise",
       "steam_url": "https://store.steampowered.com/app/5554720/",
@@ -573,7 +433,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 37,
+      "position": 27,
       "appid": 4953700,
       "name": "NEON RAID",
       "steam_url": "https://store.steampowered.com/app/4953700/",
@@ -587,7 +447,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 38,
+      "position": 28,
       "appid": 5285630,
       "name": "Dead Descent",
       "steam_url": "https://store.steampowered.com/app/5285630/",
@@ -601,7 +461,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 39,
+      "position": 29,
       "appid": 3266110,
       "name": "Black Pine",
       "steam_url": "https://store.steampowered.com/app/3266110/",
@@ -615,7 +475,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 40,
+      "position": 30,
       "appid": 5438830,
       "name": "Pixel Go",
       "steam_url": "https://store.steampowered.com/app/5438830/",
@@ -631,136 +491,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-06T08:09:31.064631Z",
-      "kind": "official_attempt",
-      "appid": 5536910,
-      "name": "WordSearch Kingdom",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:10:01.064739Z",
-      "kind": "official_attempt",
-      "appid": 5551100,
-      "name": "Let's Build Together",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:10:31.064865Z",
-      "kind": "official_attempt",
-      "appid": 5326090,
-      "name": "Demidoff Corp Pico",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 5,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:11:01.064975Z",
-      "kind": "official_attempt",
-      "appid": 5482550,
-      "name": "ナツノカナタ ―PROLOGUE－",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:11:31.065126Z",
-      "kind": "official_attempt",
-      "appid": 5131300,
-      "name": "Not Alive Enough",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 34,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:12:01.065282Z",
-      "kind": "official_attempt",
-      "appid": 5396500,
-      "name": "Realistic Football Career",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 5,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:12:31.065380Z",
-      "kind": "official_attempt",
-      "appid": 5539240,
-      "name": "无双屠龙",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:13:01.065469Z",
-      "kind": "official_attempt",
-      "appid": 5475550,
-      "name": "Definitely Safe",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:13:31.065599Z",
-      "kind": "official_attempt",
-      "appid": 5535510,
-      "name": "Hexball",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
-    {
-      "at": "2026-11-06T08:14:01.065702Z",
-      "kind": "official_attempt",
-      "appid": 5218790,
-      "name": "任意杂货铺",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 19,
-      "retry_at": null,
-      "run_id": "42184586039",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42184586039"
-    },
     {
       "at": "2026-11-06T08:14:31.065791Z",
       "kind": "official_attempt",
@@ -1927,6 +1657,136 @@
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",
       "official_followers": 2,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:12:52.062824Z",
+      "kind": "official_attempt",
+      "appid": 5561850,
+      "name": "NEONOVA Puzzle: Red",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:13:22.062943Z",
+      "kind": "official_attempt",
+      "appid": 5534880,
+      "name": "Battlecar Survivors",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:13:52.063067Z",
+      "kind": "official_attempt",
+      "appid": 5555400,
+      "name": "Kingdomsweeper",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:14:22.063187Z",
+      "kind": "official_attempt",
+      "appid": 5554910,
+      "name": "The Great Himalayan Noodle Descent",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:14:52.063306Z",
+      "kind": "official_attempt",
+      "appid": 5461990,
+      "name": "Taskbar Fishing & Aquarium",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:15:22.063433Z",
+      "kind": "official_attempt",
+      "appid": 5510860,
+      "name": "Soviet Prison: Red Winter",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:15:52.063574Z",
+      "kind": "official_attempt",
+      "appid": 5546640,
+      "name": "Christmas Lot Simulator",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:16:22.063709Z",
+      "kind": "official_attempt",
+      "appid": 5370760,
+      "name": "Dicellion",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:16:52.063838Z",
+      "kind": "official_attempt",
+      "appid": 5459980,
+      "name": "Hit the Fly",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42408896359",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"
+    },
+    {
+      "at": "2026-11-07T20:17:22.063974Z",
+      "kind": "official_attempt",
+      "appid": 5536960,
+      "name": "Dinky Derby",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
       "retry_at": null,
       "run_id": "42408896359",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42408896359"

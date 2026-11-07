@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-07T00:02:39.385182Z",
+  "generated_at": "2026-11-07T00:03:08.255091Z",
   "today_taipei": "2026-11-07",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-07T00:02:39.192148Z",
+    "checkpoint_updated_at": "2026-11-07T00:03:08.073236Z",
     "group_resolution_updated_at": "2026-11-06T23:16:58.012120Z",
     "candidate_state_updated_at": "2026-11-06T17:05:03.385951Z",
     "prefilter_updated_at": "2026-11-06T17:05:03.366273Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-07T08:02:38.605701+08:00",
-    "last_updated_at": "2026-11-07T08:02:39.192148+08:00",
+    "last_updated_at": "2026-11-07T08:03:08.073236+08:00",
+    "finished_at": "2026-11-07T08:03:08.073236+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5434690,
     "last_name": "How Smart Are You",
     "requests_this_run": 1,

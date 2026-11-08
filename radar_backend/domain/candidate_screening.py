@@ -5,6 +5,8 @@ import re
 from collections import Counter
 from typing import Callable
 
+from radar_backend.domain.mature_content_reviews import reviewed_descriptors
+
 
 SEXUAL_CONTENT_IDS = frozenset({3, 4})
 EXPLICIT_DESC = re.compile(
@@ -19,7 +21,7 @@ def is_explicit_sex_game(
     explicit_pattern=EXPLICIT_DESC,
 ) -> bool:
     """Keep ordinary violence, maturity and romance outside the adult rule."""
-    ids = set(store_item.get("content_descriptorids") or [])
+    ids = reviewed_descriptors(store_item.get("appid"), set(store_item.get("content_descriptorids") or []))
     if ids & sexual_content_ids:
         return True
     tags = [

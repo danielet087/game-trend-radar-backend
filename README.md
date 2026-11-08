@@ -97,3 +97,11 @@ python -m pytest -q
 ## 後端架構
 
 共用核心、工作結果契約與分批遷移範圍，見 [後端架構文件](docs/backend-architecture.md)。執行 Python 工作前請安裝 `requirements.txt`；執行離線測試請安裝 `requirements-dev.txt`。
+
+## 已核對的一般限制級作品
+
+Steam 的 descriptor 4（Frequent Nudity or Sexual Content）不等同以色情為主的遊戲。
+`radar_backend/domain/mature_content_reviews.py` 保存按官方 AppID、介紹與內容說明核對的更正，
+讓一般冒險、恐怖、喜劇或戀愛遊戲在其他日期／人氣條件合格時恢復收錄。
+更正同時套用歷史排除清單與新抓取的候選；descriptor 3 或新的明確色情介紹仍會阻擋。
+未核對的 descriptor 4 作品沿用原排除規則，避免將僅缺 descriptor 3 的色情遊戲一起放行。

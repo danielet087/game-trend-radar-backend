@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from radar_backend.domain.mature_content_reviews import reviewed_descriptors
+
 EXCLUDED_DESCRIPTORS = frozenset({3, 4})
 
 
@@ -20,10 +22,14 @@ def excluded_appids_from_document(
     rows = doc.get("games")
     if not isinstance(rows, list):
         raise RuntimeError("Steam adult exclusion ledger malformed")
-    return {
-        int(row["appid"]) for row in rows
-        if set(row.get("excluded_descriptor_ids", [])) & excluded_descriptors
-    }
+    blocked = set()
+    for row in rows:
+        descriptors = set(row.get("excluded_descriptor_ids", []))
+        if descriptors & excluded_descriptors:
+            appid = int(row["appid"])
+            if reviewed_descriptors(appid, descriptors) & excluded_descriptors:
+                blocked.add(appid)
+    return blocked
 
 
 def is_disallowed(
@@ -39,7 +45,7 @@ def is_disallowed(
     if isinstance(descriptors, dict):
         descriptors = descriptors.get("ids") or []
     try:
-        flagged = bool({int(x) for x in descriptors} & excluded_descriptors)
+        flagged = bool(reviewed_descriptors(appid, {int(x) for x in descriptors}) & excluded_descriptors)
     except (TypeError, ValueError):
         flagged = False
     return appid in blocked or flagged

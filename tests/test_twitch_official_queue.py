@@ -154,7 +154,7 @@ def test_candidate_rejects_malformed_or_ineligible_metadata(change):
     elif change == "malformed_descriptors": metadata["content_descriptorids"] = ["3"]
     elif change == "bool_descriptors": metadata["content_descriptorids"] = [True]
     elif change == "missing_descriptors": metadata.pop("content_descriptorids")
-    elif change == "alternate_adult": metadata["content_descriptors"] = {"ids": [4]}
+    elif change == "alternate_adult": metadata["content_descriptors"] = {"ids": [3]}
     elif change == "wrong_type": metadata["steam_type"] = "dlc"
     elif change == "unscreened": metadata["sexual_content_screened"] = False
     elif change == "uncertain_date": candidate["release_date"] = "2026-10"

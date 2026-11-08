@@ -301,7 +301,7 @@ def test_candidate_keeps_all_adult_exclusion_sources(adult_source):
     if adult_source == "descriptor":
         details["content_descriptors"]["ids"] = [3]
     elif adult_source == "item_descriptor":
-        item["content_descriptorids"] = [4]
+        item["content_descriptorids"] = [3]
     elif adult_source == "blocked":
         blocked = {123}
     else:

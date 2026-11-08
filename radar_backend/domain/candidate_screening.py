@@ -5,7 +5,7 @@ import re
 from collections import Counter
 from typing import Callable
 
-from radar_backend.domain.mature_content_reviews import reviewed_descriptors
+from radar_backend.domain.mature_content_reviews import decide_content
 
 
 SEXUAL_CONTENT_IDS = frozenset({3, 4})
@@ -21,21 +21,15 @@ def is_explicit_sex_game(
     explicit_pattern=EXPLICIT_DESC,
 ) -> bool:
     """Keep ordinary violence, maturity and romance outside the adult rule."""
-    ids = reviewed_descriptors(store_item.get("appid"), set(store_item.get("content_descriptorids") or []))
-    if ids & sexual_content_ids:
+    if decide_content(store_item, hard_ids=sexual_content_ids).status == "excluded":
         return True
-    tags = [
-        row.get("tagid") for row in (store_item.get("tags") or [])
-        if isinstance(row, dict)
-    ]
-    description = str(
-        (store_item.get("basic_info") or {}).get("short_description") or ""
-    )
-    return bool(
-        12095 in tags[:5]
-        and (9130 in tags[:10] or 6650 in tags[:5])
-        and explicit_pattern.search(description)
-    )
+    if explicit_pattern is not EXPLICIT_DESC:
+        tags = [row.get("tagid") for row in store_item.get("tags") or [] if isinstance(row, dict)]
+        description = str((store_item.get("basic_info") or {}).get("short_description") or "")
+        return bool(12095 in tags[:5] and (9130 in tags[:10] or 6650 in tags[:5])
+                    and explicit_pattern.search(description))
+    return False
+
 
 
 def classify(
@@ -52,7 +46,15 @@ def classify(
     predicate = explicit_predicate if explicit_predicate is not None else is_explicit_sex_game
     if predicate(item):
         return None, "sexual_content"
+    decision = decide_content(item)
+    if decision.status == "review":
+        return None, "content_review"
     verified = dict(existing)
+    verified["content_screening"] = decision.record()
+    if "content_descriptorids" in item:
+        verified["content_descriptorids"] = list(item["content_descriptorids"])
+    if isinstance(item.get("content_details"), dict):
+        verified["content_details"] = item["content_details"]
     verified["release_display_precision"] = "date_full"
     verified["release_display_provider"] = "Steam IStoreBrowseService/GetItems"
     verified["sexual_content_screened"] = True
@@ -85,7 +87,7 @@ def snapshot_records(
         "source_count": len(original),
         "rule": (
             "Steam Store Browse coming_soon_display=date_full; exclude "
-            "sexual content descriptors 3/4 and strongly explicit adult games"
+            "adult-only descriptor 3 and primary erotic marketing; descriptor 4 is context-screened"
         ),
         "count": len(result),
         "excluded": len(original) - len(result),

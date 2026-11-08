@@ -17,7 +17,7 @@ CORE_FIELDS = {
     "release_date_verified_at", "post_followers_store_verified_at", "post_followers_store_verified",
     "release_date_conflict", "release_timestamp_taipei_date",
     "release_store_date", "release_date_normalization",
-    "twitch_admission", "steam_type", "content_descriptorids",
+    "twitch_admission", "steam_type", "content_descriptorids", "content_screening", "content_details",
 }
 
 

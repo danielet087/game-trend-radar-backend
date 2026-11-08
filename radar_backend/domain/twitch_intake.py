@@ -11,6 +11,8 @@ import hashlib
 import json
 import re
 
+from radar_core.domain.mature_content import decide_content
+
 
 def stamp(now: datetime, *, timezone_type=timezone) -> str:
     return now.astimezone(timezone_type.utc).isoformat().replace("+00:00", "Z")
@@ -127,10 +129,12 @@ def build_candidate(
     if not isinstance(descriptor_data, dict) or not isinstance(descriptor_data.get("ids"), list):
         return None, "steam_content_descriptors_unavailable"
     descriptors = descriptor_data["ids"]
-    audited = {"appid": appid, "content_descriptorids": descriptors}
-    screening = dict(item)
+    audited = {**item, "appid": appid, "content_descriptorids": descriptors, "content_details": details}
+    screening = {**item, "content_details": details}
     if not screening.get("tags") and isinstance(item.get("tagids"), list):
         screening["tags"] = [{"tagid": tagid} for tagid in item["tagids"]]
+    if decide_content(audited).status == "review":
+        return None, "content_review_pending"
     if is_disallowed(audited, blocked) or is_explicit_sex_game(screening):
         return None, "adult_content"
     store_item = item
@@ -206,6 +210,7 @@ def build_candidate(
         "follower_source": "Steam Community XML memberCount" if followers is not None else None,
         "official_ge5000": followers is not None and followers >= 5000,
         "sexual_content_screened": True, "steam_type": "game",
+        **({"content_details": details} if 4 in (set(descriptors) | set(item.get("content_descriptorids") or [])) else {}),
         "content_descriptorids": sorted(set(descriptors) | set(item.get("content_descriptorids") or [])),
         "store_url": f"https://store.steampowered.com/app/{appid}/",
         "community_url": f"https://steamcommunity.com/app/{appid}/",

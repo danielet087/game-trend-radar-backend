@@ -52,7 +52,7 @@ def _valid_descriptors(metadata: dict, *, is_disallowed) -> bool:
             type(value) is not int or value < 0 for value in alternate
         ):
             return False
-        if is_disallowed({"appid": metadata["appid"], "content_descriptorids": alternate}, set()):
+        if is_disallowed({**metadata, "appid": metadata["appid"], "content_descriptorids": alternate}, set()):
             return False
     return True
 

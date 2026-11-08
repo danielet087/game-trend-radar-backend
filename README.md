@@ -101,7 +101,8 @@ python -m pytest -q
 ## 已核對的一般限制級作品
 
 Steam 的 descriptor 4（Frequent Nudity or Sexual Content）不等同以色情為主的遊戲。
-`radar_backend/domain/mature_content_reviews.py` 保存按官方 AppID、介紹與內容說明核對的更正，
+`packages/radar-core/src/radar_core/domain/mature_content.py` 保存按官方 AppID、介紹與內容說明核對的更正，
+由主後端與內容發布共用，
 讓一般冒險、恐怖、喜劇或戀愛遊戲在其他日期／人氣條件合格時恢復收錄。
 更正同時套用歷史排除清單與新抓取的候選；descriptor 3 或新的明確色情介紹仍會阻擋。
 未核對的 descriptor 4 作品沿用原排除規則，避免將僅缺 descriptor 3 的色情遊戲一起放行。

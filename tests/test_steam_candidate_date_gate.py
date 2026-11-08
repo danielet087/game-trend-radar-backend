@@ -48,9 +48,11 @@ def test_actual_announced_december_31_is_kept():
 
 
 def test_exclude_explicit_sex_not_romance_or_ordinary_maturity():
-    for ids in ([3], [4], [1, 3, 5]):
+    for ids in ([3], [1, 3, 5]):
         assert is_explicit_sex_game(store("date_full", ids=ids))
         assert classify(candidate(), store("date_full", ids=ids))[1] == "sexual_content"
+    assert not is_explicit_sex_game(store("date_full", ids=[4]))
+    assert classify(candidate(), store("date_full", ids=[4]))[1] == "content_review"
     for ids in ([1], [2], [5], [1, 2, 5]):
         assert not is_explicit_sex_game(store("date_full", ids=ids))
     assert is_explicit_sex_game(store(

@@ -1,7 +1,7 @@
-"""Steam official Adult Only / Frequent Sexual Content exclusion guard.
+"""Steam official adult-only and primary-content screening guard.
 
 Persistent exclusions originate in data/steam_adult_exclusion.json, audited
-against Steam Store api/appdetails content_descriptors 3 and 4.
+against Steam Store api/appdetails. Descriptor 4 requires current purpose context.
 Do not drop the exclusion gate when publishing already-qualified history.
 """
 from __future__ import annotations

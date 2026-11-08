@@ -93,7 +93,7 @@ def test_eligible_copy_keeps_original_payload_without_new_calendar_validation():
 
 
 @pytest.mark.parametrize("ids,expected", [
-    ([3], True), ([4], True), ([1, 3, 5], True), ([1], False),
+    ([3], True), ([4], False), ([1, 3, 5], True), ([1], False),
     ([2], False), ([5], False), ([1, 2, 5], False), (["3"], False),
 ])
 def test_explicit_descriptors_retain_original_numeric_membership(ids, expected):
@@ -103,14 +103,14 @@ def test_explicit_descriptors_retain_original_numeric_membership(ids, expected):
 @pytest.mark.parametrize("tags,description,expected", [
     ([12095, 6650], "A romance and dating game", False),
     ([12095, 6650], "An NSFW sex game", True),
-    ([12095, 9130], "EROTIC scenes", True),
+    ([12095, 9130], "EROTIC scenes", False),
     ([0, 0, 0, 0, 12095, 9130], "Hentai", True),
-    ([0, 0, 0, 0, 0, 12095, 9130], "Hentai", False),
+    ([0, 0, 0, 0, 0, 12095, 9130], "Hentai", True),
     ([12095] + [0] * 8 + [9130], "Hentai", True),
-    ([12095] + [0] * 9 + [9130], "Hentai", False),
+    ([12095] + [0] * 9 + [9130], "Hentai", True),
     ([12095, 6650], "unsexual scenes and relationship", False),
 ])
-def test_explicit_description_requires_existing_tag_rank_and_whole_word_rule(tags, description, expected):
+def test_primary_erotic_marketing_requires_a_whole_word_and_clear_purpose(tags, description, expected):
     assert domain.is_explicit_sex_game(metadata(tags=tags, description=description)) is expected
 
 
@@ -432,3 +432,54 @@ def test_legacy_explicit_predicate_reads_current_public_constants(monkeypatch):
     monkeypatch.setattr(legacy, "EXPLICIT_DESC", re.compile("patched phrase"))
     assert legacy.is_explicit_sex_game(metadata(tags=[12095, 6650], description="patched phrase")) is True
     assert legacy.is_explicit_sex_game(metadata(tags=[12095, 6650], description="NSFW")) is False
+
+
+def test_contextual_descriptor_gets_current_official_purpose_before_screening():
+    item = {"appid": 99000001, **metadata(ids=[1, 4, 5], description="A supernatural life simulation")}
+    details = {"steam_appid": 99000001, "short_description": "Decorate a haunted home and investigate ghosts.",
+               "content_descriptors": {"ids": [1, 4, 5], "notes": "Optional shower nudity"}}
+    rows, session, _, _ = fetch([
+        response({"response": {"store_items": [item]}}),
+        response({"99000001": {"success": True, "data": details}}),
+    ], ids=[99000001])
+    assert session.get.call_count == 2
+    assert session.get.call_args.args[0] == "https://store.steampowered.com/api/appdetails"
+    assert session.get.call_args.kwargs["params"] == {"appids": 99000001, "cc": "TW", "l": "english"}
+    row, reason = domain.classify(game(99000001), rows[99000001])
+    assert reason == "eligible" and row["content_screening"]["reason"] == "ordinary_mature_game"
+
+
+def test_missing_or_rate_limited_context_is_review_and_does_not_stop_other_games():
+    ordinary = {"appid": 2, **metadata()}
+    contextual = {"appid": 1, **metadata(ids=[4], description="Adventure")}
+    rows, session, _, _ = fetch([
+        response({"response": {"store_items": [contextual, ordinary]}}), response(status=429),
+    ], ids=[1, 2])
+    result = application.build_snapshot({"games": [game(1), game(2)]}, rows,
+        clock=lambda: NOW, exclusion_loader=lambda: set())
+    assert result["count"] == 1
+    assert result["reasons"] == {"content_review": 1, "eligible": 1}
+    assert session.get.call_count == 2
+
+
+def test_context_lookups_are_bounded_and_identity_mismatch_never_proves_clearance():
+    items = [{"appid": aid, **metadata(ids=[4])} for aid in (1, 2)]
+    rows, session, _, _ = fetch([
+        response({"response": {"store_items": items}}),
+        response({"1": {"success": True, "data": {"steam_appid": 999, "short_description": "Other game"}}}),
+    ], ids=[1, 2], max_content_details=1, context_offset=0)
+    assert session.get.call_count == 2
+    assert rows[2]["content_context_status"] == "budget_exhausted"
+    assert all(domain.classify(game(aid), rows[aid])[1] == "content_review" for aid in (1, 2))
+
+
+def test_bounded_context_batch_rotates_so_deferred_games_can_recover():
+    for offset, selected in ((0, 1), (1, 2)):
+        items = [{"appid": aid, **metadata(ids=[4])} for aid in (1, 2)]
+        rows, session, _, _ = fetch([
+            response({"response": {"store_items": items}}),
+            response({str(selected): {"success": True, "data": {
+                "steam_appid": selected, "short_description": "Explore a haunted town."}}}),
+        ], ids=[1, 2], max_content_details=1, context_offset=offset)
+        assert domain.classify(game(selected), rows[selected])[1] == "eligible"
+        assert session.get.call_count == 2

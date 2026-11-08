@@ -98,11 +98,11 @@ python -m pytest -q
 
 共用核心、工作結果契約與分批遷移範圍，見 [後端架構文件](docs/backend-architecture.md)。執行 Python 工作前請安裝 `requirements.txt`；執行離線測試請安裝 `requirements-dev.txt`。
 
-## 已核對的一般限制級作品
+## 一般限制級作品的通用內容判斷
 
-Steam 的 descriptor 4（Frequent Nudity or Sexual Content）不等同以色情為主的遊戲。
-`packages/radar-core/src/radar_core/domain/mature_content.py` 保存按官方 AppID、介紹與內容說明核對的更正，
-由主後端與內容發布共用，
-讓一般冒險、恐怖、喜劇或戀愛遊戲在其他日期／人氣條件合格時恢復收錄。
-更正同時套用歷史排除清單與新抓取的候選；descriptor 3 或新的明確色情介紹仍會阻擋。
-未核對的 descriptor 4 作品沿用原排除規則，避免將僅缺 descriptor 3 的色情遊戲一起放行。
+收集與內容發布共用 `radar_core.domain.mature_content`，依當前官方介紹判斷主要內容，所有 AppID 使用相同規則。
+Descriptor 3（Adult Only Sexual Content）直接排除；descriptor 4 不單獨當成色情判決，會補查同一 AppID 的官方介紹。
+一般暴力、裸露、戀愛與分級警語不直接排除；明確以色情為主要內容的介紹／H 場景等遊戲特徵仍排除。
+缺少資料、遇限流、身分不符或題材證據衝突時標記 `content_review`，保留完整候選，下次每日收集自動重查。
+補查有單次請求數上限並沿用間隔，不因一款資料不足而阻止其他遊戲。
+舊清單中僅有 descriptor 4 的排除會重新判斷；歷史 AppID 更正不再作為收錄白名單。

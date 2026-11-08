@@ -1,4 +1,5 @@
-"""Shared reviewed mature-game policy used by intake and content publication."""
-from radar_core.domain.mature_content import REVIEWED_NON_EROTIC, reviewed_descriptors
-
-__all__ = ["REVIEWED_NON_EROTIC", "reviewed_descriptors"]
+"""Compatibility exports for the shared evidence-based content policy."""
+from radar_core.domain.mature_content import (
+    LEGACY_DESCRIPTOR4_ONLY, ContentDecision, POLICY_VERSION,
+    decide_content, reviewed_descriptors,
+)

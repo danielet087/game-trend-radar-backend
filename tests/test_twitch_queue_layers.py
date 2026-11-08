@@ -145,7 +145,7 @@ def test_alternate_descriptors_use_empty_ledger_and_original_list(alternate):
     assert rules._valid_descriptors(metadata, is_disallowed=adult)
     actual = alternate["ids"] if isinstance(alternate, dict) else alternate
     args = adult.call_args.args
-    assert args == ({"appid": "123", "content_descriptorids": actual}, set())
+    assert args == ({**metadata, "content_descriptorids": actual}, set())
     assert args[0]["content_descriptorids"] is actual
 
 
@@ -456,3 +456,9 @@ def test_nonstring_existing_appid_key_keeps_legacy_string_restoration_behavior()
     out = sync(cp, {"follower_candidates": []})
     assert out == cp  # The old rule pops str(aid), so integer-indexed rows remain.
     assert out is not cp
+
+
+def test_alternate_descriptor_four_retains_the_current_non_erotic_context():
+    metadata = {"appid": 99000001, "content_descriptorids": [], "content_descriptors": {"ids": [4]},
+        "content_details": {"steam_appid": 99000001, "short_description": "Explore a haunted town and investigate ghosts."}}
+    assert rules._valid_descriptors(metadata, is_disallowed=is_disallowed)

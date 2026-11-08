@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from radar_backend.domain.mature_content_reviews import reviewed_descriptors
+from radar_backend.domain.mature_content_reviews import decide_content, reviewed_descriptors
 
 EXCLUDED_DESCRIPTORS = frozenset({3, 4})
 
@@ -45,7 +45,9 @@ def is_disallowed(
     if isinstance(descriptors, dict):
         descriptors = descriptors.get("ids") or []
     try:
-        flagged = bool(reviewed_descriptors(appid, {int(x) for x in descriptors}) & excluded_descriptors)
+        normalized = {int(x) for x in descriptors}
+        flagged = bool(reviewed_descriptors(appid, normalized) & excluded_descriptors)
     except (TypeError, ValueError):
-        flagged = False
-    return appid in blocked or flagged
+        normalized, flagged = set(), False
+    decision = decide_content({**row, "appid": appid, "content_descriptorids": list(normalized)}, hard_ids=excluded_descriptors)
+    return appid in blocked or flagged or decision.status != "screened"

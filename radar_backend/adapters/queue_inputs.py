@@ -34,10 +34,11 @@ def save(path, value):
 
 
 def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter,
-               official_cache, other_official, *, now=None):
+               official_cache, other_official, *, now=None, refresh_by=None):
     return official_queue.make_queue(
         cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter,
         official_cache, other_official, now=now or clock(),
         is_twitch_queue_candidate=twitch_intake.is_twitch_queue_candidate,
         cached_follower=twitch_intake.cached_follower,
+        refresh_by=refresh_by,
     )

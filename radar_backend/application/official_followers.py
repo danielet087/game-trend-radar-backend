@@ -10,6 +10,7 @@ from typing import Callable
 from radar_core.jobs import JobResult, JobStatus
 from radar_backend.domain.official_queue import (
     TAIPEI, FollowerOutcome, queue_checked_numeric as checked_numeric, valid_group_id64,
+    official_result_completes_candidate,
 )
 
 
@@ -297,7 +298,9 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
     successful = len({item["appid"] for item in attempts if item["status"] == "ok"})
     # Concurrent producers can add results during a checkpoint reload. They
     # reduce the remaining queue but never count as this worker's observations.
-    pending_left = sum(str(row["appid"]) not in cp["official_results"] for row in q)
+    pending_left = sum(not official_result_completes_candidate(
+        row, cp["official_results"].get(str(row["appid"])),
+    ) for row in q)
     report = {
         "source_status": source_status,
         "start_taipei": started_at_taipei,

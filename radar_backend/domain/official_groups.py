@@ -7,6 +7,8 @@ from email.utils import parsedate_to_datetime
 import hashlib
 import json
 
+from radar_backend.domain.official_queue import official_result_completes_candidate
+
 API_URL = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/"
 SOURCE = "Steam ISteamUser/ResolveVanityURL"
 TWITCH_SOURCE = "twitch_steam_discovery"
@@ -30,10 +32,8 @@ def fingerprint(row, *, decimal_id, json_module=json, hashlib_module=hashlib):
 
 def completed(checkpoint, aid, *, checked_numeric):
     result = (checkpoint.get("official_results") or {}).get(aid)
-    return isinstance(result, dict) and (
-        checked_numeric(result.get("official_followers"))
-        or checked_numeric(result.get("followers"))
-    )
+    candidate = (checkpoint.get("pending_candidates") or {}).get(aid) or {}
+    return official_result_completes_candidate(candidate, result)
 
 
 def retry_after(header, now, *, timedelta_type=timedelta, timezone_type=timezone,

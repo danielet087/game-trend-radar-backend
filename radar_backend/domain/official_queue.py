@@ -105,6 +105,58 @@ def utc_date_as_taipei(value):
         return None
 
 
+def latest_official_observations(*sources, now):
+    """Index actual dated counts across hourly, legacy and growth producers."""
+    latest = {}
+    for source in sources:
+        for field in ("official_results", "official_growth_observations", "games", "verified"):
+            for aid, row in source.get(field, {}).items():
+                key = str(aid)
+                if (not key.isascii() or not key.isdigit() or int(key) <= 0
+                        or not isinstance(row, dict)
+                        or (row.get("appid") is not None and str(row["appid"]) != key)):
+                    continue
+                count = row.get("official_followers", row.get("followers"))
+                at = row.get("official_checked_at_taipei") or row.get("checked_at") or row.get("follower_checked_at")
+                checked = aware_time(at)
+                if not queue_checked_numeric(count) or checked is None or checked > now:
+                    continue
+                previous = latest.get(str(aid))
+                if previous is None or checked > aware_time(previous.checked_at):
+                    latest[str(aid)] = OfficialObservation(
+                        int(aid), valid_group_id64(row.get("group_id64") or row.get("official_group_id64")), count, at,
+                    )
+    return latest
+
+
+def official_refresh_due(observation, now, *, third_party_followers=None, group_id64=None):
+    """Keep 1/3/30-day freshness; a fresh high prescreen accelerates low counts."""
+    if observation is None:
+        return True
+    if (group_id64 is not None and observation.group_id64 is not None
+            and group_id64 != observation.group_id64):
+        return True
+    days = 1 if observation.followers >= 5000 else 3 if observation.followers >= 3000 else 30
+    if queue_checked_numeric(third_party_followers) and third_party_followers >= 4000:
+        days = 1
+    return now - aware_time(observation.checked_at) >= timedelta(days=days)
+
+
+def official_result_completes_candidate(candidate, result):
+    """A saved old count cannot acknowledge a newly due recheck."""
+    if not isinstance(result, dict) or not queue_checked_numeric(result.get("official_followers", result.get("followers"))):
+        return False
+    if candidate.get("follower_recheck") is not True:
+        return True
+    checked_at = result.get("official_checked_at_taipei") or result.get("checked_at")
+    if ("follower_recheck_previous_at" in candidate
+            and checked_at == candidate["follower_recheck_previous_at"]):
+        return False
+    checked = aware_time(checked_at)
+    previous = aware_time(candidate.get("follower_recheck_after"))
+    return checked is not None and (previous is None or checked > previous)
+
+
 def last_failed_request_times(events, *, now):
     """Find unresolved real failures across every queue source.
 
@@ -159,6 +211,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         str(k) for k, v in other_official.get("verified", {}).items()
         if isinstance(v, dict) and queue_checked_numeric(v.get("official_followers"))
     }
+    observations = latest_official_observations(cp, legacy_cp, official_cache, other_official, now=observed)
+    rechecks = set()
     group_by_id = {str(x["appid"]): x.get("group_short_id") for x in old_group_rows}
     # Accepted receipts remain valid after tracking expires; explicitly pass
     # no rolling date window through the production admission port.
@@ -196,6 +250,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         "eligible_screened_at": eligible.get("screened_at"),
         "added_from_daily": 0,
         "eligible_count": len(eligible.get("games", [])),
+        "official_rechecks_pending": 0,
         "parked_group_xml_appids": [],
     }
     today = observed.date().isoformat()
@@ -214,9 +269,10 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
             if not isinstance(record, dict):
                 continue
             followers = record.get("third_party_followers")
-            # Catch true third-party misses, and higher-signal games for which
-            # the existing daily official cache has no numeric value.
-            if followers is not None and not (
+            # First verification keeps the existing prescreen gate. Previously
+            # verified games can outgrow a low count and need periodic checks
+            # even while their third-party count remains below that gate.
+            if aid not in existing_official and followers is not None and not (
                 queue_checked_numeric(followers) and followers >= 4000
             ):
                 continue
@@ -228,8 +284,9 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 source.get("sexual_content_screened") is not True
             ):
                 continue
-            if aid in existing_official or aid in admitted:
+            if aid in admitted:
                 continue
+            observation = observations.get(aid)
             new = {
                 "appid": int(aid),
                 "name": source.get("name"),
@@ -240,13 +297,31 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                                 else "fresh_daily_prefilter_ge4000_pending_official",
                 "daily_source_updated_at": prefilter.get("updated_at"),
             }
-            if aid not in cp["pending_candidates"]:
-                daily["added_from_daily"] += 1
             previous = cp["pending_candidates"].get(aid) or {}
             # Daily metadata refresh must retain a separately resolved group.
             new["group_id64"] = valid_group_id64(new["group_id64"]) or valid_group_id64(previous.get("group_id64"))
             if isinstance(previous.get("group_resolution"), dict):
                 new["group_resolution"] = previous["group_resolution"]
+            if aid in existing_official:
+                # Only today's exact-date, content-screened candidate set can
+                # revive a completed ordinary record. Frozen/stale candidates
+                # must not reintroduce removed or out-of-window games.
+                release_day = datetime.fromisoformat(release).date()
+                if not observed.date() <= release_day <= observed.date() + timedelta(days=365):
+                    continue
+                if not official_refresh_due(observation, observed,
+                        third_party_followers=followers, group_id64=new["group_id64"]):
+                    continue
+                rechecks.add(aid)
+                prior_result = cp["official_results"].get(aid) or {}
+                new.update(follower_recheck=True,
+                           follower_recheck_after=observation.checked_at if observation else None,
+                           follower_recheck_previous_at=(prior_result.get("official_checked_at_taipei")
+                                                        or prior_result.get("checked_at")))
+                if new["group_id64"] is None and observation is not None:
+                    new["group_id64"] = observation.group_id64
+            if aid not in cp["pending_candidates"]:
+                daily["added_from_daily"] += 1
             if previous.get("queue_source") == "twitch_steam_discovery":
                 # Keep the verified Twitch admission and its higher priority;
                 # the ordinary row remains available when Twitch expires.
@@ -261,8 +336,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
             else "current_day_prefilter_incomplete"
         )
 
-    # Skip all verified numbers, even if another producer discovered the same
-    # AppID today. Never imply old cache is a fresh follower verification.
+    # Ordinary completed records return only when today's verified candidate
+    # set makes their actual observation due. Retain old counts until success.
     # If a fallback /games/{appid}/memberslistxml endpoint has already returned
     # HTML for an AppID with no official group ID, park ONLY that AppID.
     # Do not falsely record an official follower count or stall all later games.
@@ -280,7 +355,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 continue
             if cached_follower(int(aid), [cp, legacy_cp, official_cache, other_official], observed) is not None:
                 continue
-        elif aid in existing_official:
+        elif aid in existing_official and aid not in rechecks:
             continue
         if aid in bad_missing_group and valid_group_id64(row.get("group_id64")) is None:
             cp.setdefault("unresolved_candidates", {})[aid] = {
@@ -302,12 +377,14 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         str(r["appid"]) in last_failure,
         last_failure.get(str(r["appid"]), 0),
         0 if r.get("queue_source") == "twitch_steam_discovery" else 1,
+        r.get("follower_recheck") is True,
         r["release_date"] < today,
         r["release_date"] if r["release_date"] >= today
         else -datetime.fromisoformat(r["release_date"]).date().toordinal(),
         r["appid"],
     ))
     daily["combined_pending_now"] = len(pending)
+    daily["official_rechecks_pending"] = sum(row.get("follower_recheck") is True for row in pending)
     daily["completed_legacy"] = len(legacy_cp["official_results"])
     daily["completed_new"] = len(cp["official_results"])
     daily["twitch_priority_pending"] = sum(r.get("queue_source") == "twitch_steam_discovery" for r in pending)

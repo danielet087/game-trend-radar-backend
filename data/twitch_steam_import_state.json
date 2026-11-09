@@ -4437,28 +4437,28 @@
     },
     "4530370": {
       "status": "accepted",
-      "updated_at": "2026-10-28T20:04:51.139483Z",
+      "updated_at": "2026-11-09T05:37:50.508502Z",
       "twitch_admission": {
-        "schema_version": 1,
-        "method": "twitch_igdb_external_steam_v1",
         "appid": 4530370,
-        "twitch_game_id": "1000178598",
-        "igdb_id": "420884",
         "checked_at": "2026-10-28T19:18:27Z",
-        "source_database_revision": "0234744383f7215e4018b395ac4cde46ab19cbbb53dcf405899b4816f2093261",
+        "igdb_id": "420884",
+        "method": "twitch_igdb_external_steam_v1",
+        "schema_version": 1,
         "source_database_generation": 783,
         "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_database_revision": "0234744383f7215e4018b395ac4cde46ab19cbbb53dcf405899b4816f2093261",
         "source_enrollment": {
-          "source": "igdb_first_release_date",
+          "min_viewers": 7000,
           "observed_at": "2026-10-28T19:18:27Z",
-          "viewer_count": 9056,
-          "min_viewers": 7000
-        }
+          "source": "igdb_first_release_date",
+          "viewer_count": 9056
+        },
+        "twitch_game_id": "1000178598"
       },
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "steam_verified",
-      "content_signature": "fa0b093c9b9c0a7e31a14afc6487ce6fc12ca5b6aea1b5a5f1dcd681920ed34d",
+      "content_signature": "79225ed8c4535d34aeea1e3492eb2006636787df37b84f395078236ff209c5b9",
       "followers": 3407,
       "follower_checked_at": "2026-10-01T09:49:29.515776+08:00",
       "retry_at": null,
@@ -4466,15 +4466,7 @@
       "rate_limit_attempts": 0,
       "rate_limit_stage": null,
       "retry_source": null,
-      "retry_after": null,
-      "content_dispatch": {
-        "status": "dispatched",
-        "signature": "fa0b093c9b9c0a7e31a14afc6487ce6fc12ca5b6aea1b5a5f1dcd681920ed34d",
-        "attempted_at": "2026-10-28T20:04:51.139483Z",
-        "target_repository": "danielet087/game-trend-radar-content-backend",
-        "event_type": "steam_game_twitch_discovered",
-        "http": 204
-      }
+      "retry_after": null
     },
     "3927170": {
       "status": "accepted",
@@ -5558,6 +5550,6 @@
       }
     }
   },
-  "updated_at": "2026-11-09T05:02:00.444294Z",
+  "updated_at": "2026-11-09T05:37:50.508502Z",
   "api_cooldowns": {}
 }

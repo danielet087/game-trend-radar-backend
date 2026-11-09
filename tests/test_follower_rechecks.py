@@ -165,9 +165,13 @@ def test_successful_recheck_crosses_threshold_and_runs_existing_publication_gate
     assert queue == []
 
 
+@pytest.mark.parametrize("checked_at", [None, (NOW + timedelta(days=1)).isoformat(), "old"])
 @pytest.mark.parametrize("cooldown", [None, (NOW + timedelta(hours=2)).isoformat()])
-def test_limited_or_cooling_recheck_retains_old_count_and_stays_pending(monkeypatch, tmp_path, cooldown):
-    queue, _, cp = projected()
+def test_limited_or_cooling_recheck_retains_old_count_and_stays_pending(monkeypatch, tmp_path, cooldown, checked_at):
+    result = observation()
+    if checked_at != "old":
+        result["official_checked_at_taipei"] = checked_at
+    queue, _, cp = projected(result=result)
     old = deepcopy(cp["official_results"]["124"])
     limited = SimpleNamespace(status_code=429, headers={"Retry-After": "7200"})
     saved, report, client, verify, upsert, dispatch, _ = run_worker(

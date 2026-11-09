@@ -148,7 +148,11 @@ def official_result_completes_candidate(candidate, result):
         return False
     if candidate.get("follower_recheck") is not True:
         return True
-    checked = aware_time(result.get("official_checked_at_taipei") or result.get("checked_at"))
+    checked_at = result.get("official_checked_at_taipei") or result.get("checked_at")
+    if ("follower_recheck_previous_at" in candidate
+            and checked_at == candidate["follower_recheck_previous_at"]):
+        return False
+    checked = aware_time(checked_at)
     previous = aware_time(candidate.get("follower_recheck_after"))
     return checked is not None and (previous is None or checked > previous)
 
@@ -309,8 +313,11 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                         third_party_followers=followers, group_id64=new["group_id64"]):
                     continue
                 rechecks.add(aid)
+                prior_result = cp["official_results"].get(aid) or {}
                 new.update(follower_recheck=True,
-                           follower_recheck_after=observation.checked_at if observation else None)
+                           follower_recheck_after=observation.checked_at if observation else None,
+                           follower_recheck_previous_at=(prior_result.get("official_checked_at_taipei")
+                                                        or prior_result.get("checked_at")))
                 if new["group_id64"] is None and observation is not None:
                     new["group_id64"] = observation.group_id64
             if aid not in cp["pending_candidates"]:

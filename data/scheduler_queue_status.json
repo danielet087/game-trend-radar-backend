@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-09T13:02:36.787762Z",
+  "generated_at": "2026-11-09T13:03:05.496021Z",
   "today_taipei": "2026-11-09",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-09T13:02:36.604126Z",
+    "checkpoint_updated_at": "2026-11-09T13:03:05.336212Z",
     "group_resolution_updated_at": "2026-11-08T17:17:12.519722Z",
     "candidate_state_updated_at": "2026-11-08T17:05:56.096667Z",
     "prefilter_updated_at": "2026-11-08T17:05:56.077866Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-09",
     "status": "completed",
-    "checked_at": "2026-11-09T21:02:36.787762+08:00",
+    "checked_at": "2026-11-09T21:03:05.496021+08:00",
     "needed": true,
     "planned_count": 747,
     "completed_count": 217,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-09T21:02:35.967308+08:00",
-    "last_updated_at": "2026-11-09T21:02:36.604126+08:00",
+    "last_updated_at": "2026-11-09T21:03:05.336212+08:00",
+    "finished_at": "2026-11-09T21:03:05.336212+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5016240,
     "last_name": "Classroom in Sora",
     "requests_this_run": 1,

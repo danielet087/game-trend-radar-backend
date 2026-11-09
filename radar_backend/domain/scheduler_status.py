@@ -45,7 +45,8 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
                  candidate_state=None, twitch_state=None, make_queue, aware_time,
                  utc, latest_time, next_official_slot, public_run, valid_group_id,
                  tz, checkpoint_path, deepcopy_fn=deepcopy, repository=REPOSITORY,
-                 twitch_source=TWITCH_SOURCE, max_events=MAX_EVENTS):
+                 twitch_source=TWITCH_SOURCE, max_events=MAX_EVENTS,
+                 recheck_plan_builder=None):
     if now.tzinfo is None or now.utcoffset() is None:
         raise ValueError("Dashboard snapshot requires an aware time")
     # make_queue intentionally reconciles ordinary candidates and parked rows.
@@ -145,6 +146,10 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
         "request_limit",
     ) if key in last_batch}
     batch.update(public_run(last_batch))
+    recheck_plan = recheck_plan_builder(
+        checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter,
+        official_cache, other_official, now=now, pending=pending, source_status=source_status,
+    ) if recheck_plan_builder is not None else None
     return {
         "schema_version": 1, "generated_at": utc(now), "today_taipei": today,
         "source": {
@@ -160,6 +165,7 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
             "queue_projection": "official_collector_make_queue",
         },
         "source_status": source_status, "summary": summary,
+        "follower_recheck_plan": recheck_plan,
         "group_resolution_api_cooldown": deepcopy_fn(checkpoint.get("group_resolution_api_cooldown")),
         "cooldown": {
             "active": active_cooldown, "until": cooldown_until,

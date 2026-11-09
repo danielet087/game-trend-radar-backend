@@ -196,8 +196,13 @@ def last_failed_request_times(events, *, now):
             if not succeeded}
 
 
-def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, official_cache, other_official, *, now, is_twitch_queue_candidate, cached_follower):
+def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, official_cache, other_official, *, now, is_twitch_queue_candidate, cached_follower, refresh_by=None):
     observed = now.astimezone(TAIPEI)
+    # A read-only daily plan can include later expiries without admitting
+    # future measurements or changing the live collector's due time.
+    refresh_deadline = refresh_by.astimezone(TAIPEI) if refresh_by is not None else observed
+    if refresh_deadline < observed or refresh_deadline.date() != observed.date():
+        raise ValueError("Follower refresh planning must stay within the current Taiwan day")
     if len(frozen_rows) != 1317 or len(old_group_rows) != 1358:
         raise ValueError("Frozen original input changed")
     if legacy_cp.get("cohort") != "steam_fresh_20260922_post_adult_1317_near_release":
@@ -309,7 +314,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 release_day = datetime.fromisoformat(release).date()
                 if not observed.date() <= release_day <= observed.date() + timedelta(days=365):
                     continue
-                if not official_refresh_due(observation, observed,
+                if not official_refresh_due(observation, refresh_deadline,
                         third_party_followers=followers, group_id64=new["group_id64"]):
                     continue
                 rechecks.add(aid)

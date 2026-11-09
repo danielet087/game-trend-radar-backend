@@ -3,9 +3,11 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from functools import partial
 from radar_core.domain.twitch_admission import aware_time
 from radar_backend.adapters import queue_inputs as worker
 from radar_backend.domain import scheduler_status as _status_rules
+from radar_backend.domain.follower_recheck_plan import build_plan
 from radar_backend.application import scheduler_status as _status_application
 from radar_backend.domain.scheduler_status import REPOSITORY, TWITCH_SOURCE, MAX_EVENTS
 OUTPUT = Path("data/scheduler_queue_status.json")
@@ -38,6 +40,7 @@ def build_status(checkpoint, frozen_rows, legacy_cp, old_group_rows, eligible,
         public_run=public_run, valid_group_id=worker.valid_group_id64, tz=worker.TZ,
         checkpoint_path=worker.CHECKPOINT, deepcopy_fn=deepcopy, repository=REPOSITORY,
         twitch_source=TWITCH_SOURCE, max_events=MAX_EVENTS,
+        recheck_plan_builder=partial(build_plan, make_queue=worker.make_queue),
     )
 
 

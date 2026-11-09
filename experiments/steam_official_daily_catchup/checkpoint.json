@@ -49499,20 +49499,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "42613414638",
-    "active": false,
-    "status": "finished",
+    "run_id": "42621667338",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-09T20:02:48.613438+08:00",
-    "last_updated_at": "2026-11-09T20:03:18.115314+08:00",
+    "started_at": "2026-11-09T21:02:35.967308+08:00",
+    "last_updated_at": "2026-11-09T21:02:36.604126+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 4973920,
-    "last_name": "Squircle",
-    "finished_at": "2026-11-09T20:03:18.115314+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5016240,
+    "last_name": "Classroom in Sora"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -117754,17 +117752,17 @@
       "release_time_utc": "2026-11-17T10:00:00Z"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-09T20:32:49.215730+08:00",
+  "next_request_after_taipei": "2026-11-09T22:02:36.604040+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-09T12:32:49.215730+00:00",
-    "observed_at": "2026-11-09T12:02:49.215730+00:00",
-    "updated_at": "2026-11-09T12:02:49.215730+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-09T14:02:36.604040+00:00",
+    "observed_at": "2026-11-09T13:02:36.604040+00:00",
+    "updated_at": "2026-11-09T13:02:36.604040+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-09T19:09:31.185013+08:00",
   "official_growth_observations": {
@@ -136402,6 +136400,16 @@
       "status": "rate_limited",
       "github_run_id": "42613414638",
       "next_request_after_taipei": "2026-11-09T20:32:49.215730+08:00"
+    },
+    {
+      "appid": 5016240,
+      "when_taipei": "2026-11-09T21:02:36.447091+08:00",
+      "release_date": "2026-11-19",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "42621667338",
+      "next_request_after_taipei": "2026-11-09T22:02:36.604040+08:00"
     }
   ]
 }

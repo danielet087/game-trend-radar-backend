@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-09T00:02:53.856476Z",
+  "generated_at": "2026-11-09T00:03:25.479085Z",
   "today_taipei": "2026-11-09",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-09T00:02:53.571036Z",
+    "checkpoint_updated_at": "2026-11-09T00:03:25.253075Z",
     "group_resolution_updated_at": "2026-11-08T17:17:12.519722Z",
     "candidate_state_updated_at": "2026-11-08T17:05:56.096667Z",
     "prefilter_updated_at": "2026-11-08T17:05:56.077866Z",
@@ -53,10 +53,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-09T08:02:52.475239+08:00",
-    "last_updated_at": "2026-11-09T08:02:53.571036+08:00",
+    "last_updated_at": "2026-11-09T08:03:25.253075+08:00",
+    "finished_at": "2026-11-09T08:03:25.253075+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5513550,
     "last_name": "Obol",
     "requests_this_run": 1,

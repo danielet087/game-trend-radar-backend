@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T20:02:40.305674Z",
+  "generated_at": "2026-11-10T20:03:10.002083Z",
   "today_taipei": "2026-11-11",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-10T20:02:40.052272Z",
+    "checkpoint_updated_at": "2026-11-10T20:03:09.774300Z",
     "group_resolution_updated_at": "2026-11-09T17:18:03.772989Z",
     "candidate_state_updated_at": "2026-11-10T17:09:46.101037Z",
     "prefilter_updated_at": "2026-11-10T17:09:46.085555Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-11",
     "status": "completed",
-    "checked_at": "2026-11-11T04:02:40.305674+08:00",
+    "checked_at": "2026-11-11T04:03:10.002083+08:00",
     "needed": true,
     "planned_count": 186,
     "completed_count": 0,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-11T04:02:38.952898+08:00",
-    "last_updated_at": "2026-11-11T04:02:40.052272+08:00",
+    "last_updated_at": "2026-11-11T04:03:09.774300+08:00",
+    "finished_at": "2026-11-11T04:03:09.774300+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4960640,
     "last_name": "KIT Three Kingdoms: Heroes at War",
     "requests_this_run": 1,

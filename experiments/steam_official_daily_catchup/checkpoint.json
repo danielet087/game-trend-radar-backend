@@ -51173,12 +51173,12 @@
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-11T07:02:55.798696+08:00",
-    "last_updated_at": "2026-11-11T07:07:26.612101+08:00",
-    "requests_this_run": 10,
-    "official_new_this_run": 10,
-    "http_429_this_run": 0,
-    "last_appid": 4640550,
-    "last_name": "Street Food Restaurant Owner"
+    "last_updated_at": "2026-11-11T07:09:59.595220+08:00",
+    "requests_this_run": 15,
+    "official_new_this_run": 14,
+    "http_429_this_run": 1,
+    "last_appid": 5557100,
+    "last_name": "フィルネティアの魔法雑貨店"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -122882,13 +122882,73 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-11T07:07:26.611921+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5114180": {
+      "appid": 5114180,
+      "name": "Prism Factory",
+      "release_date": "2026-11-26",
+      "group_id64": "103582791475796125",
+      "steam_url": "https://store.steampowered.com/app/5114180/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-10T17:09:46.085555+00:00",
+      "official_followers": 8,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-11T07:07:59.493302+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5514130": {
+      "appid": 5514130,
+      "name": "Loop Minesweeper",
+      "release_date": "2026-11-27",
+      "group_id64": "103582791476229417",
+      "steam_url": "https://store.steampowered.com/app/5514130/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-10T17:09:46.085555+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-11T07:08:29.515459+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5535750": {
+      "appid": 5535750,
+      "name": "Tanks & Trebuchets",
+      "release_date": "2026-11-27",
+      "group_id64": "103582791476187524",
+      "steam_url": "https://store.steampowered.com/app/5535750/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-10T17:09:46.085555+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-11T07:08:59.481915+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5548590": {
+      "appid": 5548590,
+      "name": "Equilibria",
+      "release_date": "2026-11-30",
+      "group_id64": "103582791476228821",
+      "steam_url": "https://store.steampowered.com/app/5548590/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-10T17:09:46.085555+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-11T07:09:29.501601+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
-  "community_last_success_at": "2026-11-11T07:07:26.611921+08:00",
+  "next_request_after_taipei": "2026-11-11T07:24:59.595135+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-11-10T23:24:59.595135+00:00",
+    "observed_at": "2026-11-10T23:09:59.595135+00:00",
+    "updated_at": "2026-11-10T23:09:59.595135+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
+  "community_last_success_at": "2026-11-11T07:09:29.501601+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -141864,6 +141924,56 @@
       "status": "ok",
       "github_run_id": "42919588478",
       "official_followers": 11
+    },
+    {
+      "appid": 5114180,
+      "when_taipei": "2026-11-11T07:07:59.366554+08:00",
+      "release_date": "2026-11-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42919588478",
+      "official_followers": 8
+    },
+    {
+      "appid": 5514130,
+      "when_taipei": "2026-11-11T07:08:29.366684+08:00",
+      "release_date": "2026-11-27",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42919588478",
+      "official_followers": 1
+    },
+    {
+      "appid": 5535750,
+      "when_taipei": "2026-11-11T07:08:59.366809+08:00",
+      "release_date": "2026-11-27",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42919588478",
+      "official_followers": 2
+    },
+    {
+      "appid": 5548590,
+      "when_taipei": "2026-11-11T07:09:29.366951+08:00",
+      "release_date": "2026-11-30",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42919588478",
+      "official_followers": 2
+    },
+    {
+      "appid": 5557100,
+      "when_taipei": "2026-11-11T07:09:59.367216+08:00",
+      "release_date": "2026-11-30",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "42919588478",
+      "next_request_after_taipei": "2026-11-11T07:24:59.595135+08:00"
     }
   ]
 }

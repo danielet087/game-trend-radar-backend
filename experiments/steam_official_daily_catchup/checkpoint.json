@@ -50597,20 +50597,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "42812056521",
-    "active": false,
-    "status": "finished",
+    "run_id": "42820566110",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-10T20:02:49.841496+08:00",
-    "last_updated_at": "2026-11-10T20:03:19.546852+08:00",
+    "started_at": "2026-11-10T21:04:27.454823+08:00",
+    "last_updated_at": "2026-11-10T21:04:28.404120+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 1830110,
-    "last_name": "THE SIGNAL: Stranded on Sirenis",
-    "finished_at": "2026-11-10T20:03:19.546852+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5136070,
+    "last_name": "Pocket Adventurer"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -122069,17 +122067,17 @@
       "release_time_utc": "2027-01-28T18:00:00Z"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-10T20:32:50.501604+08:00",
+  "next_request_after_taipei": "2026-11-10T22:04:28.404027+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-10T12:32:50.501604+00:00",
-    "observed_at": "2026-11-10T12:02:50.501604+00:00",
-    "updated_at": "2026-11-10T12:02:50.501604+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-10T14:04:28.404027+00:00",
+    "observed_at": "2026-11-10T13:04:28.404027+00:00",
+    "updated_at": "2026-11-10T13:04:28.404027+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-10T19:09:24.086211+08:00",
   "official_growth_observations": {
@@ -140722,6 +140720,16 @@
       "status": "rate_limited",
       "github_run_id": "42812056521",
       "next_request_after_taipei": "2026-11-10T20:32:50.501604+08:00"
+    },
+    {
+      "appid": 5136070,
+      "when_taipei": "2026-11-10T21:04:28.263323+08:00",
+      "release_date": "2027-02-09",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "42820566110",
+      "next_request_after_taipei": "2026-11-10T22:04:28.404027+08:00"
     }
   ]
 }

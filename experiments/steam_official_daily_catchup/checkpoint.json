@@ -51167,20 +51167,18 @@
     }
   },
   "scheduler_batch": {
-    "active": false,
-    "finished_at": "2026-11-10T23:03:38.560834+08:00",
-    "http_429_this_run": 1,
-    "last_appid": 5186730,
-    "last_name": "Lexiclue",
-    "last_updated_at": "2026-11-10T23:03:38.560834+08:00",
+    "run_id": "42890894216",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
-    "official_new_this_run": 0,
     "request_limit": 90,
+    "started_at": "2026-11-11T04:02:38.952898+08:00",
+    "last_updated_at": "2026-11-11T04:02:40.052272+08:00",
     "requests_this_run": 1,
-    "run_id": "42839848293",
-    "started_at": "2026-11-10T23:03:03.999640+08:00",
-    "status": "finished",
-    "stop_reason": "first_http_429"
+    "official_new_this_run": 0,
+    "http_429_this_run": 1,
+    "last_appid": 4960640,
+    "last_name": "KIT Three Kingdoms: Heroes at War"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -55281,7 +55279,7 @@
       "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
       "release_date": "2027-04-01",
       "steam_url": "https://store.steampowered.com/app/3266110/",
-      "store_date_checked_at_taipei": "2026-11-10T03:02:43.375134+08:00",
+      "store_date_checked_at_taipei": "2026-11-11T04:02:39.650438+08:00",
       "store_date_exact": false,
       "store_date_status": "text_comingsoon"
     },
@@ -122639,10 +122637,18 @@
       }
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
+  "next_request_after_taipei": "2026-11-11T04:17:40.052199+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-11-10T20:17:40.052199+00:00",
+    "observed_at": "2026-11-10T20:02:40.052199+00:00",
+    "updated_at": "2026-11-10T20:02:40.052199+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
   "community_last_success_at": "2026-11-11T02:44:10.098153+08:00",
   "official_growth_observations": {
     "1154960": {
@@ -141409,6 +141415,16 @@
       "release_date": "2027-02-09",
       "status": "rate_limited",
       "when_taipei": "2026-11-10T23:03:04.787502+08:00"
+    },
+    {
+      "appid": 4960640,
+      "when_taipei": "2026-11-11T04:02:39.829283+08:00",
+      "release_date": "2026-11-11",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "42890894216",
+      "next_request_after_taipei": "2026-11-11T04:17:40.052199+08:00"
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T06:11:17.014194Z",
+  "generated_at": "2026-11-10T06:11:45.726463Z",
   "today_taipei": "2026-11-10",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-10T06:11:16.801154Z",
+    "checkpoint_updated_at": "2026-11-10T06:11:45.479695Z",
     "group_resolution_updated_at": "2026-11-09T17:18:03.772989Z",
     "candidate_state_updated_at": "2026-11-09T23:07:40.106746Z",
     "prefilter_updated_at": "2026-11-09T23:07:40.090992Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-10",
     "status": "completed",
-    "checked_at": "2026-11-10T14:11:17.014194+08:00",
+    "checked_at": "2026-11-10T14:11:45.726463+08:00",
     "needed": true,
     "planned_count": 553,
     "completed_count": 182,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-10T14:02:38.702583+08:00",
-    "last_updated_at": "2026-11-10T14:11:16.801154+08:00",
+    "last_updated_at": "2026-11-10T14:11:45.479695+08:00",
+    "finished_at": "2026-11-10T14:11:45.479695+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5271570,
     "last_name": "1,000,000 Lentils & Ashes",
     "requests_this_run": 18,

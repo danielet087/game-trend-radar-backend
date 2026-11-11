@@ -51175,17 +51175,19 @@
   },
   "scheduler_batch": {
     "run_id": "42935689990",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-11T09:02:38.001536+08:00",
-    "last_updated_at": "2026-11-11T09:06:38.871369+08:00",
+    "last_updated_at": "2026-11-11T09:07:03.658079+08:00",
     "requests_this_run": 9,
     "official_new_this_run": 8,
     "http_429_this_run": 1,
     "last_appid": 5497170,
-    "last_name": "Uncatalogued"
+    "last_name": "Uncatalogued",
+    "finished_at": "2026-11-11T09:07:03.658079+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T06:23:42.592687Z",
+  "generated_at": "2026-11-11T06:28:46.809457Z",
   "today_taipei": "2026-11-11",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-11T06:23:42.346093Z",
+    "checkpoint_updated_at": "2026-11-11T06:28:46.552298Z",
     "group_resolution_updated_at": "2026-11-10T23:18:21.797522Z",
     "candidate_state_updated_at": "2026-11-10T17:09:46.101037Z",
     "prefilter_updated_at": "2026-11-10T17:09:46.085555Z",
     "eligible_screened_at": "2026-11-11T04:02:06.342077Z",
     "twitch_import_updated_at": "2026-11-11T05:38:01.314995Z",
-    "last_official_success_at": "2026-11-11T06:23:42.345906Z",
+    "last_official_success_at": "2026-11-11T06:28:46.552083Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -20,35 +20,35 @@
     "eligible_screened_at": "2026-11-11T04:02:06.342077+00:00",
     "added_from_daily": 0,
     "eligible_count": 3960,
-    "official_rechecks_pending": 22,
+    "official_rechecks_pending": 12,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 27,
+    "combined_pending_now": 17,
     "completed_legacy": 408,
-    "completed_new": 5084,
+    "completed_new": 5085,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 27,
+    "normal_pending": 17,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 27,
-    "followers_ready_pending": 27,
+    "ready_pending": 17,
+    "followers_ready_pending": 17,
     "awaiting_group_pending": 0,
-    "total_pending": 27,
-    "today_attempts": 219,
-    "today_successes": 212,
+    "total_pending": 17,
+    "today_attempts": 229,
+    "today_successes": 222,
     "today_429": 7
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-11",
     "status": "completed",
-    "checked_at": "2026-11-11T14:23:42.592687+08:00",
+    "checked_at": "2026-11-11T14:28:46.809457+08:00",
     "needed": true,
     "planned_count": 186,
-    "completed_count": 163,
-    "remaining_count": 23,
-    "due_now_count": 22
+    "completed_count": 173,
+    "remaining_count": 13,
+    "due_now_count": 12
   },
   "group_resolution_api_cooldown": {
     "attempts": 0,
@@ -68,11 +68,11 @@
     "active": true,
     "status": "querying",
     "started_at": "2026-11-11T14:02:56.184693+08:00",
-    "last_updated_at": "2026-11-11T14:23:42.346093+08:00",
-    "last_appid": 5033530,
-    "last_name": "The Crown",
-    "requests_this_run": 40,
-    "official_new_this_run": 40,
+    "last_updated_at": "2026-11-11T14:28:46.552298+08:00",
+    "last_appid": 4654850,
+    "last_name": "Deckrage",
+    "requests_this_run": 50,
+    "official_new_this_run": 50,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
@@ -82,146 +82,6 @@
   "queue": [
     {
       "position": 1,
-      "appid": 5251350,
-      "name": "Chechelevo Mainland",
-      "steam_url": "https://store.steampowered.com/app/5251350/",
-      "release_date": "2027-07-07",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475844878",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 4993250,
-      "name": "REaffraid",
-      "steam_url": "https://store.steampowered.com/app/4993250/",
-      "release_date": "2027-07-13",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475772779",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5007400,
-      "name": "Stingray Sanctuary",
-      "steam_url": "https://store.steampowered.com/app/5007400/",
-      "release_date": "2027-07-14",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475756959",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 3345800,
-      "name": "First Kingdom",
-      "steam_url": "https://store.steampowered.com/app/3345800/",
-      "release_date": "2027-08-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475815590",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5259500,
-      "name": "Doughjo",
-      "steam_url": "https://store.steampowered.com/app/5259500/",
-      "release_date": "2027-08-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475982875",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5124760,
-      "name": "August Star | Sao tháng Tám",
-      "steam_url": "https://store.steampowered.com/app/5124760/",
-      "release_date": "2027-09-02",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475797424",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5300260,
-      "name": "KOI-KOI!",
-      "steam_url": "https://store.steampowered.com/app/5300260/",
-      "release_date": "2027-09-18",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476003011",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5000900,
-      "name": "Convergent Chrono",
-      "steam_url": "https://store.steampowered.com/app/5000900/",
-      "release_date": "2027-09-30",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475832462",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5073420,
-      "name": "GORTH",
-      "steam_url": "https://store.steampowered.com/app/5073420/",
-      "release_date": "2027-10-01",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475781664",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 4654850,
-      "name": "Deckrage",
-      "steam_url": "https://store.steampowered.com/app/4654850/",
-      "release_date": "2027-10-09",
-      "source": "fresh_daily_prefilter_ge4000_pending_official",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475738828",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 3305910,
       "name": "Faceless Residence",
       "steam_url": "https://store.steampowered.com/app/3305910/",
@@ -235,7 +95,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 2,
       "appid": 5307160,
       "name": "IWA Fighting Adventure",
       "steam_url": "https://store.steampowered.com/app/5307160/",
@@ -249,7 +109,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 4973920,
       "name": "Squircle",
       "steam_url": "https://store.steampowered.com/app/4973920/",
@@ -263,7 +123,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 5016240,
       "name": "Classroom in Sora",
       "steam_url": "https://store.steampowered.com/app/5016240/",
@@ -277,7 +137,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 5036870,
       "name": "PLEASE CONFIRM THE DECEASED",
       "steam_url": "https://store.steampowered.com/app/5036870/",
@@ -291,7 +151,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 5271570,
       "name": "1,000,000 Lentils & Ashes",
       "steam_url": "https://store.steampowered.com/app/5271570/",
@@ -305,7 +165,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 4930650,
       "name": "11 PM: A Minimalist Factory Game",
       "steam_url": "https://store.steampowered.com/app/4930650/",
@@ -319,7 +179,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 1830110,
       "name": "THE SIGNAL: Stranded on Sirenis",
       "steam_url": "https://store.steampowered.com/app/1830110/",
@@ -333,7 +193,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5136070,
       "name": "Pocket Adventurer",
       "steam_url": "https://store.steampowered.com/app/5136070/",
@@ -347,7 +207,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5186730,
       "name": "Lexiclue",
       "steam_url": "https://store.steampowered.com/app/5186730/",
@@ -361,7 +221,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 4960640,
       "name": "KIT Three Kingdoms: Heroes at War",
       "steam_url": "https://store.steampowered.com/app/4960640/",
@@ -375,7 +235,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 5034320,
       "name": "いつまでも美シク - Villa NEPENTHES -",
       "steam_url": "https://store.steampowered.com/app/5034320/",
@@ -389,7 +249,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 5557100,
       "name": "フィルネティアの魔法雑貨店",
       "steam_url": "https://store.steampowered.com/app/5557100/",
@@ -403,7 +263,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 5116420,
       "name": "Dirty Derby",
       "steam_url": "https://store.steampowered.com/app/5116420/",
@@ -417,7 +277,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 5497170,
       "name": "Uncatalogued",
       "steam_url": "https://store.steampowered.com/app/5497170/",
@@ -431,7 +291,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 3781790,
       "name": "Eternal Anima",
       "steam_url": "https://store.steampowered.com/app/3781790/",
@@ -445,7 +305,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 5039930,
       "name": "Duelike",
       "steam_url": "https://store.steampowered.com/app/5039930/",
@@ -461,136 +321,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-11T05:06:34.881668Z",
-      "kind": "official_attempt",
-      "appid": 5294620,
-      "name": "Barbe-Yeux",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 6,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:07:04.881773Z",
-      "kind": "official_attempt",
-      "appid": 5295290,
-      "name": "Paladin HC",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 108,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:07:34.881877Z",
-      "kind": "official_attempt",
-      "appid": 5338100,
-      "name": "Wispward",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:08:04.881981Z",
-      "kind": "official_attempt",
-      "appid": 5194370,
-      "name": "Byte Bistro",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 13,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:08:34.882090Z",
-      "kind": "official_attempt",
-      "appid": 4611130,
-      "name": "Angler 2003",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:09:04.882203Z",
-      "kind": "official_attempt",
-      "appid": 5027780,
-      "name": "Balls to the Walls",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 6,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:09:34.882309Z",
-      "kind": "official_attempt",
-      "appid": 5071610,
-      "name": "Flowline",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:10:04.882417Z",
-      "kind": "official_attempt",
-      "appid": 5189920,
-      "name": "Minya in the Sky",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 13,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:10:34.882521Z",
-      "kind": "official_attempt",
-      "appid": 5402750,
-      "name": "Number Bound",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:11:04.882648Z",
-      "kind": "official_attempt",
-      "appid": 4850830,
-      "name": "Dodgeball Rush",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 10,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
     {
       "at": "2026-11-11T05:11:34.882752Z",
       "kind": "official_attempt",
@@ -1757,6 +1487,136 @@
       "http": 200,
       "source": "fresh_daily_prefilter_unresolved",
       "official_followers": 29,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:24:16.444960Z",
+      "kind": "official_attempt",
+      "appid": 5251350,
+      "name": "Chechelevo Mainland",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:24:46.445070Z",
+      "kind": "official_attempt",
+      "appid": 4993250,
+      "name": "REaffraid",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 167,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:25:16.445182Z",
+      "kind": "official_attempt",
+      "appid": 5007400,
+      "name": "Stingray Sanctuary",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 8,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:25:46.445327Z",
+      "kind": "official_attempt",
+      "appid": 3345800,
+      "name": "First Kingdom",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:26:16.445458Z",
+      "kind": "official_attempt",
+      "appid": 5259500,
+      "name": "Doughjo",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:26:46.445567Z",
+      "kind": "official_attempt",
+      "appid": 5124760,
+      "name": "August Star | Sao tháng Tám",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 5,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:27:16.445678Z",
+      "kind": "official_attempt",
+      "appid": 5300260,
+      "name": "KOI-KOI!",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:27:46.445833Z",
+      "kind": "official_attempt",
+      "appid": 5000900,
+      "name": "Convergent Chrono",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 6,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:28:16.445950Z",
+      "kind": "official_attempt",
+      "appid": 5073420,
+      "name": "GORTH",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 39,
+      "retry_at": null,
+      "run_id": "42969393969",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T06:28:46.446075Z",
+      "kind": "official_attempt",
+      "appid": 4654850,
+      "name": "Deckrage",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_ge4000_pending_official",
+      "official_followers": 22,
       "retry_at": null,
       "run_id": "42969393969",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T07:02:10.478319Z",
+  "generated_at": "2026-11-11T07:02:31.331794Z",
   "today_taipei": "2026-11-11",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-11T06:36:56.307421Z",
+    "checkpoint_updated_at": "2026-11-11T07:02:31.062678Z",
     "group_resolution_updated_at": "2026-11-10T23:18:21.797522Z",
     "candidate_state_updated_at": "2026-11-10T17:09:46.101037Z",
     "prefilter_updated_at": "2026-11-10T17:09:46.085555Z",
     "eligible_screened_at": "2026-11-11T04:02:06.342077Z",
     "twitch_import_updated_at": "2026-11-11T06:37:54.985474Z",
-    "last_official_success_at": "2026-11-11T06:36:56.189553Z",
+    "last_official_success_at": "2026-11-11T07:02:30.938855Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -20,35 +20,35 @@
     "eligible_screened_at": "2026-11-11T04:02:06.342077+00:00",
     "added_from_daily": 0,
     "eligible_count": 3960,
-    "official_rechecks_pending": 1,
+    "official_rechecks_pending": 0,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 1,
+    "combined_pending_now": 0,
     "completed_legacy": 408,
     "completed_new": 5091,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 1,
+    "normal_pending": 0,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 1,
-    "followers_ready_pending": 1,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 1,
-    "today_attempts": 245,
-    "today_successes": 238,
+    "total_pending": 0,
+    "today_attempts": 246,
+    "today_successes": 239,
     "today_429": 7
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-11",
     "status": "completed",
-    "checked_at": "2026-11-11T07:02:10.478319+00:00",
+    "checked_at": "2026-11-11T15:02:31.331794+08:00",
     "needed": true,
     "planned_count": 186,
-    "completed_count": 184,
-    "remaining_count": 2,
-    "due_now_count": 1
+    "completed_count": 185,
+    "remaining_count": 1,
+    "due_now_count": 0
   },
   "group_resolution_api_cooldown": {
     "attempts": 0,
@@ -61,57 +61,29 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-11-11T08:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-11-11T14:02:56.184693+08:00",
-    "last_updated_at": "2026-11-11T14:36:56.307421+08:00",
-    "finished_at": "2026-11-11T14:36:56.307421+08:00",
-    "stop_reason": "hour_time_budget",
-    "last_appid": 3781790,
-    "last_name": "Eternal Anima",
-    "requests_this_run": 66,
-    "official_new_this_run": 66,
+    "started_at": "2026-11-11T15:02:30.054824+08:00",
+    "last_updated_at": "2026-11-11T15:02:31.062678+08:00",
+    "finished_at": "2026-11-11T15:02:31.062678+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 5039930,
+    "last_name": "Duelike",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "run_id": "42969393969",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    "run_id": "42976329808",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42976329808"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 5039930,
-      "name": "Duelike",
-      "steam_url": "https://store.steampowered.com/app/5039930/",
-      "release_date": "2027-03-04",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475774551",
-      "group_resolution": null,
-      "last_attempt_at": "2026-11-11T03:02:29.952588Z",
-      "last_attempt_status": "rate_limited"
-    }
-  ],
+  "queue": [],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-11T05:20:01.023147Z",
-      "kind": "official_attempt",
-      "appid": 5343300,
-      "name": "The Last Curator",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
     {
       "at": "2026-11-11T05:20:31.023254Z",
       "kind": "official_attempt",
@@ -1398,6 +1370,19 @@
       "retry_at": null,
       "run_id": "42969393969",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42969393969"
+    },
+    {
+      "at": "2026-11-11T07:02:30.744647Z",
+      "kind": "official_attempt",
+      "appid": 5039930,
+      "name": "Duelike",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 6,
+      "retry_at": null,
+      "run_id": "42976329808",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42976329808"
     }
   ],
   "events_limit": 100

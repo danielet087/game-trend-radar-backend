@@ -4204,7 +4204,7 @@
     },
     "1771460": {
       "status": "excluded",
-      "updated_at": "2026-11-10T05:37:27.853438Z",
+      "updated_at": "2026-11-11T05:37:31.146036Z",
       "twitch_admission": {
         "schema_version": 1,
         "method": "twitch_igdb_external_steam_v1",
@@ -4212,8 +4212,8 @@
         "twitch_game_id": "733916086",
         "igdb_id": "190280",
         "checked_at": "2026-11-10T05:14:08Z",
-        "source_database_revision": "f913f967065b0ee745e51aa33cb1c7075d463c9e6f7d82d0a6e161ab95c965f9",
-        "source_database_generation": 1525,
+        "source_database_revision": "c3f489dc04eef79e92b446c1862ce713cef825e0e747aa16f7ae63b92e1a89be",
+        "source_database_generation": 1610,
         "source_database_namespace": "danielet087/game-trend-radar@main",
         "source_enrollment": {
           "source": "igdb_first_release_date",
@@ -4225,7 +4225,7 @@
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "outside_new_game_window",
-      "retry_at": "2026-11-11T05:37:29.594475Z",
+      "retry_at": "2026-11-12T05:37:32.906672Z",
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null
@@ -5761,8 +5761,41 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "5217440": {
+      "status": "accepted",
+      "updated_at": "2026-11-11T05:37:31.146036Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 5217440,
+        "twitch_game_id": "274875111",
+        "igdb_id": "417806",
+        "checked_at": "2026-11-11T05:14:02Z",
+        "source_database_revision": "c3f489dc04eef79e92b446c1862ce713cef825e0e747aa16f7ae63b92e1a89be",
+        "source_database_generation": 1610,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-11-11T05:14:02Z",
+          "viewer_count": 58177,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "steam_verified",
+      "content_signature": "76780a80238fa1becedfbbcb065a717d2a21e719a736bb26fd7d132fc0d8501b",
+      "followers": 416,
+      "follower_checked_at": "2026-10-16T18:33:36.910557+08:00",
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-11-11T02:02:01.984518Z",
+  "updated_at": "2026-11-11T05:37:31.146036Z",
   "api_cooldowns": {}
 }

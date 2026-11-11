@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T00:11:47.443084Z",
+  "generated_at": "2026-11-11T00:12:32.850714Z",
   "today_taipei": "2026-11-11",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-11T00:11:47.232294Z",
+    "checkpoint_updated_at": "2026-11-11T00:12:32.598514Z",
     "group_resolution_updated_at": "2026-11-10T23:18:21.797522Z",
     "candidate_state_updated_at": "2026-11-10T17:09:46.101037Z",
     "prefilter_updated_at": "2026-11-10T17:09:46.085555Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-11",
     "status": "completed",
-    "checked_at": "2026-11-11T08:11:47.443084+08:00",
+    "checked_at": "2026-11-11T08:12:32.850714+08:00",
     "needed": true,
     "planned_count": 186,
     "completed_count": 0,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-11T08:02:51.768190+08:00",
-    "last_updated_at": "2026-11-11T08:11:47.232294+08:00",
+    "last_updated_at": "2026-11-11T08:12:32.598514+08:00",
+    "finished_at": "2026-11-11T08:12:32.598514+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5116420,
     "last_name": "Dirty Derby",
     "requests_this_run": 18,

@@ -51188,20 +51188,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "42942935258",
-    "active": false,
-    "status": "finished",
+    "run_id": "42949791740",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-11T10:02:51.664913+08:00",
-    "last_updated_at": "2026-11-11T10:31:56.350352+08:00",
-    "requests_this_run": 57,
-    "official_new_this_run": 56,
+    "started_at": "2026-11-11T11:02:29.490394+08:00",
+    "last_updated_at": "2026-11-11T11:02:30.222444+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 3781790,
-    "last_name": "Eternal Anima",
-    "finished_at": "2026-11-11T10:31:56.350352+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5039930,
+    "last_name": "Duelike"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -123537,17 +123535,17 @@
       "release_time_utc": "2027-02-16T14:59:00Z"
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-11T10:46:29.340490+08:00",
+  "next_request_after_taipei": "2026-11-11T11:32:30.221841+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-11T02:46:29.340490+00:00",
-    "observed_at": "2026-11-11T02:31:29.340490+00:00",
-    "updated_at": "2026-11-11T02:31:29.340490+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-11-11T03:32:30.221841+00:00",
+    "observed_at": "2026-11-11T03:02:30.221841+00:00",
+    "updated_at": "2026-11-11T03:02:30.221841+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-11-11T10:30:59.370265+08:00",
   "official_growth_observations": {
@@ -143424,6 +143422,16 @@
       "status": "rate_limited",
       "github_run_id": "42942935258",
       "next_request_after_taipei": "2026-11-11T10:46:29.340490+08:00"
+    },
+    {
+      "appid": 5039930,
+      "when_taipei": "2026-11-11T11:02:29.952588+08:00",
+      "release_date": "2027-03-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "42949791740",
+      "next_request_after_taipei": "2026-11-11T11:32:30.221841+08:00"
     }
   ]
 }

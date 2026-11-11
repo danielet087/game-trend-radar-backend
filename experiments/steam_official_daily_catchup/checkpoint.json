@@ -1022,15 +1022,15 @@
     },
     "2083660": {
       "appid": 2083660,
-      "daily_source_updated_at": "2026-11-09T23:07:40.090992+00:00",
-      "follower_recheck": true,
-      "follower_recheck_after": "2026-11-09T16:30:17.768366+08:00",
-      "follower_recheck_previous_at": "2026-11-09T16:30:17.768366+08:00",
-      "group_id64": "103582791472500136",
       "name": "Littlelands",
-      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
       "release_date": "2026-11-17",
-      "steam_url": "https://store.steampowered.com/app/2083660/"
+      "group_id64": "103582791472500136",
+      "steam_url": "https://store.steampowered.com/app/2083660/",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "daily_source_updated_at": "2026-11-10T17:09:46.085555+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-10T17:02:37.811996+08:00",
+      "follower_recheck_previous_at": "2026-11-10T17:02:37.811996+08:00"
     },
     "2087540": {
       "appid": 2087540,
@@ -51202,18 +51202,20 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "42983604715",
+    "run_id": "42991503399",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-11T16:03:03.689056+08:00",
-    "last_updated_at": "2026-11-11T16:03:04.499251+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-11-11T17:02:44.275125+08:00",
+    "last_updated_at": "2026-11-11T17:02:45.078285+08:00",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
-    "finished_at": "2026-11-11T16:03:04.499251+08:00",
-    "stop_reason": "nothing_pending"
+    "last_appid": 2083660,
+    "last_name": "Littlelands",
+    "finished_at": "2026-11-11T17:02:45.078285+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -52971,19 +52973,19 @@
     },
     "2083660": {
       "appid": 2083660,
-      "daily_source_updated_at": "2026-11-09T23:07:40.090992+00:00",
-      "follower_recheck": true,
-      "follower_recheck_after": "2026-11-09T16:30:17.768366+08:00",
-      "follower_recheck_previous_at": "2026-11-09T16:30:17.768366+08:00",
-      "group_id64": "103582791472500136",
       "name": "Littlelands",
-      "official_checked_at_taipei": "2026-11-10T17:02:37.811996+08:00",
-      "official_followers": 4936,
-      "official_ge5000": false,
-      "official_source": "Steam Community XML memberCount",
-      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
       "release_date": "2026-11-17",
-      "steam_url": "https://store.steampowered.com/app/2083660/"
+      "group_id64": "103582791472500136",
+      "steam_url": "https://store.steampowered.com/app/2083660/",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "daily_source_updated_at": "2026-11-10T17:09:46.085555+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-10T17:02:37.811996+08:00",
+      "follower_recheck_previous_at": "2026-11-10T17:02:37.811996+08:00",
+      "official_followers": 4961,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-11T17:02:44.984618+08:00",
+      "official_source": "Steam Community XML memberCount"
     },
     "2087540": {
       "appid": 2087540,
@@ -124159,7 +124161,7 @@
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-11-11T15:02:30.938855+08:00",
+  "community_last_success_at": "2026-11-11T17:02:44.984618+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -145407,6 +145409,16 @@
       "status": "ok",
       "github_run_id": "42976329808",
       "official_followers": 6
+    },
+    {
+      "appid": 2083660,
+      "when_taipei": "2026-11-11T17:02:44.783013+08:00",
+      "release_date": "2026-11-17",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "42991503399",
+      "official_followers": 4961
     }
   ]
 }

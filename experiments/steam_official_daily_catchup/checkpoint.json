@@ -52349,12 +52349,12 @@
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-12T08:03:05.572541+08:00",
-    "last_updated_at": "2026-11-12T08:07:36.371476+08:00",
-    "requests_this_run": 10,
-    "official_new_this_run": 10,
-    "http_429_this_run": 0,
-    "last_appid": 5494840,
-    "last_name": "Don’t  Drop!!"
+    "last_updated_at": "2026-11-12T08:09:42.299646+08:00",
+    "requests_this_run": 14,
+    "official_new_this_run": 13,
+    "http_429_this_run": 1,
+    "last_appid": 5516730,
+    "last_name": "Beware of Ants"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -125424,13 +125424,60 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-12T08:07:36.371345+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5547370": {
+      "appid": 5547370,
+      "name": "文明融合",
+      "release_date": "2026-11-15",
+      "group_id64": "103582791476231548",
+      "steam_url": "https://store.steampowered.com/app/5547370/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-11T23:06:14.356715+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-12T08:08:12.296276+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5443350": {
+      "appid": 5443350,
+      "name": "Chisel Me This",
+      "release_date": "2026-11-16",
+      "group_id64": "103582791476186963",
+      "steam_url": "https://store.steampowered.com/app/5443350/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-11T23:06:14.356715+00:00",
+      "official_followers": 43,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-12T08:08:42.308003+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5451310": {
+      "appid": 5451310,
+      "name": "Point Nemo",
+      "release_date": "2026-11-16",
+      "group_id64": "103582791476126987",
+      "steam_url": "https://store.steampowered.com/app/5451310/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-11T23:06:14.356715+00:00",
+      "official_followers": 4,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-12T08:09:12.310783+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
-  "community_last_success_at": "2026-11-12T08:07:36.371345+08:00",
+  "next_request_after_taipei": "2026-11-12T08:24:42.299563+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-11-12T00:24:42.299563+00:00",
+    "observed_at": "2026-11-12T00:09:42.299563+00:00",
+    "updated_at": "2026-11-12T00:09:42.299563+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
+  "community_last_success_at": "2026-11-12T08:09:12.310783+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -146830,6 +146877,46 @@
       "status": "ok",
       "github_run_id": "43124032765",
       "official_followers": 1
+    },
+    {
+      "appid": 5547370,
+      "when_taipei": "2026-11-12T08:08:12.163991+08:00",
+      "release_date": "2026-11-15",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43124032765",
+      "official_followers": 1
+    },
+    {
+      "appid": 5443350,
+      "when_taipei": "2026-11-12T08:08:42.164110+08:00",
+      "release_date": "2026-11-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43124032765",
+      "official_followers": 43
+    },
+    {
+      "appid": 5451310,
+      "when_taipei": "2026-11-12T08:09:12.164221+08:00",
+      "release_date": "2026-11-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43124032765",
+      "official_followers": 4
+    },
+    {
+      "appid": 5516730,
+      "when_taipei": "2026-11-12T08:09:42.164342+08:00",
+      "release_date": "2026-11-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43124032765",
+      "next_request_after_taipei": "2026-11-12T08:24:42.299563+08:00"
     }
   ]
 }

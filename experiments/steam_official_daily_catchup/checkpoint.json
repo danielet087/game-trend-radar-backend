@@ -52351,17 +52351,19 @@
   },
   "scheduler_batch": {
     "run_id": "43158427231",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-12T13:02:38.632782+08:00",
-    "last_updated_at": "2026-11-12T13:23:06.098959+08:00",
+    "last_updated_at": "2026-11-12T13:23:35.717775+08:00",
     "requests_this_run": 40,
     "official_new_this_run": 40,
     "http_429_this_run": 0,
     "last_appid": 5023080,
-    "last_name": "Mortal Chess"
+    "last_name": "Mortal Chess",
+    "finished_at": "2026-11-12T13:23:35.717775+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {

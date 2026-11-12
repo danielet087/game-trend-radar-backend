@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-12T01:02:19.646620Z",
+  "generated_at": "2026-11-12T01:07:16.164409Z",
   "today_taipei": "2026-11-12",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-12T00:10:16.247078Z",
+    "checkpoint_updated_at": "2026-11-12T01:07:15.841911Z",
     "group_resolution_updated_at": "2026-11-10T23:18:21.797522Z",
     "candidate_state_updated_at": "2026-11-11T23:06:14.375343Z",
     "prefilter_updated_at": "2026-11-11T23:06:14.356715Z",
     "eligible_screened_at": "2026-11-11T23:06:15.252733Z",
     "twitch_import_updated_at": "2026-11-12T00:12:32.224523Z",
-    "last_official_success_at": "2026-11-12T00:09:12.310783Z",
+    "last_official_success_at": "2026-11-12T01:07:15.841767Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -22,28 +22,28 @@
     "eligible_count": 3828,
     "official_rechecks_pending": 23,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 129,
+    "combined_pending_now": 119,
     "completed_legacy": 408,
-    "completed_new": 5104,
+    "completed_new": 5114,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 129,
+    "normal_pending": 119,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 129,
-    "followers_ready_pending": 129,
+    "ready_pending": 119,
+    "followers_ready_pending": 119,
     "awaiting_group_pending": 0,
-    "total_pending": 129,
-    "today_attempts": 14,
-    "today_successes": 13,
+    "total_pending": 119,
+    "today_attempts": 24,
+    "today_successes": 23,
     "today_429": 1
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-12",
     "status": "completed",
-    "checked_at": "2026-11-12T01:02:19.646620+00:00",
+    "checked_at": "2026-11-12T09:07:16.164409+08:00",
     "needed": true,
     "planned_count": 26,
     "completed_count": 0,
@@ -59,171 +59,29 @@
   },
   "cooldown": {
     "active": false,
-    "until": "2026-11-12T00:24:42.299563Z",
+    "until": null,
     "reason": null,
     "next_eligible_slot": "2026-11-12T02:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": false,
-    "status": "finished",
-    "started_at": "2026-11-12T08:03:05.572541+08:00",
-    "last_updated_at": "2026-11-12T08:10:16.247078+08:00",
-    "finished_at": "2026-11-12T08:10:16.247078+08:00",
-    "stop_reason": "first_http_429",
-    "last_appid": 5516730,
-    "last_name": "Beware of Ants",
-    "requests_this_run": 14,
-    "official_new_this_run": 13,
-    "http_429_this_run": 1,
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-11-12T09:02:45.077004+08:00",
+    "last_updated_at": "2026-11-12T09:07:15.841911+08:00",
+    "last_appid": 5449680,
+    "last_name": "Mini Legends Idle",
+    "requests_this_run": 10,
+    "official_new_this_run": 10,
+    "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "run_id": "43124032765",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43124032765"
+    "run_id": "43131395925",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 5547980,
-      "name": "Stickman Breaks Into the World of Mathematics",
-      "steam_url": "https://store.steampowered.com/app/5547980/",
-      "release_date": "2026-11-16",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476231809",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 2781120,
-      "name": "Temporal Distortion",
-      "steam_url": "https://store.steampowered.com/app/2781120/",
-      "release_date": "2026-11-17",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476146456",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5506160,
-      "name": "Egg Harvest",
-      "steam_url": "https://store.steampowered.com/app/5506160/",
-      "release_date": "2026-11-17",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476173631",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5507870,
-      "name": "Babble Battle",
-      "steam_url": "https://store.steampowered.com/app/5507870/",
-      "release_date": "2026-11-17",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476192054",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5146380,
-      "name": "Attkand",
-      "steam_url": "https://store.steampowered.com/app/5146380/",
-      "release_date": "2026-11-18",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475810019",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5292120,
-      "name": "Unhistorical Warfare",
-      "steam_url": "https://store.steampowered.com/app/5292120/",
-      "release_date": "2026-11-18",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475913580",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5531610,
-      "name": "GBald",
-      "steam_url": "https://store.steampowered.com/app/5531610/",
-      "release_date": "2026-11-18",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476234266",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5165430,
-      "name": "PomoIdle Arena",
-      "steam_url": "https://store.steampowered.com/app/5165430/",
-      "release_date": "2026-11-19",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475812074",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5286110,
-      "name": "Empires of the Axis and Abyss",
-      "steam_url": "https://store.steampowered.com/app/5286110/",
-      "release_date": "2026-11-19",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476134579",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 5449680,
-      "name": "Mini Legends Idle",
-      "steam_url": "https://store.steampowered.com/app/5449680/",
-      "release_date": "2026-11-19",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476145266",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 5518020,
       "name": "Red Eye Empire",
       "steam_url": "https://store.steampowered.com/app/5518020/",
@@ -237,7 +95,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 2,
       "appid": 5568630,
       "name": "Mind the Tilt",
       "steam_url": "https://store.steampowered.com/app/5568630/",
@@ -251,7 +109,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 5567360,
       "name": "Summonforge: Idle RPG",
       "steam_url": "https://store.steampowered.com/app/5567360/",
@@ -265,7 +123,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 4891770,
       "name": "Orby vs Rects",
       "steam_url": "https://store.steampowered.com/app/4891770/",
@@ -279,7 +137,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 5425700,
       "name": "Bouture",
       "steam_url": "https://store.steampowered.com/app/5425700/",
@@ -293,7 +151,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 5522260,
       "name": "Toku's 12 Adventures",
       "steam_url": "https://store.steampowered.com/app/5522260/",
@@ -307,7 +165,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 5584120,
       "name": "Tell Me How I Can Hurt You",
       "steam_url": "https://store.steampowered.com/app/5584120/",
@@ -321,7 +179,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 4906740,
       "name": "KARAKARA3",
       "steam_url": "https://store.steampowered.com/app/4906740/",
@@ -335,7 +193,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5203260,
       "name": "Card Dice",
       "steam_url": "https://store.steampowered.com/app/5203260/",
@@ -349,7 +207,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5513420,
       "name": "C.L.T.",
       "steam_url": "https://store.steampowered.com/app/5513420/",
@@ -363,7 +221,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5554860,
       "name": "Seoul Zombie City",
       "steam_url": "https://store.steampowered.com/app/5554860/",
@@ -377,7 +235,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 5568320,
       "name": "Chinese-Style Exams",
       "steam_url": "https://store.steampowered.com/app/5568320/",
@@ -391,7 +249,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 5487170,
       "name": "Belly Gunner",
       "steam_url": "https://store.steampowered.com/app/5487170/",
@@ -405,7 +263,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 5507950,
       "name": "Chess Lords",
       "steam_url": "https://store.steampowered.com/app/5507950/",
@@ -419,7 +277,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 5527100,
       "name": "Ooglie Booglies",
       "steam_url": "https://store.steampowered.com/app/5527100/",
@@ -433,7 +291,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 5565800,
       "name": "Retail Empire",
       "steam_url": "https://store.steampowered.com/app/5565800/",
@@ -447,7 +305,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 5036430,
       "name": "Coding War",
       "steam_url": "https://store.steampowered.com/app/5036430/",
@@ -461,7 +319,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 28,
+      "position": 18,
       "appid": 5254210,
       "name": "Coins in Place",
       "steam_url": "https://store.steampowered.com/app/5254210/",
@@ -475,7 +333,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 29,
+      "position": 19,
       "appid": 5565650,
       "name": "Depthline",
       "steam_url": "https://store.steampowered.com/app/5565650/",
@@ -489,7 +347,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 30,
+      "position": 20,
       "appid": 5268810,
       "name": "Flak Simulator",
       "steam_url": "https://store.steampowered.com/app/5268810/",
@@ -503,7 +361,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 31,
+      "position": 21,
       "appid": 5483280,
       "name": "Metal Wayfarer",
       "steam_url": "https://store.steampowered.com/app/5483280/",
@@ -517,7 +375,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 32,
+      "position": 22,
       "appid": 5514200,
       "name": "Newborn",
       "steam_url": "https://store.steampowered.com/app/5514200/",
@@ -531,7 +389,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 33,
+      "position": 23,
       "appid": 5546110,
       "name": "SwitcHead",
       "steam_url": "https://store.steampowered.com/app/5546110/",
@@ -545,7 +403,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 34,
+      "position": 24,
       "appid": 5556830,
       "name": "Desktop Divinity",
       "steam_url": "https://store.steampowered.com/app/5556830/",
@@ -559,7 +417,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 35,
+      "position": 25,
       "appid": 5561160,
       "name": "Port Solano City: Gangster War",
       "steam_url": "https://store.steampowered.com/app/5561160/",
@@ -573,7 +431,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 36,
+      "position": 26,
       "appid": 4512860,
       "name": "NEKO-NIN exHeart SPIN! 2",
       "steam_url": "https://store.steampowered.com/app/4512860/",
@@ -587,7 +445,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 37,
+      "position": 27,
       "appid": 4636740,
       "name": "Meteor Shower",
       "steam_url": "https://store.steampowered.com/app/4636740/",
@@ -601,7 +459,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 38,
+      "position": 28,
       "appid": 5556170,
       "name": "Drawbacks: Draw, Guess, Sabotage",
       "steam_url": "https://store.steampowered.com/app/5556170/",
@@ -615,7 +473,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 39,
+      "position": 29,
       "appid": 5570610,
       "name": "Royal Guard: Hive Rescue",
       "steam_url": "https://store.steampowered.com/app/5570610/",
@@ -629,7 +487,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 40,
+      "position": 30,
       "appid": 5381720,
       "name": "Artillery Deluxe",
       "steam_url": "https://store.steampowered.com/app/5381720/",
@@ -643,7 +501,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 41,
+      "position": 31,
       "appid": 5510400,
       "name": "39D",
       "steam_url": "https://store.steampowered.com/app/5510400/",
@@ -657,7 +515,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 42,
+      "position": 32,
       "appid": 5539420,
       "name": "Raisin Universe",
       "steam_url": "https://store.steampowered.com/app/5539420/",
@@ -671,7 +529,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 43,
+      "position": 33,
       "appid": 4999730,
       "name": "Fractured Rift: Incremental",
       "steam_url": "https://store.steampowered.com/app/4999730/",
@@ -685,7 +543,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 44,
+      "position": 34,
       "appid": 5185030,
       "name": "Boba Escape",
       "steam_url": "https://store.steampowered.com/app/5185030/",
@@ -699,7 +557,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 45,
+      "position": 35,
       "appid": 5375520,
       "name": "MOMENT: A Clockwork Melody",
       "steam_url": "https://store.steampowered.com/app/5375520/",
@@ -713,7 +571,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 46,
+      "position": 36,
       "appid": 5404590,
       "name": "Toast Flipper",
       "steam_url": "https://store.steampowered.com/app/5404590/",
@@ -727,7 +585,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 47,
+      "position": 37,
       "appid": 5534210,
       "name": "52 Card Pickup",
       "steam_url": "https://store.steampowered.com/app/5534210/",
@@ -741,7 +599,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 48,
+      "position": 38,
       "appid": 5542070,
       "name": "Tidy Up the Grocery Warehouse",
       "steam_url": "https://store.steampowered.com/app/5542070/",
@@ -755,7 +613,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 49,
+      "position": 39,
       "appid": 5543010,
       "name": "Harbourside",
       "steam_url": "https://store.steampowered.com/app/5543010/",
@@ -769,7 +627,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 50,
+      "position": 40,
       "appid": 5572250,
       "name": "KOBALT – Das Erbe der Spiegelmacher",
       "steam_url": "https://store.steampowered.com/app/5572250/",
@@ -783,7 +641,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 51,
+      "position": 41,
       "appid": 5577000,
       "name": "Brand: Fracture",
       "steam_url": "https://store.steampowered.com/app/5577000/",
@@ -797,7 +655,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 52,
+      "position": 42,
       "appid": 2946800,
       "name": "Proverbial",
       "steam_url": "https://store.steampowered.com/app/2946800/",
@@ -811,7 +669,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 53,
+      "position": 43,
       "appid": 5221760,
       "name": "Send 'em Flying",
       "steam_url": "https://store.steampowered.com/app/5221760/",
@@ -825,7 +683,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 54,
+      "position": 44,
       "appid": 5279840,
       "name": "SCRAPSCRAP",
       "steam_url": "https://store.steampowered.com/app/5279840/",
@@ -839,7 +697,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 55,
+      "position": 45,
       "appid": 5541910,
       "name": "Eggcellent Guess",
       "steam_url": "https://store.steampowered.com/app/5541910/",
@@ -853,7 +711,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 56,
+      "position": 46,
       "appid": 5571890,
       "name": "plebCTO",
       "steam_url": "https://store.steampowered.com/app/5571890/",
@@ -867,7 +725,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 57,
+      "position": 47,
       "appid": 5578490,
       "name": "Two Shells Home",
       "steam_url": "https://store.steampowered.com/app/5578490/",
@@ -881,7 +739,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 58,
+      "position": 48,
       "appid": 3505400,
       "name": "LETS GO HUNTING",
       "steam_url": "https://store.steampowered.com/app/3505400/",
@@ -895,7 +753,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 59,
+      "position": 49,
       "appid": 5502030,
       "name": "Food Fight Online",
       "steam_url": "https://store.steampowered.com/app/5502030/",
@@ -909,7 +767,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 60,
+      "position": 50,
       "appid": 5502050,
       "name": "Rail Rush Multiplayer",
       "steam_url": "https://store.steampowered.com/app/5502050/",
@@ -923,7 +781,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 61,
+      "position": 51,
       "appid": 5522290,
       "name": "See Through Static: The Collection",
       "steam_url": "https://store.steampowered.com/app/5522290/",
@@ -937,7 +795,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 62,
+      "position": 52,
       "appid": 5531960,
       "name": "The Myth of Might: A Lone Wolf",
       "steam_url": "https://store.steampowered.com/app/5531960/",
@@ -951,7 +809,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 63,
+      "position": 53,
       "appid": 5561700,
       "name": "VOIDRUN: ASCENSION",
       "steam_url": "https://store.steampowered.com/app/5561700/",
@@ -965,7 +823,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 64,
+      "position": 54,
       "appid": 5577450,
       "name": "I Am Konrad Voss",
       "steam_url": "https://store.steampowered.com/app/5577450/",
@@ -979,7 +837,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 65,
+      "position": 55,
       "appid": 4944890,
       "name": "Foosball Champs",
       "steam_url": "https://store.steampowered.com/app/4944890/",
@@ -993,7 +851,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 66,
+      "position": 56,
       "appid": 5448040,
       "name": "Still Awake",
       "steam_url": "https://store.steampowered.com/app/5448040/",
@@ -1007,7 +865,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 67,
+      "position": 57,
       "appid": 5548160,
       "name": "Die Rich",
       "steam_url": "https://store.steampowered.com/app/5548160/",
@@ -1021,7 +879,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 68,
+      "position": 58,
       "appid": 5304310,
       "name": "10 Million Cubes",
       "steam_url": "https://store.steampowered.com/app/5304310/",
@@ -1035,7 +893,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 69,
+      "position": 59,
       "appid": 5534140,
       "name": "Retro Party",
       "steam_url": "https://store.steampowered.com/app/5534140/",
@@ -1049,7 +907,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 70,
+      "position": 60,
       "appid": 5545430,
       "name": "Borderfall",
       "steam_url": "https://store.steampowered.com/app/5545430/",
@@ -1063,7 +921,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 71,
+      "position": 61,
       "appid": 5432080,
       "name": "Saucer Rumble Showdown",
       "steam_url": "https://store.steampowered.com/app/5432080/",
@@ -1077,7 +935,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 72,
+      "position": 62,
       "appid": 5438240,
       "name": "Sword Duel 2: Medieval War",
       "steam_url": "https://store.steampowered.com/app/5438240/",
@@ -1091,7 +949,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 73,
+      "position": 63,
       "appid": 5499150,
       "name": "Big Pig Dig",
       "steam_url": "https://store.steampowered.com/app/5499150/",
@@ -1105,7 +963,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 74,
+      "position": 64,
       "appid": 5565690,
       "name": "Math Star",
       "steam_url": "https://store.steampowered.com/app/5565690/",
@@ -1119,7 +977,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 75,
+      "position": 65,
       "appid": 5570230,
       "name": "Mostly Absurd Battle Simulator",
       "steam_url": "https://store.steampowered.com/app/5570230/",
@@ -1133,7 +991,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 76,
+      "position": 66,
       "appid": 5552740,
       "name": "Broadcast Storm",
       "steam_url": "https://store.steampowered.com/app/5552740/",
@@ -1147,7 +1005,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 77,
+      "position": 67,
       "appid": 5566200,
       "name": "Coffinmaker",
       "steam_url": "https://store.steampowered.com/app/5566200/",
@@ -1161,7 +1019,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 78,
+      "position": 68,
       "appid": 5509890,
       "name": "Sundered Reach",
       "steam_url": "https://store.steampowered.com/app/5509890/",
@@ -1175,7 +1033,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 79,
+      "position": 69,
       "appid": 5244110,
       "name": "Kamira",
       "steam_url": "https://store.steampowered.com/app/5244110/",
@@ -1189,7 +1047,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 80,
+      "position": 70,
       "appid": 5212930,
       "name": "Task Bar Farm",
       "steam_url": "https://store.steampowered.com/app/5212930/",
@@ -1203,7 +1061,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 81,
+      "position": 71,
       "appid": 5543560,
       "name": "Poligon 6",
       "steam_url": "https://store.steampowered.com/app/5543560/",
@@ -1217,7 +1075,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 82,
+      "position": 72,
       "appid": 5430800,
       "name": "FreightLines",
       "steam_url": "https://store.steampowered.com/app/5430800/",
@@ -1231,7 +1089,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 83,
+      "position": 73,
       "appid": 5136350,
       "name": "Overflow Protocol",
       "steam_url": "https://store.steampowered.com/app/5136350/",
@@ -1245,7 +1103,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 84,
+      "position": 74,
       "appid": 5532930,
       "name": "Khanate: Fire Before Dark",
       "steam_url": "https://store.steampowered.com/app/5532930/",
@@ -1259,7 +1117,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 85,
+      "position": 75,
       "appid": 5023070,
       "name": "Die and Decay",
       "steam_url": "https://store.steampowered.com/app/5023070/",
@@ -1273,7 +1131,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 86,
+      "position": 76,
       "appid": 4943050,
       "name": "Working with Montabi",
       "steam_url": "https://store.steampowered.com/app/4943050/",
@@ -1287,7 +1145,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 87,
+      "position": 77,
       "appid": 5533780,
       "name": "Kpop Infinite",
       "steam_url": "https://store.steampowered.com/app/5533780/",
@@ -1301,7 +1159,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 88,
+      "position": 78,
       "appid": 5535330,
       "name": "sportsbook",
       "steam_url": "https://store.steampowered.com/app/5535330/",
@@ -1315,7 +1173,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 89,
+      "position": 79,
       "appid": 5510020,
       "name": "My Colony 2",
       "steam_url": "https://store.steampowered.com/app/5510020/",
@@ -1329,7 +1187,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 90,
+      "position": 80,
       "appid": 5537370,
       "name": "Defiance",
       "steam_url": "https://store.steampowered.com/app/5537370/",
@@ -1343,7 +1201,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 91,
+      "position": 81,
       "appid": 5023080,
       "name": "Mortal Chess",
       "steam_url": "https://store.steampowered.com/app/5023080/",
@@ -1357,7 +1215,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 92,
+      "position": 82,
       "appid": 5450140,
       "name": "Stock Car Classics: Championship Season",
       "steam_url": "https://store.steampowered.com/app/5450140/",
@@ -1371,7 +1229,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 93,
+      "position": 83,
       "appid": 5532470,
       "name": "Idle Forgewarden",
       "steam_url": "https://store.steampowered.com/app/5532470/",
@@ -1385,7 +1243,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 94,
+      "position": 84,
       "appid": 4601090,
       "name": "Hold Your Position",
       "steam_url": "https://store.steampowered.com/app/4601090/",
@@ -1399,7 +1257,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 95,
+      "position": 85,
       "appid": 5545080,
       "name": "Seat of Power",
       "steam_url": "https://store.steampowered.com/app/5545080/",
@@ -1413,7 +1271,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 96,
+      "position": 86,
       "appid": 5477050,
       "name": "Cosmic Inferno",
       "steam_url": "https://store.steampowered.com/app/5477050/",
@@ -1427,7 +1285,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 97,
+      "position": 87,
       "appid": 5005810,
       "name": "Operation Crimson",
       "steam_url": "https://store.steampowered.com/app/5005810/",
@@ -1441,7 +1299,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 98,
+      "position": 88,
       "appid": 4993790,
       "name": "Lonely Dung Beetle",
       "steam_url": "https://store.steampowered.com/app/4993790/",
@@ -1455,7 +1313,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 99,
+      "position": 89,
       "appid": 5444080,
       "name": "SWIFTNESS",
       "steam_url": "https://store.steampowered.com/app/5444080/",
@@ -1469,7 +1327,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 100,
+      "position": 90,
       "appid": 5564820,
       "name": "Panzertanken",
       "steam_url": "https://store.steampowered.com/app/5564820/",
@@ -1483,7 +1341,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 101,
+      "position": 91,
       "appid": 5285840,
       "name": "Leif's Garden Tower",
       "steam_url": "https://store.steampowered.com/app/5285840/",
@@ -1497,7 +1355,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 102,
+      "position": 92,
       "appid": 5400300,
       "name": "Swornhand",
       "steam_url": "https://store.steampowered.com/app/5400300/",
@@ -1511,7 +1369,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 103,
+      "position": 93,
       "appid": 5063370,
       "name": "I Launch",
       "steam_url": "https://store.steampowered.com/app/5063370/",
@@ -1525,7 +1383,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 104,
+      "position": 94,
       "appid": 3741240,
       "name": "Jesus Christ: Necromancer",
       "steam_url": "https://store.steampowered.com/app/3741240/",
@@ -1539,7 +1397,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 105,
+      "position": 95,
       "appid": 5565130,
       "name": "Odyssey of Elemental Elysium",
       "steam_url": "https://store.steampowered.com/app/5565130/",
@@ -1553,7 +1411,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 106,
+      "position": 96,
       "appid": 5013740,
       "name": "Aviator: Airline Empire",
       "steam_url": "https://store.steampowered.com/app/5013740/",
@@ -1567,7 +1425,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 107,
+      "position": 97,
       "appid": 5053000,
       "name": "From Zero: Idle Factory",
       "steam_url": "https://store.steampowered.com/app/5053000/",
@@ -1581,7 +1439,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 108,
+      "position": 98,
       "appid": 5118710,
       "name": "TapTrapGrow",
       "steam_url": "https://store.steampowered.com/app/5118710/",
@@ -1595,7 +1453,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 109,
+      "position": 99,
       "appid": 5242390,
       "name": "Nightcup",
       "steam_url": "https://store.steampowered.com/app/5242390/",
@@ -1609,7 +1467,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 110,
+      "position": 100,
       "appid": 5332290,
       "name": "Build Christmas",
       "steam_url": "https://store.steampowered.com/app/5332290/",
@@ -1623,7 +1481,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 111,
+      "position": 101,
       "appid": 5352690,
       "name": "Bust Out",
       "steam_url": "https://store.steampowered.com/app/5352690/",
@@ -1637,7 +1495,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 112,
+      "position": 102,
       "appid": 5409410,
       "name": "Mart: Tidy Up Together",
       "steam_url": "https://store.steampowered.com/app/5409410/",
@@ -1651,7 +1509,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 113,
+      "position": 103,
       "appid": 5082170,
       "name": "Fruit Kombat",
       "steam_url": "https://store.steampowered.com/app/5082170/",
@@ -1665,7 +1523,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 114,
+      "position": 104,
       "appid": 4707700,
       "name": "Gold Mining Simulator - Definitive Edition",
       "steam_url": "https://store.steampowered.com/app/4707700/",
@@ -1679,7 +1537,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 115,
+      "position": 105,
       "appid": 5269140,
       "name": "Help, My Capybaras Escaped!",
       "steam_url": "https://store.steampowered.com/app/5269140/",
@@ -1693,7 +1551,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 116,
+      "position": 106,
       "appid": 5349740,
       "name": "Hellwake",
       "steam_url": "https://store.steampowered.com/app/5349740/",
@@ -1707,7 +1565,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 117,
+      "position": 107,
       "appid": 4924860,
       "name": "Best American Point-And-Click Adventury",
       "steam_url": "https://store.steampowered.com/app/4924860/",
@@ -1721,7 +1579,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 118,
+      "position": 108,
       "appid": 5080570,
       "name": "Cecilia",
       "steam_url": "https://store.steampowered.com/app/5080570/",
@@ -1735,7 +1593,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 119,
+      "position": 109,
       "appid": 5076320,
       "name": "Carpet Daddy",
       "steam_url": "https://store.steampowered.com/app/5076320/",
@@ -1749,7 +1607,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 120,
+      "position": 110,
       "appid": 5356450,
       "name": "That Mountain Needs to Fall",
       "steam_url": "https://store.steampowered.com/app/5356450/",
@@ -1763,7 +1621,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 121,
+      "position": 111,
       "appid": 4554250,
       "name": "Hellforged",
       "steam_url": "https://store.steampowered.com/app/4554250/",
@@ -1777,7 +1635,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 122,
+      "position": 112,
       "appid": 4900890,
       "name": "Grr Grr Gnomes",
       "steam_url": "https://store.steampowered.com/app/4900890/",
@@ -1791,7 +1649,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 123,
+      "position": 113,
       "appid": 5394890,
       "name": "Orbit Anglerz",
       "steam_url": "https://store.steampowered.com/app/5394890/",
@@ -1805,7 +1663,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 124,
+      "position": 114,
       "appid": 5347900,
       "name": "Aftermyth",
       "steam_url": "https://store.steampowered.com/app/5347900/",
@@ -1819,7 +1677,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 125,
+      "position": 115,
       "appid": 5373730,
       "name": "Nameless Fate",
       "steam_url": "https://store.steampowered.com/app/5373730/",
@@ -1833,7 +1691,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 126,
+      "position": 116,
       "appid": 5323900,
       "name": "Rift Fighter",
       "steam_url": "https://store.steampowered.com/app/5323900/",
@@ -1847,7 +1705,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 127,
+      "position": 117,
       "appid": 5354550,
       "name": "Keep Making Games",
       "steam_url": "https://store.steampowered.com/app/5354550/",
@@ -1861,7 +1719,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 128,
+      "position": 118,
       "appid": 4703340,
       "name": "Tún",
       "steam_url": "https://store.steampowered.com/app/4703340/",
@@ -1875,7 +1733,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 129,
+      "position": 119,
       "appid": 5516730,
       "name": "Beware of Ants",
       "steam_url": "https://store.steampowered.com/app/5516730/",
@@ -1891,136 +1749,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-11T05:28:01.025004Z",
-      "kind": "official_attempt",
-      "appid": 5124310,
-      "name": "Bartend With Your Friends",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 24,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:28:31.025099Z",
-      "kind": "official_attempt",
-      "appid": 5110250,
-      "name": "Timberlord Clicker",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:29:01.025207Z",
-      "kind": "official_attempt",
-      "appid": 5200310,
-      "name": "Fold'Em",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 9,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:29:31.025272Z",
-      "kind": "official_attempt",
-      "appid": 4854590,
-      "name": "Stick Wars: The Laneborn",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 23,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:30:01.025380Z",
-      "kind": "official_attempt",
-      "appid": 4908780,
-      "name": "Tallawa Game Nights",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:30:31.025509Z",
-      "kind": "official_attempt",
-      "appid": 4992950,
-      "name": "Ship Happens: Pirates Wanted",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 24,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:31:01.025638Z",
-      "kind": "official_attempt",
-      "appid": 5146850,
-      "name": "Regret & Rewind",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 7,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:31:31.025730Z",
-      "kind": "official_attempt",
-      "appid": 4927990,
-      "name": "Arcane Beyond",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:32:01.025842Z",
-      "kind": "official_attempt",
-      "appid": 5082570,
-      "name": "TowerCard: Digital Edition",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 5,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
-    {
-      "at": "2026-11-11T05:32:31.025960Z",
-      "kind": "official_attempt",
-      "appid": 5108020,
-      "name": "Brute Tusk : Feral",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "42962836821",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/42962836821"
-    },
     {
       "at": "2026-11-11T05:33:16.385032Z",
       "kind": "official_attempt",
@@ -3190,6 +2918,136 @@
       "retry_at": "2026-11-12T00:24:42.299563Z",
       "run_id": "43124032765",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43124032765"
+    },
+    {
+      "at": "2026-11-12T01:02:45.718095Z",
+      "kind": "official_attempt",
+      "appid": 5547980,
+      "name": "Stickman Breaks Into the World of Mathematics",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:03:15.718205Z",
+      "kind": "official_attempt",
+      "appid": 2781120,
+      "name": "Temporal Distortion",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 6,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:03:45.718330Z",
+      "kind": "official_attempt",
+      "appid": 5506160,
+      "name": "Egg Harvest",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:04:15.718459Z",
+      "kind": "official_attempt",
+      "appid": 5507870,
+      "name": "Babble Battle",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:04:45.718580Z",
+      "kind": "official_attempt",
+      "appid": 5146380,
+      "name": "Attkand",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 6,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:05:15.718694Z",
+      "kind": "official_attempt",
+      "appid": 5292120,
+      "name": "Unhistorical Warfare",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 25,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:05:45.718805Z",
+      "kind": "official_attempt",
+      "appid": 5531610,
+      "name": "GBald",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:06:15.718888Z",
+      "kind": "official_attempt",
+      "appid": 5165430,
+      "name": "PomoIdle Arena",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 10,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:06:45.719004Z",
+      "kind": "official_attempt",
+      "appid": 5286110,
+      "name": "Empires of the Axis and Abyss",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
+    },
+    {
+      "at": "2026-11-12T01:07:15.719125Z",
+      "kind": "official_attempt",
+      "appid": 5449680,
+      "name": "Mini Legends Idle",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 32,
+      "retry_at": null,
+      "run_id": "43131395925",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43131395925"
     }
   ],
   "events_limit": 100

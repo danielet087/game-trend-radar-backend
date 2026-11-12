@@ -52344,17 +52344,19 @@
   },
   "scheduler_batch": {
     "run_id": "43131395925",
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-12T09:02:45.077004+08:00",
-    "last_updated_at": "2026-11-12T09:12:53.927987+08:00",
+    "last_updated_at": "2026-11-12T09:13:35.004754+08:00",
     "requests_this_run": 21,
     "official_new_this_run": 20,
     "http_429_this_run": 1,
     "last_appid": 5554860,
-    "last_name": "Seoul Zombie City"
+    "last_name": "Seoul Zombie City",
+    "finished_at": "2026-11-12T09:13:35.004754+08:00",
+    "stop_reason": "first_http_429"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {

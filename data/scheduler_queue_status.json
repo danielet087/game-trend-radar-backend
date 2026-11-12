@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-12T09:02:16.112934Z",
+  "generated_at": "2026-11-12T09:02:43.318393Z",
   "today_taipei": "2026-11-12",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-12T08:03:00.972410Z",
+    "checkpoint_updated_at": "2026-11-12T09:02:43.121102Z",
     "group_resolution_updated_at": "2026-11-12T05:27:43.372233Z",
     "candidate_state_updated_at": "2026-11-11T23:06:14.375343Z",
     "prefilter_updated_at": "2026-11-11T23:06:14.356715Z",
     "eligible_screened_at": "2026-11-12T04:02:11.404238Z",
     "twitch_import_updated_at": "2026-11-12T09:01:47.779930Z",
-    "last_official_success_at": "2026-11-12T07:03:00.560198Z",
+    "last_official_success_at": "2026-11-12T09:02:43.039063Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -20,35 +20,35 @@
     "eligible_screened_at": "2026-11-12T04:02:11.404238+00:00",
     "added_from_daily": 0,
     "eligible_count": 3828,
-    "official_rechecks_pending": 1,
+    "official_rechecks_pending": 0,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 1,
+    "combined_pending_now": 0,
     "completed_legacy": 408,
     "completed_new": 5211,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 1,
+    "normal_pending": 0,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 1,
-    "followers_ready_pending": 1,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 1,
-    "today_attempts": 146,
-    "today_successes": 143,
+    "total_pending": 0,
+    "today_attempts": 147,
+    "today_successes": 144,
     "today_429": 3
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-12",
     "status": "completed",
-    "checked_at": "2026-11-12T09:02:16.112934+00:00",
+    "checked_at": "2026-11-12T17:02:43.318393+08:00",
     "needed": true,
     "planned_count": 26,
-    "completed_count": 24,
-    "remaining_count": 2,
-    "due_now_count": 1
+    "completed_count": 25,
+    "remaining_count": 1,
+    "due_now_count": 0
   },
   "group_resolution_api_cooldown": {
     "attempts": 0,
@@ -61,55 +61,29 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-11-12T10:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-11-12T16:03:00.133085+08:00",
-    "last_updated_at": "2026-11-12T16:03:00.972410+08:00",
-    "finished_at": "2026-11-12T16:03:00.972410+08:00",
-    "stop_reason": "nothing_pending",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-11-12T17:02:42.352769+08:00",
+    "last_updated_at": "2026-11-12T17:02:43.121102+08:00",
+    "finished_at": "2026-11-12T17:02:43.121102+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 5185750,
+    "last_name": "Trafficity",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "run_id": "43179430992",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43179430992"
+    "run_id": "43187606747",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43187606747"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 5185750,
-      "name": "Trafficity",
-      "steam_url": "https://store.steampowered.com/app/5185750/",
-      "release_date": "2026-11-16",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475821237",
-      "group_resolution": null,
-      "last_attempt_at": "2026-11-09T08:28:16.949356Z",
-      "last_attempt_status": "ok"
-    }
-  ],
+  "queue": [],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-12T02:08:35.110807Z",
-      "kind": "official_attempt",
-      "appid": 5546110,
-      "name": "SwitcHead",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
     {
       "at": "2026-11-12T02:09:05.110919Z",
       "kind": "official_attempt",
@@ -1396,6 +1370,19 @@
       "retry_at": null,
       "run_id": "43172059769",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43172059769"
+    },
+    {
+      "at": "2026-11-12T09:02:42.846805Z",
+      "kind": "official_attempt",
+      "appid": 5185750,
+      "name": "Trafficity",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4429,
+      "retry_at": null,
+      "run_id": "43187606747",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43187606747"
     }
   ],
   "events_limit": 100

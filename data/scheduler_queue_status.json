@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-13T08:02:42.278282Z",
+  "generated_at": "2026-11-13T08:03:17.982010Z",
   "today_taipei": "2026-11-13",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-13T07:02:38.284500Z",
+    "checkpoint_updated_at": "2026-11-13T08:03:17.665419Z",
     "group_resolution_updated_at": "2026-11-12T05:27:43.372233Z",
     "candidate_state_updated_at": "2026-11-12T17:06:13.556275Z",
     "prefilter_updated_at": "2026-11-12T17:06:13.537819Z",
     "eligible_screened_at": "2026-11-13T04:02:11.217880Z",
     "twitch_import_updated_at": "2026-11-13T08:02:05.225767Z",
-    "last_official_success_at": "2026-11-13T06:13:20.157256Z",
+    "last_official_success_at": "2026-11-13T08:03:17.530167Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -20,35 +20,35 @@
     "eligible_screened_at": "2026-11-13T04:02:11.217880+00:00",
     "added_from_daily": 0,
     "eligible_count": 3771,
-    "official_rechecks_pending": 1,
+    "official_rechecks_pending": 0,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 1,
+    "combined_pending_now": 0,
     "completed_legacy": 408,
     "completed_new": 5270,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 1,
+    "normal_pending": 0,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 1,
-    "followers_ready_pending": 1,
+    "ready_pending": 0,
+    "followers_ready_pending": 0,
     "awaiting_group_pending": 0,
-    "total_pending": 1,
-    "today_attempts": 68,
-    "today_successes": 62,
+    "total_pending": 0,
+    "today_attempts": 69,
+    "today_successes": 63,
     "today_429": 6
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-13",
     "status": "completed",
-    "checked_at": "2026-11-13T08:02:42.278282+00:00",
+    "checked_at": "2026-11-13T16:03:17.982010+08:00",
     "needed": true,
     "planned_count": 8,
-    "completed_count": 3,
-    "remaining_count": 5,
-    "due_now_count": 1
+    "completed_count": 4,
+    "remaining_count": 4,
+    "due_now_count": 0
   },
   "group_resolution_api_cooldown": {
     "attempts": 0,
@@ -61,55 +61,29 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-11-13T09:00:00Z",
+    "next_eligible_slot": null,
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-11-13T15:02:37.651572+08:00",
-    "last_updated_at": "2026-11-13T15:02:38.284500+08:00",
-    "finished_at": "2026-11-13T15:02:38.284500+08:00",
-    "stop_reason": "nothing_pending",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-11-13T16:03:16.538349+08:00",
+    "last_updated_at": "2026-11-13T16:03:17.665419+08:00",
+    "finished_at": "2026-11-13T16:03:17.665419+08:00",
+    "stop_reason": "batch_request_limit",
+    "last_appid": 1830110,
+    "last_name": "THE SIGNAL: Stranded on Sirenis",
+    "requests_this_run": 1,
+    "official_new_this_run": 1,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "run_id": "43382592733",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43382592733"
+    "run_id": "43389818055",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43389818055"
   },
-  "queue": [
-    {
-      "position": 1,
-      "appid": 1830110,
-      "name": "THE SIGNAL: Stranded on Sirenis",
-      "steam_url": "https://store.steampowered.com/app/1830110/",
-      "release_date": "2027-02-05",
-      "source": "fresh_daily_prefilter_ge4000_pending_official",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791474035185",
-      "group_resolution": null,
-      "last_attempt_at": "2026-11-12T07:03:00.369746Z",
-      "last_attempt_status": "ok"
-    }
-  ],
+  "queue": [],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-12T05:08:10.393847Z",
-      "kind": "official_attempt",
-      "appid": 5063370,
-      "name": "I Launch",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "43158427231",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43158427231"
-    },
     {
       "at": "2026-11-12T05:08:40.394001Z",
       "kind": "official_attempt",
@@ -1396,6 +1370,19 @@
       "retry_at": null,
       "run_id": "43375673914",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43375673914"
+    },
+    {
+      "at": "2026-11-13T08:03:17.314850Z",
+      "kind": "official_attempt",
+      "appid": 1830110,
+      "name": "THE SIGNAL: Stranded on Sirenis",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_ge4000_pending_official",
+      "official_followers": 4460,
+      "retry_at": null,
+      "run_id": "43389818055",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43389818055"
     }
   ],
   "events_limit": 100

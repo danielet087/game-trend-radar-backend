@@ -6007,8 +6007,69 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "4224290": {
+      "status": "pending",
+      "updated_at": "2026-11-13T20:02:09.568254Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4224290,
+        "twitch_game_id": "1996317072",
+        "igdb_id": "408714",
+        "checked_at": "2026-11-13T15:17:18Z",
+        "source_database_revision": "f0f63851fd0eafb0719ae1ed72c3cd41b091f5c44065f5187ac4e2f2904d3572",
+        "source_database_generation": 1765,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-11-13T15:17:18Z",
+          "viewer_count": 10304,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "uncertain_taiwan_store_date",
+      "retry_at": "2026-11-14T20:02:11.278373Z",
+      "rate_limit_stage": null,
+      "rate_limit_attempts": 0,
+      "retry_after": null
+    },
+    "4618570": {
+      "status": "accepted",
+      "updated_at": "2026-11-13T20:02:09.568254Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4618570,
+        "twitch_game_id": "1015838409",
+        "igdb_id": "400386",
+        "checked_at": "2026-11-13T17:26:45Z",
+        "source_database_revision": "f0f63851fd0eafb0719ae1ed72c3cd41b091f5c44065f5187ac4e2f2904d3572",
+        "source_database_generation": 1765,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-11-13T17:26:45Z",
+          "viewer_count": 10110,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "twitch_verified",
+      "content_signature": "f31cb6a3a36e33cae0aaf0b6aa68f138f63e2f4bed9fe7beb582fc900b513ce6",
+      "followers": null,
+      "follower_checked_at": null,
+      "retry_at": null,
+      "retry_attempts": 0,
+      "rate_limit_attempts": 0,
+      "rate_limit_stage": null,
+      "retry_source": null,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-11-13T13:02:03.422150Z",
+  "updated_at": "2026-11-13T20:02:09.568254Z",
   "api_cooldowns": {}
 }

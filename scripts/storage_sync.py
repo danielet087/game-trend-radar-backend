@@ -18,7 +18,9 @@ from zoneinfo import ZoneInfo
 
 from radar_backend.storage.sql import D1Client, SqliteClient, StorageError, TursoClient
 from radar_backend.storage.sources import SOURCES, checkout_name, clone_source, remote_revision, snapshot_from_checkout, source_id
-from radar_backend.storage.documents import initialize, publish_snapshot, read_snapshot, sync_replica, export_sqlite, garbage_collect
+from radar_backend.storage.documents import (
+    audit_replica, export_sqlite, garbage_collect, initialize, publish_snapshot, read_snapshot, sync_replica,
+)
 from radar_core.storage.primary_store import primary_status
 
 
@@ -175,9 +177,7 @@ def make_backup(primary, output):
         return manifest, final_paths
 
 
-def capacity(client):
-    row = client.execute("SELECT COALESCE(SUM(LENGTH(payload)), 0) AS bytes FROM radar_chunks")[0]
-    size = row["bytes"]
+def capacity(size):
     return {"encoded_chunk_bytes": size, "warning": size >= 300 * 1024 * 1024,
             "warning_threshold_bytes": 300 * 1024 * 1024,
             "note": "Encoded payload only; database indexes/metadata add overhead. D1 Free cap is 500 MB per database."}
@@ -185,9 +185,10 @@ def capacity(client):
 
 def run(args):
     report = {"started_at": datetime.now(timezone.utc).isoformat(), "mode": args.mode,
-              "storage_stage": "git_ingestion_to_turso_with_d1_replica", "errors": []}
+              "storage_stage": "git_ingestion_to_turso_with_d1_replica", "errors": [], "warnings": []}
     primary = SqliteClient(args.primary_sqlite) if args.primary_sqlite else TursoClient.from_env(budget_seconds=1500)
     replica = None
+    full_replica_check = getattr(args, "full_replica_check", False)
     try:
         initialize(primary)
         if args.mode == "sync":
@@ -209,6 +210,7 @@ def run(args):
                                         "file_count": manifest["file_count"], "raw_bytes": manifest["raw_bytes"]}
                     if args.publish_backup:
                         report["backup"]["release"] = publish_daily_backup(repository, day, token, paths)
+                    full_replica_check = True
             except Exception as error:
                 _failure(report, "backup", error)
         if args.mode in {"sync", "replicate"}:
@@ -224,20 +226,30 @@ def run(args):
                                                      target_heads=report["replication"]["target_heads"])
             except Exception as error:
                 _failure(report, "replication", error)
-        if args.mode == "verify":
-            replica = SqliteClient(args.replica_sqlite) if args.replica_sqlite else D1Client.from_env(budget_seconds=600)
-            report["consistency"], report["verified_files"] = verify_snapshots(primary, replica, require_complete=True)
+        if args.mode == "verify" or (full_replica_check and replica is not None):
+            try:
+                if replica is None:
+                    replica = SqliteClient(args.replica_sqlite) if args.replica_sqlite else D1Client.from_env(budget_seconds=600)
+                if args.mode == "verify":
+                    report["consistency"], report["verified_files"] = verify_snapshots(primary, replica, require_complete=True)
+                else:
+                    report["replica_audit"] = audit_replica(replica)
+            except Exception as error:
+                _failure(report, "replica_audit", error)
         if args.mode in {"sync", "replicate"}:
             for name, client, is_replica in (("primary", primary, False), ("replica", replica, True)):
                 if client is None:
                     continue
                 try:
-                    report[name + "_gc"] = garbage_collect(client, max_delete=10000, replica_mode=is_replica, exclusive=True)
-                    report[name + "_capacity"] = capacity(client)
+                    gc = garbage_collect(client, max_delete=10000, replica_mode=is_replica, exclusive=True)
+                    report[name + "_gc"] = gc
+                    report[name + "_capacity"] = capacity(gc["encoded_chunk_bytes"])
                     if report[name + "_capacity"]["warning"]:
-                        report["errors"].append({"stage": name, "code": "CAPACITY_WARNING"})
+                        report["warnings"].append({"stage": name, "code": "CAPACITY_WARNING"})
                 except Exception as error:
                     _failure(report, name + "_maintenance", error)
+        if isinstance(replica, D1Client):
+            report["replica_usage"] = replica.usage
         report["status"] = "passed" if not report["errors"] else "degraded"
         return report
     finally:
@@ -256,6 +268,8 @@ def main(argv=None):
     parser.add_argument("--backup-dir", type=Path, default=Path("output/storage-backup"))
     parser.add_argument("--daily-backup", action="store_true")
     parser.add_argument("--publish-backup", action="store_true")
+    parser.add_argument("--full-replica-check", action="store_true",
+                        help="Read and verify every retained standby payload after syncing.")
     args = parser.parse_args(argv)
     try:
         report = run(args)
@@ -265,6 +279,8 @@ def main(argv=None):
     text = json.dumps(report, ensure_ascii=False, indent=2)
     args.report_path.write_text(text + "\n", encoding="utf-8")
     print(text)
+    for warning in report.get("warnings", []):
+        print(f"::warning title=Radar storage capacity::{warning['stage']} encoded payload exceeds the warning threshold.")
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
             summary.write("## Radar database storage\n\n```json\n" + text + "\n```\n")

@@ -3,7 +3,7 @@ from argparse import Namespace
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from radar_backend.storage import documents as store
 from radar_backend.storage.documents import initialize, publish_snapshot, read_snapshot
@@ -72,6 +72,32 @@ class StorageSyncTests(unittest.TestCase):
         self.assertEqual(report["replication"]["events_pending_in_target"], len(SOURCES) - 1)
         self.assertEqual(report["replication"]["events_deferred"], 0)
         self.assertIn({"stage": "replication", "code": "REPLICATION_PENDING"}, report["errors"])
+
+    def test_maintenance_keeps_capacity_warnings_visible_without_failing_replication(self):
+        with tempfile.TemporaryDirectory() as directory:
+            primary_path = Path(directory) / "primary.sqlite"
+            primary = SqliteClient(primary_path)
+            try:
+                initialize(primary)
+                for spec in SOURCES:
+                    publish_snapshot(primary, source_id(spec), "first", {"data/x.json": b'{}'}, "2026-10-15T10:00:00Z")
+            finally:
+                primary.close()
+            args = Namespace(mode="replicate", primary_sqlite=primary_path,
+                             replica_sqlite=Path(directory) / "replica.sqlite", backup_dir=Path(directory),
+                             daily_backup=True, publish_backup=True)
+            release_exists = Mock(side_effect=[True, False])
+            with patch("radar_backend.storage.backup_release.daily_backup_exists", release_exists), \
+                    patch("radar_backend.storage.backup_release.publish_daily_backup", return_value={}), \
+                    patch.object(sync, "capacity", return_value={"warning": True}):
+                report = sync.run(args)
+                daily_report = sync.run(args)
+        self.assertEqual(report["status"], "passed")
+        self.assertEqual(report["warnings"], [{"stage": stage, "code": "CAPACITY_WARNING"} for stage in ("primary", "replica")])
+        self.assertEqual(report["replica_gc"]["verification"], "references")
+        self.assertNotIn("replica_audit", report)
+        self.assertTrue(daily_report["backup"]["restore_verified"])
+        self.assertEqual(daily_report["replica_audit"]["status"], "passed")
 
     def test_replica_beyond_fixed_target_requires_authoritative_history(self):
         primary, replica = self.databases()

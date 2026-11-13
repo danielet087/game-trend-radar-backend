@@ -52916,20 +52916,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43333493967",
-    "active": false,
-    "status": "finished",
+    "run_id": "43341515560",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-13T08:03:06.148808+08:00",
-    "last_updated_at": "2026-11-13T08:03:41.692690+08:00",
+    "started_at": "2026-11-13T09:03:08.801306+08:00",
+    "last_updated_at": "2026-11-13T09:03:09.772553+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5435010,
-    "last_name": "Streaming Tycoon",
-    "finished_at": "2026-11-13T08:03:41.692690+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5295270,
+    "last_name": "Last Order"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -127677,17 +127675,17 @@
       }
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-13T08:33:06.918155+08:00",
+  "next_request_after_taipei": "2026-11-13T10:03:09.772454+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-13T00:33:06.918155+00:00",
-    "observed_at": "2026-11-13T00:03:06.918155+00:00",
-    "updated_at": "2026-11-13T00:03:06.918155+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-13T02:03:09.772454+00:00",
+    "observed_at": "2026-11-13T01:03:09.772454+00:00",
+    "updated_at": "2026-11-13T01:03:09.772454+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-13T07:06:23.224881+08:00",
   "official_growth_observations": {
@@ -145530,6 +145528,16 @@
       "status": "rate_limited",
       "github_run_id": "43333493967",
       "next_request_after_taipei": "2026-11-13T08:33:06.918155+08:00"
+    },
+    {
+      "appid": 5295270,
+      "when_taipei": "2026-11-13T09:03:09.599842+08:00",
+      "release_date": "2026-11-24",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43341515560",
+      "next_request_after_taipei": "2026-11-13T10:03:09.772454+08:00"
     }
   ]
 }

@@ -126,6 +126,18 @@ class StorageHTTPTests(unittest.TestCase):
         self.assertEqual(json.loads(request.data), {"sql": "SELECT ?, ?, ?, ?, ?", "params": params})
         self.assertTrue(0 < timeout <= 15)
 
+    def test_d1_reports_provider_row_counts_without_changing_query_results(self):
+        first, batch = d1_body([{"value": 1}]), d1_body([], [{"value": 2}], [])
+        first["result"][0]["meta"] = {"rows_read": 22, "rows_written": 0, "size_after": 4096}
+        batch["result"][0]["meta"] = {"rows_read": 2, "rows_written": 1, "size_after": 8192}
+        batch["result"][1]["meta"] = {"rows_read": 1, "rows_written": -5, "size_after": None}
+        batch["result"][2]["meta"] = {"rows_read": True, "rows_written": "invalid"}
+        client = self.client("d1", Opener([first, batch]))
+        self.assertEqual(client.execute("SELECT 1 AS value"), [{"value": 1}])
+        self.assertEqual(client.batch([("INSERT INTO t VALUES (2)", ()), ("SELECT value FROM t", ()),
+                                       ("SELECT 1 WHERE 0", ())]), [[], [{"value": 2}], []])
+        self.assertEqual(client.usage, {"rows_read": 25, "rows_written": 1, "size_after": 8192})
+
     def test_turso_batch_uses_execute_per_statement_and_one_close(self):
         opener = Opener([turso_body(turso_result(), turso_result(
             [[{"type": "text", "value": "ok"}]], [{"name": "value", "decltype": "TEXT"}]))])

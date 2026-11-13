@@ -645,24 +645,34 @@ _METADATA_KEYS = {"radar_operations": ("source_id", "operation_id"),
 
 
 def metadata_snapshot(client):
-    """Caller must hold the primary lease while reading metadata and its roots."""
+    """Capture metadata under the caller's database lease."""
     return {table: [dict(row) for row in client.execute(f"SELECT * FROM {table}")]
             for table in _METADATA_TABLES}
 
 
-def install_metadata(client, metadata, *, replica=False):
+def metadata_roots(metadata):
+    return {row["manifest_digest"] for row in metadata["radar_evidence"]} | {
+        row["manifest_digest"] for row in metadata["radar_operations"]
+        if row.get("delivery_target", "git") == "git" and row["projection_git_revision"] is None
+    }
+
+
+def install_metadata(client, metadata, *, replica=False, existing=None):
     """Copy semantic metadata with target-local lease proofs, policy last."""
     d = _docs()
     with maintenance(client, "replicate" if replica else "restore"):
+        # An existing snapshot is reusable only under the same target lease.
+        if existing is None:
+            existing = metadata_snapshot(client)
         for table in _METADATA_TABLES:
             keys = _METADATA_KEYS[table]
-            existing = {tuple(row[key] for key in keys): row for row in client.execute(f"SELECT * FROM {table}")}
+            by_key = {tuple(row[key] for key in keys): row for row in existing[table]}
             statements = []
             for original in metadata.get(table, []):
                 row = {key: value for key, value in original.items() if key not in _PROOF_COLUMNS}
                 if replica and table == "radar_source_policy" and row["mode"] == "primary":
                     row["mode"] = "replica"
-                old = existing.get(tuple(row[key] for key in keys))
+                old = by_key.get(tuple(row[key] for key in keys))
                 if old and all(old.get(key) == value for key, value in row.items()):
                     continue
                 owner, fence, nonce = proof(client)
@@ -675,6 +685,6 @@ def install_metadata(client, metadata, *, replica=False):
         # Explicitly released pins must not accumulate forever in the standby.
         if replica:
             live = {row["evidence_id"] for row in metadata.get("radar_evidence", [])}
-            for row in client.execute("SELECT evidence_id FROM radar_evidence"):
+            for row in existing["radar_evidence"]:
                 if row["evidence_id"] not in live:
                     client.execute("DELETE FROM radar_evidence WHERE evidence_id=?", (row["evidence_id"],))

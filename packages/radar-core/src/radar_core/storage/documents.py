@@ -290,22 +290,33 @@ def _manifest(raw):
         _error("CORRUPT_MANIFEST", "A source manifest is invalid.")
 
 
-def _graph(client, roots):
-    """Download and verify each reachable chunk once across all supplied heads."""
-    roots = set(roots)
+def _read_manifests(client, roots):
     objects = _get_objects(client, roots)
     chunks = _get_chunks(client, _chunk_ids(objects))
     manifests = {digest: _manifest(_decode(objects[digest], chunks)) for digest in roots}
-    needed = {entry["digest"] for files in manifests.values() for entry in files.values()}
-    objects.update(_get_objects(client, needed - set(objects)))
-    chunks.update(_get_chunks(client, _chunk_ids(objects) - set(chunks)))
-    # A hash identifies exact raw bytes; check each shared object only once.
-    for obj in objects.values():
-        _decode(obj, chunks)
+    return manifests, objects, chunks
+
+
+def _manifest_objects(manifests, roots):
+    return roots | {entry["digest"] for root in roots for entry in manifests[root].values()}
+
+
+def _verify_manifest_lengths(manifests, objects):
     for files in manifests.values():
         for entry in files.values():
             if objects[entry["digest"]]["raw_bytes"] != entry["raw_bytes"]:
                 _error("CORRUPT_MANIFEST", "A manifest byte count disagrees with its object.")
+
+
+def _graph(client, roots):
+    """Download and verify each reachable chunk once across all supplied heads."""
+    roots = set(roots)
+    manifests, objects, chunks = _read_manifests(client, roots)
+    objects.update(_get_objects(client, _manifest_objects(manifests, roots) - roots))
+    chunks.update(_get_chunks(client, _chunk_ids(objects) - set(chunks)))
+    for digest in objects.keys() - roots:
+        _decode(objects[digest], chunks)
+    _verify_manifest_lengths(manifests, objects)
     return manifests, objects, chunks
 
 
@@ -469,15 +480,19 @@ def sync_replica(primary: SqlClient, replica: SqlClient, max_events=100) -> dict
     # Pins, activation and projection ACKs can change without a new source head.
     # They therefore need an independent durable maintenance sweep.
     try:
-        from .primary_store import maintenance, retained_roots, metadata_snapshot, install_metadata
+        from .primary_store import metadata_roots, metadata_snapshot, install_metadata
         with maintenance(primary, "read"):
             metadata = metadata_snapshot(primary)
-            roots = retained_roots(primary)
-            _, objects, chunks = _graph(primary, roots)
+            roots = metadata_roots(metadata)
+            manifests, objects, chunks = _graph(primary, roots)
         with maintenance(replica, "replicate"):
-            _put_graph(replica, objects, chunks)
-            _graph(replica, roots)
-            install_metadata(replica, metadata, replica=True)
+            existing_metadata = metadata_snapshot(replica)
+            protected = metadata_roots(existing_metadata) | {
+                head["manifest_digest"] for head in _heads(replica)
+            }
+            verified = _manifest_objects(manifests, roots & protected)
+            _replicate_objects(replica, objects, chunks, objects.keys() - verified)
+            install_metadata(replica, metadata, replica=True, existing=existing_metadata)
     except StorageError as error:
         report["errors"].append({"source_id": "metadata", "code": error.code})
     # Count each captured source boundary independently of wall-clock times:
@@ -519,10 +534,29 @@ def _replicate_one(primary, replica, source_id, target, objects, chunks):
                 _error("REPLICA_CONFLICT", "Replica history differs from the authoritative event.")
         _graph(replica, [existing["manifest_digest"]])
         return existing
-    _put_graph(replica, objects, chunks)
-    _graph(replica, [target["manifest_digest"]])
+    verified = set()
+    if existing:
+        # A visible replica head was verified before publication. Its immutable
+        # objects stay protected by GC for as long as this lease holds the head.
+        roots = {existing["manifest_digest"]}
+        manifests, _, _ = _read_manifests(replica, roots)
+        verified = _manifest_objects(manifests, roots)
+    _replicate_objects(replica, objects, chunks, objects.keys() - verified)
     _advance(replica, target, existing["generation"] if existing else 0, writer_kind="replica")
     return target
+
+
+def _replicate_objects(replica, objects, chunks, digests):
+    if not digests:
+        return
+    selected = {digest: objects[digest] for digest in digests}
+    _put_graph(replica, selected, {digest: chunks[digest] for digest in _chunk_ids(selected)})
+    stored = _get_objects(replica, digests)
+    stored_chunks = _get_chunks(replica, _chunk_ids(stored))
+    for digest, obj in stored.items():
+        if obj["raw_bytes"] != selected[digest]["raw_bytes"]:
+            _error("CORRUPT_OBJECT", "A replica object has a different byte count from the primary.")
+        _decode(obj, stored_chunks)
 
 
 def _heads(client):
@@ -538,6 +572,8 @@ def garbage_collect(client: SqlClient, *, max_delete=10000, replica_mode=False,
     database lease enforces exclusion across repositories and active uploaders.
     On the primary retain every unacknowledged manifest; on the replica its local
     trigger events are not an upstream queue and only current heads are roots.
+    Standby cleanup checks manifest hashes, object lengths, and chunk presence.
+    The daily standby audit separately validates the actual payload bytes.
     """
     if exclusive is not True:
         _error("EXCLUSIVE_ACCESS_REQUIRED", "Garbage collection requires the explicit maintenance request.")
@@ -550,7 +586,25 @@ def garbage_collect(client: SqlClient, *, max_delete=10000, replica_mode=False,
     if not replica_mode:
         roots.update(row["manifest_digest"] for row in client.execute(
             "SELECT manifest_digest FROM radar_outbox WHERE acked_at IS NULL"))
-    _, reachable, _ = _graph(client, roots)
+    if replica_mode:
+        manifests, _, _ = _read_manifests(client, roots)
+    else:
+        manifests, _, _ = _graph(client, roots)
+    reachable = _manifest_objects(manifests, roots)
+    objects = {row["digest"]: row for row in client.execute(
+        "SELECT digest,raw_bytes,chunk_digests_json FROM radar_objects")}
+    if not reachable <= objects.keys():
+        _error("MISSING_OBJECT", "A retained snapshot references a missing object.")
+    doomed_objects = sorted(objects.keys() - reachable)[:max_delete]
+    remaining = {digest: _object(objects[digest]) for digest in objects.keys() - set(doomed_objects)}
+    _verify_manifest_lengths(manifests, remaining)
+    # Keep chunks referenced even by objects awaiting a later bounded GC pass.
+    protected_chunks = _chunk_ids(remaining)
+    chunks = {row["digest"]: row["bytes"] for row in client.execute(
+        "SELECT digest,LENGTH(payload) AS bytes FROM radar_chunks")}
+    if not _chunk_ids({digest: remaining[digest] for digest in reachable}) <= chunks.keys():
+        _error("MISSING_CHUNK", "A retained snapshot references a missing chunk.")
+    doomed_chunks = sorted(chunks.keys() - protected_chunks)[:max_delete]
     if _heads(client) != before:
         _error("STALE_GENERATION", "Source heads changed during garbage collection planning.")
     outbox_condition = "1=1" if replica_mode else "acked_at IS NOT NULL"
@@ -568,18 +622,24 @@ def garbage_collect(client: SqlClient, *, max_delete=10000, replica_mode=False,
         AND (source_id,generation) IN
           (SELECT source_id,generation FROM radar_outbox WHERE {outbox_condition} LIMIT ?)
         RETURNING source_id,generation""", (max_delete,))
-    all_objects = {row["digest"] for row in client.execute("SELECT digest FROM radar_objects")}
-    doomed_objects = sorted(all_objects - set(reachable))[:max_delete]
     _delete_digests(client, "radar_objects", doomed_objects)
-    # Keep chunks referenced even by objects awaiting a later bounded GC pass.
-    remaining = {row["digest"]: _object(row) for row in client.execute("SELECT * FROM radar_objects")}
-    protected_chunks = _chunk_ids(remaining)
-    all_chunks = {row["digest"] for row in client.execute("SELECT digest FROM radar_chunks")}
-    doomed_chunks = sorted(all_chunks - protected_chunks)[:max_delete]
     _delete_digests(client, "radar_chunks", doomed_chunks)
-    return {"status": "passed", "objects_deleted": len(doomed_objects),
+    return {"status": "passed", "verification": "references" if replica_mode else "full",
+            "objects_deleted": len(doomed_objects),
             "chunks_deleted": len(doomed_chunks), "events_deleted": len(removed_events),
-            "objects_retained": len(remaining), "chunks_retained": len(all_chunks) - len(doomed_chunks)}
+            "objects_retained": len(remaining), "chunks_retained": len(chunks) - len(doomed_chunks),
+            "encoded_chunk_bytes": sum(chunks.values()) - sum(chunks[digest] for digest in doomed_chunks)}
+
+
+@_leased("read")
+def audit_replica(client):
+    """Check the actual bytes behind current heads, evidence and pending projections."""
+    from .primary_store import retained_roots
+    heads = _heads(client)
+    roots = retained_roots(client) | {head["manifest_digest"] for head in heads}
+    _, objects, chunks = _graph(client, roots)
+    return {"status": "passed", "sources": len(heads), "roots": len(roots),
+            "objects": len(objects), "chunks": len(chunks)}
 
 
 def _delete_digests(client, table, digests):

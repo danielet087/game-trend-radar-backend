@@ -162,6 +162,46 @@ class StorageDocumentsTests(unittest.TestCase):
         self.assertEqual(report["events_pending"], 0)
         self.assertEqual(store.read_snapshot(self.replica, self.source)[0], newest)
 
+    def test_replication_reads_back_only_new_objects_under_a_verified_head(self):
+        self.publish()
+        store.sync_replica(self.primary, self.replica)
+        updated = {**self.files, "data/new.json": b'{"new":true}'}
+        newest = self.publish("b", updated, captured="2026-10-15T09:01:00Z")
+        payload_reads = set()
+
+        def record(sql, params):
+            if sql.startswith("SELECT digest,payload FROM radar_chunks"):
+                payload_reads.update(params)
+
+        report = store.sync_replica(self.primary, InterceptClient(self.replica, before=record))
+        unchanged = store._get_objects(self.primary, {store._sha(raw) for raw in self.files.values()})
+        new = store._get_objects(self.primary, {store._sha(updated["data/new.json"])})
+        self.assertTrue(store._chunk_ids(new) <= payload_reads)
+        self.assertTrue(payload_reads.isdisjoint(store._chunk_ids(unchanged)))
+        self.assertEqual(report["events_acked"], 1)
+        self.assertEqual(store.read_snapshot(self.replica, self.source), (newest, updated))
+
+    def test_new_evidence_replicates_without_a_new_head_and_is_then_reused(self):
+        from radar_core.storage import primary_store
+        head = self.publish()
+        store.sync_replica(self.primary, self.replica)
+        primary_store.pin_evidence(self.primary, self.source, revision=head["manifest_digest"],
+                                  paths=["data/empty.json"], evidence_id="evidence")
+        report = store.sync_replica(self.primary, self.replica)
+        self.assertEqual(report["events_selected"], 0)
+        self.assertEqual(report["errors"], [])
+        self.assertEqual(self.replica.execute("SELECT evidence_id FROM radar_evidence"), [{"evidence_id": "evidence"}])
+
+        def reject_readback(sql, params):
+            if sql.startswith("SELECT digest,payload FROM radar_chunks"):
+                self.fail("Previously verified evidence was downloaded again.")
+
+        client = InterceptClient(self.replica, before=reject_readback)
+        self.assertEqual(store.sync_replica(self.primary, client)["errors"], [])
+        primary_store.release_evidence(self.primary, "evidence")
+        self.assertEqual(store.sync_replica(self.primary, client)["errors"], [])
+        self.assertEqual(self.replica.execute("SELECT evidence_id FROM radar_evidence"), [])
+
     def test_replica_partial_write_keeps_primary_pending_and_retries(self):
         head = self.publish()
 
@@ -309,6 +349,28 @@ class StorageDocumentsTests(unittest.TestCase):
         self.publish("c", captured="2026-10-15T09:02:00Z")
         self.assertEqual(store.sync_replica(self.primary, self.replica)["status"], "passed")
         self.assertEqual(store.read_snapshot(self.replica, self.source)[1], self.files)
+
+    def test_reference_cleanup_skips_payloads_but_full_check_detects_corruption(self):
+        self.publish()
+        store.sync_replica(self.primary, self.replica)
+        objects = store._get_objects(self.replica, {store._sha(raw) for raw in self.files.values()})
+        data_chunks = store._chunk_ids(objects)
+
+        def reject_data_payload(sql, params):
+            if sql.startswith("SELECT digest,payload FROM radar_chunks"):
+                self.assertTrue(data_chunks.isdisjoint(params))
+
+        report = store.garbage_collect(InterceptClient(self.replica, before=reject_data_payload),
+                                       exclusive=True, replica_mode=True)
+        self.assertEqual(report["verification"], "references")
+        self.assertEqual(report["encoded_chunk_bytes"], self.replica.execute(
+            "SELECT SUM(LENGTH(payload)) AS bytes FROM radar_chunks")[0]["bytes"])
+        digest = min(data_chunks)
+        self.replica.execute("UPDATE radar_chunks SET payload=? WHERE digest=?",
+                             (base64.b64encode(b"damaged").decode(), digest))
+        self.code("CORRUPT_CHUNK", lambda: store.audit_replica(self.replica))
+        self.replica.execute("DELETE FROM radar_chunks WHERE digest=?", (digest,))
+        self.code("MISSING_CHUNK", lambda: store.garbage_collect(self.replica, exclusive=True, replica_mode=True))
 
     def test_export_restores_current_raw_bytes_and_sql_dump(self):
         self.publish()

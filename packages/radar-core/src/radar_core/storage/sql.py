@@ -278,6 +278,7 @@ def _d1_value(value):
 class D1Client(_HttpClient):
     def __init__(self, account_id, database_id, token, **kwargs):
         super().__init__(_d1_endpoint(account_id, database_id), token, **kwargs)
+        self.usage = {}
 
     @classmethod
     def from_env(cls, **kwargs):
@@ -296,8 +297,7 @@ class D1Client(_HttpClient):
         data = self._send({"batch": [{"sql": sql, "params": params} for sql, params in statements]})
         return self._results(data, len(statements))
 
-    @staticmethod
-    def _results(data, count):
+    def _results(self, data, count):
         try:
             if not isinstance(data, dict):
                 raise ValueError
@@ -308,6 +308,12 @@ class D1Client(_HttpClient):
                 raise ValueError
             decoded = []
             for result in results:
+                meta = result.get("meta")
+                if isinstance(meta, dict):
+                    for key in ("rows_read", "rows_written", "size_after"):
+                        value = meta.get(key)
+                        if type(value) is int and value >= 0:
+                            self.usage[key] = value if key == "size_after" else self.usage.get(key, 0) + value
                 if result.get("success") is False or result.get("error") or result.get("errors"):
                     raise StorageError("SQL_ERROR", "D1 rejected a SQL operation; a batch may be partially committed.")
                 rows = result["results"]

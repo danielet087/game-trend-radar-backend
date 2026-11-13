@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-13T05:02:08.971461Z",
+  "generated_at": "2026-11-13T05:06:59.136242Z",
   "today_taipei": "2026-11-13",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-13T03:11:45.136495Z",
+    "checkpoint_updated_at": "2026-11-13T05:06:58.901137Z",
     "group_resolution_updated_at": "2026-11-12T05:27:43.372233Z",
     "candidate_state_updated_at": "2026-11-12T17:06:13.556275Z",
     "prefilter_updated_at": "2026-11-12T17:06:13.537819Z",
     "eligible_screened_at": "2026-11-13T04:02:11.217880Z",
     "twitch_import_updated_at": "2026-11-13T03:01:51.894926Z",
-    "last_official_success_at": "2026-11-13T03:10:25.411824Z",
+    "last_official_success_at": "2026-11-13T05:06:58.900986Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -22,28 +22,28 @@
     "eligible_count": 3771,
     "official_rechecks_pending": 3,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 39,
+    "combined_pending_now": 29,
     "completed_legacy": 408,
-    "completed_new": 5234,
+    "completed_new": 5244,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 39,
+    "normal_pending": 29,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 39,
-    "followers_ready_pending": 39,
+    "ready_pending": 29,
+    "followers_ready_pending": 29,
     "awaiting_group_pending": 0,
-    "total_pending": 39,
-    "today_attempts": 28,
-    "today_successes": 23,
+    "total_pending": 29,
+    "today_attempts": 38,
+    "today_successes": 33,
     "today_429": 5
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-13",
     "status": "completed",
-    "checked_at": "2026-11-13T05:02:08.971461+00:00",
+    "checked_at": "2026-11-13T13:06:59.136242+08:00",
     "needed": true,
     "planned_count": 8,
     "completed_count": 0,
@@ -59,171 +59,29 @@
   },
   "cooldown": {
     "active": false,
-    "until": "2026-11-13T03:25:55.393438Z",
+    "until": null,
     "reason": null,
     "next_eligible_slot": "2026-11-13T06:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": false,
-    "status": "finished",
-    "started_at": "2026-11-13T11:02:50.380892+08:00",
-    "last_updated_at": "2026-11-13T11:11:45.136495+08:00",
-    "finished_at": "2026-11-13T11:11:45.136495+08:00",
-    "stop_reason": "first_http_429",
-    "last_appid": 5194390,
-    "last_name": "WildScore",
-    "requests_this_run": 17,
-    "official_new_this_run": 16,
-    "http_429_this_run": 1,
+    "active": true,
+    "status": "querying",
+    "started_at": "2026-11-13T13:02:28.193557+08:00",
+    "last_updated_at": "2026-11-13T13:06:58.901137+08:00",
+    "last_appid": 5579400,
+    "last_name": "Galaxization",
+    "requests_this_run": 10,
+    "official_new_this_run": 10,
+    "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "run_id": "43355977068",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43355977068"
+    "run_id": "43369111462",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 5482800,
-      "name": "Factory In Progress",
-      "steam_url": "https://store.steampowered.com/app/5482800/",
-      "release_date": "2026-12-03",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476235247",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5465030,
-      "name": "Holy Nest",
-      "steam_url": "https://store.steampowered.com/app/5465030/",
-      "release_date": "2026-12-04",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476235502",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5549740,
-      "name": "SimFarm",
-      "steam_url": "https://store.steampowered.com/app/5549740/",
-      "release_date": "2026-12-04",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476230401",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5556120,
-      "name": "Become a Real Estate Tycoon",
-      "steam_url": "https://store.steampowered.com/app/5556120/",
-      "release_date": "2026-12-07",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476234877",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 3384600,
-      "name": "Professor Layton and the New World of Steam",
-      "steam_url": "https://store.steampowered.com/app/3384600/",
-      "release_date": "2026-12-09",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476235262",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5029900,
-      "name": "Knock Twice",
-      "steam_url": "https://store.steampowered.com/app/5029900/",
-      "release_date": "2026-12-09",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475778031",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
-      "appid": 5227160,
-      "name": "Impferno",
-      "steam_url": "https://store.steampowered.com/app/5227160/",
-      "release_date": "2026-12-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476235428",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 8,
-      "appid": 5085050,
-      "name": "Calibration Sequence",
-      "steam_url": "https://store.steampowered.com/app/5085050/",
-      "release_date": "2026-12-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475789066",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 9,
-      "appid": 5273550,
-      "name": "Ecos de Valdrenne",
-      "steam_url": "https://store.steampowered.com/app/5273550/",
-      "release_date": "2026-12-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475832396",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 10,
-      "appid": 5579400,
-      "name": "Galaxization",
-      "steam_url": "https://store.steampowered.com/app/5579400/",
-      "release_date": "2026-12-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476236235",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 11,
       "appid": 5536370,
       "name": "Deadlines",
       "steam_url": "https://store.steampowered.com/app/5536370/",
@@ -237,7 +95,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 2,
       "appid": 3900220,
       "name": "Proximity",
       "steam_url": "https://store.steampowered.com/app/3900220/",
@@ -251,7 +109,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 3,
       "appid": 5071860,
       "name": "Cozy Plates",
       "steam_url": "https://store.steampowered.com/app/5071860/",
@@ -265,7 +123,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 4,
       "appid": 5145720,
       "name": "Just Fly",
       "steam_url": "https://store.steampowered.com/app/5145720/",
@@ -279,7 +137,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 5,
       "appid": 5044050,
       "name": "ONSIGHT",
       "steam_url": "https://store.steampowered.com/app/5044050/",
@@ -293,7 +151,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 6,
       "appid": 5148590,
       "name": "PHILSEQUE DIVISION",
       "steam_url": "https://store.steampowered.com/app/5148590/",
@@ -307,7 +165,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 7,
       "appid": 5211540,
       "name": "Ferryman's Obol",
       "steam_url": "https://store.steampowered.com/app/5211540/",
@@ -321,7 +179,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 8,
       "appid": 4965150,
       "name": "It Works: Electronics Repair Simulator - First Short Circuit",
       "steam_url": "https://store.steampowered.com/app/4965150/",
@@ -335,7 +193,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 9,
       "appid": 5225330,
       "name": "Dump Chaos",
       "steam_url": "https://store.steampowered.com/app/5225330/",
@@ -349,7 +207,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 10,
       "appid": 5514090,
       "name": "Leaf to Sun",
       "steam_url": "https://store.steampowered.com/app/5514090/",
@@ -363,7 +221,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 11,
       "appid": 5089490,
       "name": "EXTRAKTOR K.R.Y.P.T.",
       "steam_url": "https://store.steampowered.com/app/5089490/",
@@ -377,7 +235,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 12,
       "appid": 5547270,
       "name": "Mondrian Puzzle",
       "steam_url": "https://store.steampowered.com/app/5547270/",
@@ -391,7 +249,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 13,
       "appid": 5139580,
       "name": "Fill the Sky",
       "steam_url": "https://store.steampowered.com/app/5139580/",
@@ -405,7 +263,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 14,
       "appid": 5169080,
       "name": "Found it!: Lost & Found Co.",
       "steam_url": "https://store.steampowered.com/app/5169080/",
@@ -419,7 +277,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 15,
       "appid": 5577140,
       "name": "The Unseated",
       "steam_url": "https://store.steampowered.com/app/5577140/",
@@ -433,7 +291,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 26,
+      "position": 16,
       "appid": 5335480,
       "name": "Ratiator",
       "steam_url": "https://store.steampowered.com/app/5335480/",
@@ -447,7 +305,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 27,
+      "position": 17,
       "appid": 5504220,
       "name": "Vまねっ！",
       "steam_url": "https://store.steampowered.com/app/5504220/",
@@ -461,7 +319,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 28,
+      "position": 18,
       "appid": 5583240,
       "name": "If you die, you die!",
       "steam_url": "https://store.steampowered.com/app/5583240/",
@@ -475,7 +333,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 29,
+      "position": 19,
       "appid": 5369200,
       "name": "Lost Legends",
       "steam_url": "https://store.steampowered.com/app/5369200/",
@@ -489,7 +347,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 30,
+      "position": 20,
       "appid": 4847830,
       "name": "Living With Dad - Family Party",
       "steam_url": "https://store.steampowered.com/app/4847830/",
@@ -503,7 +361,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 31,
+      "position": 21,
       "appid": 5566650,
       "name": "Poutamelo",
       "steam_url": "https://store.steampowered.com/app/5566650/",
@@ -517,7 +375,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 32,
+      "position": 22,
       "appid": 4698160,
       "name": "Cats Don't Carry Car Parts",
       "steam_url": "https://store.steampowered.com/app/4698160/",
@@ -531,7 +389,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 33,
+      "position": 23,
       "appid": 5115320,
       "name": "Jump Bald",
       "steam_url": "https://store.steampowered.com/app/5115320/",
@@ -545,7 +403,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 34,
+      "position": 24,
       "appid": 4882810,
       "name": "BoxParty!",
       "steam_url": "https://store.steampowered.com/app/4882810/",
@@ -559,7 +417,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 35,
+      "position": 25,
       "appid": 5173540,
       "name": "Idle Legend",
       "steam_url": "https://store.steampowered.com/app/5173540/",
@@ -573,7 +431,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 36,
+      "position": 26,
       "appid": 4967770,
       "name": "Fast Point",
       "steam_url": "https://store.steampowered.com/app/4967770/",
@@ -587,7 +445,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 37,
+      "position": 27,
       "appid": 5435010,
       "name": "Streaming Tycoon",
       "steam_url": "https://store.steampowered.com/app/5435010/",
@@ -601,7 +459,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 38,
+      "position": 28,
       "appid": 5295270,
       "name": "Last Order",
       "steam_url": "https://store.steampowered.com/app/5295270/",
@@ -615,7 +473,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 39,
+      "position": 29,
       "appid": 5194390,
       "name": "WildScore",
       "steam_url": "https://store.steampowered.com/app/5194390/",
@@ -631,136 +489,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-12T02:23:54.831442Z",
-      "kind": "official_attempt",
-      "appid": 5561700,
-      "name": "VOIDRUN: ASCENSION",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:24:24.831534Z",
-      "kind": "official_attempt",
-      "appid": 5577450,
-      "name": "I Am Konrad Voss",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:24:54.831672Z",
-      "kind": "official_attempt",
-      "appid": 4944890,
-      "name": "Foosball Champs",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:25:24.831786Z",
-      "kind": "official_attempt",
-      "appid": 5448040,
-      "name": "Still Awake",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:25:54.831907Z",
-      "kind": "official_attempt",
-      "appid": 5548160,
-      "name": "Die Rich",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:26:24.832023Z",
-      "kind": "official_attempt",
-      "appid": 5304310,
-      "name": "10 Million Cubes",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 5,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:26:54.832161Z",
-      "kind": "official_attempt",
-      "appid": 5534140,
-      "name": "Retro Party",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:27:24.832313Z",
-      "kind": "official_attempt",
-      "appid": 5545430,
-      "name": "Borderfall",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 12,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:27:54.832480Z",
-      "kind": "official_attempt",
-      "appid": 5432080,
-      "name": "Saucer Rumble Showdown",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
-    {
-      "at": "2026-11-12T02:28:25.490187Z",
-      "kind": "official_attempt",
-      "appid": 5438240,
-      "name": "Sword Duel 2: Medieval War",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "43138332669",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43138332669"
-    },
     {
       "at": "2026-11-12T02:28:55.490326Z",
       "kind": "official_attempt",
@@ -1930,6 +1658,136 @@
       "retry_at": "2026-11-13T03:25:55.393438Z",
       "run_id": "43355977068",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43355977068"
+    },
+    {
+      "at": "2026-11-13T05:02:28.768963Z",
+      "kind": "official_attempt",
+      "appid": 5482800,
+      "name": "Factory In Progress",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 5,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:02:58.769086Z",
+      "kind": "official_attempt",
+      "appid": 5465030,
+      "name": "Holy Nest",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:03:28.769223Z",
+      "kind": "official_attempt",
+      "appid": 5549740,
+      "name": "SimFarm",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:03:58.769393Z",
+      "kind": "official_attempt",
+      "appid": 5556120,
+      "name": "Become a Real Estate Tycoon",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:04:28.769508Z",
+      "kind": "official_attempt",
+      "appid": 3384600,
+      "name": "Professor Layton and the New World of Steam",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 358,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:04:58.769643Z",
+      "kind": "official_attempt",
+      "appid": 5029900,
+      "name": "Knock Twice",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 9,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:05:28.769786Z",
+      "kind": "official_attempt",
+      "appid": 5227160,
+      "name": "Impferno",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:05:58.769963Z",
+      "kind": "official_attempt",
+      "appid": 5085050,
+      "name": "Calibration Sequence",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:06:28.770073Z",
+      "kind": "official_attempt",
+      "appid": 5273550,
+      "name": "Ecos de Valdrenne",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 6,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
+    },
+    {
+      "at": "2026-11-13T05:06:58.770235Z",
+      "kind": "official_attempt",
+      "appid": 5579400,
+      "name": "Galaxization",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "43369111462",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/43369111462"
     }
   ],
   "events_limit": 100

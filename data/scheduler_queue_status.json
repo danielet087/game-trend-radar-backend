@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-13T00:03:07.181116Z",
+  "generated_at": "2026-11-13T00:03:41.909960Z",
   "today_taipei": "2026-11-13",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-13T00:03:06.918240Z",
+    "checkpoint_updated_at": "2026-11-13T00:03:41.692690Z",
     "group_resolution_updated_at": "2026-11-12T05:27:43.372233Z",
     "candidate_state_updated_at": "2026-11-12T17:06:13.556275Z",
     "prefilter_updated_at": "2026-11-12T17:06:13.537819Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-13",
     "status": "completed",
-    "checked_at": "2026-11-13T08:03:07.181116+08:00",
+    "checked_at": "2026-11-13T08:03:41.909960+08:00",
     "needed": true,
     "planned_count": 8,
     "completed_count": 0,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-13T08:03:06.148808+08:00",
-    "last_updated_at": "2026-11-13T08:03:06.918240+08:00",
+    "last_updated_at": "2026-11-13T08:03:41.692690+08:00",
+    "finished_at": "2026-11-13T08:03:41.692690+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5435010,
     "last_name": "Streaming Tycoon",
     "requests_this_run": 1,

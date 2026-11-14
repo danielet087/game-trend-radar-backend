@@ -53956,20 +53956,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43578431869",
-    "active": false,
-    "status": "finished",
+    "run_id": "43587907487",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-14T17:02:50.319530+08:00",
-    "last_updated_at": "2026-11-14T17:03:19.548165+08:00",
+    "started_at": "2026-11-14T19:03:19.249307+08:00",
+    "last_updated_at": "2026-11-14T19:03:20.145729+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5347650,
-    "last_name": "Steel Umbrella",
-    "finished_at": "2026-11-14T17:03:19.548165+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5579450,
+    "last_name": "死霊の棲む廃屋敷からの脱出"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -129746,17 +129744,17 @@
       }
     }
   },
-  "rate_limit_count": 4,
+  "rate_limit_count": 5,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-14T19:02:51.314353+08:00",
+  "next_request_after_taipei": "2026-11-14T23:03:20.145062+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-14T11:02:51.314353+00:00",
-    "observed_at": "2026-11-14T09:02:51.314353+00:00",
-    "updated_at": "2026-11-14T09:02:51.314353+00:00",
-    "retry_seconds": 7200,
+    "retry_at": "2026-11-14T15:03:20.145062+00:00",
+    "observed_at": "2026-11-14T11:03:20.145062+00:00",
+    "updated_at": "2026-11-14T11:03:20.145062+00:00",
+    "retry_seconds": 14400,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 4
+    "attempts": 5
   },
   "community_last_success_at": "2026-11-14T13:17:52.316953+08:00",
   "official_growth_observations": {
@@ -148563,6 +148561,16 @@
       "status": "rate_limited",
       "github_run_id": "43578431869",
       "next_request_after_taipei": "2026-11-14T19:02:51.314353+08:00"
+    },
+    {
+      "appid": 5579450,
+      "when_taipei": "2026-11-14T19:03:19.931508+08:00",
+      "release_date": "2026-11-30",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43587907487",
+      "next_request_after_taipei": "2026-11-14T23:03:20.145062+08:00"
     }
   ]
 }

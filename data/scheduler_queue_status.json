@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T05:03:54.721431Z",
+  "generated_at": "2026-11-14T06:01:42.852603Z",
   "today_taipei": "2026-11-14",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -11,7 +11,7 @@
     "prefilter_updated_at": "2026-11-13T17:07:22.070347Z",
     "eligible_screened_at": "2026-11-14T04:02:20.500101Z",
     "twitch_import_updated_at": "2026-11-14T05:01:59.737564Z",
-    "last_official_success_at": "2026-11-14T00:06:41.281027Z",
+    "last_official_success_at": "2026-11-14T05:17:52.316953Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -20,21 +20,21 @@
     "eligible_screened_at": "2026-11-14T04:02:20.500101+00:00",
     "added_from_daily": 0,
     "eligible_count": 3685,
-    "official_rechecks_pending": 7,
+    "official_rechecks_pending": 8,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 97,
+    "combined_pending_now": 98,
     "completed_legacy": 408,
     "completed_new": 5290,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 97,
+    "normal_pending": 98,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 97,
-    "followers_ready_pending": 97,
+    "ready_pending": 98,
+    "followers_ready_pending": 98,
     "awaiting_group_pending": 0,
-    "total_pending": 97,
+    "total_pending": 98,
     "today_attempts": 27,
     "today_successes": 20,
     "today_429": 7
@@ -43,12 +43,12 @@
     "schema_version": 1,
     "date_taipei": "2026-11-14",
     "status": "completed",
-    "checked_at": "2026-11-14T05:03:54.721431+00:00",
+    "checked_at": "2026-11-14T06:01:42.852603+00:00",
     "needed": true,
     "planned_count": 11,
     "completed_count": 0,
     "remaining_count": 11,
-    "due_now_count": 7
+    "due_now_count": 8
   },
   "group_resolution_api_cooldown": {
     "attempts": 0,
@@ -59,9 +59,9 @@
   },
   "cooldown": {
     "active": false,
-    "until": "2026-11-14T05:02:59.295069Z",
+    "until": null,
     "reason": null,
-    "next_eligible_slot": "2026-11-14T06:00:00Z",
+    "next_eligible_slot": "2026-11-14T07:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -1342,6 +1342,20 @@
     },
     {
       "position": 91,
+      "appid": 4905780,
+      "name": "The Apothecary Diaries: The False Imperial Brother",
+      "steam_url": "https://store.steampowered.com/app/4905780/",
+      "release_date": "2027-03-18",
+      "source": "fresh_daily_prefilter_unresolved",
+      "priority": false,
+      "state": "waiting",
+      "group_id64": "103582791475819443",
+      "group_resolution": null,
+      "last_attempt_at": "2026-11-11T05:20:31.023254Z",
+      "last_attempt_status": "ok"
+    },
+    {
+      "position": 92,
       "appid": 4768630,
       "name": "LARVIS",
       "steam_url": "https://store.steampowered.com/app/4768630/",
@@ -1355,7 +1369,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 92,
+      "position": 93,
       "appid": 5557520,
       "name": "Midnight Shift 2: Last Rental",
       "steam_url": "https://store.steampowered.com/app/5557520/",
@@ -1369,7 +1383,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 93,
+      "position": 94,
       "appid": 5553220,
       "name": "Tea ceremony simulator",
       "steam_url": "https://store.steampowered.com/app/5553220/",
@@ -1383,7 +1397,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 94,
+      "position": 95,
       "appid": 5544590,
       "name": "Bride of Koshchei",
       "steam_url": "https://store.steampowered.com/app/5544590/",
@@ -1397,7 +1411,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 95,
+      "position": 96,
       "appid": 5551020,
       "name": "Embodybird",
       "steam_url": "https://store.steampowered.com/app/5551020/",
@@ -1411,7 +1425,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 96,
+      "position": 97,
       "appid": 5580820,
       "name": "Forts of Canada",
       "steam_url": "https://store.steampowered.com/app/5580820/",
@@ -1425,7 +1439,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 97,
+      "position": 98,
       "appid": 5587040,
       "name": "Core Valley",
       "steam_url": "https://store.steampowered.com/app/5587040/",

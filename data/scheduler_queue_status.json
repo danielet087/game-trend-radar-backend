@@ -1,54 +1,54 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T15:04:20.002718Z",
-  "today_taipei": "2026-11-14",
+  "generated_at": "2026-11-14T16:01:47.681794Z",
+  "today_taipei": "2026-11-15",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
     "checkpoint_updated_at": "2026-11-14T15:02:55.533826Z",
     "group_resolution_updated_at": "2026-11-13T23:17:12.757207Z",
-    "candidate_state_updated_at": "2026-11-13T17:07:22.090230Z",
-    "prefilter_updated_at": "2026-11-13T17:07:22.070347Z",
+    "candidate_state_updated_at": null,
+    "prefilter_updated_at": null,
     "eligible_screened_at": "2026-11-14T10:02:04.091417Z",
     "twitch_import_updated_at": "2026-11-14T14:02:02.119419Z",
     "last_official_success_at": "2026-11-14T05:17:52.316953Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
-    "status": "current_day_prefilter_complete",
-    "daily_prefilter_updated_at": "2026-11-13T17:07:22.070347+00:00",
+    "status": "no_current_day_prefilter",
+    "daily_prefilter_updated_at": null,
     "eligible_screened_at": "2026-11-14T10:02:04.091417+00:00",
     "added_from_daily": 0,
     "eligible_count": 3685,
-    "official_rechecks_pending": 9,
+    "official_rechecks_pending": 0,
     "parked_group_xml_appids": [],
-    "combined_pending_now": 99,
+    "combined_pending_now": 90,
     "completed_legacy": 408,
     "completed_new": 5290,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 99,
+    "normal_pending": 90,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 99,
-    "followers_ready_pending": 99,
+    "ready_pending": 90,
+    "followers_ready_pending": 90,
     "awaiting_group_pending": 0,
-    "total_pending": 99,
-    "today_attempts": 32,
-    "today_successes": 20,
-    "today_429": 12
+    "total_pending": 90,
+    "today_attempts": 0,
+    "today_successes": 0,
+    "today_429": 0
   },
   "follower_recheck_plan": {
     "schema_version": 1,
-    "date_taipei": "2026-11-14",
-    "status": "completed",
-    "checked_at": "2026-11-14T15:04:20.002718+00:00",
-    "needed": true,
-    "planned_count": 11,
-    "completed_count": 0,
-    "remaining_count": 11,
-    "due_now_count": 9
+    "date_taipei": "2026-11-15",
+    "status": "pending",
+    "checked_at": null,
+    "needed": null,
+    "planned_count": null,
+    "completed_count": null,
+    "remaining_count": null,
+    "due_now_count": null
   },
   "group_resolution_api_cooldown": {
     "attempts": 0,
@@ -1174,132 +1174,6 @@
     },
     {
       "position": 79,
-      "appid": 4974960,
-      "name": "The Last Station - Baku",
-      "steam_url": "https://store.steampowered.com/app/4974960/",
-      "release_date": "2026-11-14",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475759172",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 80,
-      "appid": 4776500,
-      "name": "Carry On Together",
-      "steam_url": "https://store.steampowered.com/app/4776500/",
-      "release_date": "2026-11-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475790724",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 81,
-      "appid": 5196980,
-      "name": "ArkSeed Terraformery",
-      "steam_url": "https://store.steampowered.com/app/5196980/",
-      "release_date": "2026-11-27",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475819676",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 82,
-      "appid": 5165650,
-      "name": "Mind the Clown: Reborn",
-      "steam_url": "https://store.steampowered.com/app/5165650/",
-      "release_date": "2026-11-28",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475804677",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 83,
-      "appid": 5045680,
-      "name": "Not Now, Aliens!",
-      "steam_url": "https://store.steampowered.com/app/5045680/",
-      "release_date": "2026-12-31",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475786816",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 84,
-      "appid": 1207360,
-      "name": "Medieval Frontiers",
-      "steam_url": "https://store.steampowered.com/app/1207360/",
-      "release_date": "2027-01-20",
-      "source": "fresh_daily_prefilter_ge4000_pending_official",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791465851187",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 85,
-      "appid": 1830110,
-      "name": "THE SIGNAL: Stranded on Sirenis",
-      "steam_url": "https://store.steampowered.com/app/1830110/",
-      "release_date": "2027-02-05",
-      "source": "fresh_daily_prefilter_ge4000_pending_official",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791474035185",
-      "group_resolution": null,
-      "last_attempt_at": "2026-11-13T08:03:17.314850Z",
-      "last_attempt_status": "ok"
-    },
-    {
-      "position": 86,
-      "appid": 4214960,
-      "name": "Romancing SaGa 3: Destinies United",
-      "steam_url": "https://store.steampowered.com/app/4214960/",
-      "release_date": "2027-02-05",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475819441",
-      "group_resolution": null,
-      "last_attempt_at": "2026-11-11T02:16:38.572954Z",
-      "last_attempt_status": "ok"
-    },
-    {
-      "position": 87,
-      "appid": 4905780,
-      "name": "The Apothecary Diaries: The False Imperial Brother",
-      "steam_url": "https://store.steampowered.com/app/4905780/",
-      "release_date": "2027-03-18",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475819443",
-      "group_resolution": null,
-      "last_attempt_at": "2026-11-11T05:20:31.023254Z",
-      "last_attempt_status": "ok"
-    },
-    {
-      "position": 88,
       "appid": 4768630,
       "name": "LARVIS",
       "steam_url": "https://store.steampowered.com/app/4768630/",
@@ -1313,7 +1187,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 89,
+      "position": 80,
       "appid": 5557520,
       "name": "Midnight Shift 2: Last Rental",
       "steam_url": "https://store.steampowered.com/app/5557520/",
@@ -1327,7 +1201,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 90,
+      "position": 81,
       "appid": 5553220,
       "name": "Tea ceremony simulator",
       "steam_url": "https://store.steampowered.com/app/5553220/",
@@ -1341,7 +1215,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 91,
+      "position": 82,
       "appid": 5544590,
       "name": "Bride of Koshchei",
       "steam_url": "https://store.steampowered.com/app/5544590/",
@@ -1355,7 +1229,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 92,
+      "position": 83,
       "appid": 5551020,
       "name": "Embodybird",
       "steam_url": "https://store.steampowered.com/app/5551020/",
@@ -1369,7 +1243,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 93,
+      "position": 84,
       "appid": 5580820,
       "name": "Forts of Canada",
       "steam_url": "https://store.steampowered.com/app/5580820/",
@@ -1383,7 +1257,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 94,
+      "position": 85,
       "appid": 5587040,
       "name": "Core Valley",
       "steam_url": "https://store.steampowered.com/app/5587040/",
@@ -1397,7 +1271,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 95,
+      "position": 86,
       "appid": 5062420,
       "name": "Iris's Idle Log",
       "steam_url": "https://store.steampowered.com/app/5062420/",
@@ -1411,7 +1285,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 96,
+      "position": 87,
       "appid": 5251800,
       "name": "Z-Defender",
       "steam_url": "https://store.steampowered.com/app/5251800/",
@@ -1425,7 +1299,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 97,
+      "position": 88,
       "appid": 5267090,
       "name": "Idle Raiders: Second Run",
       "steam_url": "https://store.steampowered.com/app/5267090/",
@@ -1439,7 +1313,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 98,
+      "position": 89,
       "appid": 5347650,
       "name": "Steel Umbrella",
       "steam_url": "https://store.steampowered.com/app/5347650/",
@@ -1453,7 +1327,7 @@
       "last_attempt_status": "rate_limited"
     },
     {
-      "position": 99,
+      "position": 90,
       "appid": 5579450,
       "name": "死霊の棲む廃屋敷からの脱出",
       "steam_url": "https://store.steampowered.com/app/5579450/",

@@ -53956,20 +53956,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43543827287",
-    "active": false,
-    "status": "finished",
+    "run_id": "43549301511",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-14T10:02:36.872493+08:00",
-    "last_updated_at": "2026-11-14T10:03:06.417422+08:00",
+    "started_at": "2026-11-14T11:02:58.145739+08:00",
+    "last_updated_at": "2026-11-14T11:02:59.295165+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5580820,
-    "last_name": "Forts of Canada",
-    "finished_at": "2026-11-14T10:03:06.417422+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5587040,
+    "last_name": "Core Valley"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -129746,17 +129744,17 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 3,
+  "rate_limit_count": 4,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-14T11:02:37.538110+08:00",
+  "next_request_after_taipei": "2026-11-14T13:02:59.295069+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-14T03:02:37.538110+00:00",
-    "observed_at": "2026-11-14T02:02:37.538110+00:00",
-    "updated_at": "2026-11-14T02:02:37.538110+00:00",
-    "retry_seconds": 3600,
+    "retry_at": "2026-11-14T05:02:59.295069+00:00",
+    "observed_at": "2026-11-14T03:02:59.295069+00:00",
+    "updated_at": "2026-11-14T03:02:59.295069+00:00",
+    "retry_seconds": 7200,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 3
+    "attempts": 4
   },
   "community_last_success_at": "2026-11-14T08:06:41.281027+08:00",
   "official_growth_observations": {
@@ -148506,6 +148504,16 @@
       "status": "rate_limited",
       "github_run_id": "43543827287",
       "next_request_after_taipei": "2026-11-14T11:02:37.538110+08:00"
+    },
+    {
+      "appid": 5587040,
+      "when_taipei": "2026-11-14T11:02:58.959655+08:00",
+      "release_date": "2026-11-28",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43549301511",
+      "next_request_after_taipei": "2026-11-14T13:02:59.295069+08:00"
     }
   ]
 }

@@ -53956,20 +53956,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43573699115",
-    "active": false,
-    "status": "finished",
+    "run_id": "43578431869",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-14T16:02:42.455553+08:00",
-    "last_updated_at": "2026-11-14T16:03:13.190136+08:00",
+    "started_at": "2026-11-14T17:02:50.319530+08:00",
+    "last_updated_at": "2026-11-14T17:02:51.314424+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5267090,
-    "last_name": "Idle Raiders: Second Run",
-    "finished_at": "2026-11-14T16:03:13.190136+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5347650,
+    "last_name": "Steel Umbrella"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -129746,17 +129744,17 @@
       }
     }
   },
-  "rate_limit_count": 3,
+  "rate_limit_count": 4,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-14T17:02:43.170776+08:00",
+  "next_request_after_taipei": "2026-11-14T19:02:51.314353+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-14T09:02:43.170776+00:00",
-    "observed_at": "2026-11-14T08:02:43.170776+00:00",
-    "updated_at": "2026-11-14T08:02:43.170776+00:00",
-    "retry_seconds": 3600,
+    "retry_at": "2026-11-14T11:02:51.314353+00:00",
+    "observed_at": "2026-11-14T09:02:51.314353+00:00",
+    "updated_at": "2026-11-14T09:02:51.314353+00:00",
+    "retry_seconds": 7200,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 3
+    "attempts": 4
   },
   "community_last_success_at": "2026-11-14T13:17:52.316953+08:00",
   "official_growth_observations": {
@@ -148553,6 +148551,16 @@
       "status": "rate_limited",
       "github_run_id": "43573699115",
       "next_request_after_taipei": "2026-11-14T17:02:43.170776+08:00"
+    },
+    {
+      "appid": 5347650,
+      "when_taipei": "2026-11-14T17:02:51.095344+08:00",
+      "release_date": "2026-11-30",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43578431869",
+      "next_request_after_taipei": "2026-11-14T19:02:51.314353+08:00"
     }
   ]
 }

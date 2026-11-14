@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T06:02:38.794273Z",
+  "generated_at": "2026-11-14T06:03:09.080627Z",
   "today_taipei": "2026-11-14",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-14T06:02:38.582313Z",
+    "checkpoint_updated_at": "2026-11-14T06:03:08.860601Z",
     "group_resolution_updated_at": "2026-11-13T23:17:12.757207Z",
     "candidate_state_updated_at": "2026-11-13T17:07:22.090230Z",
     "prefilter_updated_at": "2026-11-13T17:07:22.070347Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-14",
     "status": "completed",
-    "checked_at": "2026-11-14T14:02:38.794273+08:00",
+    "checked_at": "2026-11-14T14:03:09.080627+08:00",
     "needed": true,
     "planned_count": 11,
     "completed_count": 0,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-14T14:02:37.918514+08:00",
-    "last_updated_at": "2026-11-14T14:02:38.582313+08:00",
+    "last_updated_at": "2026-11-14T14:03:08.860601+08:00",
+    "finished_at": "2026-11-14T14:03:08.860601+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5062420,
     "last_name": "Iris's Idle Log",
     "requests_this_run": 1,

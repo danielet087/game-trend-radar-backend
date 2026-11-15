@@ -54825,20 +54825,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43716694174",
-    "active": false,
-    "status": "finished",
+    "run_id": "43721942405",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-15T21:02:31.943943+08:00",
-    "last_updated_at": "2026-11-15T21:02:56.798507+08:00",
+    "started_at": "2026-11-15T22:02:40.959258+08:00",
+    "last_updated_at": "2026-11-15T22:02:42.232921+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5543120,
-    "last_name": "Find100Buttons",
-    "finished_at": "2026-11-15T21:02:56.798507+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5385500,
+    "last_name": "Hero Tower Defense"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -130764,17 +130762,17 @@
       }
     }
   },
-  "rate_limit_count": 1,
+  "rate_limit_count": 2,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-15T21:17:32.586790+08:00",
+  "next_request_after_taipei": "2026-11-15T22:32:42.232205+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-15T13:17:32.586790+00:00",
-    "observed_at": "2026-11-15T13:02:32.586790+00:00",
-    "updated_at": "2026-11-15T13:02:32.586790+00:00",
-    "retry_seconds": 900,
+    "retry_at": "2026-11-15T14:32:42.232205+00:00",
+    "observed_at": "2026-11-15T14:02:42.232205+00:00",
+    "updated_at": "2026-11-15T14:02:42.232205+00:00",
+    "retry_seconds": 1800,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 1
+    "attempts": 2
   },
   "community_last_success_at": "2026-11-15T20:09:03.887373+08:00",
   "official_growth_observations": {
@@ -149672,6 +149670,16 @@
       "status": "rate_limited",
       "github_run_id": "43716694174",
       "next_request_after_taipei": "2026-11-15T21:17:32.586790+08:00"
+    },
+    {
+      "appid": 5385500,
+      "when_taipei": "2026-11-15T22:02:41.612522+08:00",
+      "release_date": "2026-11-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43721942405",
+      "next_request_after_taipei": "2026-11-15T22:32:42.232205+08:00"
     }
   ]
 }

@@ -54825,20 +54825,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43721942405",
-    "active": false,
-    "status": "finished",
+    "run_id": "43727406833",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-15T22:02:40.959258+08:00",
-    "last_updated_at": "2026-11-15T22:03:06.483410+08:00",
+    "started_at": "2026-11-15T23:03:01.094535+08:00",
+    "last_updated_at": "2026-11-15T23:03:01.888694+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5385500,
-    "last_name": "Hero Tower Defense",
-    "finished_at": "2026-11-15T22:03:06.483410+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5518650,
+    "last_name": "WHUCK Protocol"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -130764,17 +130762,17 @@
       }
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-15T22:32:42.232205+08:00",
+  "next_request_after_taipei": "2026-11-16T00:03:01.888040+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-15T14:32:42.232205+00:00",
-    "observed_at": "2026-11-15T14:02:42.232205+00:00",
-    "updated_at": "2026-11-15T14:02:42.232205+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-15T16:03:01.888040+00:00",
+    "observed_at": "2026-11-15T15:03:01.888040+00:00",
+    "updated_at": "2026-11-15T15:03:01.888040+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-15T20:09:03.887373+08:00",
   "official_growth_observations": {
@@ -149682,6 +149680,16 @@
       "status": "rate_limited",
       "github_run_id": "43721942405",
       "next_request_after_taipei": "2026-11-15T22:32:42.232205+08:00"
+    },
+    {
+      "appid": 5518650,
+      "when_taipei": "2026-11-15T23:03:01.742941+08:00",
+      "release_date": "2026-11-21",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43727406833",
+      "next_request_after_taipei": "2026-11-16T00:03:01.888040+08:00"
     }
   ]
 }

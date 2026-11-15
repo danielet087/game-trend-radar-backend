@@ -55411,18 +55411,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43761186957",
-    "active": false,
-    "status": "finished",
+    "run_id": "43772377679",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-16T05:02:47.741872+08:00",
-    "last_updated_at": "2026-11-16T05:02:48.284083+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-11-16T07:02:39.961046+08:00",
+    "last_updated_at": "2026-11-16T07:02:40.716698+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-11-16T05:02:48.284083+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 5460910,
+    "last_name": "Mayday Airways"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -131420,17 +131420,17 @@
       }
     }
   },
-  "rate_limit_count": 3,
+  "rate_limit_count": 4,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-16T05:02:58.893442+08:00",
+  "next_request_after_taipei": "2026-11-16T09:02:40.716644+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-15T21:02:58.893442+00:00",
-    "observed_at": "2026-11-15T20:02:58.893442+00:00",
-    "updated_at": "2026-11-15T20:02:58.893442+00:00",
-    "retry_seconds": 3600,
+    "retry_at": "2026-11-16T01:02:40.716644+00:00",
+    "observed_at": "2026-11-15T23:02:40.716644+00:00",
+    "updated_at": "2026-11-15T23:02:40.716644+00:00",
+    "retry_seconds": 7200,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 3
+    "attempts": 4
   },
   "community_last_success_at": "2026-11-16T01:39:08.130210+08:00",
   "official_growth_observations": {
@@ -150368,6 +150368,16 @@
       "status": "rate_limited",
       "github_run_id": "43755539104",
       "next_request_after_taipei": "2026-11-16T05:02:58.893442+08:00"
+    },
+    {
+      "appid": 5460910,
+      "when_taipei": "2026-11-16T07:02:40.455187+08:00",
+      "release_date": "2026-11-17",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43772377679",
+      "next_request_after_taipei": "2026-11-16T09:02:40.716644+08:00"
     }
   ]
 }

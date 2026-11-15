@@ -54717,18 +54717,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43665685170",
-    "active": false,
-    "status": "finished",
+    "run_id": "43670334828",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-15T10:03:13.408206+08:00",
-    "last_updated_at": "2026-11-15T10:03:14.205562+08:00",
-    "requests_this_run": 0,
+    "started_at": "2026-11-15T11:02:57.472915+08:00",
+    "last_updated_at": "2026-11-15T11:02:58.415218+08:00",
+    "requests_this_run": 1,
     "official_new_this_run": 0,
-    "http_429_this_run": 0,
-    "finished_at": "2026-11-15T10:03:14.205562+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "http_429_this_run": 1,
+    "last_appid": 4888340,
+    "last_name": "Curse of the Chronomancer"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -130579,17 +130579,17 @@
       }
     }
   },
-  "rate_limit_count": 5,
+  "rate_limit_count": 6,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-15T11:02:45.824939+08:00",
+  "next_request_after_taipei": "2026-11-15T19:02:58.415123+08:00",
   "community_cooldown": {
-    "attempts": 5,
-    "observed_at": "2026-11-14T23:02:45.824939+00:00",
+    "retry_at": "2026-11-15T11:02:58.415123+00:00",
+    "observed_at": "2026-11-15T03:02:58.415123+00:00",
+    "updated_at": "2026-11-15T03:02:58.415123+00:00",
+    "retry_seconds": 28800,
     "retry_after": null,
-    "retry_at": "2026-11-15T03:02:45.824939+00:00",
-    "retry_seconds": 14400,
     "retry_source": "existing_queue_backoff",
-    "updated_at": "2026-11-14T23:02:45.824939+00:00"
+    "attempts": 6
   },
   "community_last_success_at": "2026-11-15T01:53:49.994998+08:00",
   "official_growth_observations": {
@@ -149446,6 +149446,16 @@
       "release_date": "2026-11-17",
       "status": "rate_limited",
       "when_taipei": "2026-11-15T07:02:45.431165+08:00"
+    },
+    {
+      "appid": 4888340,
+      "when_taipei": "2026-11-15T11:02:58.192518+08:00",
+      "release_date": "2026-11-18",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43670334828",
+      "next_request_after_taipei": "2026-11-15T19:02:58.415123+08:00"
     }
   ]
 }

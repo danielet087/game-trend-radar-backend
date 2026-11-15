@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-15T19:03:23.082660Z",
+  "generated_at": "2026-11-15T19:03:59.623240Z",
   "today_taipei": "2026-11-16",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-15T19:03:22.746342Z",
+    "checkpoint_updated_at": "2026-11-15T19:03:59.326060Z",
     "group_resolution_updated_at": "2026-11-15T17:17:32.247872Z",
     "candidate_state_updated_at": "2026-11-15T17:04:47.465154Z",
     "prefilter_updated_at": "2026-11-15T17:04:47.454579Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-16",
     "status": "completed",
-    "checked_at": "2026-11-16T03:03:23.082660+08:00",
+    "checked_at": "2026-11-16T03:03:59.623240+08:00",
     "needed": true,
     "planned_count": 151,
     "completed_count": 0,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-16T03:03:21.523774+08:00",
-    "last_updated_at": "2026-11-16T03:03:22.746342+08:00",
+    "last_updated_at": "2026-11-16T03:03:59.326060+08:00",
+    "finished_at": "2026-11-16T03:03:59.326060+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4670000,
     "last_name": "Rogue's Cog",
     "requests_this_run": 1,

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-16T19:06:25.015929Z",
+  "generated_at": "2026-11-16T19:06:52.474185Z",
   "today_taipei": "2026-11-17",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-16T19:06:24.690100Z",
+    "checkpoint_updated_at": "2026-11-16T19:06:52.165895Z",
     "group_resolution_updated_at": "2026-11-16T17:16:24.104309Z",
     "candidate_state_updated_at": "2026-11-16T17:03:49.162981Z",
     "prefilter_updated_at": "2026-11-16T17:03:49.144685Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-17",
     "status": "completed",
-    "checked_at": "2026-11-17T03:06:25.015929+08:00",
+    "checked_at": "2026-11-17T03:06:52.474185+08:00",
     "needed": true,
     "planned_count": 153,
     "completed_count": 0,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-17T03:02:53.677699+08:00",
-    "last_updated_at": "2026-11-17T03:06:24.690100+08:00",
+    "last_updated_at": "2026-11-17T03:06:52.165895+08:00",
+    "finished_at": "2026-11-17T03:06:52.165895+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5363480,
     "last_name": "Sincerely, Your Diary",
     "requests_this_run": 8,

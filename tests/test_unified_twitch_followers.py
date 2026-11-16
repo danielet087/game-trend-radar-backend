@@ -1,5 +1,6 @@
 """Behavior checks for Twitch priority in the existing official-count worker."""
 from copy import deepcopy
+from datetime import timedelta
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -148,7 +149,7 @@ def known_group(candidate):
 
 
 def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_requests=90,
-               extra_args=(), initial_checkpoint=None, legacy_cooldown=None):
+               extra_args=(), initial_checkpoint=None, legacy_cooldown=None, advancing_clock=False):
     cp = checkpoint(queue)
     cp.update(deepcopy(initial_checkpoint or {}))
     cp["next_request_after_taipei"] = cooldown
@@ -171,9 +172,11 @@ def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_re
     saved = {}
     monkeypatch.setattr(worker, "read", lambda path: deepcopy(saved[path] if path in saved else documents[path]))
     monkeypatch.setattr(worker, "save", lambda path, data: saved.__setitem__(path, deepcopy(data)))
-    monkeypatch.setattr(worker, "clock", lambda: NOW.astimezone(worker.TZ))
+    slept = [0.0]
+    monkeypatch.setattr(worker, "clock", lambda: (NOW + timedelta(seconds=slept[0])).astimezone(worker.TZ))
     monkeypatch.setattr(worker.time, "monotonic", lambda: 100.0)
-    sleep = Mock()
+    # Optionally let sleeping move the wall clock, as a real wait would.
+    sleep = Mock(side_effect=(lambda seconds: slept.__setitem__(0, slept[0] + seconds)) if advancing_clock else None)
     monkeypatch.setattr(worker.time, "sleep", sleep)
     monkeypatch.setattr(worker, "git_push", Mock(return_value=True))
     monkeypatch.setattr(worker, "begin_persistence", Mock())
@@ -305,6 +308,24 @@ def test_shared_cooldown_blocks_twitch_and_normal_xml_queries(monkeypatch, tmp_p
     assert set(cp["pending_candidates"]) == {"123", "124"}
     assert report["stop_reason"] == "official_429_cooldown_no_request"
     assert report["requests_this_run"] == 0
+
+
+def test_a_cooldown_ending_within_three_minutes_is_waited_out(monkeypatch, tmp_path):
+    soon = (NOW.astimezone(worker.TZ) + timedelta(seconds=40)).isoformat()
+    cp, report, client, _, _, _, sleep = run_worker(
+        monkeypatch, tmp_path, [known_group(twitch_candidate())], [xml_response(30)], cooldown=soon,
+        advancing_clock=True)
+
+    sleep.assert_any_call(41.0)
+    assert client.get.call_count == 1
+    assert report["requests_this_run"] == 1
+    assert set(cp["official_results"]) == {"123"}
+    later = (NOW.astimezone(worker.TZ) + timedelta(minutes=4)).isoformat()
+    _, report, client, _, _, _, sleep = run_worker(
+        monkeypatch, tmp_path, [known_group(twitch_candidate())], [], cooldown=later)
+    client.get.assert_not_called()
+    sleep.assert_not_called()
+    assert report["stop_reason"] == "official_429_cooldown_no_request"
 
 
 def test_priority_and_normal_share_request_budget_and_pacing(monkeypatch, tmp_path):

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from pathlib import Path
 from typing import Callable
@@ -12,6 +12,9 @@ from radar_backend.domain.official_queue import (
     TAIPEI, FollowerOutcome, queue_checked_numeric as checked_numeric, valid_group_id64,
     official_result_completes_candidate,
 )
+
+
+COOLDOWN_GRACE = timedelta(minutes=3)
 
 
 @dataclass(frozen=True)
@@ -153,11 +156,24 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
     legacy_cooldown = oldcp.get("next_request_after_taipei")
     previous_deadlines = (cooldown, legacy_cooldown,
                           (cp.get("community_cooldown") or {}).get("retry_at"))
+    # The hourly slot reaches this check about two and a half minutes past the
+    # hour, while a 15-minute cooldown set late in the previous run often ends a
+    # few seconds later. Wait out such a deadline instead of losing the hour.
+    waited = False
+    if q and not skip_cooldown and known_group_queue:
+        now = services.clock()
+        left = [until - now for until in (services.cooldown_factory(cp).deadline(),
+                                          services.cooldown_factory(oldcp).deadline())
+                if until is not None and until > now]
+        if left and max(left) <= COOLDOWN_GRACE:
+            services.sleep(max(left).total_seconds() + 1)
+            waited = True
+            print("OFFICIAL_COOLDOWN_WAITED", int(max(left).total_seconds()) + 1, flush=True)
     if not q:
         stop = "nothing_pending"
-    elif not skip_cooldown and services.cooldown_factory(cp).blocked(services.clock()):
+    elif not skip_cooldown and not waited and services.cooldown_factory(cp).blocked(services.clock()):
         stop = "official_429_cooldown_no_request"
-    elif not skip_cooldown and services.cooldown_factory(oldcp).blocked(services.clock()):
+    elif not skip_cooldown and not waited and services.cooldown_factory(oldcp).blocked(services.clock()):
         stop = "legacy_official_429_cooldown_no_request"
     elif not known_group_queue:
         stop = "awaiting_group_resolution_no_request"

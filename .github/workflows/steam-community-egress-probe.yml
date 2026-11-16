@@ -21,6 +21,11 @@ on:
         required: false
         type: number
         default: 3
+      accept_language:
+        description: "Accept-Language header, or none to send production's exact headers"
+        required: false
+        type: string
+        default: en-US
       queue_offset:
         description: "uncached mode: first queue position to sample (use different values for parallel probes)"
         required: false
@@ -48,6 +53,7 @@ jobs:
           PROBE_SPACING_SECONDS: ${{ inputs.spacing_seconds || 20 }}
           PROBE_QUEUE_OFFSET: ${{ inputs.queue_offset || 100 }}
           PROBE_COUNT: ${{ inputs.count || 3 }}
+          PROBE_ACCEPT_LANGUAGE: ${{ inputs.accept_language || 'en-US' }}
         run: |
           echo "Runner egress: $(curl -fsS --max-time 10 https://api.ipify.org || echo unknown)"
           python -m scripts.probe_steam_community_egress

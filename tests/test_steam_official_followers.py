@@ -61,6 +61,8 @@ def test_retry_after_obeys_existing_backoff_policy(prior, minutes):
     assert state['rate_limit_count'] == prior + 1
     assert '/gid/' in session.get.call_args.args[0]
     assert session.get.call_args.kwargs['timeout'] == (8, 24)
+    # Without Accept-Language, Steam Community answers most XML requests with 429.
+    assert session.get.call_args.kwargs['headers']['Accept-Language'].startswith('en')
 
 
 @pytest.mark.parametrize('header,hours', [('7200', 2), ('Thu, 08 Oct 2026 14:00:00 GMT', 3)])

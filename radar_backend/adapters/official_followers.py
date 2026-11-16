@@ -10,6 +10,13 @@ import requests
 from radar_backend.domain.official_queue import TAIPEI, FollowerOutcome, valid_group_id64
 from radar_backend.state.official_followers import CooldownStore
 
+# Steam Community throttles XML requests that carry no Accept-Language far more
+# than browser-like ones. A probe on 2026-11-16 got 429 for nine of twelve
+# requests with requests' default headers and 200 for every request with this
+# header, from the same kind of runner at the same time.
+COMMUNITY_HEADERS = {"Accept-Language": "en-US,en;q=0.9"}
+
+
 def parse_official_xml(body, expected_group):
     """A numeric memberCount is evidence only for the requested clan identity."""
     expected_group = valid_group_id64(expected_group)
@@ -38,7 +45,8 @@ class OfficialFollowerClient:
             return FollowerOutcome("cooldown_no_request", now)
         response = None
         try:
-            response = self.session.get(f"https://steamcommunity.com/gid/{gid}/memberslistxml/?xml=1", timeout=(8, 24))
+            response = self.session.get(f"https://steamcommunity.com/gid/{gid}/memberslistxml/?xml=1",
+                                        headers=COMMUNITY_HEADERS, timeout=(8, 24))
             observed = self.clock()
             if response.status_code == 429:
                 if self.cooldown:

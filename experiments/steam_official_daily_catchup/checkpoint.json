@@ -55597,20 +55597,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43827814944",
-    "active": false,
-    "status": "finished",
+    "run_id": "43835878029",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-16T16:02:39.663066+08:00",
-    "last_updated_at": "2026-11-16T16:03:12.011932+08:00",
+    "started_at": "2026-11-16T17:02:49.292069+08:00",
+    "last_updated_at": "2026-11-16T17:02:50.286890+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5599530,
-    "last_name": "I'd Choose the Bear",
-    "finished_at": "2026-11-16T16:03:12.011932+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5565560,
+    "last_name": "One Million Chips"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -131673,17 +131671,17 @@
       "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-16T16:32:40.311388+08:00",
+  "next_request_after_taipei": "2026-11-16T18:02:50.286803+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-16T08:32:40.311388+00:00",
-    "observed_at": "2026-11-16T08:02:40.311388+00:00",
-    "updated_at": "2026-11-16T08:02:40.311388+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-16T10:02:50.286803+00:00",
+    "observed_at": "2026-11-16T09:02:50.286803+00:00",
+    "updated_at": "2026-11-16T09:02:50.286803+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-16T15:05:04.649774+08:00",
   "official_growth_observations": {
@@ -150725,6 +150723,16 @@
       "status": "rate_limited",
       "github_run_id": "43827814944",
       "next_request_after_taipei": "2026-11-16T16:32:40.311388+08:00"
+    },
+    {
+      "appid": 5565560,
+      "when_taipei": "2026-11-16T17:02:50.081468+08:00",
+      "release_date": "2026-11-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43835878029",
+      "next_request_after_taipei": "2026-11-16T18:02:50.286803+08:00"
     }
   ]
 }

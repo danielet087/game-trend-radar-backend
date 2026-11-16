@@ -28,13 +28,26 @@ CHECKS = (
 HEADERS = ("Retry-After", "Server", "Content-Type", "Cache-Control", "X-Cache", "Akamai-GRN")
 
 
+def uncached_checks():
+    """Groups still waiting in the queue, so the edge cache cannot answer for Steam."""
+    queue = json.loads(open("data/scheduler_queue_status.json", encoding="utf-8").read())["queue"]
+    offset = int(os.environ.get("PROBE_QUEUE_OFFSET", "100"))
+    groups = [row["group_id64"] for row in queue[offset:] if row.get("group_id64")][:3]
+    unique = f"Mozilla/5.0 (X11; Linux x86_64) RadarProbe/{os.environ.get('GITHUB_RUN_ID', 'local')}"
+    return [(f"uncached_xml_{name}", f"https://steamcommunity.com/gid/{group}/memberslistxml/?xml=1", agent)
+            for (name, agent), group in zip((("production_agent", PRODUCTION), ("browser_agent", BROWSER),
+                                             ("unique_agent", unique)), groups)]
+
+
 def main() -> int:
     session = requests.Session()
     rows = []
-    for index, (label, url, agent) in enumerate(CHECKS):
+    checks = uncached_checks() if os.environ.get("PROBE_MODE") == "uncached" else CHECKS
+    for index, (label, url, agent) in enumerate(checks):
         if index:
             time.sleep(float(os.environ.get("PROBE_SPACING_SECONDS", "20")))
-        row = {"check": label, "url": url, "agent": "browser" if agent == BROWSER else "production"}
+        row = {"check": label, "url": url,
+               "agent": "production" if agent == PRODUCTION else "browser" if agent == BROWSER else "unique"}
         started = time.monotonic()
         try:
             response = session.get(url, timeout=(8, 24), headers={"User-Agent": agent, "Accept-Language": "en-US"})

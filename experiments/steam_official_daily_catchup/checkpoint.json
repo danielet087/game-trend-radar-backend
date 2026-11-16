@@ -55603,12 +55603,12 @@
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-16T22:28:04.304474+08:00",
-    "last_updated_at": "2026-11-16T22:47:35.185162+08:00",
-    "requests_this_run": 40,
-    "official_new_this_run": 40,
-    "http_429_this_run": 0,
-    "last_appid": 5358400,
-    "last_name": "Idle Cultivator: Ascend Together"
+    "last_updated_at": "2026-11-16T22:49:35.195885+08:00",
+    "requests_this_run": 44,
+    "official_new_this_run": 43,
+    "http_429_this_run": 1,
+    "last_appid": 5568040,
+    "last_name": "Deep Clean"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -132381,13 +132381,60 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-16T22:47:35.184920+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5550770": {
+      "appid": 5550770,
+      "name": "Depthforged",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791476210674",
+      "steam_url": "https://store.steampowered.com/app/5550770/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-15T17:04:47.454579+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-16T22:48:05.172587+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5563250": {
+      "appid": 5563250,
+      "name": "Sort The Pandas",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791476242416",
+      "steam_url": "https://store.steampowered.com/app/5563250/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-15T17:04:47.454579+00:00",
+      "official_followers": 3,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-16T22:48:35.171822+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5565330": {
+      "appid": 5565330,
+      "name": "Sun is Lava",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791476238809",
+      "steam_url": "https://store.steampowered.com/app/5565330/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-15T17:04:47.454579+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-16T22:49:05.173806+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
-  "community_last_success_at": "2026-11-16T22:47:35.184920+08:00",
+  "next_request_after_taipei": "2026-11-16T23:04:35.195792+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-11-16T15:04:35.195792+00:00",
+    "observed_at": "2026-11-16T14:49:35.195792+00:00",
+    "updated_at": "2026-11-16T14:49:35.195792+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
+  "community_last_success_at": "2026-11-16T22:49:05.173806+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -151957,6 +152004,46 @@
       "status": "ok",
       "github_run_id": "43885562890",
       "official_followers": 13
+    },
+    {
+      "appid": 5550770,
+      "when_taipei": "2026-11-16T22:48:05.117884+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43885562890",
+      "official_followers": 3
+    },
+    {
+      "appid": 5563250,
+      "when_taipei": "2026-11-16T22:48:35.118001+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43885562890",
+      "official_followers": 3
+    },
+    {
+      "appid": 5565330,
+      "when_taipei": "2026-11-16T22:49:05.118159+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43885562890",
+      "official_followers": 1
+    },
+    {
+      "appid": 5568040,
+      "when_taipei": "2026-11-16T22:49:35.118279+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43885562890",
+      "next_request_after_taipei": "2026-11-16T23:04:35.195792+08:00"
     }
   ]
 }

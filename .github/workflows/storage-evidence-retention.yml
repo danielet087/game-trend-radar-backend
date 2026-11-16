@@ -1,11 +1,12 @@
 name: Release unreferenced database evidence
-run-name: "Evidence retention | ${{ (github.event_name == 'schedule' || inputs.apply) && 'apply' || 'dry-run' }} | grace=${{ inputs.grace_days || 3 }}d"
+run-name: "Evidence retention | ${{ (github.event_name == 'schedule' || inputs.trigger_source == 'cloudflare' || inputs.apply) && 'apply' || 'dry-run' }} | grace=${{ inputs.grace_days || 3 }}d | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 # Each hourly Steam intake pins the frontend snapshot it reads. Pins that no
 # current document references only keep old bytes in Turso and D1. The daily
-# schedule releases them after the grace window, at most 200 per run; a manual
-# run only reports unless apply is chosen. The hourly storage sync
-# garbage-collects the released bytes on both databases.
+# run (dispatched by the Cloudflare scheduler at 04:30 Taipei, with GitHub's
+# best-effort cron as a fallback) releases them after the grace window, at most
+# 200 per run; a manual run only reports unless apply is chosen. The hourly
+# storage sync garbage-collects the released bytes on both databases.
 on:
   schedule:
     - cron: '37 20 * * *'  # 04:37 Asia/Taipei
@@ -21,6 +22,16 @@ on:
         required: false
         type: number
         default: 3
+      target_slot:
+        description: External scheduler slot identifier (leave empty for a manual run)
+        required: false
+        type: string
+        default: ''
+      trigger_source:
+        description: Trigger source for run identification
+        required: false
+        type: string
+        default: manual
 
 permissions:
   contents: read
@@ -49,9 +60,9 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-          APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
+          APPLY: ${{ github.event_name == 'schedule' || inputs.trigger_source == 'cloudflare' || inputs.apply }}
           GRACE_DAYS: ${{ inputs.grace_days || 3 }}
-          MAX_RELEASE: ${{ github.event_name == 'schedule' && '200' || '' }}
+          MAX_RELEASE: ${{ (github.event_name == 'schedule' || inputs.trigger_source == 'cloudflare') && '200' || '' }}
         run: |
           args=(--grace-days "$GRACE_DAYS" --report-path "$RUNNER_TEMP/evidence-retention.json")
           if [ "$APPLY" = "true" ]; then args+=(--apply); fi

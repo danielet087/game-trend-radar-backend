@@ -56056,12 +56056,12 @@
     "manual_cooldown_override": false,
     "request_limit": 90,
     "started_at": "2026-11-17T04:03:17.151478+08:00",
-    "last_updated_at": "2026-11-17T04:07:48.103048+08:00",
-    "requests_this_run": 10,
-    "official_new_this_run": 10,
-    "http_429_this_run": 0,
-    "last_appid": 5592710,
-    "last_name": "The Perfect Crime"
+    "last_updated_at": "2026-11-17T04:09:56.621805+08:00",
+    "requests_this_run": 14,
+    "official_new_this_run": 13,
+    "http_429_this_run": 1,
+    "last_appid": 5510630,
+    "last_name": "Clanker Town"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -133166,13 +133166,60 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-17T04:07:48.102909+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5020760": {
+      "appid": 5020760,
+      "name": "Kitchen Tidy",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791475799495",
+      "steam_url": "https://store.steampowered.com/app/5020760/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-16T17:03:49.144685+00:00",
+      "official_followers": 124,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-17T04:08:26.665363+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5070980": {
+      "appid": 5070980,
+      "name": "Who?",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791476070613",
+      "steam_url": "https://store.steampowered.com/app/5070980/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-16T17:03:49.144685+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-17T04:08:56.653379+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5476940": {
+      "appid": 5476940,
+      "name": "Ex Death Game",
+      "release_date": "2026-12-04",
+      "group_id64": "103582791476164691",
+      "steam_url": "https://store.steampowered.com/app/5476940/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-16T17:03:49.144685+00:00",
+      "official_followers": 26,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-17T04:09:26.732589+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
-  "rate_limit_count": 0,
+  "rate_limit_count": 1,
   "temporary_error_count": 0,
-  "next_request_after_taipei": null,
-  "community_cooldown": null,
-  "community_last_success_at": "2026-11-17T04:07:48.102909+08:00",
+  "next_request_after_taipei": "2026-11-17T04:24:56.621730+08:00",
+  "community_cooldown": {
+    "retry_at": "2026-11-16T20:24:56.621730+00:00",
+    "observed_at": "2026-11-16T20:09:56.621730+00:00",
+    "updated_at": "2026-11-16T20:09:56.621730+00:00",
+    "retry_seconds": 900,
+    "retry_after": null,
+    "retry_source": "existing_queue_backoff",
+    "attempts": 1
+  },
+  "community_last_success_at": "2026-11-17T04:09:26.732589+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -152969,6 +153016,46 @@
       "status": "ok",
       "github_run_id": "43945202104",
       "official_followers": 1
+    },
+    {
+      "appid": 5020760,
+      "when_taipei": "2026-11-17T04:08:26.518382+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43945202104",
+      "official_followers": 124
+    },
+    {
+      "appid": 5070980,
+      "when_taipei": "2026-11-17T04:08:56.518505+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43945202104",
+      "official_followers": 1
+    },
+    {
+      "appid": 5476940,
+      "when_taipei": "2026-11-17T04:09:26.518586+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "43945202104",
+      "official_followers": 26
+    },
+    {
+      "appid": 5510630,
+      "when_taipei": "2026-11-17T04:09:56.518700+08:00",
+      "release_date": "2026-12-04",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "43945202104",
+      "next_request_after_taipei": "2026-11-17T04:24:56.621730+08:00"
     }
   ]
 }

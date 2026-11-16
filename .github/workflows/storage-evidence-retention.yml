@@ -40,7 +40,7 @@ jobs:
           python-version: '3.12'
       - name: Verify retention rules without credentials
         run: |
-          python -m pip install --disable-pip-version-check ./packages/radar-core 'pytest>=8,<9'
+          python -m pip install --disable-pip-version-check ./packages/radar-core 'pytest>=8,<9' 'requests>=2.32,<3'
           python -m pytest -q tests/test_storage_evidence_retention.py
       - name: Plan or release unreferenced evidence
         env:

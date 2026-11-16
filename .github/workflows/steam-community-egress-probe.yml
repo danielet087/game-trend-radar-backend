@@ -16,6 +16,11 @@ on:
         required: false
         type: number
         default: 20
+      queue_offset:
+        description: "uncached mode: first queue position to sample (use different values for parallel probes)"
+        required: false
+        type: number
+        default: 100
 
 permissions:
   contents: read
@@ -36,6 +41,7 @@ jobs:
         env:
           PROBE_MODE: ${{ inputs.mode || 'cached' }}
           PROBE_SPACING_SECONDS: ${{ inputs.spacing_seconds || 20 }}
+          PROBE_QUEUE_OFFSET: ${{ inputs.queue_offset || 100 }}
         run: |
           echo "Runner egress: $(curl -fsS --max-time 10 https://api.ipify.org || echo unknown)"
           python -m scripts.probe_steam_community_egress

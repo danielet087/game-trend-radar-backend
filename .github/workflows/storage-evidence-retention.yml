@@ -1,0 +1,62 @@
+name: Release unreferenced database evidence
+run-name: "Evidence retention | ${{ inputs.apply && 'apply' || 'dry-run' }} | grace=${{ inputs.grace_days || 3 }}d"
+
+# Each hourly Steam intake pins the frontend snapshot it reads. Pins that no
+# current document references only keep old bytes in Turso and D1. The default
+# run only reports; releasing requires an explicit manual apply. The hourly
+# storage sync garbage-collects the released bytes on both databases.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Release unreferenced pins older than the grace window (default: report only)"
+        required: false
+        type: boolean
+        default: false
+      grace_days:
+        description: "Always keep pins captured within this many days"
+        required: false
+        type: number
+        default: 3
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radar-evidence-retention
+  cancel-in-progress: false
+
+jobs:
+  retention:
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify retention rules without credentials
+        run: |
+          python -m pip install --disable-pip-version-check ./packages/radar-core 'pytest>=8,<9'
+          python -m pytest -q tests/test_storage_evidence_retention.py
+      - name: Plan or release unreferenced evidence
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          APPLY: ${{ inputs.apply }}
+          GRACE_DAYS: ${{ inputs.grace_days || 3 }}
+        run: |
+          args=(--grace-days "$GRACE_DAYS" --report-path "$RUNNER_TEMP/evidence-retention.json")
+          if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          python -u -m scripts.storage_evidence_retention "${args[@]}"
+      - name: Keep the retention report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-retention-report
+          path: ${{ runner.temp }}/evidence-retention.json
+          if-no-files-found: warn
+          retention-days: 30

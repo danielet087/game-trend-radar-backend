@@ -144,6 +144,19 @@ chunk payload 達 300 MiB 時，workflow 會在報告和 Actions 標註容量警
 擴大來源 prefix 或新增資料類型時，需做來源 scope 版本遷移；不能直接讓相同 Git commit
 指向不同 manifest。資料表升級亦需明確 schema migration，未知版本會拒絕執行。
 
+### 證據快照保留
+
+每小時的 Steam Twitch intake 會釘住當下前端的 discovery、tracking、steam_upcoming、mapping
+四份文件（`steam-twitch-<manifest>`），2026-11-16 量測時這類釘選佔備援 chunk 約六成，
+是 D1 每天約增加 15 MB 的主因。之後只有仍被現行文件引用的 manifest（例如已收錄遊戲的
+`source_database_revision`、intake 待查紀錄）會再被讀取。
+
+`storage-evidence-retention.yml`（手動執行）掃描所有來源的現行文件，跳過不含收錄證據的
+`data/twitch_history/`、`data/twitch_series/`，把任何 64 位十六進位字串都當成引用。
+匯入的 legacy 釘選、寬限期（預設 3 天）內的釘選與被引用的釘選一律保留；預設只產生報告，
+勾選 `apply` 才刪除其餘 `radar_evidence` 列。刪除以每批 50 筆、各自的短租約進行，
+之後由每小時的同步 GC 回收 Turso 與 D1 的物件；被釋放的快照仍可從每日 SQL 備份還原。
+
 ## 正式切換與重試
 
 1. 先部署所有 repo，primary 開關保留 0；外部 repo 固定同一個 immutable core SHA。

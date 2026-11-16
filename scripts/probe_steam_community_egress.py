@@ -32,8 +32,13 @@ def uncached_checks():
     """Groups still waiting in the queue, so the edge cache cannot answer for Steam."""
     queue = json.loads(open("data/scheduler_queue_status.json", encoding="utf-8").read())["queue"]
     offset = int(os.environ.get("PROBE_QUEUE_OFFSET", "100"))
-    groups = [row["group_id64"] for row in queue[offset:] if row.get("group_id64")][:3]
+    count = int(os.environ.get("PROBE_COUNT", "3"))
+    groups = [row["group_id64"] for row in queue[offset:] if row.get("group_id64")][:count]
     unique = f"Mozilla/5.0 (X11; Linux x86_64) RadarProbe/{os.environ.get('GITHUB_RUN_ID', 'local')}"
+    if count != 3:
+        # A long run repeats the production request exactly, to find the per-IP budget.
+        return [(f"uncached_xml_production_agent_{index + 1}", f"https://steamcommunity.com/gid/{group}/memberslistxml/?xml=1",
+                 PRODUCTION) for index, group in enumerate(groups)]
     return [(f"uncached_xml_{name}", f"https://steamcommunity.com/gid/{group}/memberslistxml/?xml=1", agent)
             for (name, agent), group in zip((("production_agent", PRODUCTION), ("browser_agent", BROWSER),
                                              ("unique_agent", unique)), groups)]

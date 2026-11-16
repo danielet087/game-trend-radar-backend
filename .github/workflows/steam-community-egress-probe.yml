@@ -16,6 +16,11 @@ on:
         required: false
         type: number
         default: 20
+      count:
+        description: "uncached mode: number of groups (3 compares user agents; other values repeat production)"
+        required: false
+        type: number
+        default: 3
       queue_offset:
         description: "uncached mode: first queue position to sample (use different values for parallel probes)"
         required: false
@@ -28,7 +33,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -42,6 +47,7 @@ jobs:
           PROBE_MODE: ${{ inputs.mode || 'cached' }}
           PROBE_SPACING_SECONDS: ${{ inputs.spacing_seconds || 20 }}
           PROBE_QUEUE_OFFSET: ${{ inputs.queue_offset || 100 }}
+          PROBE_COUNT: ${{ inputs.count || 3 }}
         run: |
           echo "Runner egress: $(curl -fsS --max-time 10 https://api.ipify.org || echo unknown)"
           python -m scripts.probe_steam_community_egress

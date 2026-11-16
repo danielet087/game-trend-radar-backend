@@ -1,0 +1,21 @@
+name: Record credential expiry
+description: Record when this repository's pipeline credentials expire (never their values) for the radar watchdog.
+inputs:
+  credentials:
+    description: >-
+      One "kind NAME" per line; kind is github, turso or cloudflare. The value is
+      read from the environment variable NAME, which the calling step sets from a
+      secret. Cloudflare checks also read CLOUDFLARE_ACCOUNT_ID when it is set.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Check credentials and record their expiry dates
+      uses: actions/github-script@v9
+      env:
+        CREDENTIAL_MODULE: ${{ github.action_path }}/index.cjs
+        CREDENTIAL_SPECS: ${{ inputs.credentials }}
+      with:
+        script: |
+          const { checkAndRecord } = require(process.env.CREDENTIAL_MODULE);
+          await checkAndRecord({ github, context, core, specs: process.env.CREDENTIAL_SPECS });

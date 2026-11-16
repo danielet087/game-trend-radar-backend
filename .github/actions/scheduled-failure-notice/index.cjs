@@ -138,4 +138,4 @@ async function record({ github, context, core, workflowKey, jobName, completionS
   return result;
 }
 
-module.exports = { BRANCH, THRESHOLD, initialState, validateState, transition, jobOutcome, saveResult, record };
+module.exports = { BRANCH, THRESHOLD, initialState, validateState, transition, jobOutcome, ensureBranch, saveResult, record };

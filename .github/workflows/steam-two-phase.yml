@@ -188,43 +188,9 @@ jobs:
             python -m json.tool output/steam_upcoming.json > /dev/null
           fi
       - name: Validate strict three-stage results before public update
-        run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          from scripts.twitch_steam_admission import is_twitch_qualified
-
-          state = json.loads(Path("data/steam_candidate_state.json").read_text(encoding="utf-8"))
-          attempt = state.get("last_attempt") or {}
-          if attempt.get("phase") == "prefilter":
-              assert int(attempt.get("fresh_follower_requests", -1)) == 0, (
-                  "Stage 2 must NEVER query Steam XML"
-              )
-              assert 0 <= int(state["prefilter_next_index"]) <= int(attempt["candidate_count"])
-              payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
-              assert payload["initialization"]["prefilter_next_index"] == state["prefilter_next_index"]
-              assert all(int(g["followers"]) >= 5000 or is_twitch_qualified(g) for g in payload["games"])
-              print(f"Third-party >=4000 prescreen: {state['prefilter_screened_count']} "
-                    f"/{attempt['candidate_count']}; Steam XML queries: 0")
-          elif attempt.get("phase") == "followers":
-              n = int(attempt.get("fresh_follower_requests", -1))
-              assert 0 <= n <= 50, f"Unexpected fresh Followers requests: {n}"
-              start, end = int(attempt["start_index"]), int(attempt["next_index"])
-              assert end > start or state.get("initial_complete"), (
-                  "No new verified priority games or completion"
-              )
-              payload = json.loads(Path("output/steam_upcoming.json").read_text(encoding="utf-8"))
-              assert payload["initialization"]["prefilter_complete"] is True
-              assert payload["initialization"]["verified_priority_count"] == end
-              assert payload["initialization"]["days_scanned"] == 365
-              assert payload["count"] == len(payload["games"])
-              assert all(int(g["followers"]) >= 5000 or is_twitch_qualified(g) for g in payload["games"])
-              print(f"Steam XML verification: {n} new, shortlisted {start}->{end}; "
-                    f"officially qualified {payload['count']}")
-          else:
-              print("Steam discovery/initialization completion; no new XML batch.")
-
-          PY
+        # Twitch-admitted games may have unknown Followers; the script checks
+        # the admission before the count (int(None) failed every run since 2026-10-30).
+        run: python -m scripts.validate_daily_results
       - name: Save private candidate catalog and checkpoint metadata
         if: always() && steps.schedule_guard.outcome == 'success' && steps.install.outcome == 'success' && steps.private_baseline.outcome == 'success'
         env:

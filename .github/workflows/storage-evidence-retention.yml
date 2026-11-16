@@ -1,11 +1,14 @@
 name: Release unreferenced database evidence
-run-name: "Evidence retention | ${{ inputs.apply && 'apply' || 'dry-run' }} | grace=${{ inputs.grace_days || 3 }}d"
+run-name: "Evidence retention | ${{ (github.event_name == 'schedule' || inputs.apply) && 'apply' || 'dry-run' }} | grace=${{ inputs.grace_days || 3 }}d"
 
 # Each hourly Steam intake pins the frontend snapshot it reads. Pins that no
-# current document references only keep old bytes in Turso and D1. The default
-# run only reports; releasing requires an explicit manual apply. The hourly
-# storage sync garbage-collects the released bytes on both databases.
+# current document references only keep old bytes in Turso and D1. The daily
+# schedule releases them after the grace window, at most 200 per run; a manual
+# run only reports unless apply is chosen. The hourly storage sync
+# garbage-collects the released bytes on both databases.
 on:
+  schedule:
+    - cron: '37 20 * * *'  # 04:37 Asia/Taipei
   workflow_dispatch:
     inputs:
       apply:
@@ -46,11 +49,13 @@ jobs:
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
-          APPLY: ${{ inputs.apply }}
+          APPLY: ${{ github.event_name == 'schedule' || inputs.apply }}
           GRACE_DAYS: ${{ inputs.grace_days || 3 }}
+          MAX_RELEASE: ${{ github.event_name == 'schedule' && '200' || '' }}
         run: |
           args=(--grace-days "$GRACE_DAYS" --report-path "$RUNNER_TEMP/evidence-retention.json")
           if [ "$APPLY" = "true" ]; then args+=(--apply); fi
+          if [ -n "$MAX_RELEASE" ]; then args+=(--max-release "$MAX_RELEASE"); fi
           python -u -m scripts.storage_evidence_retention "${args[@]}"
       - name: Keep the retention report
         if: always()

@@ -15,6 +15,10 @@ Each source is read in one call, so its documents come from one generation.
 Releasing only deletes ``radar_evidence`` rows. The hourly storage sync then
 garbage-collects the unreachable objects on Turso and, after installing the
 same metadata, on D1. Daily SQL backups keep the released snapshots restorable.
+
+The scheduled run caps how many pins one run may release. About one pin is
+added per hour, so a much larger batch means the scan missed references and
+the run refuses instead of deleting.
 """
 from __future__ import annotations
 
@@ -48,6 +52,9 @@ def _time(value):
 def referenced_tokens(client, *, skipped=SKIPPED_PREFIXES):
     """Every 64-hex token in the current documents, read one source at a time."""
     present = {row["source_id"] for row in client.execute("SELECT source_id FROM radar_sources")}
+    if present - {source_id(spec) for spec in SOURCES}:
+        # Its documents could reference a pin; never release without reading them.
+        raise StorageError("UNSCANNED_SOURCE", "A database source is outside the reference scan.")
     tokens, scanned = set(), {"sources": 0, "files": 0, "raw_bytes": 0, "skipped_files": 0}
     for spec in SOURCES:
         identity = source_id(spec)
@@ -131,9 +138,11 @@ def release_pins(client, evidence_ids, *, batch=DELETE_BATCH):
     return released
 
 
-def run(client, *, apply=False, grace_days=3, now=None):
+def run(client, *, apply=False, grace_days=3, now=None, max_release=None):
     if type(grace_days) is not int or grace_days < 1:
         raise ValueError("grace_days must be a positive integer")
+    if max_release is not None and (type(max_release) is not int or max_release < 1):
+        raise ValueError("max_release must be a positive integer")
     now = now or datetime.now(timezone.utc)
     tokens, scanned = referenced_tokens(client)
     rows = evidence_rows(client)
@@ -148,6 +157,9 @@ def run(client, *, apply=False, grace_days=3, now=None):
         "estimated_release": estimate_release(client, release),
         "released": 0,
     }
+    if apply and max_release is not None and len(release) > max_release:
+        report.update(status="refused", error="RELEASE_LIMIT_EXCEEDED", max_release=max_release)
+        return report
     if apply and release:
         released = release_pins(client, [row["evidence_id"] for row in release])
         report["released"] = len(released)
@@ -160,13 +172,14 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="Release the planned pins; the default only reports.")
     parser.add_argument("--grace-days", type=int, default=3)
+    parser.add_argument("--max-release", type=int, help="Refuse to release more pins than this in one run.")
     parser.add_argument("--report-path", type=Path, required=True)
     parser.add_argument("--sqlite", type=Path, help="Use a local SQLite database instead of Turso.")
     args = parser.parse_args(argv)
     client = None
     try:
         client = SqliteClient(args.sqlite) if args.sqlite else TursoClient.from_env(budget_seconds=900)
-        report = run(client, apply=args.apply, grace_days=args.grace_days)
+        report = run(client, apply=args.apply, grace_days=args.grace_days, max_release=args.max_release)
     except (StorageError, ValueError) as error:
         report = {"status": "failed", "error": getattr(error, "code", "INVALID_ARGUMENT")}
     finally:

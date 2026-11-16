@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta, timezone
 import json
 import unittest
+from unittest import mock
 
 from radar_core.storage import documents, primary_store
 from radar_core.storage.sql import SqliteClient, StorageError
@@ -97,6 +98,23 @@ class EvidenceRetentionTest(unittest.TestCase):
         self.assertEqual([row["evidence_id"] for row in keep["referenced"]], [rows[2]["evidence_id"]])
         self.assertEqual([row["evidence_id"] for row in release], [rows[1]["evidence_id"]])
 
+    def test_release_limit_refuses_without_deleting(self):
+        later = T0 + timedelta(days=30)
+        report = retention.run(self.db, apply=True, grace_days=3, now=later, max_release=1)
+        self.assertEqual((report["status"], report["error"]), ("refused", "RELEASE_LIMIT_EXCEEDED"))
+        self.assertEqual((report["release_candidates"], report["released"]), (2, 0))
+        self.assertEqual(len(self.ids()), 3)
+        report = retention.run(self.db, apply=True, grace_days=3, now=later, max_release=2)
+        self.assertEqual((report["status"], report["released"]), ("passed", 2))
+        self.assertEqual(self.ids(), {self.old["evidence_id"]})
+
+    def test_a_source_outside_the_scan_blocks_any_release(self):
+        with mock.patch.object(retention, "SOURCES", ()):
+            with self.assertRaises(StorageError) as caught:
+                retention.run(self.db, apply=True, grace_days=3, now=T0 + timedelta(days=6))
+        self.assertEqual(caught.exception.code, "UNSCANNED_SOURCE")
+        self.assertEqual(len(self.ids()), 3)
+
     def test_naive_capture_times_and_invalid_grace_fail_closed(self):
         rows = [{"evidence_id": "steam-twitch-x", "origin_manifest_digest": "a" * 64,
                  "manifest_digest": "b" * 64, "captured_at": "2026-09-01T00:00:00"}]
@@ -104,6 +122,8 @@ class EvidenceRetentionTest(unittest.TestCase):
             retention.plan(rows, set(), now=T0, grace=timedelta(days=3))
         with self.assertRaises(ValueError):
             retention.run(self.db, grace_days=0)
+        with self.assertRaises(ValueError):
+            retention.run(self.db, max_release=0)
 
 
 if __name__ == "__main__":

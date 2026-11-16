@@ -55,7 +55,11 @@ def main() -> int:
                "agent": "production" if agent == PRODUCTION else "browser" if agent == BROWSER else "unique"}
         started = time.monotonic()
         try:
-            response = session.get(url, timeout=(8, 24), headers={"User-Agent": agent, "Accept-Language": "en-US"})
+            headers = {"User-Agent": agent}
+            # Production sends requests' defaults only; "none" reproduces that exactly.
+            if os.environ.get("PROBE_ACCEPT_LANGUAGE", "en-US") != "none":
+                headers["Accept-Language"] = os.environ.get("PROBE_ACCEPT_LANGUAGE", "en-US")
+            response = session.get(url, timeout=(8, 24), headers=headers)
             body = response.content
             row.update(http=response.status_code, bytes=len(body),
                        headers={key: response.headers.get(key)[:120] for key in HEADERS if response.headers.get(key)},

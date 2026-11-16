@@ -1,10 +1,21 @@
 name: Steam Community egress probe
-run-name: "Steam Community egress probe | ${{ github.event_name }}"
+run-name: "Steam Community egress probe | ${{ inputs.mode || 'cached' }} | ${{ github.event_name }}"
 
 # Read-only diagnosis of the official Followers 429s: six spaced requests from
 # one GitHub runner, compared with a Store API control. No secrets, no state.
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "cached: fixed URLs; uncached: three queued groups the edge cache cannot answer"
+        required: false
+        type: choice
+        options: [cached, uncached]
+        default: cached
+      spacing_seconds:
+        required: false
+        type: number
+        default: 20
 
 permissions:
   contents: read
@@ -22,6 +33,9 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check 'requests>=2.32,<3'
       - name: Probe from this runner
+        env:
+          PROBE_MODE: ${{ inputs.mode || 'cached' }}
+          PROBE_SPACING_SECONDS: ${{ inputs.spacing_seconds || 20 }}
         run: |
           echo "Runner egress: $(curl -fsS --max-time 10 https://api.ipify.org || echo unknown)"
           python -m scripts.probe_steam_community_egress

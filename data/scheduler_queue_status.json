@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-17T06:03:10.343507Z",
+  "generated_at": "2026-11-17T06:03:47.157277Z",
   "today_taipei": "2026-11-17",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-17T06:03:10.008087Z",
+    "checkpoint_updated_at": "2026-11-17T06:03:46.859731Z",
     "group_resolution_updated_at": "2026-11-16T23:40:12.254489Z",
     "candidate_state_updated_at": "2026-11-16T17:03:49.162981Z",
     "prefilter_updated_at": "2026-11-16T17:03:49.144685Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-17",
     "status": "completed",
-    "checked_at": "2026-11-17T14:03:10.343507+08:00",
+    "checked_at": "2026-11-17T14:03:47.157277+08:00",
     "needed": true,
     "planned_count": 53,
     "completed_count": 46,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-17T14:03:09.027033+08:00",
-    "last_updated_at": "2026-11-17T14:03:10.008087+08:00",
+    "last_updated_at": "2026-11-17T14:03:46.859731+08:00",
+    "finished_at": "2026-11-17T14:03:46.859731+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 4193690,
     "last_name": "Terranigma",
     "requests_this_run": 1,

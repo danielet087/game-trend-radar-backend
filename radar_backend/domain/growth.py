@@ -9,6 +9,7 @@ from datetime import date, datetime, timedelta, timezone
 from radar_core.domain.twitch_admission import is_twitch_qualified
 from radar_core.jobs import JobResult
 from radar_backend.domain.official_groups import SOURCE as GROUP_SOURCE, STATUSES as GROUP_STATUSES
+from radar_backend.domain import follower_cadence
 
 TAIPEI = timezone(timedelta(hours=8))
 
@@ -91,6 +92,38 @@ def _appid_set(rows):
     return ids if len(ids) == len(rows) else None
 
 
+def _iso_day(value):
+    try:
+        return date.fromisoformat(value) if isinstance(value, str) and len(value) == 10 else None
+    except ValueError:
+        return None
+
+
+def scheduled_entry(appid, previous, release, today):
+    """A cohort game whose latest official measurement is still within its cadence."""
+    last = timestamp(previous["at"]).astimezone(TAIPEI).date()
+    return {"appid": appid, "followers": previous["followers"], "at": previous["at"],
+            "release_date": release.isoformat(),
+            "next_due_taipei": follower_cadence.next_due(release, last, today).isoformat(),
+            "source": "steam_community"}
+
+
+def valid_scheduled(row, now) -> bool:
+    """Re-derive a scheduled row from its own fields; nothing is taken on trust."""
+    if not isinstance(row, dict) or now.tzinfo is None:
+        return False
+    today = now.astimezone(TAIPEI).date()
+    aid, followers, at = row.get("appid"), row.get("followers"), timestamp(row.get("at"))
+    release = _iso_day(row.get("release_date"))
+    if (type(aid) is not int or aid <= 0 or type(followers) is not int or followers < 0
+            or at is None or at > now or release is None or release <= today
+            or row.get("source", "steam_community") != "steam_community"):
+        return False
+    last = at.astimezone(TAIPEI).date()
+    return (last < today and not follower_cadence.due(release, last, today)
+            and row.get("next_due_taipei") == follower_cadence.next_due(release, last, today).isoformat())
+
+
 def growth_collection_complete(result: dict, now: datetime) -> bool:
     """Require coverage by real measurements or evidenced availability outcomes.
 
@@ -117,9 +150,16 @@ def growth_collection_complete(result: dict, now: datetime) -> bool:
     eligible = result.get("eligible")
     measurements = result.get("measurements")
     unavailable = result.get("unavailable", [])
+    # Version 3 adds games whose latest measurement is still within their
+    # weekly/2-day cadence; earlier reports never carry such rows.
+    version = result.get("coverage_schema_version")
+    scheduled = result.get("scheduled", []) if version == 3 else []
+    if version != 3 and "scheduled" in result:
+        return False
     if (not isinstance(eligible, int) or isinstance(eligible, bool) or eligible < 0
             or not isinstance(measurements, list) or not isinstance(unavailable, list)
-            or len(measurements) + len(unavailable) != eligible):
+            or not isinstance(scheduled, list)
+            or len(measurements) + len(scheduled) + len(unavailable) != eligible):
         return False
     today = now.astimezone(TAIPEI).date()
     if "coverage_checked_at" in result:
@@ -136,7 +176,7 @@ def growth_collection_complete(result: dict, now: datetime) -> bool:
         generated = timestamp(result.get("generated_at"))
         cohort = _appid_set(result.get("eligible_appids"))
         if (type(result.get("coverage_schema_version")) is not int
-                or result["coverage_schema_version"] != 2
+                or result["coverage_schema_version"] not in (2, 3)
                 or cohort is None or len(cohort) != eligible
                 or type(result.get("measurement_complete")) is not bool
                 or result.get("collection_date_taipei") != today.isoformat()
@@ -151,12 +191,14 @@ def growth_collection_complete(result: dict, now: datetime) -> bool:
         cohort = None
     if "measurement_complete" in result and (
         type(result["measurement_complete"]) is not bool
-        or result["measurement_complete"] != (len(measurements) == eligible)
+        or result["measurement_complete"] != (len(measurements) + len(scheduled) == eligible)
     ):
         return False
     if "coverage" in result:
         expected = {"eligible": eligible, "measured": len(measurements),
                     "unavailable": len(unavailable), "pending": 0}
+        if version == 3:
+            expected["scheduled"] = len(scheduled)
         coverage = result["coverage"]
         if (not isinstance(coverage, dict) or coverage != expected
                 or any(type(value) is not int for value in coverage.values())):
@@ -175,6 +217,10 @@ def growth_collection_complete(result: dict, now: datetime) -> bool:
                 or measured_at.astimezone(TAIPEI).date() != today):
             return False
         ids.add(aid)
+    for row in scheduled:
+        if not valid_scheduled(row, now) or row["appid"] in ids:
+            return False
+        ids.add(row["appid"])
     unavailable_ids = set()
     for row in unavailable:
         if not isinstance(row, dict):

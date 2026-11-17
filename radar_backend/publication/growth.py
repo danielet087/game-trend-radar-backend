@@ -4,7 +4,9 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import datetime, timezone
 from radar_core.jobs import JobResult, JobStatus
-from radar_backend.domain.growth import TAIPEI, eligible, group_unavailable, growth_collection_complete, timestamp
+from radar_backend.domain.growth import (
+    TAIPEI, eligible, group_unavailable, growth_collection_complete, timestamp, valid_scheduled,
+)
 from radar_backend.domain.official_queue import valid_group_id64
 from radar_backend.state.official_followers import OfficialFollowerCache
 
@@ -54,6 +56,12 @@ def _refresh_growth_coverage(payload, appids, now):
                 and row.get("source", "steam_community") == "steam_community"
                 and at is not None and at <= now and at.astimezone(TAIPEI).date() == today):
             measured.add(row["appid"])
+    scheduled = set()
+    if payload.get("coverage_schema_version") == 3:
+        for row in payload.get("scheduled", []):
+            if (valid_scheduled(row, now) and row["appid"] in eligible_ids
+                    and row["appid"] not in measured):
+                scheduled.add(row["appid"])
     pending = {row.get("appid") for row in payload.get("pending", []) if isinstance(row, dict)}
     resolved = set(payload.get("checkpoint_resolvable_appids", [])) | set(payload.get("published_resolvable_appids", []))
     unavailable = set()
@@ -61,13 +69,16 @@ def _refresh_growth_coverage(payload, appids, now):
         if not isinstance(row, dict):
             continue
         aid = row.get("appid")
-        if (type(aid) is not int or aid not in eligible_ids or aid in measured | pending | resolved
+        if (type(aid) is not int or aid not in eligible_ids or aid in measured | scheduled | pending | resolved
                 or not _current_unavailability(row, payload, now)):
             continue
         unavailable.add(aid)
-    payload["coverage"] = {"eligible": len(eligible_ids), "measured": len(measured),
-                           "unavailable": len(unavailable),
-                           "pending": len(eligible_ids - measured - unavailable)}
+    coverage = {"eligible": len(eligible_ids), "measured": len(measured)}
+    if payload.get("coverage_schema_version") == 3:
+        coverage["scheduled"] = len(scheduled)
+    coverage.update(unavailable=len(unavailable),
+                    pending=len(eligible_ids - measured - scheduled - unavailable))
+    payload["coverage"] = coverage
 
 
 def growth_checkpoint_payload(result: dict, checkpoint: dict, *, now: datetime | None = None) -> dict:

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-17T01:04:36.828859Z",
+  "generated_at": "2026-11-17T01:05:22.982043Z",
   "today_taipei": "2026-11-17",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-17T01:04:36.517160Z",
+    "checkpoint_updated_at": "2026-11-17T01:05:22.699137Z",
     "group_resolution_updated_at": "2026-11-16T23:40:12.254489Z",
     "candidate_state_updated_at": "2026-11-16T17:03:49.162981Z",
     "prefilter_updated_at": "2026-11-16T17:03:49.144685Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-17",
     "status": "completed",
-    "checked_at": "2026-11-17T09:04:36.828859+08:00",
+    "checked_at": "2026-11-17T09:05:22.982043+08:00",
     "needed": true,
     "planned_count": 115,
     "completed_count": 46,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-17T09:02:32.367452+08:00",
-    "last_updated_at": "2026-11-17T09:04:36.517160+08:00",
+    "last_updated_at": "2026-11-17T09:05:22.699137+08:00",
+    "finished_at": "2026-11-17T09:05:22.699137+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5013480,
     "last_name": "NextBot PANIC!",
     "requests_this_run": 5,

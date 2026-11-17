@@ -21,9 +21,9 @@ jobs:
     timeout-minutes: 175
     steps:
       - name: Checkout private full-year catalog and latest persisted prescreen cursor
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install pipeline and test dependencies

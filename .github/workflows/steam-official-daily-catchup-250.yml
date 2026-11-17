@@ -43,10 +43,10 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout backend
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -170,7 +170,7 @@ jobs:
 
       - name: Keep official checkpoint evidence and frozen recovery input
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steam-official-checkpoint-publication
           path: |
@@ -243,7 +243,7 @@ jobs:
 
       - name: Upload attempt details and observed batch report
         if: always() && steps.query_window.outputs.proceed == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steam-official-dynamic-catchup-250
           path: output/steam_official_daily_catchup/
@@ -259,7 +259,7 @@ jobs:
       actions: read
       contents: write
     steps:
-      - uses: danielet087/game-trend-radar-backend/.github/actions/scheduled-failure-notice@202d8a9945c5cb0a2f182a327dd533ac98d8178e
+      - uses: danielet087/game-trend-radar-backend/.github/actions/scheduled-failure-notice@e743210a045e1d1603b381e0476e9a6369972bf1
         with:
           workflow-key: steam-official-daily-catchup-250.yml
           job-name: follower-catchup

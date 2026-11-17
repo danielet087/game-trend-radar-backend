@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 6
     steps:
       - name: Checkout only isolated script and checkpoint
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: |
             scripts/experiment_official_near_release_batches.py
@@ -58,7 +58,7 @@ jobs:
           PY
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -139,7 +139,7 @@ jobs:
 
       - name: Upload next date-ordered queue and official Followers
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steam-official-nearfirst-small-batch
           path: output/steam_official_nearfirst/

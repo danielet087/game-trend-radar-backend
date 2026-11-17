@@ -19,9 +19,9 @@ jobs:
     timeout-minutes: 35
     steps:
       - name: Checkout private backend read-only
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install HTTP client
@@ -37,7 +37,7 @@ jobs:
           git diff --exit-code -- data/steam_candidate_state.json data/steam_followers_cache.json data/steam_upcoming_master.json
       - name: Archive private pilot report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steam-xml-25-20-pilot
           path: output/steam_xml_25_20_pilot.json

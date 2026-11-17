@@ -202,7 +202,7 @@ class StorageSyncTests(unittest.TestCase):
             report = sync.run(args)
         self.assertEqual(order, ["ingest", "backup", "d1"])
         self.assertEqual(report["backup"]["status"], "passed")
-        self.assertEqual(len(report["sources"]), 7)
+        self.assertEqual(len(report["sources"]), len(SOURCES))
         self.assertEqual(report["primary_gc"]["status"], "passed")
         self.assertEqual(report["status"], "degraded")
         self.assertNotIn("secret-token", str(report))

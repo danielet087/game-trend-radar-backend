@@ -1,0 +1,48 @@
+name: Bootstrap Twitch views source
+run-name: "Bootstrap Twitch views source | ${{ inputs.apply && 'apply' || 'dry run' }}"
+
+# One-time copy of the four high-churn Twitch directories from the frontend
+# source into the database-only source danielet087/game-trend-radar@twitch-views,
+# so they can leave Git. It reads the copy back and compares it, and never
+# replaces an existing views source. Manual only.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Create the source (otherwise only report what would be copied)
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bootstrap-twitch-views
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Verify bootstrap rules without credentials
+        run: |
+          python -m pip install --disable-pip-version-check ./packages/radar-core 'pytest>=8,<9' 'requests>=2.32,<3'
+          python -m pytest -q tests/test_bootstrap_twitch_views.py
+      - name: Copy the Twitch views into the database-only source
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          APPLY: ${{ inputs.apply && 'true' || 'false' }}
+        run: |
+          args=()
+          if [ "$APPLY" = true ]; then args+=(--apply); fi
+          python -u -m scripts.bootstrap_twitch_views "${args[@]}"

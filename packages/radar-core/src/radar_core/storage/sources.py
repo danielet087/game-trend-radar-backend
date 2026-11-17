@@ -21,6 +21,11 @@ SOURCES = (
     {"repository": "danielet087/game-trend-radar-igdb-backend", "branch": "main", "prefixes": ("data/",)},
     {"repository": "danielet087/game-trend-radar-twitch-backend", "branch": "main", "prefixes": ("data/",)},
     {"repository": "danielet087/game-trend-radar-youtube-backend", "branch": "main", "prefixes": ("data/",), "allow_empty": True},
+    # The high-churn Twitch views live only in the database: no Git branch
+    # exists and nothing is ever projected to Git. The site deploy adds them.
+    {"repository": "danielet087/game-trend-radar", "branch": "twitch-views", "database_only": True,
+     "prefixes": ("data/twitch_history/", "data/twitch_history_compact/", "data/twitch_history_close/",
+                  "data/twitch_series/")},
 )
 MAX_FILE_BYTES = 256 * 1024 * 1024
 MAX_SOURCE_BYTES = 1024 * 1024 * 1024
@@ -28,6 +33,11 @@ MAX_SOURCE_BYTES = 1024 * 1024 * 1024
 
 def source_id(spec):
     return spec["repository"] + "@" + spec["branch"]
+
+
+def git_backed(spec):
+    """Database-only sources have no Git branch to import from or project to."""
+    return not spec.get("database_only", False)
 
 
 def checkout_name(spec):

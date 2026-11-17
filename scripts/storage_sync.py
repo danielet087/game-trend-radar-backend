@@ -17,7 +17,7 @@ import tempfile
 from zoneinfo import ZoneInfo
 
 from radar_backend.storage.sql import D1Client, SqliteClient, StorageError, TursoClient
-from radar_backend.storage.sources import SOURCES, checkout_name, clone_source, remote_revision, snapshot_from_checkout, source_id
+from radar_backend.storage.sources import SOURCES, checkout_name, clone_source, git_backed, remote_revision, snapshot_from_checkout, source_id
 from radar_backend.storage.documents import (
     audit_replica, export_sqlite, garbage_collect, initialize, publish_snapshot, read_snapshot, sync_replica,
 )
@@ -39,6 +39,10 @@ def ingest(primary, *, local_root=None):
         for spec in SOURCES:
             identity = source_id(spec)
             previous = existing.get(identity)
+            if not git_backed(spec):
+                # Written only through the database; there is no Git to import.
+                results.append({**(previous or {"source_id": identity}), "import_status": "database_only"})
+                continue
             try:
                 if primary_status(primary, identity).get("active"):
                     results.append({**previous, "import_status": "database_primary"})

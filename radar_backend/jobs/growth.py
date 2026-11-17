@@ -18,7 +18,7 @@ from radar_backend.application.growth_daily import collect_daily_observations
 from radar_backend.state.growth import GrowthProgressWriter, load_growth_inputs
 from radar_backend.state.official_followers import CooldownStore, OfficialFollowerCache
 
-DESCRIPTION = "Daily official Followers observations for accepted games, through release +30d."
+DESCRIPTION = "Daily official Followers observations for accepted games, through their release day."
 
 
 def collect(data_dir, output, *, max_requests=120, max_seconds=3600, interval=30,

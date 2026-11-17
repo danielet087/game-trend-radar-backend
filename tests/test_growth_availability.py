@@ -224,7 +224,9 @@ def test_unknown_followers_remain_eligible_when_shared_twitch_policy_qualifies(m
 
 def test_existing_twitch_admission_and_real_low_followers_use_the_shared_rule():
     from tests.test_twitch_public_maintenance import admitted_game
-    row = admitted_game()
+    # Released today: the release day is the last tracked day.
+    row = {**admitted_game(), "release_start": "2026-10-11", "release_end": "2026-10-11",
+           "release_time_utc": "2026-10-11T07:00:00Z"}
     original = deepcopy(row)
     result, _, _ = collect([row], checkpoint=missing_state(aid=row["appid"]))
     assert row == original

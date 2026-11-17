@@ -77,10 +77,14 @@ class GrowthProgressWriter:
             latest = strict_json_loads(files[CHECKPOINT].decode("utf-8"))
             merged = merge_growth_checkpoint(latest, baseline, observed, frozen_report)
             raw = (json.dumps(merged, ensure_ascii=False, indent=2, sort_keys=True, allow_nan=False) + "\n").encode()
+            # Each measurement is durable in the database before the collector moves
+            # on, but only the final checkpoint publication needs a Git projection.
+            # A projected save per measurement left the final step acknowledging
+            # 60-110 of them one by one, which exhausted its 600 s storage budget.
             try:
                 receipt = self.primary.write_files(REPOSITORY, {CHECKPOINT: raw},
                     base_generation=head["generation"], operation_id="steam-growth-" + digest,
-                    payload_revision=digest)
+                    payload_revision=digest, projection_required=False)
             except Exception as error:
                 if getattr(error, "code", None) != "STALE_GENERATION" or attempt == 4:
                     raise

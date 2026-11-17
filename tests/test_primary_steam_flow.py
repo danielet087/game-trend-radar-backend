@@ -153,6 +153,11 @@ def test_growth_observation_is_durable_before_return_and_db_failure_stops(db, tm
     writer.save(cp, report)
     assert primary.read_json(REPOSITORY, CHECKPOINT)['official_growth_observations']['123']['official_followers'] == 6000
     assert json.loads(output.with_name('growth-database-pending.json').read_bytes())['recovery_eligible'] is False
+    # Progress is database-only: the final checkpoint publication projects the
+    # head once instead of acknowledging every measurement's save.
+    progress = db.execute("SELECT delivery_target FROM radar_operations WHERE source_id=? AND operation_id LIKE 'steam-growth-%'", (SOURCE,))
+    assert [row['delivery_target'] for row in progress] == ['database_only']
+    assert primary_store.projection_pending(db, SOURCE) == []
     cp['official_growth_observations']['123']['official_followers'] = 7000
     cp['official_growth_observations']['123']['official_checked_at_taipei'] = '2026-10-15T11:00:00+00:00'
     def fail(*a, **k):

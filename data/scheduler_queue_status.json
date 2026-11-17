@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-17T04:03:02.019439Z",
+  "generated_at": "2026-11-17T04:03:33.746946Z",
   "today_taipei": "2026-11-17",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-17T04:03:01.780501Z",
+    "checkpoint_updated_at": "2026-11-17T04:03:33.507689Z",
     "group_resolution_updated_at": "2026-11-16T23:40:12.254489Z",
     "candidate_state_updated_at": "2026-11-16T17:03:49.162981Z",
     "prefilter_updated_at": "2026-11-16T17:03:49.144685Z",
@@ -43,7 +43,7 @@
     "schema_version": 1,
     "date_taipei": "2026-11-17",
     "status": "completed",
-    "checked_at": "2026-11-17T12:03:02.019439+08:00",
+    "checked_at": "2026-11-17T12:03:33.746946+08:00",
     "needed": true,
     "planned_count": 115,
     "completed_count": 46,
@@ -65,10 +65,12 @@
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
-    "active": true,
-    "status": "querying",
+    "active": false,
+    "status": "finished",
     "started_at": "2026-11-17T12:02:49.479664+08:00",
-    "last_updated_at": "2026-11-17T12:03:01.780501+08:00",
+    "last_updated_at": "2026-11-17T12:03:33.507689+08:00",
+    "finished_at": "2026-11-17T12:03:33.507689+08:00",
+    "stop_reason": "first_http_429",
     "last_appid": 5244700,
     "last_name": "Wyrmhold",
     "requests_this_run": 1,

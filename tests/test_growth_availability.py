@@ -87,7 +87,7 @@ def test_resolver_repairs_accepted_games_and_accounts_for_verified_absence():
     assert result["unavailable"] == [{"appid": 2, "reason": "official_group_not_found",
                                         "group_resolution": receipt()}]
     assert result["pending"] == result["errors"] == []
-    assert result["coverage"] == {"eligible": 2, "measured": 1, "unavailable": 1, "pending": 0}
+    assert result["coverage"] == {"eligible": 2, "measured": 1, "scheduled": 0, "unavailable": 1, "pending": 0}
     assert result["collection_complete"] is True
     assert result["measurement_complete"] is False
     assert set(state["official_growth_observations"]) == {"1"}

@@ -38,8 +38,8 @@ def projected(*, result=None, prescreen=1000, sources=None, amend=None):
     return queue, status, cp
 
 
-@pytest.mark.parametrize("followers,days", [(0, 90), (2999, 90), (3000, 3), (4999, 3), (5000, 1), (9000, 1)])
-def test_official_count_expires_at_its_1_3_90_day_boundary(followers, days):
+@pytest.mark.parametrize("followers,days", [(0, 90), (2999, 90), (3000, 3), (4999, 3)])
+def test_official_count_expires_at_its_3_90_day_boundary(followers, days):
     result = observation(followers=followers, age=days)
     result["official_checked_at_taipei"] = (NOW - timedelta(days=days) + timedelta(seconds=1)).isoformat()
     queue, _, _ = projected(result=result)
@@ -50,6 +50,26 @@ def test_official_count_expires_at_its_1_3_90_day_boundary(followers, days):
     assert status["official_rechecks_pending"] == 1
     assert queue[0]["follower_recheck_after"] == result["official_checked_at_taipei"]
     assert cp["pending_candidates"]["124"]["follower_recheck"] is True
+
+
+def queued(**options):
+    queue, _, _ = projected(**options)
+    return [row["appid"] for row in queue] == [124]
+
+
+@pytest.mark.parametrize("followers", [5000, 9000])
+def test_accepted_counts_follow_the_release_cadence(followers):
+    # The fixture release (2026-10-03) is tomorrow: every 2 Taipei days.
+    assert not queued(result=observation(followers=followers, age=1), prescreen=6000)
+    assert queued(result=observation(followers=followers, age=2), prescreen=6000)
+    # More than 14 days away: weekly, even with a high daily prescreen.
+    far = lambda cp, eligible, pre: eligible["games"][0].update(release_start="2026-11-20")
+    assert not queued(result=observation(followers=followers, age=6), prescreen=6000, amend=far)
+    assert queued(result=observation(followers=followers, age=7), prescreen=6000, amend=far)
+    # The release day always gets its final measurement.
+    today = lambda cp, eligible, pre: eligible["games"][0].update(release_start="2026-10-02")
+    assert queued(result=observation(followers=followers, age=1), prescreen=6000, amend=today)
+    assert not queued(result=observation(followers=followers, age=0.1), prescreen=6000, amend=today)
 
 
 @pytest.mark.parametrize("followers", [0, 2999, 3000, 4999])

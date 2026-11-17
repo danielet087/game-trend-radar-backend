@@ -97,7 +97,7 @@ def test_actual_0715_shape_waits_17_minutes_then_measures_remaining_18():
     assert all(b[2] - a[2] >= 30 for a, b in zip(client.calls, client.calls[1:]))
     assert result['reused'] == 120 and result['eligible'] == 138
     assert result['measurement_complete'] and result['collection_complete']
-    assert result['coverage'] == {'eligible': 138, 'measured': 138, 'unavailable': 0, 'pending': 0}
+    assert result['coverage'] == {'eligible': 138, 'measured': 138, 'scheduled': 0, 'unavailable': 0, 'pending': 0}
     assert result['daily_budget']['cooldown_wait_seconds'] == 1049
     assert result['daily_budget']['passes'] == 2
     assert checkpoint['official_results'] == legacy

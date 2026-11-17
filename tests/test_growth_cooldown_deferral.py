@@ -51,7 +51,7 @@ def test_actual_cooldown_is_deferred_after_real_delivery_without_daily_success()
     assert classification.deferred_cooldown(original, delivered, NOW)
     assert (original, delivered) == frozen
     assert original["requests"] == 0 and original["daily_budget"]["cooldown_wait_seconds"] == 0
-    assert delivered["coverage"] == {"eligible": 2, "measured": 1, "unavailable": 0, "pending": 1}
+    assert delivered["coverage"] == {"eligible": 2, "measured": 1, "scheduled": 0, "unavailable": 0, "pending": 1}
     assert delivered["job_result"]["status"] == "cooling_down"
     assert not delivered["job_result"]["successful"]
     assert not growth_collection_complete(delivered, NOW)

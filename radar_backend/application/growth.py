@@ -5,12 +5,13 @@ not create an HTTP session, choose file paths or acknowledge publication.
 """
 from __future__ import annotations
 
-from datetime import timezone
+from datetime import date, timezone
 import math
 from radar_core.jobs import JobResult, JobStatus
+from radar_backend.domain import follower_cadence
 from radar_backend.domain.growth import (
     TAIPEI, eligible, group_unavailable, growth_collection_complete,
-    latest_measurement, timestamp, validated_group_resolution,
+    latest_measurement, scheduled_entry, timestamp, validated_group_resolution,
 )
 from radar_backend.domain.official_queue import OfficialObservation
 
@@ -40,8 +41,17 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
         shared = cache.latest(row["appid"], clock(), expected_group=cache.group_id(row["appid"]))
         return latest_measurement(row, record, shared, clock())
 
+    def not_due(row, previous):
+        """Still within the weekly/2-day cadence; never on the release day."""
+        if previous is None:
+            return False
+        last = timestamp(previous["at"]).astimezone(TAIPEI).date()
+        if last == today:
+            return False  # Reused below as today's measurement.
+        return not follower_cadence.due(date.fromisoformat(row["release_start"]), last, today)
+
     rows.sort(key=lambda row: (latest(row) or {}).get("at") or "")
-    measurements, errors, pending, events, unavailable = [], [], [], [], []
+    measurements, errors, pending, events, unavailable, scheduled = [], [], [], [], [], []
     attempts = reused = 0
     previous_start = None
     previous_tick = None
@@ -71,7 +81,7 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
             previous = latest(row)
             if (cache.group_id(row["appid"]) is None and not (
                 previous and timestamp(previous["at"]).astimezone(TAIPEI).date() == today
-            )):
+            ) and not not_due(row, previous)):
                 unresolved.append(row)
         if unresolved:
             group_batch = group_resolver(checkpoint, unresolved, now=clock())
@@ -104,6 +114,9 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
             measurements.append({"appid": aid, "followers": previous["followers"],
                                  "at": previous["at"], "source": "steam_community"})
             reused += 1
+            continue
+        if not_due(row, previous):
+            scheduled.append(scheduled_entry(aid, previous, date.fromisoformat(row["release_start"]), today))
             continue
         gid = cache.group_id(aid)
         if gid is None:
@@ -152,7 +165,7 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
         # Invalid XML/unexpected HTTP also stop this run; they never imply zero.
         if outcome.status not in {"ok", "rate_limited", "cooldown_no_request"}:
             measured = {item["appid"] for item in measurements}
-            accounted = {item["appid"] for item in pending + unavailable}
+            accounted = {item["appid"] for item in pending + unavailable + scheduled}
             for later in rows:
                 if later["appid"] not in measured | accounted:
                     recent = latest(later)
@@ -160,6 +173,9 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
                         measurements.append({"appid": later["appid"], "followers": recent["followers"],
                                              "at": recent["at"], "source": "steam_community"})
                         reused += 1
+                    elif not_due(later, recent):
+                        scheduled.append(scheduled_entry(later["appid"], recent,
+                                                         date.fromisoformat(later["release_start"]), today))
                     elif cache.group_id(later["appid"]) is None and (missing := unavailable_outcome(later["appid"])):
                         unavailable.append(missing)
                     else:
@@ -172,17 +188,18 @@ def collect_observations(rows, history, checkpoint, *, client, cache, cooldown,
     result = {"generated_at": finished.isoformat(), "eligible": len(rows),
               "max_requests": max_requests, "max_seconds": max_seconds,
               "elapsed_seconds": read_monotonic() - started,
-              "coverage_schema_version": 2, "eligible_appids": eligible_appids,
+              "coverage_schema_version": 3, "eligible_appids": eligible_appids,
               "collection_date_taipei": today.isoformat(),
               "requests": attempts, "reused": reused, "errors": errors, "reason": reason,
-              "pending": pending, "unavailable": unavailable,
+              "pending": pending, "unavailable": unavailable, "scheduled": scheduled,
               "events": events, "measurements": measurements,
               "group_resolution_requests": (group_batch or {}).get("requests_this_run", 0),
               "group_resolution_batch": group_batch,
               "coverage": {"eligible": len(rows), "measured": len(measurements),
-                           "unavailable": len(unavailable), "pending": len(pending)},
+                           "scheduled": len(scheduled), "unavailable": len(unavailable),
+                           "pending": len(pending)},
               "next_request_after_taipei": checkpoint.get("next_request_after_taipei"),
-              "measurement_complete": len(measurements) == len(rows),
+              "measurement_complete": len(measurements) + len(scheduled) == len(rows),
               "state_saved": state_saved}
     result["collection_complete"] = growth_collection_complete(result, finished)
     result["job_result"] = JobResult(

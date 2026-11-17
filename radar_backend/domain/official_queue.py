@@ -12,6 +12,7 @@ from email.utils import parsedate_to_datetime
 from zoneinfo import ZoneInfo
 
 from radar_core.domain.twitch_admission import aware_time as admission_aware_time
+from radar_backend.domain import follower_cadence
 
 TAIPEI = ZoneInfo("Asia/Taipei")
 GROUP_BASE = 103582791429521408
@@ -131,7 +132,10 @@ def latest_official_observations(*sources, now):
 
 # Official Community XML requests share one small per-identity budget, so a
 # count is rechecked only as often as it can change the admission decision.
-ACCEPTED_REFRESH_DAYS = 1      # >= 5,000: the daily growth record
+# An accepted count (>= 5,000) follows the release-relative growth cadence in
+# follower_cadence (weekly, every 2 days in the last 14, final on the release
+# day); ACCEPTED_REFRESH_DAYS applies only when no release day is known.
+ACCEPTED_REFRESH_DAYS = 1
 NEAR_THRESHOLD_DAYS = 2        # third-party >= 4,000 but official still below 5,000
 APPROACHING_DAYS = 3           # official or third-party 3,000-4,999
 LOW_BACKSTOP_DAYS = 90         # below 3,000 with no third-party signal
@@ -149,15 +153,20 @@ def official_refresh_days(followers, third_party_followers=None):
     return LOW_BACKSTOP_DAYS
 
 
-def official_refresh_due(observation, now, *, third_party_followers=None, group_id64=None):
-    """Keep 1/2/3/90-day freshness; a high daily prescreen accelerates low counts."""
+def official_refresh_due(observation, now, *, third_party_followers=None, group_id64=None,
+                         release_date=None):
+    """Accepted counts follow the growth cadence; others keep 2/3/90-day freshness."""
     if observation is None:
         return True
     if (group_id64 is not None and observation.group_id64 is not None
             and group_id64 != observation.group_id64):
         return True
+    checked = aware_time(observation.checked_at)
+    if observation.followers >= 5000 and release_date is not None:
+        return follower_cadence.due(release_date, checked.astimezone(TAIPEI).date(),
+                                    now.astimezone(TAIPEI).date())
     days = official_refresh_days(observation.followers, third_party_followers)
-    return now - aware_time(observation.checked_at) >= timedelta(days=days)
+    return now - checked >= timedelta(days=days)
 
 
 def official_result_completes_candidate(candidate, result):
@@ -333,7 +342,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
                 if not observed.date() <= release_day <= observed.date() + timedelta(days=365):
                     continue
                 if not official_refresh_due(observation, refresh_deadline,
-                        third_party_followers=followers, group_id64=new["group_id64"]):
+                        third_party_followers=followers, group_id64=new["group_id64"],
+                        release_date=release_day):
                     continue
                 rechecks.add(aid)
                 prior_result = cp["official_results"].get(aid) or {}

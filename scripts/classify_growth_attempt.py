@@ -64,12 +64,12 @@ def deferred_cooldown(original, delivered, now):
     if (cohort is None or type(original.get("eligible")) is not int
             or original["eligible"] != len(cohort)
             or type(original.get("coverage_schema_version")) is not int
-            or original["coverage_schema_version"] != 2
+            or original["coverage_schema_version"] not in (2, 3)
             or original.get("collection_date_taipei") != now.astimezone(TAIPEI).date().isoformat()
             or _ids(delivered.get("published_eligible_appids")) != cohort):
         return False
     for field in ("eligible", "eligible_appids", "coverage_schema_version", "collection_date_taipei",
-                  "generated_at", "measurements", "unavailable", "pending", "coverage"):
+                  "generated_at", "measurements", "unavailable", "scheduled", "pending", "coverage"):
         if delivered.get(field) != original.get(field):
             return False
     pending = original.get("pending")
@@ -81,10 +81,15 @@ def deferred_cooldown(original, delivered, now):
     if missing is None or not missing <= cohort:
         return False
     measurements, unavailable = original.get("measurements"), original.get("unavailable")
-    if not isinstance(measurements, list) or not isinstance(unavailable, list):
+    version = original["coverage_schema_version"]
+    scheduled = original.get("scheduled", []) if version == 3 else []
+    if (not isinstance(measurements, list) or not isinstance(unavailable, list)
+            or not isinstance(scheduled, list)):
         return False
-    expected = {"eligible": len(cohort), "measured": len(measurements),
-                "unavailable": len(unavailable), "pending": len(missing)}
+    expected = {"eligible": len(cohort), "measured": len(measurements)}
+    if version == 3:
+        expected["scheduled"] = len(scheduled)
+    expected.update(unavailable=len(unavailable), pending=len(missing))
     coverage = original.get("coverage")
     if (not isinstance(coverage, dict) or coverage != expected
             or any(type(value) is not int for value in coverage.values())):
@@ -94,12 +99,14 @@ def deferred_cooldown(original, delivered, now):
     accounted = cohort - missing
     valid_evidence = {
         "reason": "completed", "errors": [], "pending": [],
-        "generated_at": original["generated_at"], "coverage_schema_version": 2,
+        "generated_at": original["generated_at"], "coverage_schema_version": version,
         "collection_date_taipei": original["collection_date_taipei"],
         "eligible": len(accounted), "eligible_appids": sorted(accounted),
         "measurements": measurements, "unavailable": unavailable,
-        "measurement_complete": len(measurements) == len(accounted),
+        "measurement_complete": len(measurements) + len(scheduled) == len(accounted),
     }
+    if version == 3:
+        valid_evidence["scheduled"] = scheduled
     if not growth_collection_complete(valid_evidence, now):
         return False
     events = original.get("events")

@@ -22,7 +22,7 @@ runs:
       # A transient GitHub API/state error must not generate another email.
       # Existing state is never replaced by an assumed zero on a read error.
       continue-on-error: true
-      uses: actions/github-script@v7
+      uses: actions/github-script@v9
       env:
         NOTICE_MODULE: ${{ github.action_path }}/index.cjs
         NOTICE_WORKFLOW_KEY: ${{ inputs.workflow-key }}

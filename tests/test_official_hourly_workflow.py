@@ -18,7 +18,9 @@ def test_hourly_collection_leaves_time_for_all_bounded_queue_phases():
     argv = shlex.split(next(line for line in commands.splitlines()
                            if "python -u -m radar_backend.jobs.official_followers" in line))
     option = lambda name: argv[argv.index(name) + 1]
-    assert int(collect["env"]["REQUEST_LIMIT"]) == 90
+    # Spread over 21 hourly rounds: at most 315 a day, near the observed
+    # per-identity Steam Community budget, never most of it in one burst.
+    assert int(collect["env"]["REQUEST_LIMIT"]) == 15
     assert option("--max-requests") == "$REQUEST_LIMIT"
     assert float(option("--interval")) >= 30
     collection_budget = int(option("--max-seconds"))

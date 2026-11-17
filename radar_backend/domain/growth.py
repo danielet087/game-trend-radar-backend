@@ -21,6 +21,11 @@ def timestamp(value):
         return None
 
 
+# Followers are tracked through the release day; its measurement is the
+# game's final count. The site no longer needs post-release observations.
+POST_RELEASE_DAYS = 0
+
+
 def eligible(row, today):
     try:
         released = date.fromisoformat(row["release_start"])
@@ -30,7 +35,7 @@ def eligible(row, today):
                     type(count) is int and (count >= 5000 or count > 3000
                     and row.get("recent_source") in {"tracked_release", "direct_release"})))
                 and row.get("release_precision", "day") == "day"
-                and today - timedelta(days=30) <= released <= today + timedelta(days=365))
+                and today - timedelta(days=POST_RELEASE_DAYS) <= released <= today + timedelta(days=365))
     except (KeyError, TypeError, ValueError):
         return False
 

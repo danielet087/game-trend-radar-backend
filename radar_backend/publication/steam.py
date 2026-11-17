@@ -165,7 +165,7 @@ def publish_growth(frontend: Path, report: dict, *, input_revision: str,
         receipt = publish_with_retry(
             repository or frontend_repository(frontend, auth_script=auth_script), apply,
             paths=GROWTH_PATHS,
-            message="data: record official growth observations through release plus 30 days",
+            message="data: record official growth observations through the release day",
             input_revision=input_revision, payload_revision=revision, max_attempts=max_attempts,
         )
         if published_report is not None:

@@ -10,10 +10,12 @@ from unittest.mock import Mock
 
 
 class GrowthTests(unittest.TestCase):
-    def test_exact_30_day_boundary(self):
+    def test_release_day_is_the_last_tracked_day(self):
         row = {"appid": 10, "followers": 6000, "release_start": "2026-09-01"}
-        self.assertTrue(eligible(row, date(2026, 10, 1)))
-        self.assertFalse(eligible(row, date(2026, 10, 2)))
+        self.assertTrue(eligible(row, date(2026, 9, 1)))
+        self.assertTrue(eligible(row, date(2025, 9, 1)))
+        self.assertFalse(eligible(row, date(2025, 8, 31)))
+        self.assertFalse(eligible(row, date(2026, 9, 2)))
         self.assertFalse(eligible({**row, "release_precision": "month"}, date(2026, 9, 28)))
         self.assertFalse(eligible({**row, "followers": 3000}, date(2026, 9, 28)))
         self.assertEqual(parse_count('<memberList><memberCount>6,521</memberCount></memberList>'), 6521)

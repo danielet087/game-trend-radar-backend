@@ -25,11 +25,11 @@ def admitted_game():
     }
 
 
-def test_growth_keeps_real_low_follower_source_and_existing_30_day_window():
+def test_growth_keeps_real_low_follower_source_through_the_release_day():
     row = admitted_game()
+    assert eligible(row, date(2026, 9, 15))
     assert eligible(row, date(2026, 10, 2))
-    assert eligible(row, date(2026, 11, 1))
-    assert not eligible(row, date(2026, 11, 2))
+    assert not eligible(row, date(2026, 10, 3))
     del row["twitch_admission"]
     assert not eligible(row, date(2026, 10, 2))
 

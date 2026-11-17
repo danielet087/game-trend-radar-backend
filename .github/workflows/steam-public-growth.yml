@@ -1,4 +1,4 @@
-name: Track accepted game growth through release plus 30 days
+name: Track accepted game growth until release day
 run-name: "Steam public growth | slot=${{ inputs.target_slot || 'manual' }} | source=${{ inputs.trigger_source || github.event_name }}"
 
 on:

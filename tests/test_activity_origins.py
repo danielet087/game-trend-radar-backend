@@ -38,7 +38,7 @@ def twitch_row(*, checked_at="2026-10-13T06:00:00Z"):
     ("Steam candidates then Followers", "steam_daily_search"),
     ("Steam official Followers - hourly auto 250", "steam_official_verification"),
     ("Steam official Followers - hourly bounded queue", "steam_official_verification"),
-    ("Track accepted game growth through release plus 30 days", "steam_catalog_sync"),
+    ("Track accepted game growth until release day", "steam_catalog_sync"),
     ("Steam candidates then Followers renamed", "steam_catalog_sync"),
 ])
 def test_only_explicit_collection_workflows_identify_daily_search(monkeypatch, workflow, expected):

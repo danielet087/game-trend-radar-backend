@@ -14,7 +14,7 @@ on:
     workflows:
       - Steam candidates then Followers
       - Steam official Followers - hourly bounded queue
-      - Track accepted game growth through release plus 30 days
+      - Track accepted game growth until release day
     types: [completed]
     branches: [main]
   push:

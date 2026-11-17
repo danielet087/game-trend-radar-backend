@@ -151,7 +151,7 @@ def test_database_only_and_inactive_sources_never_need_git_or_credentials(system
     database, _, environment, events = system
     change(database, "private-cache", "durable-only", projection_required=False)
     environment.pop("FRONTEND_REPO_TOKEN")
-    report = project.run(database=database, environment=environment, sources=(SPEC, project.SOURCES[-1]))
+    report = project.run(database=database, environment=environment, sources=(SPEC, next(spec for spec in project.SOURCES if spec["repository"].endswith("youtube-backend"))))
     assert [r["status"] for r in report["sources"]] == ["up_to_date", "inactive"]
     assert events == []
 

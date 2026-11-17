@@ -13,7 +13,7 @@ import tempfile
 import time
 
 from radar_core.storage import primary_store
-from radar_core.storage.sources import SOURCES, source_id
+from radar_core.storage.sources import SOURCES, git_backed, source_id
 from radar_core.storage.sql import StorageError, TursoClient
 
 BACKEND = "danielet087/game-trend-radar-backend"
@@ -164,6 +164,9 @@ def run(*, environment=None, database=None, deadline=None, sources=SOURCES):
                                      budget_seconds=deadline.remaining(TOTAL_SECONDS))
     report = {"started_at": datetime.now(timezone.utc).isoformat(), "status": "passed", "sources": [], "errors": []}
     for spec in sources:
+        if not git_backed(spec):
+            report["sources"].append({"source_id": source_id(spec), "status": "database_only"})
+            continue
         try:
             deadline.remaining(1)
             report["sources"].append(project_source(database, spec, environment=environment, deadline=deadline))

@@ -247,7 +247,8 @@ class DatabasePrimaryControlTests(unittest.TestCase):
         self.assertTrue(all(self.github.variable(repo, control.PRIMARY_FLAG) is None for repo in control.RUNTIMES))
 
     def test_resume_refuses_partial_authority_without_changing_runtime_flags(self):
-        states = iter([True, False, False, False, False, False, False])
+        from radar_core.storage.sources import SOURCES
+        states = iter([True] + [False] * (len(SOURCES) - 1))
         with patch.object(control.TursoClient, "from_env", return_value=object()), patch.object(documents, "initialize"), \
                 patch.object(primary_store, "primary_status", side_effect=lambda *_: {"active": next(states)}):
             with self.assertRaises(control.ControlError) as caught:

@@ -124,9 +124,13 @@ def test_all_production_repositories_and_backend_state_branch_are_included(tmp_p
         "danielet087/game-trend-radar-twitch-backend@main": {"data/twitch_tracking.json"},
         "danielet087/game-trend-radar-youtube-backend@main": set(),
     }
-    assert {sources.source_id(spec) for spec in sources.SOURCES} == set(expected)
-    assert len({sources.checkout_name(spec) for spec in sources.SOURCES}) == len(expected)
-    for index, spec in enumerate(sources.SOURCES):
+    git_sources = [spec for spec in sources.SOURCES if sources.git_backed(spec)]
+    assert {sources.source_id(spec) for spec in git_sources} == set(expected)
+    # The Twitch views never come from Git; the bootstrap copies them in the database.
+    assert [sources.source_id(spec) for spec in sources.SOURCES if not sources.git_backed(spec)] == [
+        "danielet087/game-trend-radar@twitch-views"]
+    assert len({sources.checkout_name(spec) for spec in git_sources}) == len(expected)
+    for index, spec in enumerate(git_sources):
         identity = sources.source_id(spec)
         root = repository(tmp_path / str(index))
         files = {path: b'{"unknown": ["preserve", "all", "fields"]}\n' for path in expected[identity]}

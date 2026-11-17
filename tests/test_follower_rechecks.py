@@ -14,7 +14,7 @@ from tests.test_unified_twitch_followers import (
 )
 
 
-def observation(appid=124, followers=2500, age=31):
+def observation(appid=124, followers=2500, age=91):
     return {**known_group(ordinary_candidate(appid)),
             "official_followers": followers,
             "official_checked_at_taipei": (NOW - timedelta(days=age)).isoformat()}
@@ -38,8 +38,8 @@ def projected(*, result=None, prescreen=1000, sources=None, amend=None):
     return queue, status, cp
 
 
-@pytest.mark.parametrize("followers,days", [(0, 30), (2999, 30), (3000, 3), (4999, 3), (5000, 1), (9000, 1)])
-def test_official_count_expires_at_its_1_3_30_day_boundary(followers, days):
+@pytest.mark.parametrize("followers,days", [(0, 90), (2999, 90), (3000, 3), (4999, 3), (5000, 1), (9000, 1)])
+def test_official_count_expires_at_its_1_3_90_day_boundary(followers, days):
     result = observation(followers=followers, age=days)
     result["official_checked_at_taipei"] = (NOW - timedelta(days=days) + timedelta(seconds=1)).isoformat()
     queue, _, _ = projected(result=result)
@@ -54,9 +54,19 @@ def test_official_count_expires_at_its_1_3_30_day_boundary(followers, days):
 
 @pytest.mark.parametrize("followers", [0, 2999, 3000, 4999])
 def test_fresh_ge4000_prescreen_accelerates_previously_low_official_counts(followers):
-    queue, _, _ = projected(result=observation(followers=followers, age=1), prescreen=4000)
+    queue, _, _ = projected(result=observation(followers=followers, age=2), prescreen=4000)
     assert [row["appid"] for row in queue] == [124]
-    queue, _, _ = projected(result=observation(followers=followers, age=0.5), prescreen=6000)
+    queue, _, _ = projected(result=observation(followers=followers, age=1.5), prescreen=6000)
+    assert queue == []
+
+
+@pytest.mark.parametrize("followers", [0, 2999])
+def test_a_rising_prescreen_moves_a_low_count_from_the_90_day_backstop_to_3_days(followers):
+    queue, _, _ = projected(result=observation(followers=followers, age=3), prescreen=3000)
+    assert [row["appid"] for row in queue] == [124]
+    queue, _, _ = projected(result=observation(followers=followers, age=2.5), prescreen=3999)
+    assert queue == []
+    queue, _, _ = projected(result=observation(followers=followers, age=89), prescreen=2999)
     assert queue == []
 
 

@@ -129,16 +129,34 @@ def latest_official_observations(*sources, now):
     return latest
 
 
+# Official Community XML requests share one small per-identity budget, so a
+# count is rechecked only as often as it can change the admission decision.
+ACCEPTED_REFRESH_DAYS = 1      # >= 5,000: the daily growth record
+NEAR_THRESHOLD_DAYS = 2        # third-party >= 4,000 but official still below 5,000
+APPROACHING_DAYS = 3           # official or third-party 3,000-4,999
+LOW_BACKSTOP_DAYS = 90         # below 3,000 with no third-party signal
+
+
+def official_refresh_days(followers, third_party_followers=None):
+    """Recheck cadence for one official count; the daily third-party count accelerates it."""
+    third = third_party_followers if queue_checked_numeric(third_party_followers) else None
+    if followers >= 5000:
+        return ACCEPTED_REFRESH_DAYS
+    if third is not None and third >= 4000:
+        return NEAR_THRESHOLD_DAYS
+    if followers >= 3000 or (third is not None and third >= 3000):
+        return APPROACHING_DAYS
+    return LOW_BACKSTOP_DAYS
+
+
 def official_refresh_due(observation, now, *, third_party_followers=None, group_id64=None):
-    """Keep 1/3/30-day freshness; a fresh high prescreen accelerates low counts."""
+    """Keep 1/2/3/90-day freshness; a high daily prescreen accelerates low counts."""
     if observation is None:
         return True
     if (group_id64 is not None and observation.group_id64 is not None
             and group_id64 != observation.group_id64):
         return True
-    days = 1 if observation.followers >= 5000 else 3 if observation.followers >= 3000 else 30
-    if queue_checked_numeric(third_party_followers) and third_party_followers >= 4000:
-        days = 1
+    days = official_refresh_days(observation.followers, third_party_followers)
     return now - aware_time(observation.checked_at) >= timedelta(days=days)
 
 

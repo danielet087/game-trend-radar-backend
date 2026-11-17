@@ -10,7 +10,7 @@ from tests.test_follower_rechecks import observation
 from tests.test_unified_twitch_followers import NOW, checkpoint, current_daily, queue_inputs as frozen_inputs
 
 
-def project(*, age=31, followers=1000, transform=None, now=NOW):
+def project(*, age=91, followers=1000, transform=None, now=NOW):
     cp = checkpoint()
     cp["official_results"]["124"] = observation(followers=followers, age=age)
     eligible, prefilter = current_daily(124)
@@ -36,8 +36,8 @@ def test_completed_plan_exposes_today_count_without_claiming_queries_completed()
 
 
 def test_daily_plan_includes_expiry_later_today_without_making_live_queue_query_early():
-    # 29.9 days old is not due yet, but the 30-day deadline is later today.
-    status = project(age=29.9)
+    # 89.9 days old is not due yet, but the 90-day deadline is later today.
+    status = project(age=89.9)
     assert status["summary"]["ready_pending"] == 0
     plan = status["follower_recheck_plan"]
     assert plan["planned_count"] == plan["remaining_count"] == 1

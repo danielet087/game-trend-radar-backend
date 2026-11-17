@@ -146,7 +146,9 @@ jobs:
           TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
           CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
-          REQUEST_LIMIT: "90"
+          # Spread the official requests over the 21 hourly rounds instead of
+          # spending the shared Steam Community budget in the first few.
+          REQUEST_LIMIT: "15"
           SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
           SKIP_COOLDOWN: ${{ github.event_name == 'workflow_dispatch' && inputs.trigger_source == 'manual' && inputs.skip_cooldown || false }}
         run: |

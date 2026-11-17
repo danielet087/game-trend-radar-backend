@@ -17,9 +17,9 @@ jobs:
     timeout-minutes: 9
     steps:
       - name: Checkout only read-only probe
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install minimal dependency
@@ -34,7 +34,7 @@ jobs:
           fi
       - name: Save rate-limit pilot
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steam-xml-shorter-pilot
           path: output/steam_xml_shorter_pilot.json

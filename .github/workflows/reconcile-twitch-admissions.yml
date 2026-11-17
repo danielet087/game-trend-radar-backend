@@ -25,8 +25,8 @@ jobs:
       CONTENT_BACKEND_REPOSITORY: danielet087/game-trend-radar-content-backend
       CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Install and verify admission contracts
@@ -60,7 +60,7 @@ jobs:
           python -m radar_backend.jobs.publish_steam queue --kind dispatch \
             --batch output/twitch-recovery/dispatch.json \
             --receipt output/twitch-recovery/dispatch-receipt.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: twitch-admission-recovery

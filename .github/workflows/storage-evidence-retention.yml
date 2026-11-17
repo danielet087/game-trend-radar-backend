@@ -46,10 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Verify retention rules without credentials
@@ -70,7 +70,7 @@ jobs:
           python -u -m scripts.storage_evidence_retention "${args[@]}"
       - name: Keep the retention report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: evidence-retention-report
           path: ${{ runner.temp }}/evidence-retention.json

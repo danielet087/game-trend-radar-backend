@@ -42,11 +42,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Verify storage safeguards without credentials
@@ -81,7 +81,7 @@ jobs:
           --report-path "$RUNNER_TEMP/storage-projection.json"
       - name: Preserve status and recovery evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: radar-storage-report
           path: |
@@ -91,7 +91,7 @@ jobs:
           retention-days: 7
       - name: Downloadable fresh export when explicitly requested
         if: success() && inputs.mode == 'export'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: radar-storage-fresh-export
           path: |
@@ -110,7 +110,7 @@ jobs:
       actions: read
       contents: write
     steps:
-      - uses: danielet087/game-trend-radar-backend/.github/actions/scheduled-failure-notice@202d8a9945c5cb0a2f182a327dd533ac98d8178e
+      - uses: danielet087/game-trend-radar-backend/.github/actions/scheduled-failure-notice@e743210a045e1d1603b381e0476e9a6369972bf1
         with:
           workflow-key: source-storage-sync.yml
           job-name: sync

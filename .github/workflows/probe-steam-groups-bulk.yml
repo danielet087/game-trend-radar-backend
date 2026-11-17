@@ -14,9 +14,9 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Checkout private backend read-only
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Install HTTP client
@@ -31,7 +31,7 @@ jobs:
           fi
       - name: Archive private experiment report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steam-groups-bulk-probe
           path: output/steam_groups_bulk_probe.json

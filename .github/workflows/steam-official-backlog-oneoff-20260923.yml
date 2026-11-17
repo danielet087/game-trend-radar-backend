@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 240
     steps:
       - name: Checkout existing scanner plus original, daily and official checkpoints
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           sparse-checkout: |
             scripts/
@@ -45,7 +45,7 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
@@ -175,7 +175,7 @@ jobs:
 
       - name: Keep final checkpoint evidence and frozen recovery input
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steam-backlog-checkpoint-publication
           path: |
@@ -213,7 +213,7 @@ jobs:
 
       - name: Upload result reports (including on failure)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: official-steam-followers-backlog-oneoff-20260923
           path: output/steam_official_backlog_oneoff/

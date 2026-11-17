@@ -56114,20 +56114,18 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "43999750591",
-    "active": false,
-    "status": "finished",
+    "run_id": "44007027386",
+    "active": true,
+    "status": "querying",
     "manual_cooldown_override": false,
     "request_limit": 90,
-    "started_at": "2026-11-17T10:03:54.889411+08:00",
-    "last_updated_at": "2026-11-17T10:04:22.514679+08:00",
+    "started_at": "2026-11-17T11:02:59.778445+08:00",
+    "last_updated_at": "2026-11-17T11:03:00.637938+08:00",
     "requests_this_run": 1,
     "official_new_this_run": 0,
     "http_429_this_run": 1,
-    "last_appid": 5340870,
-    "last_name": "Underbloom",
-    "finished_at": "2026-11-17T10:04:22.514679+08:00",
-    "stop_reason": "first_http_429"
+    "last_appid": 5440890,
+    "last_name": "Dead Man's Crown"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -135569,17 +135567,17 @@
       "release_time_utc": "2026-12-12T17:00:00Z"
     }
   },
-  "rate_limit_count": 2,
+  "rate_limit_count": 3,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-17T10:33:55.917523+08:00",
+  "next_request_after_taipei": "2026-11-17T12:03:00.637850+08:00",
   "community_cooldown": {
-    "retry_at": "2026-11-17T02:33:55.917523+00:00",
-    "observed_at": "2026-11-17T02:03:55.917523+00:00",
-    "updated_at": "2026-11-17T02:03:55.917523+00:00",
-    "retry_seconds": 1800,
+    "retry_at": "2026-11-17T04:03:00.637850+00:00",
+    "observed_at": "2026-11-17T03:03:00.637850+00:00",
+    "updated_at": "2026-11-17T03:03:00.637850+00:00",
+    "retry_seconds": 3600,
     "retry_after": null,
     "retry_source": "existing_queue_backoff",
-    "attempts": 2
+    "attempts": 3
   },
   "community_last_success_at": "2026-11-17T09:04:06.530869+08:00",
   "official_growth_observations": {
@@ -152521,6 +152519,16 @@
       "status": "rate_limited",
       "github_run_id": "43999750591",
       "next_request_after_taipei": "2026-11-17T10:33:55.917523+08:00"
+    },
+    {
+      "appid": 5440890,
+      "when_taipei": "2026-11-17T11:03:00.457228+08:00",
+      "release_date": "2026-11-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 429,
+      "status": "rate_limited",
+      "github_run_id": "44007027386",
+      "next_request_after_taipei": "2026-11-17T12:03:00.637850+08:00"
     }
   ]
 }

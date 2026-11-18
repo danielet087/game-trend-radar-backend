@@ -94,7 +94,9 @@ class PublicationReceipt:
     ``payload_revision`` identifies the frozen batch. ``target_snapshot_revision``
     hashes the resulting owned JSON files, including newer data preserved by the
     callback. ``published_revision`` is the actual Git commit, not a fabricated
-    self-reference written into that commit.
+    self-reference written into that commit. When the source keeps its data out
+    of Git (``storage.data_home``) it is the committed database manifest digest
+    instead, which database reads accept as a revision.
     """
 
     input_revision: str
@@ -259,6 +261,14 @@ class SubprocessGitRepository:
     def acknowledge_projection(self, revision: str) -> None:
         if self._primary is not None:
             self._primary.acknowledge(revision)
+
+    @property
+    def database_only(self) -> bool:
+        """True when the last database read switched the Git projection off."""
+        return self._primary is not None and getattr(self._primary, "database_only", False) is True
+
+    def published_revision(self, revision: str) -> str:
+        return self._primary.published_revision(revision) if self.database_only else revision
 
     def _run(self, *args: str, push: bool = False) -> str:
         command = (*self.push_command_prefix, *args) if push and self.push_command_prefix else ("git", *args)
@@ -437,6 +447,9 @@ class SubprocessGitRepository:
     def push(self, revision: str | None = None) -> bool:
         revision = self.head_revision() if revision is None else revision
         _hash(revision, "push revision", git=True)
+        if self.database_only:
+            # The database commit already is the publication; Git keeps code only.
+            return True
         try:
             self._run("push", self.remote, f"{revision}:{self.target_ref}", push=True)
         except GitOperationError:
@@ -454,6 +467,8 @@ def publish_with_retry(
     Push failures retry from the newest remote state. Apply, JSON validation,
     fetch, scope and commit failures stop immediately. A no-op still pushes and
     retries if the remote advanced; an empty diff alone proves no publication.
+    Without a Git projection the database commit is the acknowledgement, and a
+    concurrent writer makes it retry through ``STALE_GENERATION`` instead.
     """
     owned = _paths(paths)
     _nonempty(message, "message")
@@ -483,6 +498,8 @@ def publish_with_retry(
                 raise PublicationError("checkout HEAD changed during publication")
             if hasattr(repository, "acknowledge_projection"):
                 repository.acknowledge_projection(revision)
+            if hasattr(repository, "published_revision"):
+                revision = repository.published_revision(revision)
             return PublicationReceipt(
                 input_revision=input_revision, payload_revision=payload_revision,
                 published_revision=revision, target_ref=repository.target_ref,

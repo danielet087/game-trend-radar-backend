@@ -54,7 +54,8 @@ gzip/base64 去重 chunks 約 39.4 MB，另外加上索引、來源清單與同�
   workflow concurrency 僅負責單一排程，跨 repo 安全性由資料庫保證。
 - CAS 衝突重新讀取主庫並重播固定觀測；API 不重查、觀測時間不改寫。
 - DB 保存成功與 Git push 成功分開記錄。Git 失敗保留 pending，維運工作補發布；
-  `published_revision` 永遠是真 Git SHA。IGDB 的 `persisted` 回條僅表示 DB 已保存。
+  `published_revision` 是真 Git SHA；來源用 `data/publication/data_home.json` 關掉 Git 投影時，
+  發布只寫資料庫，回條改記資料庫 manifest 摘要（見 radar-core README）。IGDB 的 `persisted` 回條僅表示 DB 已保存。
 
 資料表是可攜式 SQLite 文件儲存：`radar_sources` 為來源版本，`radar_objects` /
 `radar_chunks` 保存內容，`radar_outbox` 保存待同步事件，`radar_revisions` 防止同一

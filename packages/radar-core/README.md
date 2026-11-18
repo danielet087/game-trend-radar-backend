@@ -73,7 +73,7 @@ receipt = result.to_dict()
 | `input_revision` | 呼叫者提供的來源 commit、來源 bundle 或其他非空版本識別 |
 | `payload_revision` | `snapshot_revision(frozen_payload)`，識別這次固定的輸入資料 |
 | `target_snapshot_revision` | 實際提交中，允許發布的 JSON 檔案之內容雜湊，包括保留的較新資料 |
-| `published_revision` | 遠端 push 已確認的不可變 Git commit SHA |
+| `published_revision` | 遠端 push 已確認的不可變 Git commit SHA；來源關掉 Git 投影時（見下方「資料存放位置開關」）改為資料庫已提交的 manifest 摘要 |
 
 `snapshot_revision()` 使用 UTF-8、物件 key 排序及緊縮 JSON 計算 SHA-256；陣列順序保留。非 JSON 型別、非字串 key、NaN 及 Infinity 都會被拒絕。實際公開檔案再以 `{path: {"present": true, "payload": ...}}` 計算 `target_snapshot_revision`；明確指定且已刪除的檔案使用 `{"present": false}`。資料集合本身另有不包含 manifest 的雜湊時，請命名為 `dataset_revision`，避免混淆。
 
@@ -114,3 +114,24 @@ publication_report = receipt.to_dict()
 `PublicationReceipt.from_dict()` 嚴格檢查 schema、欄位、型別與 hash；未知欄位或缺少證據都會拒絕。只有 `publish_with_retry()` 真正完成 push 後才產生回條，所有失敗均丟出例外且沒有成功回條。實際 `published_revision` 只能在成功後寫入 runner artifact／既有工作報告，不能寫入正在發布的 commit 形成自身 SHA 引用。Git 內的 manifest 可以包含 `input_revision`、`payload_revision`、`dataset_revision`，但不能預先宣稱 `published=true`。收集是否完整仍由既有 `JobResult` 判定，發布成功不會把 partial 收集變成 complete。
 
 本套件測試使用本機暫存 bare Git repository，涵蓋競爭更新、拒絕 push、空 diff、固定輸入重放及 scope 防護，不會收集 live API。
+
+### 資料存放位置開關
+
+來源裡的 `data/publication/data_home.json`（以資料庫那份為準）決定網站資料從哪裡組、發布要不要寫進 Git：
+
+```json
+{"schema_version": 1, "site": "git" | "database", "git_projection": true | false}
+```
+
+- 沒有這個檔：跟以前一樣，網站用 Git 那份，發布會 push。
+- `site: "database"`：部署時用資料庫最新版組網站資料。
+- `git_projection: false`：發布只寫資料庫（`projection_required=False`），不 push、不確認投影，回條的 `published_revision` 是資料庫 manifest 摘要（資料庫讀取接受它當版本）。必須搭配 `site: "database"`。同時寫入時改由資料庫世代檢查（`STALE_GENERATION`）重試。
+- 發布不能改這個檔（`DATA_HOME_READ_ONLY`）；格式錯誤時，發布在寫資料庫之前就停止（`INVALID_DATA_HOME`）。
+- 只用指令切換，寫入時對讀到的世代做 compare-and-swap：
+
+```bash
+python -m radar_core.storage.data_home show
+python -m radar_core.storage.data_home set --site database --git-projection false
+```
+
+改回 `git_projection: true` 就是退回：下一次發布會把資料庫最新版整份 push 回 Git。

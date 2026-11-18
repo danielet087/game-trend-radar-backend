@@ -259,37 +259,66 @@ def commit_paths(root, paths, *, operation_id, payload_revision=None):
 
 
 class GitPrimary:
-    """Internal bridge: DB CAS happens before any public Git push."""
+    """Internal bridge: DB CAS happens before any public Git push.
+
+    With the data home flag's ``git_projection`` off (see ``data_home``) the
+    database commit is the whole publication: the checkout still receives the
+    committed snapshot as the builder's baseline, but nothing is pushed or
+    acknowledged, and the published revision is the database manifest digest.
+    The mode is read from every snapshot this bridge reads, and a commit is a
+    compare-and-swap on the snapshot it was built from, so a concurrent switch
+    makes the writer retry under the new mode.
+    """
     def __init__(self, source, db=None):
         self.source, self.db = source_id(source), db or client()
         self.head, self.files, self.receipt = None, {}, None
         self.operation_id = self.payload_revision = None
         self.projection_changed = False
+        self.database_only = False
+
+    def _read_mode(self):
+        from .data_home import FLAG, parse
+        self.database_only = not parse(self.files.get(FLAG))["git_projection"]
 
     def refresh(self, root):
         _active(self.db, self.source)
         known = {**_known_files(root, self.source), **self.files}
         self.head, self.files = _store().read_files(self.db, self.source, known_files=known)
+        # An invalid flag stops the publication before anything is projected or written.
+        self._read_mode()
         self.projection_changed = _project(root, self.source, self.head, self.files, clean_baseline=True)
 
     def commit(self, root, paths):
+        from .data_home import FLAG
         changed, deleted = _patch(root, {"source_id": self.source, "head": self.head}, paths)
+        if FLAG in changed or FLAG in deleted:
+            raise StorageError("DATA_HOME_READ_ONLY", "Publications cannot change the data home flag.")
         self.receipt = _store().publish_patch(self.db, self.source,
             base_generation=self.head["generation"], changed=changed, deleted=deleted,
-            operation_id=self.operation_id, payload_revision=self.payload_revision)
+            operation_id=self.operation_id, payload_revision=self.payload_revision,
+            projection_required=not self.database_only)
         # A duplicate operation can refer to an older generation. Always project
         # the actual committed source, never the uncommitted candidate on disk.
         self.head, self.files = _store().read_files(self.db, self.source, known_files={**self.files, **changed})
+        self._read_mode()
         changed = _project(root, self.source, self.head, self.files, clean_baseline=True)
         return self.projection_changed or changed
 
     def acknowledge(self, git_revision):
+        if self.database_only:
+            # Nothing was pushed; earlier pending operations wait until the
+            # projection is switched back on and a real push carries them.
+            return
         # The pushed tree contains every source file at this generation. Later
         # generations stay pending, including a concurrent writer after our read.
         for receipt in _store().projection_pending(self.db, self.source):
             if receipt["generation"] <= self.head["generation"]:
                 _store().acknowledge_projection(self.db, self.source, receipt["operation_id"], git_revision,
                     generation=self.head["generation"], manifest_digest=self.head["manifest_digest"])
+
+    def published_revision(self, git_revision):
+        """The pushed Git commit, or the committed database snapshot without Git."""
+        return self.head["manifest_digest"] if self.database_only else git_revision
 
 
 def git_primary(root, *, remote="origin", branch="main"):

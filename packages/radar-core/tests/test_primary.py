@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 
 from radar_core.publication import PublicationError, PublicationScopeError, SubprocessGitRepository, publish_with_retry, snapshot_revision
-from radar_core.storage import primary
+from radar_core.storage import data_home, primary
 from radar_core.storage.sql import StorageError
 
 
@@ -60,13 +60,15 @@ class Store:
         self.files.update(changed)
         if changed or deleted:
             self.generation += 1
-        receipt = {**self.head(), "operation_id": operation_id, "projection_pending": True,
+        receipt = {**self.head(), "operation_id": operation_id, "projection_pending": projection_required,
+                   "delivery_target": "git" if projection_required else "database_only",
                    "changed": bool(changed or deleted)}
         self.operations[operation_id] = receipt
         return receipt
 
     def projection_pending(self, db, source):
-        return [value for key, value in self.operations.items() if key not in {ack[0] for ack in self.acks}]
+        return [value for key, value in self.operations.items()
+                if value["delivery_target"] == "git" and key not in {ack[0] for ack in self.acks}]
 
     def acknowledge_projection(self, db, source, operation_id, git_revision, **evidence):
         self.acks.append((operation_id, git_revision, evidence))
@@ -105,9 +107,12 @@ class PrimaryTests(unittest.TestCase):
     def repo(self):
         return SubprocessGitRepository(self.work, disposable_checkout=True, primary=primary.GitPrimary(SOURCE))
 
-    def publish(self, apply, repository=None, **options):
-        return publish_with_retry(repository or self.repo(), apply, paths=["data/live.json"], message="test",
-            input_revision="input", payload_revision=snapshot_revision({"run": 1}), **options)
+    def publish(self, apply, repository=None, run=1, paths=("data/live.json",), **options):
+        return publish_with_retry(repository or self.repo(), apply, paths=list(paths), message="test",
+            input_revision="input", payload_revision=snapshot_revision({"run": run}), **options)
+
+    def projection_off(self, git_projection=False):
+        self.store.files[data_home.FLAG] = data_home.document(site="database", git_projection=git_projection)
 
     def update(self, root):
         path = root / "data/live.json"
@@ -157,6 +162,65 @@ class PrimaryTests(unittest.TestCase):
         self.publish(changed_replay)
         public = self.git(self.remote, "show", "main:data/live.json")
         self.assertNotIn("unauthorized_candidate", public)
+
+    def test_projection_off_commits_database_without_push_or_ack(self):
+        self.projection_off()
+        before = self.git(self.remote, "rev-parse", "main")
+        repository = self.repo()
+        receipt = self.publish(self.update, repository)
+        self.assertTrue(repository.database_only)
+        self.assertEqual(self.git(self.remote, "rev-parse", "main"), before)
+        self.assertEqual(receipt.published_revision, self.store.head()["manifest_digest"])
+        self.assertEqual(self.store.acks, [])
+        self.assertEqual([op["delivery_target"] for op in self.store.operations.values()], ["database_only"])
+        self.assertIn("observation", json.loads(self.store.files["data/live.json"]))
+        # The builder baseline still holds the committed snapshot; it is never pushed.
+        self.assertIn("observation", json.loads((self.work / "data/live.json").read_bytes()))
+        self.assertEqual(self.git(self.work, "status", "--porcelain"), "")
+
+    def test_projection_off_concurrent_writer_retries_through_generation(self):
+        self.projection_off()
+        self.store.race = True
+        receipt = self.publish(self.update)
+        self.assertEqual(receipt.attempts, 2)
+        live = json.loads(self.store.files["data/live.json"])
+        self.assertEqual((live["concurrent"], live["observation"]), (2, "遊戲 103582791429521430"))
+        self.assertEqual(receipt.published_revision, self.store.head()["manifest_digest"])
+
+    def test_projection_back_on_pushes_the_database_snapshot(self):
+        self.projection_off()
+        self.publish(self.update)
+        self.projection_off(git_projection=True)
+        receipt = self.publish(lambda root: None, run=2)
+        self.assertEqual(receipt.published_revision, self.git(self.remote, "rev-parse", "main"))
+        public = json.loads(self.git(self.remote, "show", "main:data/live.json"))
+        self.assertEqual(public["observation"], "遊戲 103582791429521430")
+        flag = json.loads(self.git(self.remote, "show", "main:" + data_home.FLAG))
+        self.assertEqual((flag["site"], flag["git_projection"]), ("database", True))
+        self.assertEqual(self.store.acks[0][1], receipt.published_revision)
+
+    def test_invalid_flag_stops_before_database_or_checkout_changes(self):
+        for raw in (data_home.document(site="database", git_projection=False).replace(b"database", b"git"),
+                    b"[]\n", b'{"schema_version": 1, "site": "database", "git_projection": "off"}\n'):
+            with self.subTest(raw=raw):
+                self.store.files[data_home.FLAG] = raw
+                with self.assertRaises(StorageError) as raised:
+                    self.publish(self.update)
+                self.assertEqual(raised.exception.code, "INVALID_DATA_HOME")
+                self.assertEqual(self.store.operations, {})
+                self.assertFalse((self.work / data_home.FLAG).exists())
+
+    def test_publications_cannot_change_or_remove_the_flag(self):
+        self.projection_off(git_projection=True)
+        switch = data_home.document(site="database", git_projection=False)
+        for apply in (lambda root: (root / data_home.FLAG).write_bytes(switch),
+                      lambda root: (root / data_home.FLAG).unlink()):
+            with self.subTest(apply=apply):
+                with self.assertRaises(StorageError) as raised:
+                    self.publish(apply, paths=("data/publication/",))
+                self.assertEqual(raised.exception.code, "DATA_HOME_READ_ONLY")
+                self.assertEqual(self.store.operations, {})
+        self.assertTrue(data_home.parse(self.store.files[data_home.FLAG])["git_projection"])
 
     def test_deletion_is_durable_and_unowned_db_document_is_preserved(self):
         self.publish(lambda root: (root / "data/live.json").unlink())
@@ -265,6 +329,55 @@ class PrimaryTests(unittest.TestCase):
             self.assertEqual(primary_store.projection_pending(database, SOURCE), [])
             self.assertEqual(database.execute("SELECT * FROM radar_projections"), [])
             self.assertEqual(primary.read_json(SOURCE, "data/private_cache.json"), {"id": "103582791429521430"})
+
+    def sqlite(self, files):
+        from radar_core.storage import documents, primary_store
+        from radar_core.storage.sql import SqliteClient
+        database = SqliteClient()
+        self.addCleanup(database.close)
+        documents.initialize(database)
+        primary_store.bootstrap_primary(database, SOURCE, files, "a" * 40)
+        for target, value in ((primary, "_store"), (primary, "client")):
+            patch.object(target, value, return_value=primary_store if value == "_store" else database).start()
+        return database, primary_store
+
+    def test_real_sqlite_projection_off_receipt_resolves_later(self):
+        database, store = self.sqlite({**self.store.files,
+            data_home.FLAG: data_home.document(site="database", git_projection=False)})
+        before = self.git(self.remote, "rev-parse", "main")
+        first = self.publish(self.update)
+        later = self.publish(lambda root: (root / "data/live.json").write_text('{"db": 2}\n'), run=2)
+        head, _ = store.read_files(database, SOURCE)
+        self.assertEqual(later.published_revision, head["manifest_digest"])
+        self.assertNotEqual(first.published_revision, later.published_revision)
+        self.assertEqual(store.projection_pending(database, SOURCE), [])
+        self.assertEqual(database.execute("SELECT * FROM radar_projections"), [])
+        historical = primary.read_json(SOURCE, "data/live.json", revision=first.published_revision)
+        self.assertEqual(historical["observation"], "遊戲 103582791429521430")
+        self.assertEqual(primary.read_json(SOURCE, "data/live.json", revision=later.published_revision), {"db": 2})
+        self.assertEqual(self.git(self.remote, "rev-parse", "main"), before)
+
+    def test_real_sqlite_switch_between_attempts_reuses_the_committed_operation(self):
+        database, store = self.sqlite(self.store.files)
+        repository = self.repo()
+        def push(revision=None):
+            repository.push = lambda revision=None: SubprocessGitRepository.push(repository, revision)
+            # The owner switches the projection off while this first push fails.
+            head, _ = store.read_files(database, SOURCE)
+            store.publish_patch(database, SOURCE, base_generation=head["generation"],
+                changed={data_home.FLAG: data_home.document(site="database", git_projection=False)},
+                operation_id="switch-off", projection_required=False)
+            return False
+        repository.push = push
+        before = self.git(self.remote, "rev-parse", "main")
+        receipt = self.publish(self.update, repository)
+        self.assertEqual(receipt.attempts, 2)
+        head, files = store.read_files(database, SOURCE)
+        self.assertEqual(receipt.published_revision, head["manifest_digest"])
+        self.assertEqual(json.loads(files["data/live.json"])["observation"], "遊戲 103582791429521430")
+        # The Git-bound commit of the first attempt waits for the projection to return.
+        self.assertEqual(len(store.projection_pending(database, SOURCE)), 1)
+        self.assertEqual(self.git(self.remote, "rev-parse", "main"), before)
 
 
 if __name__ == "__main__":

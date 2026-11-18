@@ -17,8 +17,9 @@ def _utc_now():
     return datetime.now(timezone.utc)
 
 
-def fetch_metadata(session, ids, *, batch_size=steam_metadata.BATCH_SIZE, interval=1.5):
-    return steam_metadata.fetch_metadata(session, ids, batch_size=batch_size, interval=interval)
+def fetch_metadata(session, ids, *, batch_size=steam_metadata.BATCH_SIZE, interval=1.5, outage_pauses=()):
+    options = {"outage_pauses": outage_pauses} if outage_pauses else {}
+    return steam_metadata.fetch_metadata(session, ids, batch_size=batch_size, interval=interval, **options)
 
 
 def build_snapshot(catalog, store_items):

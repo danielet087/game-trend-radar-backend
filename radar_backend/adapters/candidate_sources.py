@@ -22,14 +22,17 @@ from radar_backend.adapters.follower_prefilter import scan_batch
 from radar_backend.adapters.steam_follower_prefilter import (
     TemporaryLookupError, _request_with_retries, through_steam_outage,
 )
-from radar_backend.adapters.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
+from radar_backend.adapters.steam_localized_titles import (
+    enrich_tw_names, fetch_store_tw_names as _fetch_store_tw_names,
+)
 from radar_core.domain.twitch_admission import is_twitch_qualified
 from radar_backend.adapters.steam_store import (
-    build_snapshot, fetch_metadata, excluded_appids, is_disallowed,
+    build_snapshot, fetch_metadata as _fetch_store_metadata, excluded_appids, is_disallowed,
     apply_store_release_detail, fetch_store_release_details, filter_confirmed_master_games,
 )
 from radar_backend.adapters.partial_catalog import merge_partial_segment
 from radar_backend.domain.candidates import QUERY_URL, TAIWAN_TZ, candidate_record
+from radar_backend.domain.follower_prefilter import STEAM_OUTAGE_PAUSES
 
 LOG = logging.getLogger(__name__)
 PAGE_SIZE = 1000
@@ -43,6 +46,16 @@ QUERY_RESTART_SECONDS = 30
 
 class MatchingTotalChanged(RuntimeError):
     """Steam's result set moved while paging, so this pass may have skipped rows."""
+
+
+def fetch_metadata(session: requests.Session, ids: list[int], **options: Any) -> dict[int, dict]:
+    """The daily date check's Store Browse read also waits out Steam's weekly maintenance."""
+    return _fetch_store_metadata(session, ids, outage_pauses=STEAM_OUTAGE_PAUSES, **options)
+
+
+def fetch_store_tw_names(session: requests.Session, ids: list[int], **options: Any) -> dict[int, str]:
+    """The daily Traditional Chinese title read also waits out Steam's weekly maintenance."""
+    return _fetch_store_tw_names(session, ids, outage_pauses=STEAM_OUTAGE_PAUSES, **options)
 
 
 def query_one_day(

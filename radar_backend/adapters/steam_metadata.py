@@ -16,13 +16,28 @@ STORE_BROWSE_URL = "https://api.steampowered.com/IStoreBrowseService/GetItems/v1
 BATCH_SIZE = 35
 
 
+def steam_outage_error(exc: BaseException, requests_module=requests) -> bool:
+    """A 5xx answer or a dropped connection: what Steam's weekly maintenance looks like."""
+    status = getattr(getattr(exc, "response", None), "status_code", None)
+    if isinstance(status, int):
+        return 500 <= status <= 599
+    network = tuple(error for error in (getattr(requests_module, "ConnectionError", None),
+                                        getattr(requests_module, "Timeout", None)) if isinstance(error, type))
+    return bool(network) and isinstance(exc, network)
+
+
 def fetch_metadata(
     session: requests.Session, ids: list[int], *, batch_size: int = BATCH_SIZE,
     interval: float = 1.5, sleep: Callable | None = None,
     monotonic: Callable | None = None, logger=None, requests_module=None,
     url: str = STORE_BROWSE_URL, max_content_details: int = 200, context_offset: int | None = None,
+    outage_pauses: tuple[int, ...] = (),
 ) -> dict[int, dict]:
-    """Keep pacing, retry boundaries and partial response handling unchanged."""
+    """Keep pacing, retry boundaries and partial response handling unchanged.
+
+    With ``outage_pauses``, a batch whose four attempts all end on 5xx or a
+    dropped connection pauses and tries again, once per pause.
+    """
     sleep = sleep if sleep is not None else time.sleep
     monotonic = monotonic if monotonic is not None else time.monotonic
     logger = logger if logger is not None else LOG
@@ -42,40 +57,50 @@ def fetch_metadata(
                 "include_tag_count": 20,
             },
         }
-        for attempt in range(4):
-            sleep(max(0.0, interval - (monotonic() - last_start)))
-            last_start = monotonic()
-            try:
-                response = session.get(
-                    url,
-                    params={"input_json": json.dumps(request, separators=(",", ":"))},
-                    timeout=30,
-                )
-                if response.status_code == 429:
-                    logger.warning("Steam Store Browse HTTP 429 at batch %d; cooling down",
-                                   start // batch_size + 1)
-                    sleep(20 * (attempt + 1))
+        for pause in (*outage_pauses, None):
+            outage = False
+            for attempt in range(4):
+                sleep(max(0.0, interval - (monotonic() - last_start)))
+                last_start = monotonic()
+                try:
+                    response = session.get(
+                        url,
+                        params={"input_json": json.dumps(request, separators=(",", ":"))},
+                        timeout=30,
+                    )
+                    if response.status_code == 429:
+                        outage = False
+                        logger.warning("Steam Store Browse HTTP 429 at batch %d; cooling down",
+                                       start // batch_size + 1)
+                        sleep(20 * (attempt + 1))
+                        continue
+                    response.raise_for_status()
+                    result = response.json()
+                    items = (result.get("response") or {}).get("store_items") or []
+                    for item in items:
+                        if (
+                            isinstance(item, dict)
+                            and isinstance(item.get("appid"), int)
+                            and item["appid"] in batch
+                        ):
+                            rows[item["appid"]] = item
+                    break
+                except (requests_module.RequestException, ValueError, TypeError) as exc:
+                    outage = steam_outage_error(exc, requests_module)
+                    logger.warning("Steam Browse batch retry %d: %s", attempt + 1, exc)
+                    if attempt < 3:
+                        sleep(5 * (attempt + 1))
+            else:
+                if pause is not None and outage:
+                    logger.warning("STEAM_TEMPORARY_OUTAGE Store Browse batch %d; retrying in %s seconds",
+                                   start // batch_size + 1, pause)
+                    sleep(pause)
                     continue
-                response.raise_for_status()
-                result = response.json()
-                items = (result.get("response") or {}).get("store_items") or []
-                for item in items:
-                    if (
-                        isinstance(item, dict)
-                        and isinstance(item.get("appid"), int)
-                        and item["appid"] in batch
-                    ):
-                        rows[item["appid"]] = item
-                break
-            except (requests_module.RequestException, ValueError, TypeError) as exc:
-                logger.warning("Steam Browse batch retry %d: %s", attempt + 1, exc)
-                if attempt < 3:
-                    sleep(5 * (attempt + 1))
-        else:
-            raise RuntimeError(
-                f"Steam Browse batch {start // batch_size + 1} failed; "
-                "refusing to publish an incomplete eligibility snapshot"
-            )
+                raise RuntimeError(
+                    f"Steam Browse batch {start // batch_size + 1} failed; "
+                    "refusing to publish an incomplete eligibility snapshot"
+                )
+            break
         logger.info("DATE_GATE_CHECKED %s/%s resolved=%s",
                     min(start + len(batch), len(ids)), len(ids), len(rows))
     # Only contextual descriptor-4 rows need a second official request. A

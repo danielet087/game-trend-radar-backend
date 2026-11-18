@@ -9,6 +9,7 @@ from typing import Callable
 import requests
 from opencc import OpenCC
 
+from radar_backend.adapters.steam_metadata import steam_outage_error
 from radar_backend.application import localized_titles as application
 from radar_backend.domain import localized_titles as rules
 from radar_backend.domain.localized_titles import HAN, actual_zh_tw_title
@@ -40,8 +41,13 @@ def fetch_store_tw_names(
     batch_size: int = BATCH, interval: float = 1.5,
     sleep: Callable | None = None, monotonic: Callable | None = None,
     logger=None, requests_module=None, url: str = STORE_URL,
+    outage_pauses: tuple[int, ...] = (),
 ) -> dict[int, str]:
-    """Keep four attempts and fail closed if any requested batch fails."""
+    """Keep four attempts and fail closed if any requested batch fails.
+
+    With ``outage_pauses``, a batch whose four attempts all end on 5xx or a
+    dropped connection pauses and tries again, once per pause.
+    """
     sleep = sleep if sleep is not None else time.sleep
     monotonic = monotonic if monotonic is not None else time.monotonic
     logger = logger if logger is not None else LOG
@@ -58,40 +64,50 @@ def fetch_store_tw_names(
             },
             "data_request": {"include_basic_info": True},
         }
-        for attempt in range(4):
-            sleep(max(0.0, interval - (monotonic() - last_started)))
-            last_started = monotonic()
-            try:
-                response = session.get(
-                    url,
-                    params={"input_json": json.dumps(payload, separators=(",", ":"))},
-                    timeout=30,
-                )
-                if response.status_code == 429:
-                    logger.warning("Steam TW title lookup throttled; cooldown")
-                    sleep(20 * (attempt + 1))
+        for pause in (*outage_pauses, None):
+            outage = False
+            for attempt in range(4):
+                sleep(max(0.0, interval - (monotonic() - last_started)))
+                last_started = monotonic()
+                try:
+                    response = session.get(
+                        url,
+                        params={"input_json": json.dumps(payload, separators=(",", ":"))},
+                        timeout=30,
+                    )
+                    if response.status_code == 429:
+                        outage = False
+                        logger.warning("Steam TW title lookup throttled; cooldown")
+                        sleep(20 * (attempt + 1))
+                        continue
+                    response.raise_for_status()
+                    rows = (response.json().get("response") or {}).get("store_items") or []
+                    for row in rows:
+                        if (
+                            isinstance(row, dict)
+                            and isinstance(row.get("appid"), int)
+                            and row["appid"] in batch
+                            and isinstance(row.get("name"), str)
+                            and row["name"].strip()
+                        ):
+                            names[row["appid"]] = row["name"].strip()
+                    break
+                except (requests_module.RequestException, ValueError, TypeError) as exc:
+                    outage = steam_outage_error(exc, requests_module)
+                    logger.warning("Steam TW title batch retry %d: %s", attempt + 1, exc)
+                    if attempt < 3:
+                        sleep(5 * (attempt + 1))
+            else:
+                if pause is not None and outage:
+                    logger.warning("STEAM_TEMPORARY_OUTAGE TW title batch %d; retrying in %s seconds",
+                                   offset // batch_size + 1, pause)
+                    sleep(pause)
                     continue
-                response.raise_for_status()
-                rows = (response.json().get("response") or {}).get("store_items") or []
-                for row in rows:
-                    if (
-                        isinstance(row, dict)
-                        and isinstance(row.get("appid"), int)
-                        and row["appid"] in batch
-                        and isinstance(row.get("name"), str)
-                        and row["name"].strip()
-                    ):
-                        names[row["appid"]] = row["name"].strip()
-                break
-            except (requests_module.RequestException, ValueError, TypeError) as exc:
-                logger.warning("Steam TW title batch retry %d: %s", attempt + 1, exc)
-                if attempt < 3:
-                    sleep(5 * (attempt + 1))
-        else:
-            raise RuntimeError(
-                f"Steam TW title batch {offset // batch_size + 1} failed; "
-                "do not publish incomplete localized candidates"
-            )
+                raise RuntimeError(
+                    f"Steam TW title batch {offset // batch_size + 1} failed; "
+                    "do not publish incomplete localized candidates"
+                )
+            break
         logger.info("TW_TITLES_LOOKUP %d/%d resolved=%d",
                     min(offset + len(batch), len(ids)), len(ids), len(names))
     return names

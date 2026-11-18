@@ -192,3 +192,102 @@ def test_third_party_bulk_keeps_the_short_retry_burst(monkeypatch):
     with pytest.raises(RuntimeError, match=r"Temporary lookup exhausted retries \(HTTP 502\)"):
         follower_prefilter._bulk_counts(session, [42])
     assert sleeps == list(rules.RETRY_DELAYS)
+
+
+# The daily date check reads Store Browse (english and tchinese). With pauses
+# a batch that ends on 5xx or a dropped connection waits out the outage.
+from unittest.mock import Mock
+
+import requests
+
+from radar_backend.adapters import steam_localized_titles, steam_metadata
+
+ITEM = {"appid": 101, "name": "Game 101"}
+
+
+class BrowseSession:
+    def __init__(self, replies):
+        self.replies = list(replies)
+        self.calls = 0
+
+    def get(self, url, *, params, timeout):
+        self.calls += 1
+        reply = self.replies.pop(0)
+        if isinstance(reply, Exception):
+            raise reply
+        return reply
+
+
+def browse(replies, pauses):
+    sleeps = []
+    session = BrowseSession(replies)
+    result = steam_metadata.fetch_metadata(
+        session, [101], interval=0, sleep=sleeps.append, monotonic=lambda: 0.0,
+        max_content_details=0, outage_pauses=pauses,
+    )
+    return result, [delay for delay in sleeps if delay], session
+
+
+def items(*rows):
+    return Reply(200, {"response": {"store_items": list(rows)}})
+
+
+def test_store_browse_batch_waits_out_an_outage_when_asked():
+    result, sleeps, session = browse([*(Reply(502) for _ in range(4)), items(ITEM)], (60, 120))
+    assert result == {101: ITEM}
+    assert sleeps == [5, 10, 15, 60] and session.calls == 5
+
+
+def test_store_browse_counts_a_dropped_connection_as_an_outage():
+    result, sleeps, _session = browse([*(requests.ConnectionError("reset") for _ in range(4)), items(ITEM)], (60,))
+    assert result == {101: ITEM} and sleeps == [5, 10, 15, 60]
+
+
+def test_store_browse_without_pauses_fails_as_before():
+    with pytest.raises(RuntimeError, match="Steam Browse batch 1 failed"):
+        browse([Reply(502) for _ in range(4)], ())
+
+
+@pytest.mark.parametrize("code, expected", [(429, [20, 40, 60, 80]), (403, [5, 10, 15])])
+def test_store_browse_rate_limit_or_client_error_is_not_an_outage(code, expected):
+    sleeps = []
+    session = BrowseSession([Reply(code) for _ in range(4)])
+    with pytest.raises(RuntimeError, match="Steam Browse batch 1 failed"):
+        steam_metadata.fetch_metadata(session, [101], interval=0, sleep=sleeps.append, monotonic=lambda: 0.0,
+                                      max_content_details=0, outage_pauses=(60,))
+    assert [delay for delay in sleeps if delay] == expected and session.calls == 4
+
+
+def test_tw_titles_wait_out_an_outage_when_asked():
+    sleeps = []
+    session = BrowseSession([*(Reply(503) for _ in range(4)), items({"appid": 101, "name": "遊戲"})])
+    names = steam_localized_titles.fetch_store_tw_names(
+        session, [101], interval=0, sleep=sleeps.append, monotonic=lambda: 0.0, outage_pauses=(60,))
+    assert names == {101: "遊戲"}
+    assert [delay for delay in sleeps if delay] == [5, 10, 15, 60]
+    with pytest.raises(RuntimeError, match="Steam TW title batch 1 failed"):
+        steam_localized_titles.fetch_store_tw_names(
+            BrowseSession([Reply(503) for _ in range(4)]), [101], interval=0, sleep=lambda _s: None,
+            monotonic=lambda: 0.0)
+
+
+def test_only_the_daily_candidate_ports_wait_out_maintenance(monkeypatch):
+    from scripts import steam_candidate_pipeline as pipeline
+    from radar_backend.adapters import steam_store
+
+    metadata = Mock(return_value={})
+    monkeypatch.setattr(steam_metadata, "fetch_metadata", metadata)
+    candidate_sources.fetch_metadata(object(), [1])
+    assert metadata.call_args.kwargs["outage_pauses"] == rules.STEAM_OUTAGE_PAUSES
+    # Other Store Browse callers (release-date rechecks, content) keep the short retries.
+    steam_store.fetch_metadata(object(), [1], interval=0)
+    assert "outage_pauses" not in metadata.call_args.kwargs
+    titles = Mock(return_value={})
+    monkeypatch.setattr(candidate_sources, "_fetch_store_tw_names", titles)
+    candidate_sources.fetch_store_tw_names(object(), [1], interval=0)
+    assert titles.call_args.kwargs == {"outage_pauses": rules.STEAM_OUTAGE_PAUSES, "interval": 0}
+    defaults = candidate_sources.CandidateSources()
+    assert defaults.fetch_metadata is candidate_sources.fetch_metadata
+    assert defaults.fetch_store_tw_names is candidate_sources.fetch_store_tw_names
+    assert pipeline.fetch_metadata is candidate_sources.fetch_metadata
+    assert pipeline.fetch_store_tw_names is candidate_sources.fetch_store_tw_names

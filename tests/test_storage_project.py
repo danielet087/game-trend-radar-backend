@@ -6,7 +6,7 @@ import subprocess
 
 import pytest
 
-from radar_core.storage import documents, primary, primary_store
+from radar_core.storage import data_home, documents, primary, primary_store
 from radar_core.storage.sql import SqliteClient, StorageError
 from scripts import storage_project as project
 
@@ -145,6 +145,30 @@ def test_operations_after_hydration_remain_pending(system, monkeypatch):
     assert report["sources"][0]["pending"] == 1
     assert json.loads(git(remote, "show", "main:data/value.json"))["value"] == "project-this"
     assert [r["operation_id"] for r in primary_store.projection_pending(database, SOURCE)] == ["after-hydrate"]
+
+
+def switch(database, operation, *, git_projection):
+    head, _ = primary_store.read_files(database, SOURCE)
+    return primary_store.publish_patch(database, SOURCE, base_generation=head["generation"],
+        changed={data_home.FLAG: data_home.document(site="database", git_projection=git_projection)},
+        operation_id=operation, projection_required=git_projection)
+
+
+def test_projection_off_keeps_pending_operations_out_of_git_until_switched_back(system):
+    database, remote, environment, events = system
+    change(database, "pending-before-switch", "database-only")
+    switch(database, "switch-off", git_projection=False)
+    before = git(remote, "rev-parse", "main")
+    report = project.run(database=database, environment=environment, sources=(SPEC,))
+    assert report["status"] == "passed"
+    assert report["sources"] == [{"source_id": SOURCE, "status": "projection_off", "pending": 1}]
+    assert git(remote, "rev-parse", "main") == before and events == []
+    switch(database, "switch-on", git_projection=True)
+    report = project.run(database=database, environment=environment, sources=(SPEC,))
+    row = report["sources"][0]
+    assert row["status"] == "projected" and row["acknowledged"] == 2 and row["pending"] == 0
+    assert json.loads(git(remote, "show", "main:data/value.json")) == {"value": "database-only"}
+    assert data_home.parse(git(remote, "show", "main:" + data_home.FLAG).encode())["git_projection"] is True
 
 
 def test_database_only_and_inactive_sources_never_need_git_or_credentials(system):

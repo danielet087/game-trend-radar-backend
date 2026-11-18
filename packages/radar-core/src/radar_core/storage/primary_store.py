@@ -432,8 +432,11 @@ def publish_patch(client, source_id, *, base_generation, changed, deleted=(), op
             raise StorageError("SOURCE_NOT_PRIMARY", "This namespace has not been activated for primary writes.")
         prior = client.execute("SELECT * FROM radar_operations WHERE source_id=? AND operation_id=?", (source_id, operation_id))
         if prior:
+            # A database-only replay is satisfied by the same payload committed
+            # earlier for Git too, e.g. a retry after the Git projection was
+            # switched off between attempts. The reverse still needs a projection.
             if (prior[0]["payload_revision"] != payload_revision or
-                    prior[0]["delivery_target"] != ("git" if projection_required else "database_only")):
+                    (projection_required and prior[0]["delivery_target"] != "git")):
                 raise StorageError("OPERATION_CONFLICT", "An operation ID was reused for a different frozen payload.")
             return _receipt(prior[0])
         head, manifest = _load_manifest(client, source_id)

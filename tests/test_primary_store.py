@@ -92,6 +92,16 @@ class PrimaryStoreTests(unittest.TestCase):
         self.assertEqual(p.projection_pending(self.c, self.source), [])
         self.assertIsNone(self.c.execute("SELECT projection_git_revision FROM radar_operations")[0]["projection_git_revision"])
 
+    def test_database_only_replay_reuses_git_commit_but_not_the_reverse(self):
+        self.activate()
+        committed = self.write(payload_revision="frozen-input")
+        # A retry after the Git projection was switched off needs no second write.
+        self.assertEqual(self.write(payload_revision="frozen-input", projection_required=False), committed)
+        self.code("OPERATION_CONFLICT", lambda: self.write(payload_revision="other", projection_required=False))
+        self.write(operation="db-only", generation=2, projection_required=False)
+        self.code("OPERATION_CONFLICT", lambda: self.write(operation="db-only", generation=2))
+        self.assertEqual(len(p.projection_pending(self.c, self.source)), 1)
+
     def test_atomic_operation_failure_rolls_back_head_and_outbox(self):
         self.activate()
         self.c.execute("""CREATE TRIGGER fail_operation BEFORE INSERT ON radar_operations

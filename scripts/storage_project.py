@@ -12,7 +12,7 @@ import sys
 import tempfile
 import time
 
-from radar_core.storage import primary_store
+from radar_core.storage import data_home, primary_store
 from radar_core.storage.sources import SOURCES, git_backed, source_id
 from radar_core.storage.sql import StorageError, TursoClient
 
@@ -111,6 +111,10 @@ def project_source(database, spec, *, environment, deadline):
     pending = primary_store.projection_pending(database, source)
     if not pending:
         return {**result, "status": "up_to_date", "pending": 0}
+    if not data_home.mode(database, source)["git_projection"]:
+        # Git keeps only code for this source. Its pending operations wait in
+        # the database until the projection is switched back on.
+        return {**result, "status": "projection_off", "pending": len(pending)}
     token_name = "GH_TOKEN" if spec["repository"] == BACKEND else "FRONTEND_REPO_TOKEN"
     token = environment.get(token_name, "").strip()
     if not token or "\n" in token or "\r" in token:

@@ -11,6 +11,10 @@ DEFAULT_BATCH_SIZE = 200
 RETRYABLE_HTTP = {408, 425, 429, 500, 502, 503, 504}
 RETRY_DELAYS = (4, 12, 30, 60)
 RATE_LIMIT_DELAYS = (15, 30, 60, 120)
+# Steam's weekly maintenance (Tuesday afternoon US Pacific, about Wednesday
+# 06:00-09:00 Taipei) answers 5xx for roughly 10-60 minutes. After a retry
+# burst fails, pause and try again: about 30 minutes in all before giving up.
+STEAM_OUTAGE_PAUSES = (60, 120, 300, 300, 300)
 
 
 def parse_group_id(payload: Any, *, group_base: int = GROUP_BASE) -> int | None:

@@ -7,16 +7,21 @@ are source adapters. No phase reads requests or environment variables directly.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import time
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
+from functools import partial
 from typing import Any, Callable
 
 import requests
 
 from collectors.steam_upcoming import SteamUpcomingCollector, UpcomingGame
 from radar_backend.adapters.follower_prefilter import scan_batch
+from radar_backend.adapters.steam_follower_prefilter import (
+    TemporaryLookupError, _request_with_retries, through_steam_outage,
+)
 from radar_backend.adapters.steam_localized_titles import enrich_tw_names, fetch_store_tw_names
 from radar_core.domain.twitch_admission import is_twitch_qualified
 from radar_backend.adapters.steam_store import (
@@ -26,9 +31,19 @@ from radar_backend.adapters.steam_store import (
 from radar_backend.adapters.partial_catalog import merge_partial_segment
 from radar_backend.domain.candidates import QUERY_URL, TAIWAN_TZ, candidate_record
 
+LOG = logging.getLogger(__name__)
 PAGE_SIZE = 1000
 MAX_PAGES_PER_DAY = 30
 QUERY_INTERVAL_SECONDS = 1.5
+# A total that moves between pages means rows may have shifted past the
+# cursor; read the whole day again, a few times, before giving up.
+QUERY_DAY_PASSES = 3
+QUERY_RESTART_SECONDS = 30
+
+
+class MatchingTotalChanged(RuntimeError):
+    """Steam's result set moved while paging, so this pass may have skipped rows."""
+
 
 def query_one_day(
     session: requests.Session, api_key: str, day: date, *,
@@ -40,9 +55,32 @@ def query_one_day(
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Read every paginated result for one Taiwan release day.
 
-    Fail closed on unexpected pagination, missing metadata, or a rate limit.
-    Never mark a day scanned merely because a page yielded no usable titles.
+    Fail closed on unexpected pagination or missing metadata. Temporary HTTP
+    failures are retried, including Steam's weekly maintenance, and a total
+    that changes between pages restarts the day. Never mark a day scanned
+    merely because a page yielded no usable titles.
     """
+    for attempt in range(1, QUERY_DAY_PASSES + 1):
+        try:
+            return _query_day_pass(
+                session, api_key, day, request_interval=request_interval,
+                page_size=page_size, max_pages=max_pages,
+                candidate_factory=candidate_factory, sleep=sleep,
+            )
+        except MatchingTotalChanged:
+            if attempt == QUERY_DAY_PASSES:
+                raise RuntimeError(f"Steam Query changed matching total within {day}; retry later") from None
+            LOG.warning("STEAM_QUERY_TOTAL_CHANGED day=%s pass=%s/%s; reading the day again",
+                        day, attempt, QUERY_DAY_PASSES)
+            sleep(QUERY_RESTART_SECONDS)
+    raise AssertionError("unreachable")
+
+
+def _query_day_pass(
+    session: requests.Session, api_key: str, day: date, *,
+    request_interval: float, page_size: int, max_pages: int,
+    candidate_factory: Callable, sleep: Callable[[float], None],
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     utc_start = datetime(day.year, day.month, day.day, tzinfo=TAIWAN_TZ).astimezone(timezone.utc)
     utc_end = utc_start + timedelta(days=1)
     by_id: dict[int, dict[str, Any]] = {}
@@ -69,14 +107,20 @@ def query_one_day(
                 "include_basic_info": True, "include_release": True, "include_assets": True,
             },
         }
+        params = {"key": api_key, "input_json": json.dumps(query, separators=(",", ":"))}
+        send = partial(
+            _request_with_retries, session, "GET", QUERY_URL, sleep=sleep,
+            request_exception=requests.RequestException,
+            request_options={"params": params, "timeout": 35},
+        )
         # Never print a request URL: requests exceptions can contain the key.
         try:
-            response = session.get(
-                QUERY_URL,
-                params={"key": api_key, "input_json": json.dumps(query, separators=(",", ":"))},
-                timeout=35,
-            )
+            response = through_steam_outage(send, sleep=sleep)
             response.raise_for_status()
+        except TemporaryLookupError as error:
+            raise RuntimeError(
+                f"Steam Query failed for {day} at offset {offset}: {error.reason}"
+            ) from None
         except requests.RequestException as exc:
             status = getattr(getattr(exc, "response", None), "status_code", None)
             reason = f"HTTP {status}" if status is not None else type(exc).__name__
@@ -94,7 +138,7 @@ def query_one_day(
         if reported_total is None:
             reported_total = count
         elif count != reported_total:
-            raise RuntimeError(f"Steam Query changed matching total within {day}; retry later")
+            raise MatchingTotalChanged(f"Steam Query changed matching total within {day}")
         rows = result.get("store_items") or []
         if count > offset and not rows:
             raise RuntimeError(f"Steam Query returned an incomplete page at {day}, offset {offset}")

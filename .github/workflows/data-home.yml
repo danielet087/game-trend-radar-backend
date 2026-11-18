@@ -1,0 +1,76 @@
+name: Show or switch where the site's data lives
+run-name: "Data home | ${{ inputs.action }}${{ inputs.action == 'set' && format(' | site={0} | git_projection={1}', inputs.site, inputs.git_projection) || '' }}"
+
+# The frontend source's data/publication/data_home.json, read from the
+# database, decides whether the hourly deploy builds the site's data from the
+# database ("site": "database") and whether publications still push their
+# snapshot to the frontend Git ("git_projection"). Each switch is one stage of
+# the data-out-of-Git plan and is made only with the owner's approval; "show"
+# changes nothing. Setting the values already in effect writes nothing. The
+# command is a compare-and-swap on the generation it read, so a concurrent
+# publication makes it fail instead of being overwritten; run it again.
+# See packages/radar-core/README.md.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "show (default) or set"
+        required: true
+        type: choice
+        options: [show, set]
+        default: show
+      site:
+        description: "set only: where the deploy takes the site's data from"
+        required: false
+        type: choice
+        options: [git, database]
+        default: git
+      git_projection:
+        description: "set only: whether publications still push their snapshot to Git (false needs site=database)"
+        required: false
+        type: choice
+        options: ['true', 'false']
+        default: 'true'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: radar-data-home
+  cancel-in-progress: false
+
+jobs:
+  data-home:
+    if: vars.RADAR_DATABASE_MIGRATION_PAUSE != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Verify the flag rules without credentials
+        run: |
+          python -m pip install --disable-pip-version-check ./packages/radar-core
+          python -m unittest discover -s packages/radar-core/tests -p 'test_data_home.py'
+      - name: Show or switch the data home flag
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+          ACTION: ${{ inputs.action }}
+          SITE: ${{ inputs.site }}
+          GIT_PROJECTION: ${{ inputs.git_projection }}
+        run: |
+          if [ "$ACTION" = set ]; then
+            args=(set --site "$SITE" --git-projection "$GIT_PROJECTION")
+          else
+            args=(show)
+          fi
+          # The report holds the source, generation and mode; never credentials.
+          status=0
+          python -m radar_core.storage.data_home "${args[@]}" > "$RUNNER_TEMP/data-home.json" || status=$?
+          cat "$RUNNER_TEMP/data-home.json"
+          { echo '### Data home'; echo; echo '```json'; cat "$RUNNER_TEMP/data-home.json"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"

@@ -33,7 +33,7 @@ def test_the_views_source_is_database_only_and_covers_exactly_the_four_directori
     assert not git_backed(spec)
     assert spec["prefixes"] == ("data/twitch_history/", "data/twitch_history_compact/",
                                 "data/twitch_history_close/", "data/twitch_series/")
-    assert sum(not git_backed(item) for item in SOURCES) == 1
+    assert [source_id(item) for item in SOURCES if not git_backed(item)][0] == bootstrap.VIEWS
 
 
 def test_dry_run_reports_without_writing(database):

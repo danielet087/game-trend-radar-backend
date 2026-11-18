@@ -28,9 +28,18 @@ def _request_with_retries(
     )
 
 
+def _steam_request(
+    session: requests.Session, method: str, url: str, **kwargs: Any,
+) -> requests.Response:
+    """Steam's own API also waits out its weekly maintenance; the third-party bulk API does not."""
+    return _prefilter_transport.through_steam_outage(
+        lambda: _request_with_retries(session, method, url, **kwargs), sleep=time.sleep,
+    )
+
+
 def _group_id(session: requests.Session, key: str, appid: int) -> int | None:
     return _prefilter_transport._group_id(
-        session, key, appid, request=_request_with_retries, url=VANITY_URL,
+        session, key, appid, request=_steam_request, url=VANITY_URL,
         group_base=GROUP_BASE, parser=_prefilter_rules.parse_group_id,
     )
 

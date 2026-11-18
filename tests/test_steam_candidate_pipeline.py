@@ -29,6 +29,7 @@ def test_query_candidate_uses_taiwan_day_and_retains_exact_time():
 
 def test_one_day_query_uses_real_date_filter_and_metadata_pagination():
     class Reply:
+        status_code = 200
         def __init__(self, result):
             self.result = result
         def raise_for_status(self):
@@ -77,6 +78,7 @@ def test_incomplete_pagination_does_not_mark_a_day_as_scanned():
     class Session:
         def get(self, *args, **kwargs):
             class Reply:
+                status_code = 200
                 def raise_for_status(self):
                     return None
                 def json(self):

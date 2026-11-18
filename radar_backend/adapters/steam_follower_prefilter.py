@@ -1,19 +1,30 @@
 """Bounded Steam vanity/provider HTTP lookups for the follower prescreen."""
 from __future__ import annotations
 
+import logging
 import time
 from typing import Any, Callable
 
 import requests
 
 from radar_backend.domain.follower_prefilter import (
-    GROUP_BASE, RATE_LIMIT_DELAYS, RETRYABLE_HTTP, RETRY_DELAYS,
+    GROUP_BASE, RATE_LIMIT_DELAYS, RETRYABLE_HTTP, RETRY_DELAYS, STEAM_OUTAGE_PAUSES,
     parse_bulk_counts, parse_group_id,
 )
+
+LOG = logging.getLogger(__name__)
 
 
 VANITY_URL = "https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/"
 BULK_URL = "https://api.steam-groups.com/api/groups/bulk"
+
+
+class TemporaryLookupError(RuntimeError):
+    """Retries ran out on a temporary failure. ``reason`` never holds request details."""
+
+    def __init__(self, reason: str):
+        super().__init__(f"Temporary lookup exhausted retries ({reason}); priority cursor unchanged")
+        self.reason = reason
 
 
 def _request_with_retries(
@@ -58,10 +69,28 @@ def _request_with_retries(
             except (TypeError, ValueError):
                 pass
         sleep(delay)
-    raise RuntimeError(
-        f"Temporary lookup exhausted retries ({last_error}); "
-        "priority cursor unchanged"
-    )
+    raise TemporaryLookupError(last_error)
+
+
+def through_steam_outage(
+    send: Callable[[], requests.Response], *, sleep: Callable,
+    pauses: tuple[int, ...] = STEAM_OUTAGE_PAUSES, logger: Any = None,
+) -> requests.Response:
+    """Wait out Steam's weekly maintenance when a whole retry burst fails.
+
+    A burst that ends on 429 is raised at once: rate limits keep their own
+    backoff and are never stretched into an outage wait.
+    """
+    logger = logger if logger is not None else LOG
+    for pause in (*pauses, None):
+        try:
+            return send()
+        except TemporaryLookupError as error:
+            if pause is None or error.reason == "HTTP 429":
+                raise
+            logger.warning("STEAM_TEMPORARY_OUTAGE %s; retrying in %s seconds", error.reason, pause)
+            sleep(pause)
+    raise AssertionError("unreachable")
 
 
 def _group_id(

@@ -29,15 +29,23 @@ def test_steam_query_sanitizes_http_error_containing_api_key():
     assert "key=" not in str(error.value)
 
 
-def test_steam_query_sanitizes_transport_exception_containing_api_key():
+def test_steam_query_sanitizes_transport_exception_containing_api_key(monkeypatch):
     secret = "steam-api-key-test-value"
+    monkeypatch.setattr("time.sleep", lambda _seconds: None)
 
     class Session:
+        calls = 0
+
         def get(self, url, *, params, timeout):
+            self.calls += 1
             raise requests.ConnectionError(f"Connect error: {url}?key={secret}")
 
+    session = Session()
     with pytest.raises(RuntimeError) as error:
-        query_one_day(Session(), secret, date(2026, 9, 22))
-    assert "ConnectionError" in str(error.value)
+        query_one_day(session, secret, date(2026, 9, 22))
+    # Network errors are retried (and waited out as a possible outage) first.
+    assert session.calls > 1
+    assert "temporary network failure" in str(error.value)
     assert secret not in str(error.value)
     assert "key=" not in str(error.value)
+    assert error.value.__cause__ is None

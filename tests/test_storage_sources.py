@@ -126,9 +126,10 @@ def test_all_production_repositories_and_backend_state_branch_are_included(tmp_p
     }
     git_sources = [spec for spec in sources.SOURCES if sources.git_backed(spec)]
     assert {sources.source_id(spec) for spec in git_sources} == set(expected)
-    # The Twitch views never come from Git; the bootstrap copies them in the database.
+    # The Twitch views and the IGDB ledger never come from Git; their
+    # bootstraps copy them inside the database.
     assert [sources.source_id(spec) for spec in sources.SOURCES if not sources.git_backed(spec)] == [
-        "danielet087/game-trend-radar@twitch-views"]
+        "danielet087/game-trend-radar@twitch-views", "danielet087/game-trend-radar-igdb-backend@nintendo-state"]
     assert len({sources.checkout_name(spec) for spec in git_sources}) == len(expected)
     for index, spec in enumerate(git_sources):
         identity = sources.source_id(spec)

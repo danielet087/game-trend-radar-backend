@@ -26,6 +26,10 @@ SOURCES = (
     {"repository": "danielet087/game-trend-radar", "branch": "twitch-views", "database_only": True,
      "prefixes": ("data/twitch_history/", "data/twitch_history_compact/", "data/twitch_history_close/",
                   "data/twitch_series/")},
+    # The IGDB candidate ledger (a 7 MB document replaced by every daily run)
+    # is private collection state: database only, never in Git or on the site.
+    {"repository": "danielet087/game-trend-radar-igdb-backend", "branch": "nintendo-state", "database_only": True,
+     "prefixes": (), "files": ("data/nintendo_master.json",)},
 )
 MAX_FILE_BYTES = 256 * 1024 * 1024
 MAX_SOURCE_BYTES = 1024 * 1024 * 1024

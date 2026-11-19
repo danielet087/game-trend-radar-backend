@@ -250,6 +250,87 @@ class PrimaryStoreTests(unittest.TestCase):
         self.assertEqual(self.c.execute("SELECT * FROM radar_evidence"), [])
         self.assertEqual(d._head(self.c, self.source), self.initial)
 
+    def receipts(self):
+        """Seven receipts across two sources, written out of key order."""
+        other = "owner/other@main"
+        d.publish_snapshot(self.c, other, "b" * 40, {"data/x.json": b"[]"}, "2026-10-15T00:00:00Z")
+        p.activate_primary(self.c, other, expected_generation=1)
+        self.activate()
+        generations = {self.source: 1, other: 1}
+        for number, (source, operation) in enumerate([
+                (self.source, "op-c"), (other, "op-b"), (self.source, "op-a"), (other, "op-a"),
+                (self.source, "op-e"), (self.source, "op-b"), (other, "op-c")]):
+            receipt = p.publish_patch(self.c, source, base_generation=generations[source],
+                                      changed={"data/n.json": str(number).encode()},
+                                      operation_id=operation, projection_required=False)
+            generations[source] = receipt["generation"]
+
+    def test_metadata_snapshot_reads_each_table_in_bounded_key_order_pages(self):
+        self.receipts()
+        pages = []
+
+        class Recorder:
+            def __init__(self, client):
+                self.client = client
+
+            def execute(self, sql, params=()):
+                rows = self.client.execute(sql, params)
+                if sql.startswith("SELECT * FROM radar_"):
+                    pages.append((sql.split()[3], sql, len(rows)))
+                return rows
+
+        snapshot = p.metadata_snapshot(Recorder(self.c), page_rows=2)
+        expected = {table: [dict(row) for row in self.c.execute(
+            f"SELECT * FROM {table} ORDER BY {','.join(p._METADATA_KEYS[table])}")]
+            for table in p._METADATA_TABLES}
+        self.assertEqual(snapshot, expected)
+        self.assertEqual(len(snapshot["radar_operations"]), 7)
+        self.assertTrue(all("LIMIT ?" in sql and rows <= 2 for _, sql, rows in pages))
+        # Seven rows in pages of two: 2+2+2+1, the last short page ends the table.
+        self.assertEqual([rows for table, _, rows in pages if table == "radar_operations"], [2, 2, 2, 1])
+        self.assertEqual(snapshot, p.metadata_snapshot(self.c))
+        self.code("INVALID_PAGE_SIZE", lambda: p.metadata_snapshot(self.c, page_rows=0))
+
+    def test_replication_and_backup_survive_a_receipt_table_larger_than_one_response(self):
+        self.receipts()
+
+        class Capped:
+            """A receipts SELECT above the cap fails, like the 32 MiB response limit."""
+
+            def __init__(self, client, cap=3):
+                self.client, self.cap = client, cap
+
+            def execute(self, sql, params=()):
+                rows = self.client.execute(sql, params)
+                if sql.startswith("SELECT * FROM radar_operations") and len(rows) > self.cap:
+                    raise StorageError("INVALID_RESPONSE", "Storage response exceeded the bounded response size.")
+                return rows
+
+            def batch(self, statements):
+                return [self.execute(sql, params) for sql, params in statements]
+
+        primary = Capped(self.c)
+        replica = SqliteClient()
+        self.addCleanup(replica.close)
+        d.initialize(replica)
+        with patch.object(p, "METADATA_PAGE_ROWS", 100):
+            unpaged = d.sync_replica(primary, replica)
+        self.assertIn({"source_id": "metadata", "code": "INVALID_RESPONSE"}, unpaged["errors"])
+        with patch.object(p, "METADATA_PAGE_ROWS", 3):
+            report = d.sync_replica(primary, replica)
+            self.assertEqual(report["errors"], [])
+            # Writer proof columns are target-local; the receipts themselves must match.
+            receipts = ("SELECT source_id,operation_id,payload_revision,generation,delivery_target "
+                        "FROM radar_operations ORDER BY source_id,operation_id")
+            self.assertEqual(len(self.c.execute(receipts)), 7)
+            self.assertEqual(replica.execute(receipts), self.c.execute(receipts))
+            with tempfile.TemporaryDirectory() as folder:
+                path = Path(folder) / "backup.sqlite"
+                d.export_sqlite(primary, path)
+                restored = SqliteClient(path)
+                self.addCleanup(restored.close)
+                self.assertEqual(restored.execute(receipts), self.c.execute(receipts))
+
 
 if __name__ == "__main__":
     unittest.main()

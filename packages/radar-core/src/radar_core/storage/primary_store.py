@@ -647,10 +647,39 @@ _METADATA_KEYS = {"radar_operations": ("source_id", "operation_id"),
                   "radar_evidence": ("evidence_id",), "radar_source_policy": ("source_id",)}
 
 
-def metadata_snapshot(client):
-    """Capture metadata under the caller's database lease."""
-    return {table: [dict(row) for row in client.execute(f"SELECT * FROM {table}")]
+# Receipts only grow. One unbounded SELECT of radar_operations passed the
+# 32 MiB SQL response cap on 2026-11-19 (22,219 rows); 1,000-row pages of the
+# same data stay under 6 MB, so each metadata table is read in key order.
+METADATA_PAGE_ROWS = 1000
+
+
+def metadata_snapshot(client, page_rows=None):
+    """Capture metadata under the caller's database lease, one bounded page at a time.
+
+    Writers need the same global lease, so the pages form one consistent snapshot.
+    """
+    page_rows = METADATA_PAGE_ROWS if page_rows is None else page_rows
+    if type(page_rows) is not int or page_rows < 1:
+        raise StorageError("INVALID_PAGE_SIZE", "Metadata pages need a positive row limit.")
+    return {table: _table_rows(client, table, _METADATA_KEYS[table], page_rows)
             for table in _METADATA_TABLES}
+
+
+def _table_rows(client, table, keys, page_rows):
+    order = ",".join(keys)
+    after = f"({order}) > ({','.join('?' for _ in keys)})" if len(keys) > 1 else f"{keys[0]} > ?"
+    rows, last = [], None
+    while True:
+        if last is None:
+            page = client.execute(f"SELECT * FROM {table} ORDER BY {order} LIMIT ?", (page_rows,))
+        else:
+            page = client.execute(f"SELECT * FROM {table} WHERE {after} ORDER BY {order} LIMIT ?",
+                                  (*last, page_rows))
+        rows.extend(dict(row) for row in page)
+        if len(page) < page_rows:
+            return rows
+        last = tuple(page[-1][key] for key in keys)
+        heartbeat(client)
 
 
 def metadata_roots(metadata):

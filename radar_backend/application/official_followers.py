@@ -12,9 +12,20 @@ from radar_backend.domain.official_queue import (
     TAIPEI, FollowerOutcome, queue_checked_numeric as checked_numeric, valid_group_id64,
     official_result_completes_candidate,
 )
+from radar_backend.state.official_followers import DAILY_REQUESTS_FIELD, PRIMARY_IDENTITY
 
 
 COOLDOWN_GRACE = timedelta(minutes=3)
+
+
+def daily_requests_used(checkpoint, day):
+    """Official requests this job already sent on one Taipei date."""
+    record = checkpoint.get(DAILY_REQUESTS_FIELD)
+    if record is None or not isinstance(record, dict) or record.get("date") != day:
+        return 0
+    if not checked_numeric(record.get("requests")):
+        raise ValueError("Malformed official daily request counter")
+    return record["requests"]
 
 
 @dataclass(frozen=True)
@@ -132,6 +143,20 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
     # workflow before using Community XML; they must not consume XML attempts.
     follower_cache = services.follower_cache_factory(cp, official_cache, oldcp, other_official, prefilter)
     cooldown_store = services.cooldown_factory(cp, oldcp)
+    # Manual cooldown overrides keep their single-request behavior unchanged.
+    identity_fallback = getattr(args, "identity_fallback", False) and not skip_cooldown
+    if identity_fallback and cooldown_store.begin_fallback(services.clock()):
+        print("OFFICIAL_IDENTITY_FALLBACK", json.dumps(cp["community_identity"], sort_keys=True), flush=True)
+    today = services.clock().astimezone(TAIPEI).date().isoformat()
+    daily_limit = getattr(args, "daily_limit", None)
+    used_today = daily_requests_used(cp, today)
+    request_limit = (args.max_requests if daily_limit is None
+                     else max(0, min(args.max_requests, daily_limit - used_today)))
+
+    def count_request():
+        nonlocal used_today
+        used_today += 1
+        cp[DAILY_REQUESTS_FIELD] = {"date": today, "requests": used_today}
     known_group_queue = [{**row, "group_id64": gid} for row in q
                          if (gid := valid_group_id64(row.get("group_id64"))
                              or follower_cache.group_id(row["appid"])) is not None]
@@ -169,6 +194,46 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
             services.sleep(max(left).total_seconds() + 1)
             waited = True
             print("OFFICIAL_COOLDOWN_WAITED", int(max(left).total_seconds()) + 1, flush=True)
+    probe = None
+    if (identity_fallback and known_group_queue and request_limit > 0
+            and cooldown_store.primary_probe_due(services.clock())):
+        # One request with the primary identity, before the fallback's own
+        # cooldown check. A success returns to the primary for the rest of the
+        # run; the loop then reuses the stored count instead of asking again.
+        target = next((row for row in known_group_queue if follower_cache.latest(
+            row["appid"], services.clock(), today_only=True, expected_group=row["group_id64"]) is None), None)
+        if target is not None:
+            last_start = services.monotonic()
+            probe = follower_client.probe_primary(target["group_id64"])
+            cooldown_store.primary_probe_result(probe, services.clock())
+            count_request()
+            request_limit -= 1
+            event = {
+                "appid": target["appid"], "when_taipei": services.clock().isoformat(),
+                "release_date": target["release_date"], "queue_source": target["queue_source"],
+                "http": probe.http, "status": probe.status,
+                "community_identity": PRIMARY_IDENTITY, "identity_probe": True,
+            }
+            if run_id.isdecimal():
+                event["github_run_id"] = run_id
+            if probe.retry_after:
+                event["retry_after_header"] = probe.retry_after[:128]
+            if probe.status == "ok":
+                event["official_followers"] = probe.followers
+                cp["official_results"][str(target["appid"])] = {
+                    **target, "group_id64": target["group_id64"],
+                    "official_followers": probe.followers, "official_ge5000": probe.followers >= 5000,
+                    "official_checked_at_taipei": probe.observed_at.astimezone(TAIPEI).isoformat(),
+                    "official_source": "Steam Community XML memberCount",
+                }
+            attempts.append(event)
+            cp["attempt_events"].append(event)
+            print("OFFICIAL_IDENTITY_PROBE", json.dumps({
+                "appid": target["appid"], "status": probe.status, "http": probe.http,
+                "active_identity": cooldown_store.identity(),
+                "primary_retry_at": cp["community_identity"].get("primary_retry_at"),
+            }, sort_keys=True), flush=True)
+            services.save(paths.checkpoint, cp)
     if not q:
         stop = "nothing_pending"
     elif not skip_cooldown and not waited and services.cooldown_factory(cp).blocked(services.clock()):
@@ -177,9 +242,11 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
         stop = "legacy_official_429_cooldown_no_request"
     elif not known_group_queue:
         stop = "awaiting_group_resolution_no_request"
+    elif request_limit <= 0:
+        stop = "daily_request_budget"
     else:
         stop = "batch_request_limit"
-        for row in known_group_queue[:args.max_requests]:
+        for row in known_group_queue[:request_limit]:
             if services.monotonic() - started >= args.max_seconds - 40:
                 stop = "hour_time_budget"
                 break
@@ -214,6 +281,8 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
                 event["cache_reused"] = True
             else:
                 outcome = follower_client.fetch(row["group_id64"], manual_override=skip_cooldown)
+                if outcome.status not in {"cooldown_no_request", "awaiting_group_resolution"}:
+                    count_request()
             event.update(status=outcome.status, http=outcome.http)
             # These responses identify an unusable individual group, rather
             # than permission to ignore a shared service cooldown. Keep its
@@ -342,6 +411,10 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
         "twitch_official_success_this_run": sum(e.get("queue_source") == "twitch_steam_discovery"
                                                 and e["status"] == "ok" for e in attempts),
         "next_request_after_taipei": cp.get("next_request_after_taipei"),
+        "daily_request_limit": daily_limit,
+        "daily_requests_used": used_today,
+        "community_identity": (cp.get("community_identity") or {}).get("active", PRIMARY_IDENTITY),
+        "identity_probe": probe.status if probe is not None else None,
         "production_cache_modified": False,
         "github_actions_hourly_schedule": "03:00-23:00 Asia/Taipei",
     }

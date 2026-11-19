@@ -9,6 +9,7 @@ from datetime import timedelta, timezone
 from copy import deepcopy
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 from radar_backend.domain.official_queue import (
     TAIPEI, OfficialObservation, aware_time, checked_numeric,
@@ -17,6 +18,15 @@ from radar_backend.domain.official_queue import (
 from radar_backend.domain.growth import validated_group_resolution
 
 GROWTH_GROUPS = "official_growth_group_resolutions"
+# Steam limits Community XML per request identity (User-Agent, Accept-Language),
+# not per runner IP (2026-11-17 probe). en-US has been refused since 2026-11-17
+# 09:04. The owner chose on 2026-11-19: use zh-TW temporarily, probe en-US once
+# its own backoff ends (at most daily), return to en-US when it answers, and
+# never try a third identity. The top-level cooldown fields always describe
+# the active identity, so every existing reader keeps its meaning.
+IDENTITY_FIELD = "community_identity"
+PRIMARY_IDENTITY, FALLBACK_IDENTITY = "en-US", "zh-TW"
+DAILY_REQUESTS_FIELD = "community_daily_requests"
 FOLLOWER_SOURCE_FIELDS = (
     "official_results", "official_growth_observations", GROWTH_GROUPS,
     "games", "verified", "pending_candidates", "unresolved_candidates",
@@ -205,3 +215,80 @@ class CooldownStore:
         self.checkpoint.update(rate_limit_count=0, temporary_error_count=0,
                                next_request_after_taipei=None, community_cooldown=None,
                                community_last_success_at=now.astimezone(TAIPEI).isoformat())
+
+    def _identity_state(self):
+        block = self.checkpoint.get(IDENTITY_FIELD)
+        if block is None:
+            return None
+        if (not isinstance(block, dict) or block.get("active") not in (PRIMARY_IDENTITY, FALLBACK_IDENTITY)
+                or block.get("primary") != PRIMARY_IDENTITY or block.get("fallback") != FALLBACK_IDENTITY):
+            raise ValueError("Malformed Community identity state")
+        return block
+
+    def identity(self):
+        """The request identity whose backoff the top-level fields describe."""
+        block = self._identity_state()
+        return block["active"] if block else PRIMARY_IDENTITY
+
+    def begin_fallback(self, now):
+        """Move an active primary 429 backoff aside and start the fallback, once.
+
+        Only this checkpoint's own deadline moves; a legacy source still blocks.
+        After a return to the primary the record stays, so it never repeats.
+        """
+        if self._identity_state() is not None:
+            return False
+        count = self.checkpoint.get("rate_limit_count", 0)
+        if not checked_numeric(count):
+            raise ValueError("Malformed Community rate-limit counter")
+        cooldown = self.checkpoint.get("community_cooldown") or {}
+        deadlines = [aware_time(value) for value in (self.checkpoint.get("next_request_after_taipei"),
+                                                     cooldown.get("retry_at")) if value is not None]
+        if any(value is None for value in deadlines):
+            raise ValueError("Malformed Community retry deadline")
+        until = max(deadlines, default=None)
+        if count < 1 or until is None or until <= now:
+            return False
+        self.checkpoint[IDENTITY_FIELD] = {
+            "active": FALLBACK_IDENTITY, "primary": PRIMARY_IDENTITY, "fallback": FALLBACK_IDENTITY,
+            "switched_at": now.astimezone(TAIPEI).isoformat(),
+            "primary_retry_at": until.astimezone(TAIPEI).isoformat(),
+            "primary_rate_limit_count": count,
+            "primary_last_success_at": self.checkpoint.get("community_last_success_at"),
+            "returned_at": None, "last_probe_at": None, "last_probe_status": None,
+        }
+        self.checkpoint.update(rate_limit_count=0, temporary_error_count=0,
+                               next_request_after_taipei=None, community_cooldown=None)
+        return True
+
+    def primary_probe_due(self, now):
+        block = self._identity_state()
+        if not block or block["active"] != FALLBACK_IDENTITY:
+            return False
+        retry = aware_time(block.get("primary_retry_at"))
+        return retry is None or now >= retry
+
+    def primary_probe_result(self, outcome, now):
+        """Record one primary request; the fallback's own backoff is untouched."""
+        block = self._identity_state()
+        if not block or block["active"] != FALLBACK_IDENTITY:
+            raise ValueError("No primary identity probe is pending")
+        stamp = now.astimezone(TAIPEI).isoformat()
+        block.update(last_probe_at=stamp, last_probe_status=outcome.status)
+        if outcome.status == "ok":
+            block.update(active=PRIMARY_IDENTITY, returned_at=stamp,
+                         primary_retry_at=None, primary_rate_limit_count=0)
+            self.success(now)
+            return None
+        if outcome.status == "rate_limited":
+            count = block.get("primary_rate_limit_count", 0)
+            if not checked_numeric(count):
+                raise ValueError("Malformed primary identity rate-limit counter")
+            count += 1
+            response = SimpleNamespace(headers={"Retry-After": outcome.retry_after} if outcome.retry_after else {})
+            until = steam_429_cooldown(response, count, now)
+            block["primary_rate_limit_count"] = count
+        else:
+            until = now + timedelta(hours=1)
+        block["primary_retry_at"] = until.astimezone(TAIPEI).isoformat()
+        return until

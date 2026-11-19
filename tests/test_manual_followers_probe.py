@@ -65,6 +65,12 @@ def test_scheduled_run_without_override_keeps_obeying_cooldown(monkeypatch, tmp_
     monkeypatch.setenv("SCHEDULE_TRIGGER_SOURCE", "cloudflare")
     first = known_group(twitch_candidate())
     original = prior_checkpoint([first], cooldown=deadline(5))
+    # The one-time zh-TW switch already happened; its own backoff still binds.
+    identity = {"active": "zh-TW", "primary": "en-US", "fallback": "zh-TW",
+                "switched_at": deadline(-24), "primary_retry_at": deadline(20),
+                "primary_rate_limit_count": 9, "primary_last_success_at": None,
+                "returned_at": None, "last_probe_at": None, "last_probe_status": None}
+    original["community_identity"] = dict(identity)
 
     cp, report, client, *_ = run_worker(
         monkeypatch, tmp_path, [first], [], cooldown=deadline(5),
@@ -72,6 +78,7 @@ def test_scheduled_run_without_override_keeps_obeying_cooldown(monkeypatch, tmp_
     )
 
     client.get.assert_not_called()
+    assert cp["community_identity"] == identity
     assert report["stop_reason"] == "official_429_cooldown_no_request"
     assert report["request_limit"] == 90
     assert report["manual_cooldown_override"] is False
@@ -195,3 +202,24 @@ def test_probe_failures_do_not_clear_existing_cooldowns_or_claim_followers(
     assert cp["rate_limit_count"] == original["rate_limit_count"]
     assert cp["group_resolution_api_cooldown"] == original["group_resolution_api_cooldown"]
     assert worker.read(worker.FROZEN / "checkpoint.json")["next_request_after_taipei"] == deadline(7)
+
+
+def test_first_scheduled_run_after_the_owner_switch_resumes_with_zh_tw(monkeypatch, tmp_path):
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "schedule")
+    monkeypatch.setenv("SCHEDULE_TRIGGER_SOURCE", "cloudflare")
+    first = known_group(twitch_candidate())
+    original = prior_checkpoint([first], cooldown=deadline(5))
+
+    cp, report, client, *_ = run_worker(
+        monkeypatch, tmp_path, [first], [xml_response(88, first["group_id64"])],
+        cooldown=deadline(5), initial_checkpoint=original,
+    )
+
+    assert client.get.call_count == 1
+    assert client.get.call_args.kwargs["headers"] == {"Accept-Language": "zh-TW,zh;q=0.9"}
+    assert cp["community_identity"]["active"] == "zh-TW"
+    assert cp["community_identity"]["primary_retry_at"] == deadline(5)
+    assert cp["next_request_after_taipei"] is None
+    assert cp["community_daily_requests"]["requests"] == 1
+    assert report["requests_this_run"] == 1
+    assert report["community_identity"] == "zh-TW"

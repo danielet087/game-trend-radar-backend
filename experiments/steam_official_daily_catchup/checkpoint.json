@@ -58202,19 +58202,19 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "44614341261",
+    "run_id": "44624350499",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 5,
-    "started_at": "2026-11-20T05:02:58.404171+08:00",
-    "last_updated_at": "2026-11-20T05:04:59.258640+08:00",
+    "started_at": "2026-11-20T06:02:44.074343+08:00",
+    "last_updated_at": "2026-11-20T06:04:45.085959+08:00",
     "requests_this_run": 5,
     "official_new_this_run": 5,
     "http_429_this_run": 0,
-    "last_appid": 5607830,
-    "last_name": "Stay Lit",
-    "finished_at": "2026-11-20T05:04:59.258640+08:00",
+    "last_appid": 5570360,
+    "last_name": "Mischka Cars",
+    "finished_at": "2026-11-20T06:04:45.085959+08:00",
     "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
@@ -59555,7 +59555,7 @@
   },
   "community_daily_requests": {
     "date": "2026-11-20",
-    "requests": 15
+    "requests": 20
   },
   "official_results": {
     "1077310": {
@@ -137864,13 +137864,78 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-20T05:04:59.167935+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "4738220": {
+      "appid": 4738220,
+      "name": "NGL Biathlon 2027",
+      "release_date": "2026-11-26",
+      "group_id64": "103582791475835010",
+      "steam_url": "https://store.steampowered.com/app/4738220/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-19T17:06:07.179661+00:00",
+      "official_followers": 148,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-20T06:02:44.939733+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5159310": {
+      "appid": 5159310,
+      "name": "Limited-time Game Bundle Challenge",
+      "release_date": "2026-11-26",
+      "group_id64": "103582791475819473",
+      "steam_url": "https://store.steampowered.com/app/5159310/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-19T17:06:07.179661+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-20T06:03:15.014119+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5169130": {
+      "appid": 5169130,
+      "name": "Valliberum Memory Challenges",
+      "release_date": "2026-11-26",
+      "group_id64": "103582791476261039",
+      "steam_url": "https://store.steampowered.com/app/5169130/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-19T17:06:07.179661+00:00",
+      "official_followers": 1,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-20T06:03:44.921454+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5423300": {
+      "appid": 5423300,
+      "name": "碧海遗城",
+      "release_date": "2026-11-26",
+      "group_id64": "103582791476164445",
+      "steam_url": "https://store.steampowered.com/app/5423300/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-19T17:06:07.179661+00:00",
+      "official_followers": 4,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-20T06:04:14.846681+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5570360": {
+      "appid": 5570360,
+      "name": "Mischka Cars",
+      "release_date": "2026-11-26",
+      "group_id64": "103582791476232968",
+      "steam_url": "https://store.steampowered.com/app/5570360/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-19T17:06:07.179661+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-20T06:04:44.971675+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-11-20T05:04:59.167935+08:00",
+  "community_last_success_at": "2026-11-20T06:04:44.971675+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -155029,6 +155094,56 @@
       "http": 200,
       "status": "ok",
       "github_run_id": "44614341261",
+      "official_followers": 2
+    },
+    {
+      "appid": 4738220,
+      "when_taipei": "2026-11-20T06:02:44.709037+08:00",
+      "release_date": "2026-11-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "44624350499",
+      "official_followers": 148
+    },
+    {
+      "appid": 5159310,
+      "when_taipei": "2026-11-20T06:03:14.709146+08:00",
+      "release_date": "2026-11-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "44624350499",
+      "official_followers": 2
+    },
+    {
+      "appid": 5169130,
+      "when_taipei": "2026-11-20T06:03:44.709261+08:00",
+      "release_date": "2026-11-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "44624350499",
+      "official_followers": 1
+    },
+    {
+      "appid": 5423300,
+      "when_taipei": "2026-11-20T06:04:14.709375+08:00",
+      "release_date": "2026-11-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "44624350499",
+      "official_followers": 4
+    },
+    {
+      "appid": 5570360,
+      "when_taipei": "2026-11-20T06:04:44.709499+08:00",
+      "release_date": "2026-11-26",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "44624350499",
       "official_followers": 2
     }
   ]

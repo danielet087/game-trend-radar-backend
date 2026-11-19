@@ -6,7 +6,7 @@ from datetime import timezone
 from radar_backend.domain.official_queue import aware_time, checked_numeric, valid_group_id64
 from radar_backend.domain.growth import validated_group_resolution
 from radar_backend.domain.official_groups import SOURCE as GROUP_SOURCE, STATUSES as GROUP_STATUSES
-from radar_backend.state.official_followers import GROWTH_GROUPS, OfficialFollowerCache
+from radar_backend.state.official_followers import GROWTH_GROUPS, IDENTITY_FIELD, OfficialFollowerCache
 
 COMMUNITY_FIELDS = (
     "rate_limit_count", "temporary_error_count", "next_request_after_taipei",
@@ -121,6 +121,12 @@ def _community(state):
     return {field: state[field] for field in COMMUNITY_FIELDS if field in state}
 
 
+def _active_identity(state):
+    """The request identity the Community fields describe (None: legacy en-US)."""
+    block = state.get(IDENTITY_FIELD)
+    return block.get("active") if isinstance(block, dict) else None
+
+
 def merge_growth_checkpoint(latest, baseline, observed, report):
     """Keep remote queue edits and apply only observations and Community state.
 
@@ -148,6 +154,10 @@ success cannot erase a newer failure, and a stale failure cannot undo success.
     changed = {field: deepcopy(observed[field]) for field in COMMUNITY_FIELDS
                if field in observed and observed[field] != baseline.get(field)}
     if not changed:
+        return merged
+    # The follower batch switched request identities while this collector ran:
+    # its Community results describe the identity that is no longer active.
+    if _active_identity(latest) != _active_identity(baseline):
         return merged
     if _community(latest) == _community(baseline):
         merged.update(changed)

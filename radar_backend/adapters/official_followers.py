@@ -8,13 +8,17 @@ import xml.etree.ElementTree as ET
 import requests
 
 from radar_backend.domain.official_queue import TAIPEI, FollowerOutcome, valid_group_id64
-from radar_backend.state.official_followers import CooldownStore
+from radar_backend.state.official_followers import CooldownStore, PRIMARY_IDENTITY
 
 # Steam Community throttles XML requests that carry no Accept-Language far more
 # than browser-like ones. A probe on 2026-11-16 got 429 for nine of twelve
 # requests with requests' default headers and 200 for every request with this
-# header, from the same kind of runner at the same time.
-COMMUNITY_HEADERS = {"Accept-Language": "en-US,en;q=0.9"}
+# header, from the same kind of runner at the same time. The limit follows the
+# request identity; see CooldownStore for zh-TW (main) and en-US (backup).
+COMMUNITY_IDENTITIES = {
+    "zh-TW": {"Accept-Language": "zh-TW,zh;q=0.9"},
+    "en-US": {"Accept-Language": "en-US,en;q=0.9"},
+}
 
 
 def parse_official_xml(body, expected_group):
@@ -43,18 +47,31 @@ class OfficialFollowerClient:
             return FollowerOutcome("awaiting_group_resolution", now)
         if self.cooldown and not manual_override and self.cooldown.blocked(now):
             return FollowerOutcome("cooldown_no_request", now)
+        # CooldownStore validates the stored identity; simple test stores have none.
+        identity = self.cooldown.identity() if isinstance(self.cooldown, CooldownStore) else PRIMARY_IDENTITY
+        return self._request(gid, COMMUNITY_IDENTITIES[identity], self.cooldown)
+
+    def probe_primary(self, group_id64):
+        """One zh-TW request while en-US is active. The active backoff is left
+        alone; the caller records the outcome with primary_probe_result."""
+        gid = valid_group_id64(group_id64)
+        if gid is None:
+            return FollowerOutcome("awaiting_group_resolution", self.clock())
+        return self._request(gid, COMMUNITY_IDENTITIES[PRIMARY_IDENTITY], None)
+
+    def _request(self, gid, request_headers, cooldown):
         response = None
         try:
             response = self.session.get(f"https://steamcommunity.com/gid/{gid}/memberslistxml/?xml=1",
-                                        headers=COMMUNITY_HEADERS, timeout=(8, 24))
+                                        headers=request_headers, timeout=(8, 24))
             observed = self.clock()
             if response.status_code == 429:
-                if self.cooldown:
-                    self.cooldown.rate_limited(response, observed)
+                if cooldown:
+                    cooldown.rate_limited(response, observed)
                 return FollowerOutcome("rate_limited", observed, http=429, retry_after=(getattr(response, "headers", None) or {}).get("Retry-After"))
             if response.status_code in (401, 403) or response.status_code >= 500:
-                if self.cooldown:
-                    self.cooldown.temporary_failure(observed, access_error=True)
+                if cooldown:
+                    cooldown.temporary_failure(observed, access_error=True)
                 return FollowerOutcome("access_or_server_error", observed, http=response.status_code)
             if response.status_code != 200:
                 return FollowerOutcome("unexpected_http", observed, http=response.status_code)
@@ -65,13 +82,13 @@ class OfficialFollowerClient:
                 count = parse_official_xml(body, gid)
             except ValueError:
                 return FollowerOutcome("missing_count_or_group_mismatch", observed, http=200)
-            if self.cooldown:
-                self.cooldown.success(observed)
+            if cooldown:
+                cooldown.success(observed)
             return FollowerOutcome("ok", observed, followers=count, http=200)
         except (requests.RequestException, ET.ParseError) as exc:
             observed = self.clock()
-            if self.cooldown:
-                self.cooldown.temporary_failure(observed)
+            if cooldown:
+                cooldown.temporary_failure(observed)
             body = getattr(response, "content", b"") if response is not None else b""
             if isinstance(body, str):
                 body = body.encode()

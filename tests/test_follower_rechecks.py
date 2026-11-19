@@ -10,7 +10,7 @@ from radar_backend.adapters import official_groups, queue_inputs as canonical_qu
 from radar_backend.domain.official_queue import latest_official_observations
 from tests.test_unified_twitch_followers import (
     NOW, checkpoint, current_daily, known_group, ordinary_candidate,
-    queue_inputs, run_worker, worker, xml_response,
+    queue_inputs, run_worker, worker, xml_response, zh_tw_active,
 )
 
 
@@ -206,7 +206,7 @@ def test_limited_or_cooling_recheck_retains_old_count_and_stays_pending(monkeypa
     limited = SimpleNamespace(status_code=429, headers={"Retry-After": "7200"})
     saved, report, client, verify, upsert, dispatch, _ = run_worker(
         monkeypatch, tmp_path, queue, [limited], cooldown=cooldown,
-        initial_checkpoint=cp)
+        initial_checkpoint={**cp, **zh_tw_active()})
     assert client.get.call_count == (0 if cooldown else 1)
     assert saved["official_results"]["124"] == old
     assert report["remaining_queue"] == 1

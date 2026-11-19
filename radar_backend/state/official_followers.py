@@ -9,6 +9,7 @@ from datetime import timedelta, timezone
 from copy import deepcopy
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 from radar_backend.domain.official_queue import (
     TAIPEI, OfficialObservation, aware_time, checked_numeric,
@@ -17,6 +18,21 @@ from radar_backend.domain.official_queue import (
 from radar_backend.domain.growth import validated_group_resolution
 
 GROWTH_GROUPS = "official_growth_group_resolutions"
+# Steam limits Community XML per request identity (User-Agent, Accept-Language),
+# not per runner IP (2026-11-17 probe). en-US has been refused since 2026-11-17
+# 09:04. The owner chose on 2026-11-19: zh-TW is the main identity and en-US
+# its backup. A rate-limited identity hands over to the other one once that
+# one's own backoff has passed; while on en-US, zh-TW is asked again when its
+# backoff ends and takes over when it answers. A third identity is never
+# tried. The top-level backoff fields always describe the active identity, so
+# every existing reader keeps its meaning; community_last_success_at is the
+# last answer with either identity.
+IDENTITY_FIELD = "community_identity"
+PRIMARY_IDENTITY, FALLBACK_IDENTITY = "zh-TW", "en-US"
+# Every request before the switch used en-US, so a checkpoint without the
+# identity block describes en-US.
+LEGACY_IDENTITY = "en-US"
+DAILY_REQUESTS_FIELD = "community_daily_requests"
 FOLLOWER_SOURCE_FIELDS = (
     "official_results", "official_growth_observations", GROWTH_GROUPS,
     "games", "verified", "pending_candidates", "unresolved_candidates",
@@ -205,3 +221,108 @@ class CooldownStore:
         self.checkpoint.update(rate_limit_count=0, temporary_error_count=0,
                                next_request_after_taipei=None, community_cooldown=None,
                                community_last_success_at=now.astimezone(TAIPEI).isoformat())
+
+    def _identity_state(self):
+        block = self.checkpoint.get(IDENTITY_FIELD)
+        if block is None:
+            return None
+        if (not isinstance(block, dict) or block.get("active") not in (PRIMARY_IDENTITY, FALLBACK_IDENTITY)
+                or block.get("primary") != PRIMARY_IDENTITY or block.get("fallback") != FALLBACK_IDENTITY
+                or not checked_numeric(block.get("standby_rate_limit_count", 0))):
+            raise ValueError("Malformed Community identity state")
+        for field in ("switched_at", "standby_retry_at", "last_probe_at"):
+            if block.get(field) is not None and aware_time(block[field]) is None:
+                raise ValueError("Malformed Community identity time")
+        return block
+
+    def identity(self):
+        """The request identity whose backoff the top-level fields describe."""
+        block = self._identity_state()
+        return block["active"] if block else LEGACY_IDENTITY
+
+    def _own_deadline(self):
+        """This checkpoint's deadline for the active identity (legacy sources aside)."""
+        cooldown = self.checkpoint.get("community_cooldown")
+        if cooldown is not None and not isinstance(cooldown, dict):
+            raise ValueError("Malformed Community cooldown state")
+        deadlines = [aware_time(value) for value in (self.checkpoint.get("next_request_after_taipei"),
+                                                     (cooldown or {}).get("retry_at")) if value is not None]
+        if any(value is None for value in deadlines):
+            raise ValueError("Malformed Community retry deadline")
+        return max(deadlines, default=None)
+
+    def _active_backoff(self, now):
+        """The active identity's 429 count and its future deadline, if any."""
+        count = self.checkpoint.get("rate_limit_count", 0)
+        if not checked_numeric(count):
+            raise ValueError("Malformed Community rate-limit counter")
+        until = self._own_deadline()
+        return count, until if until is not None and until > now else None
+
+    def _switch(self, block, now, *, answered=False):
+        """Park the active identity's backoff and make the other one active."""
+        count, until = self._active_backoff(now)
+        incoming = FALLBACK_IDENTITY if block["active"] == PRIMARY_IDENTITY else PRIMARY_IDENTITY
+        restored = block.get("standby_rate_limit_count", 0)
+        block.update(active=incoming, switched_at=now.astimezone(TAIPEI).isoformat(),
+                     standby_retry_at=until.astimezone(TAIPEI).isoformat() if until else None,
+                     standby_rate_limit_count=count)
+        self.checkpoint.update(rate_limit_count=0 if answered else restored, temporary_error_count=0,
+                               next_request_after_taipei=None, community_cooldown=None)
+
+    def prepare_identity(self, now):
+        """Choose this run's identity: returns "migrated", "switched" or None.
+
+        A checkpoint without the identity block still describes the en-US
+        backoff: it becomes the en-US standby and zh-TW starts fresh. After
+        that, a rate-limited active identity hands over once the other one's
+        own backoff has passed. Only this checkpoint's own deadline moves; a
+        legacy source still blocks.
+        """
+        block = self._identity_state()
+        if block is None:
+            count, until = self._active_backoff(now)
+            self.checkpoint[IDENTITY_FIELD] = {
+                "active": PRIMARY_IDENTITY, "primary": PRIMARY_IDENTITY, "fallback": FALLBACK_IDENTITY,
+                "switched_at": now.astimezone(TAIPEI).isoformat(),
+                "standby_retry_at": until.astimezone(TAIPEI).isoformat() if until else None,
+                "standby_rate_limit_count": count, "last_probe_at": None, "last_probe_status": None,
+            }
+            self.checkpoint.update(rate_limit_count=0, temporary_error_count=0,
+                                   next_request_after_taipei=None, community_cooldown=None)
+            return "migrated"
+        count, until = self._active_backoff(now)
+        standby = aware_time(block.get("standby_retry_at")) if block.get("standby_retry_at") else None
+        if count < 1 or until is None or (standby is not None and now < standby):
+            return None
+        self._switch(block, now)
+        return "switched"
+
+    def primary_probe_due(self, now):
+        """While on en-US, ask zh-TW again once its own backoff has passed."""
+        block = self._identity_state()
+        if not block or block["active"] == PRIMARY_IDENTITY:
+            return False
+        retry = aware_time(block.get("standby_retry_at")) if block.get("standby_retry_at") else None
+        return retry is None or now >= retry
+
+    def primary_probe_result(self, outcome, now):
+        """Record one zh-TW request made while en-US is active."""
+        block = self._identity_state()
+        if not block or block["active"] == PRIMARY_IDENTITY:
+            raise ValueError("No primary identity probe is pending")
+        stamp = now.astimezone(TAIPEI).isoformat()
+        block.update(last_probe_at=stamp, last_probe_status=outcome.status)
+        if outcome.status == "ok":
+            self._switch(block, now, answered=True)
+            self.success(now)
+            return None
+        if outcome.status == "rate_limited":
+            count = block.get("standby_rate_limit_count", 0) + 1
+            response = SimpleNamespace(headers={"Retry-After": outcome.retry_after} if outcome.retry_after else {})
+            until = steam_429_cooldown(response, count, now)
+            block["standby_rate_limit_count"] = count
+        else:
+            until = now + timedelta(hours=1)
+        block["standby_retry_at"] = until.astimezone(TAIPEI).isoformat()
+        return until

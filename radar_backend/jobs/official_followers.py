@@ -115,11 +115,18 @@ def run_job(*, paths, services, argv=None, cooldown_override=None):
     parser.add_argument("--save-every", type=int, default=10)
     parser.add_argument("--skip-cooldown", action="store_true",
                         help="Explicit manual dispatch only: probe one queued game during cooldown")
+    parser.add_argument("--daily-limit", type=int, default=40,
+                        help="Official requests this job may send per Taipei date (growth is separate)")
     args = parser.parse_args(argv)
     if not 1 <= args.max_requests <= 90 or not math.isfinite(args.interval) or args.interval < 30.0:
         raise ValueError("Max 90 single-file requests, min 30 seconds apart")
     if not 120 <= args.max_seconds <= 2700 or not 1 <= args.save_every <= 20:
         raise ValueError("Invalid duration/save interval")
+    if not 1 <= args.daily_limit <= 250:
+        raise ValueError("Keep the daily official request limit between 1 and 250")
+    # The owner's 2026-11-19 choice: a temporary zh-TW identity with a daily
+    # en-US probe (see CooldownStore). Manual overrides never switch identity.
+    args.identity_fallback = True
     skip_cooldown = (cooldown_override or manual_cooldown_override)(args.skip_cooldown)
     if skip_cooldown:
         args.max_requests = 1

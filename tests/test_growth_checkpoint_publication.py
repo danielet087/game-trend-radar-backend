@@ -223,6 +223,18 @@ def test_stale_success_cannot_clear_a_newer_remote_429():
     assert merged == latest
 
 
+def test_results_of_an_identity_that_is_no_longer_active_are_not_merged():
+    """The follower batch moved en-US's backoff aside and made zh-TW active
+    while this collector, which read the en-US state, was still running."""
+    baseline = limited("2026-10-02T00:30:00Z", "2026-10-02T03:00:00Z")
+    latest = {**successful("2026-10-01T22:00:00Z"), "community_identity": {
+        "active": "zh-TW", "primary": "zh-TW", "fallback": "en-US", "switched_at": "2026-10-02T00:45:00Z",
+        "standby_retry_at": "2026-10-02T03:00:00Z", "standby_rate_limit_count": 1,
+        "last_probe_at": None, "last_probe_status": None}}
+    observed = {**limited("2026-10-02T01:00:00Z", "2026-10-02T04:00:00Z"), "rate_limit_count": 2}
+    assert merge_growth_checkpoint(latest, baseline, observed, report("rate_limited")) == latest
+
+
 def test_stale_429_cannot_restore_cooldown_after_newer_remote_success():
     baseline = {}
     latest = successful("2026-10-02T01:30:00Z")

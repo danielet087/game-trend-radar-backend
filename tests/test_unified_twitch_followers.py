@@ -148,6 +148,14 @@ def known_group(candidate):
     return candidate
 
 
+def zh_tw_active():
+    """The identity block every checkpoint has after its first run: the stored
+    cooldown is zh-TW's own, and en-US is not backing off."""
+    return {"community_identity": {
+        "active": "zh-TW", "primary": "zh-TW", "fallback": "en-US", "switched_at": "2026-10-01T09:00:00+08:00",
+        "standby_retry_at": None, "standby_rate_limit_count": 0, "last_probe_at": None, "last_probe_status": None}}
+
+
 def run_worker(monkeypatch, tmp_path, queue, responses, *, cooldown=None, max_requests=90,
                extra_args=(), initial_checkpoint=None, legacy_cooldown=None, advancing_clock=False):
     cp = checkpoint(queue)
@@ -301,7 +309,7 @@ def test_shared_loop_stops_after_first_429_and_preserves_all_pending_work(monkey
 def test_shared_cooldown_blocks_twitch_and_normal_xml_queries(monkeypatch, tmp_path):
     cp, report, client, _, _, _, _ = run_worker(
         monkeypatch, tmp_path, [twitch_candidate(), ordinary_candidate()], [],
-        cooldown="2026-10-02T18:00:00+08:00")
+        cooldown="2026-10-02T18:00:00+08:00", initial_checkpoint=zh_tw_active())
 
     client.get.assert_not_called()
     assert cp["official_results"] == {}
@@ -314,7 +322,7 @@ def test_a_cooldown_ending_within_three_minutes_is_waited_out(monkeypatch, tmp_p
     soon = (NOW.astimezone(worker.TZ) + timedelta(seconds=40)).isoformat()
     cp, report, client, _, _, _, sleep = run_worker(
         monkeypatch, tmp_path, [known_group(twitch_candidate())], [xml_response(30)], cooldown=soon,
-        advancing_clock=True)
+        advancing_clock=True, initial_checkpoint=zh_tw_active())
 
     sleep.assert_any_call(41.0)
     assert client.get.call_count == 1
@@ -322,7 +330,8 @@ def test_a_cooldown_ending_within_three_minutes_is_waited_out(monkeypatch, tmp_p
     assert set(cp["official_results"]) == {"123"}
     later = (NOW.astimezone(worker.TZ) + timedelta(minutes=4)).isoformat()
     _, report, client, _, _, _, sleep = run_worker(
-        monkeypatch, tmp_path, [known_group(twitch_candidate())], [], cooldown=later)
+        monkeypatch, tmp_path, [known_group(twitch_candidate())], [], cooldown=later,
+        initial_checkpoint=zh_tw_active())
     client.get.assert_not_called()
     sleep.assert_not_called()
     assert report["stop_reason"] == "official_429_cooldown_no_request"

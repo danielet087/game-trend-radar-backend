@@ -145,8 +145,10 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
     cooldown_store = services.cooldown_factory(cp, oldcp)
     # Manual cooldown overrides keep their single-request behavior unchanged.
     identity_fallback = getattr(args, "identity_fallback", False) and not skip_cooldown
-    if identity_fallback and cooldown_store.begin_fallback(services.clock()):
-        print("OFFICIAL_IDENTITY_FALLBACK", json.dumps(cp["community_identity"], sort_keys=True), flush=True)
+    switched = cooldown_store.prepare_identity(services.clock()) if identity_fallback else None
+    if switched:
+        print("OFFICIAL_IDENTITY_SWITCH", json.dumps({"change": switched, **cp["community_identity"]},
+                                                     sort_keys=True), flush=True)
     today = services.clock().astimezone(TAIPEI).date().isoformat()
     daily_limit = getattr(args, "daily_limit", None)
     used_today = daily_requests_used(cp, today)
@@ -197,9 +199,9 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
     probe = None
     if (identity_fallback and known_group_queue and request_limit > 0
             and cooldown_store.primary_probe_due(services.clock())):
-        # One request with the primary identity, before the fallback's own
-        # cooldown check. A success returns to the primary for the rest of the
-        # run; the loop then reuses the stored count instead of asking again.
+        # One zh-TW request while en-US is active, before en-US's own cooldown
+        # check. A success makes zh-TW active for the rest of the run; the loop
+        # then reuses the stored count instead of asking again.
         target = next((row for row in known_group_queue if follower_cache.latest(
             row["appid"], services.clock(), today_only=True, expected_group=row["group_id64"]) is None), None)
         if target is not None:
@@ -231,7 +233,7 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
             print("OFFICIAL_IDENTITY_PROBE", json.dumps({
                 "appid": target["appid"], "status": probe.status, "http": probe.http,
                 "active_identity": cooldown_store.identity(),
-                "primary_retry_at": cp["community_identity"].get("primary_retry_at"),
+                "standby_retry_at": cp["community_identity"].get("standby_retry_at"),
             }, sort_keys=True), flush=True)
             services.save(paths.checkpoint, cp)
     if not q:
@@ -413,7 +415,7 @@ def run_official_batch(args, *, paths: OfficialPaths, services: OfficialBatchSer
         "next_request_after_taipei": cp.get("next_request_after_taipei"),
         "daily_request_limit": daily_limit,
         "daily_requests_used": used_today,
-        "community_identity": (cp.get("community_identity") or {}).get("active", PRIMARY_IDENTITY),
+        "community_identity": cooldown_store.identity(),
         "identity_probe": probe.status if probe is not None else None,
         "production_cache_modified": False,
         "github_actions_hourly_schedule": "03:00-23:00 Asia/Taipei",

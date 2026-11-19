@@ -8,18 +8,17 @@ import xml.etree.ElementTree as ET
 import requests
 
 from radar_backend.domain.official_queue import TAIPEI, FollowerOutcome, valid_group_id64
-from radar_backend.state.official_followers import CooldownStore, FALLBACK_IDENTITY, PRIMARY_IDENTITY
+from radar_backend.state.official_followers import CooldownStore, PRIMARY_IDENTITY
 
 # Steam Community throttles XML requests that carry no Accept-Language far more
 # than browser-like ones. A probe on 2026-11-16 got 429 for nine of twelve
 # requests with requests' default headers and 200 for every request with this
 # header, from the same kind of runner at the same time. The limit follows the
-# request identity; see CooldownStore for the owner's temporary zh-TW fallback.
+# request identity; see CooldownStore for zh-TW (main) and en-US (backup).
 COMMUNITY_IDENTITIES = {
-    PRIMARY_IDENTITY: {"Accept-Language": "en-US,en;q=0.9"},
-    FALLBACK_IDENTITY: {"Accept-Language": "zh-TW,zh;q=0.9"},
+    "zh-TW": {"Accept-Language": "zh-TW,zh;q=0.9"},
+    "en-US": {"Accept-Language": "en-US,en;q=0.9"},
 }
-COMMUNITY_HEADERS = COMMUNITY_IDENTITIES[PRIMARY_IDENTITY]
 
 
 def parse_official_xml(body, expected_group):
@@ -53,8 +52,8 @@ class OfficialFollowerClient:
         return self._request(gid, COMMUNITY_IDENTITIES[identity], self.cooldown)
 
     def probe_primary(self, group_id64):
-        """One primary-identity request. The active backoff is left alone; the
-        caller records the outcome with CooldownStore.primary_probe_result."""
+        """One zh-TW request while en-US is active. The active backoff is left
+        alone; the caller records the outcome with primary_probe_result."""
         gid = valid_group_id64(group_id64)
         if gid is None:
             return FollowerOutcome("awaiting_group_resolution", self.clock())

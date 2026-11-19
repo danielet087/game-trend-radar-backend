@@ -65,11 +65,10 @@ def test_scheduled_run_without_override_keeps_obeying_cooldown(monkeypatch, tmp_
     monkeypatch.setenv("SCHEDULE_TRIGGER_SOURCE", "cloudflare")
     first = known_group(twitch_candidate())
     original = prior_checkpoint([first], cooldown=deadline(5))
-    # The one-time zh-TW switch already happened; its own backoff still binds.
-    identity = {"active": "zh-TW", "primary": "en-US", "fallback": "zh-TW",
-                "switched_at": deadline(-24), "primary_retry_at": deadline(20),
-                "primary_rate_limit_count": 9, "primary_last_success_at": None,
-                "returned_at": None, "last_probe_at": None, "last_probe_status": None}
+    # zh-TW is rate limited and en-US's own backoff still binds: no switch.
+    identity = {"active": "zh-TW", "primary": "zh-TW", "fallback": "en-US",
+                "switched_at": deadline(-24), "standby_retry_at": deadline(20),
+                "standby_rate_limit_count": 9, "last_probe_at": None, "last_probe_status": None}
     original["community_identity"] = dict(identity)
 
     cp, report, client, *_ = run_worker(
@@ -125,10 +124,13 @@ def test_authorized_probe_bypasses_both_cooldowns_once_and_accepts_true_zero(mon
     )
     next_client.get.assert_not_called()
     assert next_report["manual_cooldown_override"] is False
-    assert next_report["stop_reason"] == "official_429_cooldown_no_request"
+    # The stored en-US deadline moves to the en-US standby; the frozen legacy
+    # source's own deadline still blocks every identity.
+    assert next_report["stop_reason"] == "legacy_official_429_cooldown_no_request"
     assert automatic["scheduler_batch"]["manual_cooldown_override"] is False
     assert automatic["attempt_events"][-1]["manual_cooldown_override"] is True
-    assert automatic["next_request_after_taipei"] == deadline(3)
+    assert automatic["community_identity"]["standby_retry_at"] == deadline(3)
+    assert automatic["next_request_after_taipei"] is None
 
 
 @pytest.mark.parametrize("cp_hours,legacy_hours,community_hours,retry_after,expected_hours", [
@@ -204,7 +206,7 @@ def test_probe_failures_do_not_clear_existing_cooldowns_or_claim_followers(
     assert worker.read(worker.FROZEN / "checkpoint.json")["next_request_after_taipei"] == deadline(7)
 
 
-def test_first_scheduled_run_after_the_owner_switch_resumes_with_zh_tw(monkeypatch, tmp_path):
+def test_first_scheduled_run_parks_the_en_us_backoff_and_asks_with_zh_tw(monkeypatch, tmp_path):
     monkeypatch.setenv("GITHUB_EVENT_NAME", "schedule")
     monkeypatch.setenv("SCHEDULE_TRIGGER_SOURCE", "cloudflare")
     first = known_group(twitch_candidate())
@@ -218,7 +220,8 @@ def test_first_scheduled_run_after_the_owner_switch_resumes_with_zh_tw(monkeypat
     assert client.get.call_count == 1
     assert client.get.call_args.kwargs["headers"] == {"Accept-Language": "zh-TW,zh;q=0.9"}
     assert cp["community_identity"]["active"] == "zh-TW"
-    assert cp["community_identity"]["primary_retry_at"] == deadline(5)
+    assert cp["community_identity"]["standby_retry_at"] == deadline(5)
+    assert cp["community_identity"]["standby_rate_limit_count"] == original["rate_limit_count"]
     assert cp["next_request_after_taipei"] is None
     assert cp["community_daily_requests"]["requests"] == 1
     assert report["requests_this_run"] == 1

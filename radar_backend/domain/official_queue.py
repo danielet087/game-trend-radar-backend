@@ -195,14 +195,19 @@ def last_failed_request_times(events, *, now):
     Cached results and skipped requests never introduce a failure. A later
     success clears the previous failure, including a successful cache reuse.
     Comparing observation times also handles events merged out of order.
+    A 429 is not this game's failure either: Steam limits the request
+    identity, whichever game happens to be first, and the cooldown already
+    stops the batch. It neither introduces nor clears a failure.
     """
     latest = {}
     for event in events:
         if not isinstance(event, dict):
             continue
         status = event.get("status")
+        if status == "rate_limited" or (type(event.get("http")) is int and event["http"] == 429):
+            continue
         # Older checkpoints can omit status while retaining an explicit HTTP
-        # error. Such a 429 still represents a real failed request.
+        # error. Any other HTTP error still represents a real failed request.
         if status is None and type(event.get("http")) is int and event["http"] >= 400:
             status = "unexpected_http"
         if not isinstance(status, str):
@@ -424,7 +429,8 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
     # Give unfailed work a turn before retrying any failed candidate. This
     # tier must precede Twitch priority: one unavailable Twitch endpoint must
     # not monopolize every first request after the shared cooldown expires.
-    # Failed ordinary candidates rotate too, oldest real failure first.
+    # Failed ordinary candidates rotate too, oldest real failure first. A 429
+    # is the shared rate limit, not a failure, so it keeps its place.
     last_failure = last_failed_request_times(cp.get("attempt_events", []), now=observed)
 
     def tier(row):

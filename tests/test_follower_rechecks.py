@@ -216,24 +216,44 @@ def test_limited_or_cooling_recheck_retains_old_count_and_stays_pending(monkeypa
     dispatch.assert_not_called()
 
 
-def test_games_that_can_cross_5000_go_before_counts_nobody_has_seen():
+def crossing_mix(cp, eligible, pre):
     # 124: an official 3,500 due again; 125: a first check without any
     # third-party count, releasing sooner; 126: a first check with a
     # third-party 4,500; 127: a small game's 90-day backstop, releasing soonest.
-    def amend(cp, eligible, pre):
-        rows, counts = current_daily(125, 126, 127)
-        eligible["games"] += rows["games"]
-        pre["games"].update(counts["games"])
-        dates = {"124": "2026-12-01", "125": "2026-10-10", "126": "2027-01-01", "127": "2026-10-03"}
-        for row in eligible["games"]:
-            row["release_start"] = dates[str(row["appid"])]
-        pre["games"]["125"]["third_party_followers"] = None
-        pre["games"]["127"]["third_party_followers"] = 100
-        cp["official_results"]["127"] = observation(127, followers=40, age=91)
-    queue, status, _ = projected(result=observation(followers=3500, age=3), prescreen=None, amend=amend)
+    rows, counts = current_daily(125, 126, 127)
+    eligible["games"] += rows["games"]
+    pre["games"].update(counts["games"])
+    dates = {"124": "2026-12-01", "125": "2026-10-10", "126": "2027-01-01", "127": "2026-10-03"}
+    for row in eligible["games"]:
+        row["release_start"] = dates[str(row["appid"])]
+    pre["games"]["125"]["third_party_followers"] = None
+    pre["games"]["127"]["third_party_followers"] = 100
+    cp["official_results"]["127"] = observation(127, followers=40, age=91)
+
+
+def test_games_that_can_cross_5000_go_before_counts_nobody_has_seen():
+    queue, status, _ = projected(result=observation(followers=3500, age=3), prescreen=None, amend=crossing_mix)
     assert [row["appid"] for row in queue] == [124, 126, 125, 127]
     assert status["likely_threshold_pending"] == 2
     assert status["official_rechecks_pending"] == 2
+
+
+@pytest.mark.parametrize("attempt,order", [
+    ({"status": "rate_limited", "http": 429}, [124, 126, 125, 127]),
+    ({"status": "access_or_server_error", "http": 503}, [126, 125, 127, 124]),
+])
+def test_a_shared_429_does_not_send_a_game_that_can_cross_5000_to_the_back(attempt, order):
+    # 11-20: Terranigma and Hack You (official 3,437 and 3,033) were last of
+    # 218 because their previous request met the identity's 429. Only a real
+    # error of the game's own request rotates it behind the others.
+    def amend(cp, eligible, pre):
+        crossing_mix(cp, eligible, pre)
+        cp.setdefault("attempt_events", []).append({
+            "appid": 124, "queue_source": "fresh_daily_prefilter_unresolved",
+            "when_taipei": (NOW - timedelta(days=1)).isoformat(), **attempt})
+    queue, status, _ = projected(result=observation(followers=3500, age=3), prescreen=None, amend=amend)
+    assert [row["appid"] for row in queue] == order
+    assert status["likely_threshold_pending"] == 2
 
 
 def test_a_daily_candidate_no_longer_listed_today_costs_no_request():

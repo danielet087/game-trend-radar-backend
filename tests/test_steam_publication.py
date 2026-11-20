@@ -288,7 +288,9 @@ def test_growth_cli_retry_passes_one_frozen_observation_clock_and_keeps_metadata
         "Path(a.data_dir,'insights-state.json').write_text(json.dumps(s))\n"
         "Path(a.data_dir,'activity.json').write_text(json.dumps({'clock':a.observed_at}))\n"
         "day=(datetime.fromisoformat(a.observed_at)+timedelta(hours=8)).date().isoformat()\n"
-        "Path(a.data_dir,'growth.json').write_text(json.dumps({'as_of':day}))\n", encoding="utf-8")
+        "Path(a.data_dir,'growth.json').write_text(json.dumps({'as_of':day}))\n"
+        "Path(a.data_dir,'followers.json').write_text(json.dumps({'schema_version':1,'games':{str(r['appid']):[5600,'2026-10-08T15:00:00Z']}}))\n",
+        encoding="utf-8")
     git(root, "add", "scripts", "data/catalog.json")
     git(root, "commit", "-m", "seed observation-clock CLI port")
     git(root, "push", "origin", "HEAD:main")
@@ -324,6 +326,8 @@ def test_growth_cli_retry_passes_one_frozen_observation_clock_and_keeps_metadata
     assert calls == [True, True]  # Coverage is checked anew on the Git retry.
     assert rendered == [clock.isoformat()] * 2
     assert published_json(remote, "data/growth.json")["as_of"] == "2026-10-08"
+    # The small latest-count file for list pages is published with the growth report.
+    assert published_json(remote, "data/followers.json")["games"] == {str(row["appid"]): [5600, "2026-10-08T15:00:00Z"]}
     assert published_json(remote, "data/insights-state.json")["records"][str(row["appid"])]["first_seen_at"] == clock.isoformat()
     assert published_json(remote, "data/unrelated.json") == {"latest": True}
     assert not list((root / "scripts").rglob("*.pyc"))

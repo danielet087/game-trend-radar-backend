@@ -61,7 +61,9 @@ class PublicationTests(unittest.TestCase):
                    'tag_ids':{'Capitalism':4845}, 'tag_labels_zh_tw':{'Capitalism':'資本主義'},
                    'genre_labels_zh_tw':{'RPG':'角色扮演'}}
             write_catalog_projection(data, [row], 'now')
-            self.assertEqual(json.loads((data/'catalog.json').read_text())['games'][0], row)
+            # Tag IDs stay in the records; list pages read only names and labels.
+            projected = {key: value for key, value in row.items() if key != 'tag_ids'}
+            self.assertEqual(json.loads((data/'catalog.json').read_text())['games'][0], projected)
 
     def test_bad_or_empty_authoritative_input_cannot_remove_public_records(self):
         for value in ['broken-json', '{}', '{"games":[]}']:

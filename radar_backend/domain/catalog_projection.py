@@ -7,6 +7,9 @@ import json
 from radar_backend.domain.catalog_metadata import PLAYER_CATEGORY_FIELDS
 
 
+# Descriptions, small capsules, tag IDs and other fields list pages never read
+# left catalog.json in 2026-11; a game page reads them from games/<appid>.json.
+# The content backend writes the same fields.
 FIELDS = (
     'appid', 'name', 'name_en', 'display_name', 'name_zh_tw', 'name_zh_cn',
     'name_zh_tw_traditional', 'name_zh_cn_traditional', 'name_en_traditional',
@@ -14,17 +17,12 @@ FIELDS = (
     'release_display_precision', 'release_date_timezone', 'followers',
     'follower_checked_at', 'recent_source', 'first_week_qualified_at',
     'header_image', 'header_image_2x', 'main_capsule_image', 'main_capsule_image_2x',
-    'small_capsule_image', 'capsule_image', 'tags', 'genres',
-    'tag_ids', 'tag_labels_zh_tw', 'genre_labels_zh_tw',
-    'content_enriched_at', 'tags_fetch_status',
+    'tags', 'genres', 'tag_labels_zh_tw', 'genre_labels_zh_tw',
     *PLAYER_CATEGORY_FIELDS,
     'twitch_admission', 'steam_type', 'sexual_content_screened',
     'release_time_utc', 'release_timestamp_taipei_date', 'release_date_conflict',
     'release_store_date', 'release_date_normalization',
     'release_display_provider', 'release_date_verified_at',
-    'official_ge5000', 'content_descriptorids',
-    'short_description', 'short_description_en', 'short_description_language',
-    'short_description_source', 'description_source_url',
 )
 
 

@@ -83,10 +83,17 @@ def test_projection_keeps_order_none_and_nested_references_without_unknown_field
     assert row['unknown'] == 'hidden'
 
 
-def test_projection_fields_include_player_categories_and_description_evidence():
-    assert len(FIELDS) == 52
-    assert len(set(FIELDS)) == 52
-    assert FIELDS[32:35] == ('categories', 'categories_source', 'categories_checked_at')
+def test_projection_fields_include_player_categories_but_not_detail_only_fields():
+    assert len(FIELDS) == 40
+    assert len(set(FIELDS)) == 40
+    assert FIELDS[27:30] == ('categories', 'categories_source', 'categories_checked_at')
+    # A game page reads these from games/<appid>.json; list pages never do.
+    assert not set(FIELDS) & {
+        'short_description', 'short_description_en', 'short_description_language',
+        'short_description_source', 'description_source_url', 'small_capsule_image',
+        'capsule_image', 'tag_ids', 'tags_fetch_status', 'official_ge5000',
+        'content_descriptorids', 'content_enriched_at',
+    }
     row = {key: None for key in reversed(FIELDS)}
     assert list(catalog_payload([row], 'now', 'r')['games'][0]) == list(FIELDS)
 

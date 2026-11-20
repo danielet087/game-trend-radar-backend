@@ -69,7 +69,7 @@ def test_catalog_revision_keeps_full_rows_and_matching_revision_does_not_rewrite
     ("探索廣闊世界，展開全新冒險。", "zh-TW", "steam_tchinese"),
     ("Explore a vast world.", "en", "steam_english"),
 ])
-def test_follower_refresh_retains_published_description_in_browser_catalog(tmp_path, text, language, source_name):
+def test_follower_refresh_retains_published_description(tmp_path, text, language, source_name):
     frontend, source = tmp_path / "frontend", tmp_path / "input.json"
     evidence = {
         "short_description": text,
@@ -99,8 +99,12 @@ def test_follower_refresh_retains_published_description_in_browser_catalog(tmp_p
         document = json.loads((frontend / "data" / name).read_text())
         row = document if name.startswith("games/") else document["games"][0]
         assert row["followers"] == 6000
-        assert {key: row[key] for key in evidence} == evidence
         assert row["language_support"] == original["language_support"]
+        if name == "catalog.json":
+            # List pages never show it; the game page reads games/7.json.
+            assert not set(evidence) & set(row)
+        else:
+            assert {key: row[key] for key in evidence} == evidence
 
 
 def test_default_preview_category_port_uses_shared_catalog_without_legacy_bridge(monkeypatch):

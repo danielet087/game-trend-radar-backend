@@ -99,12 +99,12 @@ def test_failure_rotation_crosses_twitch_and_ordinary_source_boundaries(
     cp = checkpoint([failed, untried, older_attempt, later_normal, ordinary_candidate(125)])
     cp["attempt_events"] = [
         {"appid": 126, "queue_source": "twitch_steam_discovery",
-         "when_taipei": "2026-10-01T18:00:00+08:00", "http": 429, "status": "rate_limited"},
+         "when_taipei": "2026-10-01T18:00:00+08:00", "http": 503, "status": "access_or_server_error"},
         {"appid": 123, "queue_source": "twitch_steam_discovery",
-         "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 429, "status": "rate_limited"},
+         "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 503, "status": "access_or_server_error"},
         # Failure follows the AppID even if its queue source later changes.
         {"appid": 124, "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
-         "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 429, "status": "rate_limited"},
+         "when_taipei": NOW.astimezone(worker.TZ).isoformat(), "http": 503, "status": "access_or_server_error"},
     ]
     frozen, legacy, groups = queue_inputs()
 

@@ -56,7 +56,7 @@ def test_domain_queue_rotates_injected_twitch_admissions_without_io():
         "pending_candidates": candidates, "official_results": {},
         "attempt_events": [{
             "appid": 10, "queue_source": "twitch_steam_discovery",
-            "when_taipei": NOW.isoformat(), "http": 429,
+            "when_taipei": NOW.isoformat(), "http": 503,
         }],
     }
     admission = Mock(side_effect=lambda row, *, now: row["appid"] != 12)

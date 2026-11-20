@@ -214,3 +214,39 @@ def test_limited_or_cooling_recheck_retains_old_count_and_stays_pending(monkeypa
     verify.assert_not_called()
     upsert.assert_not_called()
     dispatch.assert_not_called()
+
+
+def test_games_that_can_cross_5000_go_before_counts_nobody_has_seen():
+    # 124: an official 3,500 due again; 125: a first check without any
+    # third-party count, releasing sooner; 126: a first check with a
+    # third-party 4,500; 127: a small game's 90-day backstop, releasing soonest.
+    def amend(cp, eligible, pre):
+        rows, counts = current_daily(125, 126, 127)
+        eligible["games"] += rows["games"]
+        pre["games"].update(counts["games"])
+        dates = {"124": "2026-12-01", "125": "2026-10-10", "126": "2027-01-01", "127": "2026-10-03"}
+        for row in eligible["games"]:
+            row["release_start"] = dates[str(row["appid"])]
+        pre["games"]["125"]["third_party_followers"] = None
+        pre["games"]["127"]["third_party_followers"] = 100
+        cp["official_results"]["127"] = observation(127, followers=40, age=91)
+    queue, status, _ = projected(result=observation(followers=3500, age=3), prescreen=None, amend=amend)
+    assert [row["appid"] for row in queue] == [124, 126, 125, 127]
+    assert status["likely_threshold_pending"] == 2
+    assert status["official_rechecks_pending"] == 2
+
+
+def test_a_daily_candidate_no_longer_listed_today_costs_no_request():
+    def unlisted(cp, eligible, pre):
+        cp["pending_candidates"]["130"] = {**ordinary_candidate(130), "queue_source": "fresh_daily_prefilter_unresolved"}
+    queue, status, cp = projected(amend=unlisted)
+    assert [row["appid"] for row in queue] == [124]
+    assert status["dropped_unlisted"] == 1
+    assert "130" in cp["pending_candidates"]  # it returns once a daily set lists it again
+    # Without today's daily set nothing is dropped (and nothing is rechecked).
+    def stale(cp, eligible, pre):
+        unlisted(cp, eligible, pre)
+        pre.update(updated_at=(NOW - timedelta(days=1)).isoformat())
+    queue, status, _ = projected(amend=stale)
+    assert [row["appid"] for row in queue] == [130]
+    assert status["dropped_unlisted"] == 0

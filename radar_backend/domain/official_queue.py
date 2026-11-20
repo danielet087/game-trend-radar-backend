@@ -139,6 +139,11 @@ ACCEPTED_REFRESH_DAYS = 1
 NEAR_THRESHOLD_DAYS = 2        # third-party >= 4,000 but official still below 5,000
 APPROACHING_DAYS = 3           # official or third-party 3,000-4,999
 LOW_BACKSTOP_DAYS = 90         # below 3,000 with no third-party signal
+# Requests go first to games that can cross 5,000 (a count of 3,000 or more,
+# official or third-party), then to first measurements without a third-party
+# count, then to the 90-day backstop of small games.
+LIKELY_THRESHOLD = 3000
+DAILY_SOURCES = frozenset({"fresh_daily_prefilter_unresolved", "fresh_daily_prefilter_ge4000_pending_official"})
 
 
 def official_refresh_days(followers, third_party_followers=None):
@@ -276,6 +281,9 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         # confirms a newer date and updates this pending record.
         cp["pending_candidates"].setdefault(aid, new)
 
+    # Today's counts per AppID: (third-party, newest official), for the order below.
+    signals = {}
+    listed_today = None
     daily = {
         "status": "no_current_day_prefilter",
         "daily_prefilter_updated_at": prefilter.get("updated_at"),
@@ -295,12 +303,16 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         daily["status"] = "current_day_partial_or_complete"
         if not prefilter.get("complete"):
             daily["status"] = "current_day_prefilter_incomplete"
+        listed_today = {str(int(source["appid"])) for source in rows}
         for source in rows:
             aid = str(int(source["appid"]))
             record = pre.get(aid)
             if not isinstance(record, dict):
                 continue
             followers = record.get("third_party_followers")
+            observed_count = observations.get(aid)
+            signals[aid] = (followers if queue_checked_numeric(followers) else None,
+                            observed_count.followers if observed_count else None)
             # First verification keeps the existing prescreen gate. Previously
             # verified games can outgrow a low count and need periodic checks
             # even while their third-party count remains below that gate.
@@ -381,6 +393,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
         and "text/html" in event.get("content_type", "").lower()
     }
     pending = []
+    daily["dropped_unlisted"] = 0
     for aid, row in cp["pending_candidates"].items():
         twitch = row.get("queue_source") == "twitch_steam_discovery"
         if twitch:
@@ -400,17 +413,31 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
             daily["parked_group_xml_appids"].append(aid)
             continue
         cp.setdefault("unresolved_candidates", {}).pop(aid, None)
+        if (not twitch and listed_today is not None and row.get("queue_source") in DAILY_SOURCES
+                and aid not in listed_today):
+            # Today's exact-date candidate set no longer lists this daily
+            # candidate (released, date changed, screened out): no request.
+            # It returns if a later daily set lists it again.
+            daily["dropped_unlisted"] += 1
+            continue
         pending.append(row)
     # Give unfailed work a turn before retrying any failed candidate. This
     # tier must precede Twitch priority: one unavailable Twitch endpoint must
     # not monopolize every first request after the shared cooldown expires.
     # Failed ordinary candidates rotate too, oldest real failure first.
     last_failure = last_failed_request_times(cp.get("attempt_events", []), now=observed)
+
+    def tier(row):
+        third, official = signals.get(str(row["appid"]), (None, None))
+        if max(third or 0, official or 0) >= LIKELY_THRESHOLD:
+            return 0  # a third-party >= 4,000 first check, or a near-threshold or accepted recheck
+        return 2 if row.get("follower_recheck") is True else 1
+
     pending.sort(key=lambda r: (
         str(r["appid"]) in last_failure,
         last_failure.get(str(r["appid"]), 0),
         0 if r.get("queue_source") == "twitch_steam_discovery" else 1,
-        r.get("follower_recheck") is True,
+        tier(r),
         r["release_date"] < today,
         r["release_date"] if r["release_date"] >= today
         else -datetime.fromisoformat(r["release_date"]).date().toordinal(),
@@ -418,6 +445,7 @@ def make_queue(cp, frozen_rows, legacy_cp, old_group_rows, eligible, prefilter, 
     ))
     daily["combined_pending_now"] = len(pending)
     daily["official_rechecks_pending"] = sum(row.get("follower_recheck") is True for row in pending)
+    daily["likely_threshold_pending"] = sum(tier(row) == 0 for row in pending)
     daily["completed_legacy"] = len(legacy_cp["official_results"])
     daily["completed_new"] = len(cp["official_results"])
     daily["twitch_priority_pending"] = sum(r.get("queue_source") == "twitch_steam_discovery" for r in pending)

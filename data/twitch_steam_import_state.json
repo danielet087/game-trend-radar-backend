@@ -1353,26 +1353,26 @@
     },
     "2659410": {
       "status": "accepted",
-      "updated_at": "2026-10-04T21:08:00.168093Z",
+      "updated_at": "2026-11-20T02:07:05.343362Z",
       "twitch_admission": {
-        "schema_version": 1,
-        "method": "twitch_igdb_external_steam_v1",
         "appid": 2659410,
-        "twitch_game_id": "1576133629",
-        "igdb_id": "414942",
         "checked_at": "2026-10-04T20:12:49Z",
-        "source_frontend_commit": "e8985949d96008a156675f6beee978668030e1c2",
+        "igdb_id": "414942",
+        "method": "twitch_igdb_external_steam_v1",
+        "schema_version": 1,
         "source_enrollment": {
-          "source": "igdb_first_release_date",
+          "min_viewers": 7000,
           "observed_at": "2026-10-04T20:12:49Z",
-          "viewer_count": 15547,
-          "min_viewers": 7000
-        }
+          "source": "igdb_first_release_date",
+          "viewer_count": 15547
+        },
+        "source_frontend_commit": "e8985949d96008a156675f6beee978668030e1c2",
+        "twitch_game_id": "1576133629"
       },
       "validation_version": 4,
       "follower_candidate": null,
       "reason": "steam_verified",
-      "content_signature": "dd9f2be586566a1bfc4ae3e84f1e7ebd91bf6f943d7e7ee15244c53e66c512f8",
+      "content_signature": "e62e93f5c305e9a67b3baeba70dac5016de9a158bfab46f22acae2efbfb3c15e",
       "followers": 3288,
       "follower_checked_at": "2026-10-02T10:11:56.851881+08:00",
       "retry_at": null,
@@ -1380,15 +1380,7 @@
       "rate_limit_attempts": 0,
       "rate_limit_stage": null,
       "retry_source": null,
-      "retry_after": null,
-      "content_dispatch": {
-        "status": "dispatched",
-        "signature": "dd9f2be586566a1bfc4ae3e84f1e7ebd91bf6f943d7e7ee15244c53e66c512f8",
-        "attempted_at": "2026-10-04T21:08:00.168093Z",
-        "target_repository": "danielet087/game-trend-radar-content-backend",
-        "event_type": "steam_game_twitch_discovered",
-        "http": 204
-      }
+      "retry_after": null
     },
     "3832490": {
       "status": "accepted",
@@ -6531,6 +6523,6 @@
       }
     }
   },
-  "updated_at": "2026-11-20T01:11:58.789227Z",
+  "updated_at": "2026-11-20T02:07:05.343362Z",
   "api_cooldowns": {}
 }

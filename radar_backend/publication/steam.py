@@ -26,7 +26,8 @@ CATALOG_PATHS = (
     "data/index.json", "data/calendar", "data/games", "data/lists",
     "data/steam_upcoming.json", "data/catalog.json", ACTIVITY_ORIGINS_PATH,
 )
-GROWTH_PATHS = ("data/insights-state.json", "data/activity.json", "data/growth.json")
+# followers.json: each game's latest official count, small enough for every list page.
+GROWTH_PATHS = ("data/insights-state.json", "data/activity.json", "data/growth.json", "data/followers.json")
 
 
 def _pairs(pairs):

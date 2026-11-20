@@ -1353,7 +1353,7 @@
     },
     "2659410": {
       "status": "accepted",
-      "updated_at": "2026-11-20T02:07:05.343362Z",
+      "updated_at": "2026-11-20T02:07:34.256087Z",
       "twitch_admission": {
         "appid": 2659410,
         "checked_at": "2026-10-04T20:12:49Z",
@@ -1380,7 +1380,15 @@
       "rate_limit_attempts": 0,
       "rate_limit_stage": null,
       "retry_source": null,
-      "retry_after": null
+      "retry_after": null,
+      "content_dispatch": {
+        "status": "dispatched",
+        "signature": "e62e93f5c305e9a67b3baeba70dac5016de9a158bfab46f22acae2efbfb3c15e",
+        "attempted_at": "2026-11-20T02:07:34.256087Z",
+        "target_repository": "danielet087/game-trend-radar-content-backend",
+        "event_type": "steam_game_twitch_discovered",
+        "http": 204
+      }
     },
     "3832490": {
       "status": "accepted",
@@ -6523,6 +6531,6 @@
       }
     }
   },
-  "updated_at": "2026-11-20T02:07:05.343362Z",
+  "updated_at": "2026-11-20T02:07:34.256087Z",
   "api_cooldowns": {}
 }

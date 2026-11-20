@@ -130,22 +130,43 @@ def test_missing_games_array_is_replaced_only_by_qualified_evidence():
     assert promoted["follower_source"] == "Steam Community XML memberCount"
 
 
-@pytest.mark.parametrize("announced,timestamp,conflict", [
-    ("2026-10-23", "2026-10-24", True),
-    ("2026-10-25", "2026-10-24", True),
-    ("2026-10-24", "2026-10-24", False),
+@pytest.mark.parametrize("announced,timestamp,day,store_day,conflict", [
+    # One day off either way is the announced day's time zone: Taiwan's day decides.
+    ("2026-10-23", "2026-10-24", "2026-10-24", "2026-10-23", False),
+    ("2026-10-25", "2026-10-24", "2026-10-24", "2026-10-25", False),
+    ("2026-10-24", "2026-10-24", "2026-10-24", None, False),
+    # A wider gap is not a time zone: the announced day stays, flagged.
+    ("2026-10-22", "2026-10-24", "2026-10-22", None, True),
 ])
-def test_store_recheck_preserves_announced_taiwan_day_in_both_midnight_directions(announced, timestamp, conflict):
+def test_store_recheck_takes_taiwans_day_only_when_the_announced_day_is_one_day_off(
+        announced, timestamp, day, store_day, conflict):
     observed = result(release_date=announced, custom_proof={"source": "candidate"})
     assert domain.apply_store_detail_to_result(
         observed, exact_detail(timestamp), checked_at=NOW,
     ) is True
-    assert observed["release_date"] == announced
+    assert observed["release_date"] == day
+    assert observed.get("release_store_date") == store_day
+    assert observed.get("release_date_normalization") == (
+        "steam_release_time_taipei" if store_day else None)
     assert observed["release_timestamp_taipei_date"] == timestamp
     assert observed["release_date_conflict"] is conflict
     assert observed["store_date_checked_at_taipei"] == "2026-10-09T00:10:00+08:00"
     assert observed["custom_proof"] == {"source": "candidate"}
     assert observed["official_followers"] == 5000
+
+
+def test_the_promoted_row_keeps_the_announced_day_beside_taiwans_day():
+    observed = result()
+    assert domain.apply_store_detail_to_result(observed, exact_detail(), checked_at=NOW) is True
+    master = {"games": []}
+    assert domain.upsert_qualified_master(
+        master, observed, now=NOW, blocked=set(), is_disallowed=lambda *_: False,
+    ) is True
+    promoted = master["games"][0]
+    assert promoted["release_start"] == promoted["release_end"] == "2026-10-24"
+    assert promoted["release_store_date"] == "2026-10-23"
+    assert promoted["release_date_normalization"] == "steam_release_time_taipei"
+    assert promoted["release_date_conflict"] is False
 
 
 @pytest.mark.parametrize("announced", [None, "2026-10", "2026-02-29"])
@@ -205,8 +226,9 @@ def test_single_result_use_case_uses_store_only_with_the_injected_taiwan_day():
         observed, session, clock=lambda: NOW, fetch_store_release_details=fetch,
     ) is True
     fetch.assert_called_once_with(session, [10], today=TODAY, interval=0.0)
-    assert observed["release_date"] == "2026-10-23"
-    assert observed["release_date_conflict"] is True
+    assert observed["release_date"] == "2026-10-24"
+    assert observed["release_store_date"] == "2026-10-23"
+    assert observed["release_date_conflict"] is False
 
 
 def test_single_missing_store_response_is_unavailable_and_never_claims_exact():

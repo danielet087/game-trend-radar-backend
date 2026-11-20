@@ -106,14 +106,15 @@ def test_confirmed_taiwan_date_change_replaces_pending_date_with_its_official_au
     state = seed(tmp_path, 123)
     responses = list(metadata_responses(123))
     details = responses[1].json.return_value["123"]["data"]
-    details["release_date"] = {"date": "2026-10-01", "coming_soon": False}
+    # Two days before the release time's Taiwan day: wider than a time zone, so the Store day decides.
+    details["release_date"] = {"date": "2026-09-30", "coming_soon": False}
     session = Mock()
     session.get.side_effect = responses
 
     batch = run(tmp_path, state, session=session)
 
     metadata, = batch["records"]
-    assert metadata["release_start"] == "2026-10-01"
+    assert metadata["release_start"] == "2026-09-30"
     assert metadata["followers"] is None
     assert metadata["release_date_normalization"] == "steam_taiwan_store_date_authoritative"
     assert metadata["release_timestamp_taipei_date"] == "2026-10-02"

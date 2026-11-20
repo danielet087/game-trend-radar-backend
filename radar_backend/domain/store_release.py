@@ -5,6 +5,8 @@ from datetime import date, datetime, timezone
 from typing import Any, Callable
 from zoneinfo import ZoneInfo
 
+from radar_core.domain.twitch_admission import STEAM_RELEASE_TIME_TAIPEI, taipei_release_day
+
 TAIPEI = ZoneInfo("Asia/Taipei")
 STORE_DATE_PROVIDER = "Steam IStoreBrowseService/GetItems"
 
@@ -62,6 +64,15 @@ def prepare_store_release_detail(
     except (TypeError, ValueError):
         prior_exact = False
     day = prior_day if prior_exact else timestamp_day
+    if (prior_exact and day != timestamp_day
+            and abs((date.fromisoformat(timestamp_day) - date.fromisoformat(day)).days) == 1):
+        # One day off is a time zone: Taiwan's day of the release time decides.
+        # A prior Store day (not the prior release time's Taiwan day) stays beside it.
+        if row.get("release_timestamp_taipei_date") != day:
+            result["release_store_date"] = day
+        result["release_date_normalization"] = STEAM_RELEASE_TIME_TAIPEI
+        day = timestamp_day
+        store_authority = False
     result["release_raw"] = day
     result["release_start"] = day
     result["release_end"] = day
@@ -108,6 +119,8 @@ def filter_confirmed_master_games(
     for row in games:
         if not isinstance(row, dict) or is_disallowed(row, blocked):
             continue
+        # Earlier Store-day admissions one day off their release time take Taiwan's day.
+        row = taipei_release_day(row)
         try:
             appid = int(row["appid"])
             day = date.fromisoformat(row["release_start"])

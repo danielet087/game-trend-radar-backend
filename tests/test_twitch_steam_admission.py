@@ -332,9 +332,11 @@ def test_date_conflict_migration_rechecks_metadata_with_official_cache():
             "validation_version": 3, "retry_at": "2026-10-03T00:00:00Z", "twitch_admission": proof()}}}
         cache = {"games": {"123": {"followers": 13, "checked_at": "2026-10-02T06:00:00Z"}}}
         output = collect(root, SHA, {"games": []}, state, session=session, now=NOW, caches=[cache], blocked=set())
-        assert output["records"][0]["release_start"] == "2026-09-03"
+        # The Store's 9/3 is one day off the release time: Taiwan's 9/4, with the Store day kept.
+        assert output["records"][0]["release_start"] == "2026-09-04"
+        assert output["records"][0]["release_store_date"] == "2026-09-03"
         assert output["records"][0]["release_timestamp_taipei_date"] == "2026-09-04"
-        assert output["records"][0]["release_date_conflict"] is True
+        assert output["records"][0]["release_date_conflict"] is False
         assert output["state_updates"]["123"]["validation_version"] == 4
         assert output["records"][0]["followers"] == 13
         assert session.get.call_count == 2

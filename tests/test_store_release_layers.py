@@ -133,10 +133,11 @@ def test_invalid_store_update_never_reads_the_clock_or_mutates_source(detail, er
 
 
 @pytest.mark.parametrize("authority", [False, True])
-def test_announced_day_is_preserved_and_store_provider_depends_on_authority(authority):
+def test_an_announced_day_one_day_off_moves_to_taiwans_day_with_or_without_authority(authority):
     original = game(
         day="2026-10-10", release_display_provider="Taiwan visible announcement",
         release_date_verified_at="2026-10-01T00:00:00Z", unknown={"retained": 1},
+        release_date_conflict=True, release_date_conflict_note="kept the announced day",
     )
     before = deepcopy(original)
     clock = Mock(return_value=NOW)
@@ -145,28 +146,58 @@ def test_announced_day_is_preserved_and_store_provider_depends_on_authority(auth
         has_taiwan_store_date_authority=lambda row: authority,
     )
     assert original == before
-    assert updated["release_raw"] == updated["release_start"] == updated["release_end"] == "2026-10-10"
+    assert updated["release_raw"] == updated["release_start"] == updated["release_end"] == "2026-10-11"
+    assert updated["release_store_date"] == "2026-10-10"
+    assert updated["release_date_normalization"] == "steam_release_time_taipei"
     assert updated["release_precision"] == "day"
     assert updated["release_timestamp_taipei_date"] == "2026-10-11"
     assert updated["release_time_utc"] == "2026-10-10T16:30:00Z"
-    assert updated["release_date_conflict"] is True
+    assert "release_date_conflict" not in updated and "release_date_conflict_note" not in updated
     assert updated["unknown"] == {"retained": 1}
+    # Taiwan's day comes from Store Browse now, whatever kept the announced day before.
+    assert updated["release_display_provider"] == domain.STORE_DATE_PROVIDER
+    assert updated["release_date_verified_at"] == NOW.isoformat()
+    assert updated["post_followers_store_verified_at"] == NOW.isoformat()
+    assert updated["post_followers_store_verified"] is True
+    clock.assert_called_once_with()
+
+
+@pytest.mark.parametrize("authority", [False, True])
+def test_a_wider_gap_keeps_the_announced_day_and_store_provider_depends_on_authority(authority):
+    original = game(
+        day="2026-10-09", release_display_provider="Taiwan visible announcement",
+        release_date_verified_at="2026-10-01T00:00:00Z",
+    )
+    updated = application.apply_store_release_detail(
+        original, exact_detail(), clock=Mock(return_value=NOW),
+        has_taiwan_store_date_authority=lambda row: authority,
+    )
+    assert updated["release_start"] == "2026-10-09"
+    assert "release_store_date" not in updated
+    assert updated["release_date_conflict"] is True
     assert updated["release_display_provider"] == (
         "Taiwan visible announcement" if authority else domain.STORE_DATE_PROVIDER
     )
     assert updated["release_date_verified_at"] == (
         original["release_date_verified_at"] if authority else NOW.isoformat()
     )
-    assert updated["post_followers_store_verified_at"] == NOW.isoformat()
-    assert updated["post_followers_store_verified"] is True
-    clock.assert_called_once_with()
+
+
+def test_a_moved_release_time_moves_a_taiwan_day_without_inventing_a_store_day():
+    prepared, authority = domain.prepare_store_release_detail(
+        game(day="2026-10-10", release_timestamp_taipei_date="2026-10-10"), exact_detail(),
+        has_taiwan_store_date_authority=lambda row: False,
+    )
+    assert prepared["release_start"] == "2026-10-11"
+    assert "release_store_date" not in prepared
+    assert authority is False
 
 
 @pytest.mark.parametrize("day,precision,expected", [
     (None, "date_full", "2026-10-11"),
     ("2026-02-30", "date_full", "2026-10-11"),
     ("2026-10-10", None, "2026-10-11"),
-    ("20261010", "date_full", "20261010"),
+    ("20261010", "date_full", "2026-10-11"),
 ])
 def test_only_a_valid_prior_full_date_overrides_the_timestamp(day, precision, expected):
     prepared, authority = domain.prepare_store_release_detail(

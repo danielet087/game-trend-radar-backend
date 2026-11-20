@@ -90,7 +90,7 @@ def test_store_date_full_converts_timestamp_to_taipei_day():
     assert row["post_followers_store_verified"] is True
 
 
-def test_verified_tw_store_day_is_preserved_when_timestamp_rolls_to_next_day():
+def test_a_store_day_one_day_before_the_release_time_moves_to_taiwans_day():
     detail = {
         "exact": True,
         "status": "date_full",
@@ -111,9 +111,10 @@ def test_verified_tw_store_day_is_preserved_when_timestamp_rolls_to_next_day():
         },
         detail,
     )
-    assert row["release_start"] == "2026-10-23"
+    assert row["release_start"] == row["release_end"] == "2026-10-24"
+    assert row["release_store_date"] == "2026-10-23"
     assert row["release_timestamp_taipei_date"] == "2026-10-24"
-    assert row["release_date_conflict"] is True
+    assert "release_date_conflict" not in row
 
 
 def test_month_quarter_year_are_rejected_after_followers():

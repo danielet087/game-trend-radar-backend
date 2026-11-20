@@ -49,7 +49,7 @@ def test_canonical_scheduled_dates_work_when_legacy_helpers_are_forbidden(monkey
     assert session.calls[0][1]["timeout"] == 25
 
 
-def test_official_announcement_authority_and_scheduled_time_policy_remain_separate():
+def test_official_and_scheduled_dates_agree_on_taiwans_day_when_the_announcement_is_one_day_off():
     item = {"release": {"coming_soon_display": "date_full", "steam_release_date": STAMP}}
     from radar_backend.domain.store_release import parse_store_release_detail
     detail = parse_store_release_detail(item, today=date(2026, 9, 20))
@@ -57,8 +57,10 @@ def test_official_announcement_authority_and_scheduled_time_policy_remain_separa
         "appid": 123, "release_start": "2026-09-22", "release_display_precision": "date_full",
     }, detail)
     scheduled = dates.resolved_store_date(123, "22 Sep, 2026", {"steam_release_date": STAMP})
-    assert official["release_start"] == "2026-09-22"
+    assert official["release_start"] == "2026-09-23"
+    assert official["release_store_date"] == "2026-09-22"
     assert official["release_timestamp_taipei_date"] == "2026-09-23"
+    assert "release_date_conflict" not in official
     assert scheduled["release_start"] == "2026-09-23"
 
 

@@ -40,7 +40,9 @@ def test_projection_matches_official_order_without_mutating_source_inputs():
          "when_taipei": (NOW - timedelta(hours=2)).isoformat(),
          "http": 429, "status": "rate_limited"},
     ]
-    eligible, prefilter = current_daily(123, 128)
+    # 127 is a daily candidate: it stays queued while today's daily set lists it.
+    eligible, prefilter = current_daily(123, 127, 128)
+    prefilter["games"]["127"]["group_short_id"] = None
     source = inputs(cp, eligible, prefilter)
     original = deepcopy(source)
     official, _ = worker.make_queue(*deepcopy(source), now=NOW)

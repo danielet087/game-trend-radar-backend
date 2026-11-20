@@ -139,7 +139,7 @@ jobs:
           SCHEDULE_TARGET_SLOT: ${{ inputs.target_slot }}
         run: python -m scripts.external_schedule --workflow official-followers
 
-      - name: Fetch up to 90 official counts, Twitch first, with >=30s pacing
+      - name: Fetch up to 6 official counts (120 a day), Twitch first, with >=30s pacing
         if: steps.query_window.outputs.proceed == 'true'
         env:
           TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
@@ -148,9 +148,9 @@ jobs:
           CONTENT_BACKEND_TOKEN: ${{ secrets.CONTENT_BACKEND_TOKEN }}
           # Spread the official requests over the 21 hourly rounds instead of
           # spending the shared Steam Community budget in the first few. Since
-          # 2026-11-19 (temporary zh-TW identity) at most 5 per round, 40 a day.
-          REQUEST_LIMIT: "5"
-          DAILY_LIMIT: "40"
+          # 2026-11-20 (owner): at most 6 per round, 120 a Taipei day.
+          REQUEST_LIMIT: "6"
+          DAILY_LIMIT: "120"
           SCHEDULE_TRIGGER_SOURCE: ${{ inputs.trigger_source }}
           SKIP_COOLDOWN: ${{ github.event_name == 'workflow_dispatch' && inputs.trigger_source == 'manual' && inputs.skip_cooldown || false }}
         run: |

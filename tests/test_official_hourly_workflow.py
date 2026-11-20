@@ -18,11 +18,13 @@ def test_hourly_collection_leaves_time_for_all_bounded_queue_phases():
     argv = shlex.split(next(line for line in commands.splitlines()
                            if "python -u -m radar_backend.jobs.official_followers" in line))
     option = lambda name: argv[argv.index(name) + 1]
-    # Spread over 21 hourly rounds, never most of it in one burst. Since the
-    # 2026-11-19 zh-TW fallback: at most 5 a round and 40 a Taipei day.
-    assert int(collect["env"]["REQUEST_LIMIT"]) == 5
+    # Spread over 21 hourly rounds, never most of it in one burst. Since
+    # 2026-11-20 (owner): at most 6 a round and 120 a Taipei day; 21 rounds of
+    # 6 can reach the daily limit.
+    assert int(collect["env"]["REQUEST_LIMIT"]) == 6
     assert option("--max-requests") == "$REQUEST_LIMIT"
-    assert int(collect["env"]["DAILY_LIMIT"]) == 40
+    assert int(collect["env"]["DAILY_LIMIT"]) == 120
+    assert 21 * int(collect["env"]["REQUEST_LIMIT"]) >= int(collect["env"]["DAILY_LIMIT"])
     assert option("--daily-limit") == "$DAILY_LIMIT"
     assert float(option("--interval")) >= 30
     collection_budget = int(option("--max-seconds"))

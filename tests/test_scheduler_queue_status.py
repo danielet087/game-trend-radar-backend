@@ -35,10 +35,10 @@ def test_projection_matches_official_order_without_mutating_source_inputs():
                      twitch_candidate(126), ordinary_candidate(127)])
     cp["attempt_events"] = [
         {"appid": 123, "queue_source": "twitch_steam_discovery",
-         "when_taipei": NOW.isoformat(), "http": 429, "status": "rate_limited"},
+         "when_taipei": NOW.isoformat(), "http": 503, "status": "access_or_server_error"},
         {"appid": 126, "queue_source": "twitch_steam_discovery",
          "when_taipei": (NOW - timedelta(hours=2)).isoformat(),
-         "http": 429, "status": "rate_limited"},
+         "http": 503, "status": "access_or_server_error"},
     ]
     # 127 is a daily candidate: it stays queued while today's daily set lists it.
     eligible, prefilter = current_daily(123, 127, 128)

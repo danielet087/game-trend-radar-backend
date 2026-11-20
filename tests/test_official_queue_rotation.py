@@ -19,7 +19,7 @@ def candidate(appid, *, source=DAILY, release="2026-10-16"):
             "group_id64": str(GROUP_BASE + appid), "queue_source": source}
 
 
-def event(appid, *, age=1, status="rate_limited", http=429, source=DAILY, **extra):
+def event(appid, *, age=1, status="access_or_server_error", http=503, source=DAILY, **extra):
     return {"appid": appid, "queue_source": source, "status": status, "http": http,
             "when_taipei": (NOW - timedelta(hours=age)).isoformat(), **extra}
 
@@ -87,6 +87,36 @@ def test_unfailed_candidates_keep_twitch_and_near_release_priority():
 ])
 def test_no_request_or_cache_reuse_does_not_introduce_a_failure(extra):
     assert last_failed_request_times([event(1, **extra)], now=NOW) == {}
+
+
+@pytest.mark.parametrize("extra", [
+    {"status": "rate_limited", "http": 429},
+    {"status": "rate_limited", "http": None},
+    {"status": None, "http": 429},  # an older checkpoint without status
+])
+def test_rate_limit_is_not_the_games_failure(extra):
+    rate_limited = event(1, **extra)
+    if rate_limited["status"] is None:
+        rate_limited.pop("status")
+    assert last_failed_request_times([rate_limited], now=NOW) == {}
+
+
+def test_rate_limited_candidates_keep_their_place_in_the_queue():
+    # Steam limits the request identity, whichever game is first: the next
+    # request after the cooldown goes to the same game, not behind all others.
+    rows = [candidate(1, release="2026-10-15"), candidate(2), candidate(3, source=TWITCH)]
+    rate_limited = dict(status="rate_limited", http=429)
+    events = [event(1, age=3, **rate_limited), event(1, age=1, **rate_limited),
+              event(3, age=2, source=TWITCH, **rate_limited)]
+    assert build_queue(rows, events) == [3, 1, 2]
+
+
+def test_rate_limit_neither_clears_nor_moves_an_earlier_real_failure():
+    events = [event(1, age=2), event(1, age=1, status="rate_limited", http=429)]
+    assert last_failed_request_times(events, now=NOW) == {
+        "1": (NOW - timedelta(hours=2)).timestamp(),
+    }
+    assert build_queue([candidate(1, release="2026-10-15"), candidate(2)], events) == [2, 1]
 
 
 def test_transport_exception_counts_as_real_failure_without_http_response():

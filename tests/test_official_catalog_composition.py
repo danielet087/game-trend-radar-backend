@@ -47,7 +47,9 @@ def test_canonical_services_do_not_call_historical_worker_ports(monkeypatch):
     monkeypatch.setenv("GITHUB_REPOSITORY", "example/steam")
     row, master = result(), {"games": []}
     assert services.verify_store_date_for_result(row, session) is True
-    assert row["release_date"] == "2026-10-20" and row["release_date_conflict"] is True
+    # The announced day is one day off the release time: Taiwan's day, with the announced day kept.
+    assert row["release_date"] == "2026-10-21" and row["release_date_conflict"] is False
+    assert row["release_store_date"] == "2026-10-20"
     assert services.upsert_qualified_master(master, row) is True
     checkpoint = {"official_results": {"123": row}}
     assert services.dispatch_content_event(checkpoint, row) == "dispatched"

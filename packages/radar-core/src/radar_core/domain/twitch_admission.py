@@ -18,6 +18,8 @@ EVIDENCE_SOURCES = frozenset({
 TAIPEI = ZoneInfo("Asia/Taipei")
 TW_STORE_DATE_AUTHORITY = "steam_taiwan_store_date_authoritative"
 TW_STORE_DATE_PROVIDER = "Steam Store appdetails cc=TW l=tchinese"
+# The Store's announced day is another time zone's day; Taiwan's day is the release time's.
+STEAM_RELEASE_TIME_TAIPEI = "steam_release_time_taipei"
 
 
 def decimal_id(value: object) -> str | None:
@@ -39,7 +41,13 @@ def aware_time(value: object) -> datetime | None:
 
 def resolve_store_release_day(store_day: object, release_time_utc: object, *,
                               allow_taiwan_store_authority: bool = False) -> dict | None:
-    """Keep a verified TW display day when the two official date sources differ."""
+    """Taiwan's day of the release time, with the Store's announced day beside it.
+
+    The Store shows the publisher's announced day, so an evening launch in the
+    Americas or a midnight launch in Japan is one day off Taiwan's calendar;
+    that difference is a time zone and the release time decides. Only a wider
+    gap keeps a verified TW display day (when allowed) or fails closed.
+    """
     instant = aware_time(release_time_utc)
     if instant is None or not isinstance(store_day, str):
         return None
@@ -55,6 +63,8 @@ def resolve_store_release_day(store_day: object, release_time_utc: object, *,
         basis = "steam_store_date_matches_taipei"
     elif announced == utc_day and taipei_day == utc_day + timedelta(days=1):
         basis = "steam_utc_date_normalized_to_taipei"
+    elif abs((taipei_day - announced).days) == 1:
+        basis = STEAM_RELEASE_TIME_TAIPEI
     elif allow_taiwan_store_authority:
         return {"release_start": store_day, "release_store_date": store_day,
                 "release_date_normalization": TW_STORE_DATE_AUTHORITY}
@@ -62,6 +72,30 @@ def resolve_store_release_day(store_day: object, release_time_utc: object, *,
         return None
     return {"release_start": taipei_day.isoformat(), "release_store_date": store_day,
             "release_date_normalization": basis}
+
+
+def taipei_release_day(row: object) -> object:
+    """Move an earlier Store-day admission one day off its release time to Taiwan's day.
+
+    Admissions before the time-zone rule kept the Store's announced day; when
+    it is one day off the release time, the row takes Taiwan's day and keeps
+    the Store day as release_store_date. Any other row is returned as is.
+    """
+    if not has_taiwan_store_date_authority(row):
+        return row
+    taipei_day = aware_time(row["release_time_utc"]).astimezone(TAIPEI).date()
+    if abs((taipei_day - date.fromisoformat(row["release_store_date"])).days) != 1:
+        return row
+    day = taipei_day.isoformat()
+    result = dict(row)
+    result.update({
+        "release_raw": day, "release_start": day, "release_end": day,
+        "release_timestamp_taipei_date": day, "release_date_conflict": False,
+        "release_date_normalization": STEAM_RELEASE_TIME_TAIPEI,
+        "release_display_provider": row.get("release_time_source") or row.get("release_display_provider"),
+    })
+    result.pop("release_date_conflict_note", None)
+    return result
 
 
 def has_taiwan_store_date_authority(row: object) -> bool:

@@ -60,7 +60,8 @@ def test_candidate_default_ports_use_shared_layers_when_legacy_helpers_are_forbi
     assert details == {101: parse_store_release_detail(items[101], today=TODAY)}
     assert fetch.call_args.kwargs == {"batch_size": 35, "interval": 0.5}
     row = sources.apply_store_release_detail(snapshot["games"][0], details[101])
-    assert row["release_start"] == "2026-10-20"
+    # The release time is 10/21 07:00 in Taiwan: one day off the listed 10/20, so Taiwan's day.
+    assert row["release_start"] == "2026-10-21"
     assert row["post_followers_store_verified_at"] == NOW.isoformat()
     assert row["post_followers_store_verified"] is True
     assert sources.filter_confirmed_master_games([row], snapshot["games"], today=TODAY) == [row]
@@ -78,7 +79,7 @@ def test_official_ports_share_direct_metadata_and_ledger_owners(monkeypatch):
            "release_date": "2026-10-20"}
     master = {"games": []}
     assert official_catalog.verify_store_date_for_result(row, object(), clock=lambda: NOW) is True
-    assert row["release_date"] == "2026-10-20"
+    assert row["release_date"] == "2026-10-21" and row["release_store_date"] == "2026-10-20"
     assert official_catalog.upsert_qualified_master(master, row, clock=lambda: NOW) is True
     assert master["games"][0]["appid"] == 101
     ledger.assert_called_once_with()

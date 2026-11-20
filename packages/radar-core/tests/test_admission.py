@@ -5,10 +5,10 @@ from datetime import datetime, timezone
 import unittest
 
 from radar_core.domain.twitch_admission import (
-    METHOD, TW_STORE_DATE_AUTHORITY, TW_STORE_DATE_PROVIDER, aware_time,
-    decimal_id, has_taiwan_store_date_authority, has_twitch_admission,
+    METHOD, STEAM_RELEASE_TIME_TAIPEI, TW_STORE_DATE_AUTHORITY, TW_STORE_DATE_PROVIDER,
+    aware_time, decimal_id, has_taiwan_store_date_authority, has_twitch_admission,
     is_twitch_qualified, normalize_twitch_admission, preserve_twitch_admission,
-    resolve_store_release_day, validate_twitch_snapshot,
+    resolve_store_release_day, taipei_release_day, validate_twitch_snapshot,
 )
 
 
@@ -173,8 +173,24 @@ class AdmissionTests(unittest.TestCase):
         matching = resolve_store_release_day("2026-09-09", "2026-09-08T16:02:05Z")
         self.assertEqual(matching["release_date_normalization"], "steam_store_date_matches_taipei")
 
+    def test_a_store_day_one_day_off_is_a_time_zone_and_takes_taiwans_day(self):
+        # An evening launch in the Americas: the Store says 9/3, Taiwan has 9/4 12:02.
+        evening = {"release_start": "2026-09-04", "release_store_date": "2026-09-03",
+                   "release_date_normalization": STEAM_RELEASE_TIME_TAIPEI}
+        self.assertEqual(resolve_store_release_day("2026-09-03", "2026-09-04T04:02:14Z"), evening)
+        # The time zone rule comes before any Store-day authority.
+        self.assertEqual(resolve_store_release_day("2026-09-03", "2026-09-04T04:02:14Z",
+                                                   allow_taiwan_store_authority=True), evening)
+        # A Japanese midnight launch is 23:00 the day before in Taiwan.
+        self.assertEqual(resolve_store_release_day("2026-12-04", "2026-12-03T15:00:00Z"), {
+            "release_start": "2026-12-03", "release_store_date": "2026-12-04",
+            "release_date_normalization": STEAM_RELEASE_TIME_TAIPEI,
+        })
+
     def test_unverified_date_conflict_and_imprecise_dates_are_rejected(self):
-        self.assertIsNone(resolve_store_release_day("2026-09-03", "2026-09-04T04:02:14Z"))
+        self.assertIsNone(resolve_store_release_day("2026-09-02", "2026-09-04T04:02:14Z"))
+        self.assertEqual(resolve_store_release_day("2026-09-02", "2026-09-04T04:02:14Z",
+                                                   allow_taiwan_store_authority=True)["release_start"], "2026-09-02")
         for day in ("September 2026", "2026", "20260903", "2026-02-30"):
             self.assertIsNone(resolve_store_release_day(day, "2026-09-04T04:02:14Z",
                                                        allow_taiwan_store_authority=True))
@@ -199,6 +215,41 @@ class AdmissionTests(unittest.TestCase):
             with self.subTest(field=field):
                 self.assertFalse(has_taiwan_store_date_authority(invalid))
                 self.assertFalse(is_twitch_qualified(invalid))
+
+    def test_an_earlier_store_day_admission_one_day_off_moves_to_taiwans_day(self):
+        legacy = row()
+        legacy.update({
+            "release_raw": "2026-10-01", "release_start": "2026-10-01", "release_end": "2026-10-01",
+            "release_store_date": "2026-10-01", "release_time_utc": "2026-10-02T04:00:00Z",
+            "release_date_normalization": TW_STORE_DATE_AUTHORITY,
+            "release_display_provider": TW_STORE_DATE_PROVIDER,
+            "release_time_source": "Steam IStoreBrowseService/GetItems",
+            "release_date_verified_at": "2026-10-02T08:00:00Z",
+            "release_date_conflict": True, "release_date_conflict_note": "kept the Store day",
+        })
+        self.assertTrue(has_taiwan_store_date_authority(legacy))
+        before = deepcopy(legacy)
+        moved = taipei_release_day(legacy)
+        self.assertEqual(legacy, before)
+        self.assertEqual((moved["release_raw"], moved["release_start"], moved["release_end"],
+                          moved["release_timestamp_taipei_date"]), ("2026-10-02",) * 4)
+        self.assertEqual(moved["release_store_date"], "2026-10-01")
+        self.assertIs(moved["release_date_conflict"], False)
+        self.assertNotIn("release_date_conflict_note", moved)
+        self.assertEqual(moved["release_date_normalization"], STEAM_RELEASE_TIME_TAIPEI)
+        self.assertEqual(moved["release_display_provider"], "Steam IStoreBrowseService/GetItems")
+        self.assertFalse(has_taiwan_store_date_authority(moved))
+        self.assertTrue(is_twitch_qualified(moved))
+        self.assertEqual(taipei_release_day(moved), moved)
+        # A wider gap keeps its Store day, and ordinary rows are untouched.
+        wide = deepcopy(legacy)
+        wide.update({"release_raw": "2026-09-30", "release_start": "2026-09-30",
+                     "release_end": "2026-09-30", "release_store_date": "2026-09-30"})
+        self.assertTrue(has_taiwan_store_date_authority(wide))
+        self.assertIs(taipei_release_day(wide), wide)
+        ordinary = row()
+        self.assertIs(taipei_release_day(ordinary), ordinary)
+        self.assertEqual(taipei_release_day("not a row"), "not a row")
 
     def test_twitch_admission_is_independent_of_ordinary_follower_threshold(self):
         game = row()

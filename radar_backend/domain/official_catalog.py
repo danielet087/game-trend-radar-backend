@@ -1,12 +1,16 @@
 """Post-Followers Store date decisions and qualified master promotion.
 
-The Store announcement is the calendar authority; its API timestamp is kept
-as diagnostic evidence. All clocks and adult decisions are explicit inputs.
+The Store announcement is the calendar authority unless it is one day off the
+API release time: that is the announced day's time zone, so Taiwan's day of
+the release time is used and the announced day is kept beside it. All clocks
+and adult decisions are explicit inputs.
 """
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
 from typing import Callable
+
+from radar_core.domain.twitch_admission import STEAM_RELEASE_TIME_TAIPEI
 
 from radar_backend.domain.official_queue import (
     TAIPEI, queue_checked_numeric as checked_numeric, valid_date,
@@ -39,6 +43,12 @@ def apply_store_detail_to_result(result: dict, detail: dict, *, checked_at: date
         return False
     announced_day = result.get("release_date")
     timestamp_day = detail["release_start"]
+    if (valid_date(announced_day) and announced_day != timestamp_day
+            and abs((date.fromisoformat(timestamp_day) - date.fromisoformat(announced_day)).days) == 1):
+        # An evening launch in the Americas (or midnight in Japan) is one day off Taiwan.
+        result["release_store_date"] = announced_day
+        result["release_date_normalization"] = STEAM_RELEASE_TIME_TAIPEI
+        announced_day = timestamp_day
     result["release_date"] = announced_day if valid_date(announced_day) else timestamp_day
     result["release_timestamp_taipei_date"] = detail.get(
         "release_timestamp_taipei_date", timestamp_day,
@@ -100,6 +110,9 @@ def upsert_qualified_master(
         "release_time_source": result.get("release_display_provider"),
         "release_timestamp_taipei_date": result.get("release_timestamp_taipei_date"),
         "release_date_conflict": result.get("release_date_conflict") is True,
+        # The announced day and the rule that moved it, when it was one day off Taiwan's day.
+        "release_store_date": result.get("release_store_date"),
+        "release_date_normalization": result.get("release_date_normalization"),
         "release_date_verified_at": stamp,
         "post_followers_store_verified": True,
         "post_followers_store_verified_at": stamp,

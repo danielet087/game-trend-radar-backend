@@ -1,4 +1,10 @@
-"""Preserve a verified Taiwan Store calendar date without changing its instant."""
+"""Taiwan's day of the release time, and the Store-day authority kept for wider gaps.
+
+A Store day one day off the release time is the announced day's time zone, so
+the admission takes Taiwan's day. Only a wider gap keeps a verified TW Store
+day (without changing the instant), and earlier one-day authority rows move to
+Taiwan's day without announcing a new release date.
+"""
 from copy import deepcopy
 from datetime import date, datetime
 import json
@@ -7,24 +13,29 @@ import pytest
 
 from scripts.build_public_steam_shards import build, merge_game, valid_record
 from scripts.import_twitch_steam_discoveries import build_candidate, follower_candidate
-from scripts.steam_master_date_gate import apply_store_release_detail, parse_store_release_detail
+from scripts.steam_master_date_gate import (
+    apply_store_release_detail, filter_confirmed_master_games, parse_store_release_detail,
+)
 from scripts.twitch_official_queue import is_twitch_queue_candidate
+from radar_backend.publication.activity_origins import catalog_activity_origins
+from radar_core.domain.twitch_admission import STEAM_RELEASE_TIME_TAIPEI, taipei_release_day
 from scripts.twitch_steam_admission import (
     has_taiwan_store_date_authority, is_twitch_qualified, resolve_store_release_day,
 )
 from tests.test_twitch_steam_admission import NOW, proof, row, steam
 
 
-STORE_DAY = "2026-09-03"
+# Two days before Taiwan's 9/4: wider than a time zone, so the Store day keeps authority.
+STORE_DAY = "2026-09-02"
 REAL_INSTANT = "2026-09-04T04:02:14Z"
 PROVIDER = "Steam Store appdetails cc=TW l=tchinese"
 
 
-def authoritative_record(followers=0):
+def authoritative_record(followers=0, store_text="2026 年 9 月 2 日"):
     item, details = steam()
     item["release"]["steam_release_date"] = int(datetime.fromisoformat(
         REAL_INSTANT.replace("Z", "+00:00")).timestamp())
-    details["release_date"] = {"date": "2026 年 9 月 3 日", "coming_soon": False}
+    details["release_date"] = {"date": store_text, "coming_soon": False}
     candidate, reason = build_candidate(
         123, proof(), item, details, followers, "2026-10-02T06:00:00Z", NOW, set(),
     )
@@ -56,7 +67,7 @@ def test_taiwan_store_authority_is_opt_in_and_keeps_the_real_release_instant():
     ("release_date_normalization", "steam_store_date_matches_taipei"),
     ("release_timestamp_taipei_date", STORE_DAY),
     ("release_date_conflict", False),
-    ("release_store_date", "2026-09-02"),
+    ("release_store_date", "2026-09-01"),
     ("release_time_utc", None),
 ])
 def test_incomplete_or_inconsistent_authority_cannot_bypass_date_validation(field, value):
@@ -145,3 +156,59 @@ def test_browse_refresh_retains_verified_taiwan_date_and_updates_only_the_diagno
     assert updated["release_timestamp_taipei_date"] == "2026-10-02"
     assert updated["release_date_conflict"] is True
     assert is_twitch_qualified(updated)
+
+
+def test_a_one_day_gap_is_a_time_zone_and_admits_taiwans_day():
+    # The Store's 9/3 is an evening launch in the Americas: Taiwan has 9/4 12:02.
+    game = authoritative_record(store_text="2026 年 9 月 3 日")
+    assert game["release_start"] == game["release_end"] == game["release_timestamp_taipei_date"] == "2026-09-04"
+    assert game["release_store_date"] == "2026-09-03"
+    assert game["release_date_normalization"] == STEAM_RELEASE_TIME_TAIPEI
+    assert game["release_date_conflict"] is False
+    assert game["release_display_provider"] == "Steam IStoreBrowseService/GetItems"
+    assert not has_taiwan_store_date_authority(game)
+    assert is_twitch_qualified(game)
+    assert is_twitch_queue_candidate(follower_candidate(game), NOW)
+
+
+def legacy_one_day_authority():
+    """A row admitted before the time-zone rule: the Store's 9/3 kept as the day."""
+    game = authoritative_record(store_text="2026 年 9 月 3 日")
+    game.update({"release_raw": "2026-09-03", "release_start": "2026-09-03", "release_end": "2026-09-03",
+                 "release_date_normalization": "steam_taiwan_store_date_authoritative",
+                 "release_display_provider": PROVIDER, "release_date_conflict": True})
+    assert has_taiwan_store_date_authority(game) and is_twitch_qualified(game)
+    return game
+
+
+def test_an_earlier_one_day_authority_row_moves_to_taiwans_day_in_the_master_and_calendar(tmp_path):
+    legacy = legacy_one_day_authority()
+    retained = filter_confirmed_master_games([legacy], [], today=date(2026, 10, 2))
+    assert [row["release_start"] for row in retained] == ["2026-09-04"]
+    moved = retained[0]
+    assert moved == taipei_release_day(legacy)
+    assert moved["release_store_date"] == "2026-09-03" and moved["release_date_conflict"] is False
+    assert is_twitch_qualified(moved)
+    source = tmp_path / "master.json"
+    frontend = tmp_path / "frontend"
+    source.write_text(json.dumps({"games": retained}), encoding="utf-8")
+    build(source, frontend, authoritative_future=True)
+    published = json.loads((frontend / "data/catalog.json").read_text())["games"][0]
+    assert published["release_start"] == "2026-09-04"
+    assert published["release_store_date"] == "2026-09-03"
+    assert is_twitch_qualified(published)
+
+
+def test_moving_to_taiwans_day_is_not_announced_as_a_new_release_date():
+    legacy, moved = legacy_one_day_authority(), taipei_release_day(legacy_one_day_authority())
+    stamp = "2026-10-02T09:00:00Z"
+    origins = catalog_activity_origins(None, {"games": [legacy]}, {"games": [moved]},
+                                       update_reason="steam_daily_search", at=stamp)
+    assert origins["events"] == []
+    # A release time that really moves to another Taiwan day is still news.
+    later = dict(moved, release_raw="2026-09-05", release_start="2026-09-05", release_end="2026-09-05",
+                 release_timestamp_taipei_date="2026-09-05", release_time_utc="2026-09-05T04:00:00Z")
+    origins = catalog_activity_origins(None, {"games": [moved]}, {"games": [later]},
+                                       update_reason="steam_daily_search", at=stamp)
+    assert [(event["type"], event["previous_date"], event["date"]) for event in origins["events"]] == [
+        ("release_date", "2026-09-04", "2026-09-05")]

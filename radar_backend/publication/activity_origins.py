@@ -107,6 +107,11 @@ def catalog_activity_origins(previous: dict | None, before: dict, after: dict, *
         )
         if kind is None:
             continue
+        if (kind == "release_date" and prior.get("release_timestamp_taipei_date") == row["release_start"]
+                and row.get("release_store_date") == prior["release_start"]):
+            # The same release time, now shown on Taiwan's day instead of the
+            # Store's announced day: not a new release date.
+            continue
         reason = update_reason
         if kind == "added" and is_twitch_qualified(row):
             proof = normalize_twitch_admission(row.get("twitch_admission"), appid)

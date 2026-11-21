@@ -13,6 +13,8 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable, Protocol
 
+from radar_core.domain.twitch_admission import taipei_release_day
+
 from radar_backend.domain.candidates import (
     PRIORITY_THRESHOLD, candidate_catalog_rows, candidate_job_result,
     date_gate_candidates, filter_candidate_rows, fresh_state, normalize_prefilter_entries,
@@ -367,6 +369,18 @@ def execute_pipeline(args: argparse.Namespace, runtime: CandidateRuntime) -> dic
         raise RuntimeError("This pipeline needs its own private state; legacy state untouched")
     catalog = runtime.state.load(catalog_file, {"games": []})
     master = runtime.state.load(master_file, {"games": []})
+    # Earlier Store-day admissions one day off their release time take Taiwan's
+    # day (#70). Only the Followers phase saved the filtered master, and the
+    # daily refresh now stops before it (Followers run hourly elsewhere); the
+    # catalog publication and the content reconcile read this file, so the rows
+    # move here in every phase. Nothing else in a row changes.
+    games = master.get("games", [])
+    moved = [taipei_release_day(row) if isinstance(row, dict) else row for row in games]
+    if moved != games:
+        master["games"] = moved
+        runtime.state.save(master_file, master)
+        LOG.info("MASTER_TAIWAN_RELEASE_DAY moved=%d",
+                 sum(new is not old for new, old in zip(moved, games)))
     phase = state.get("phase")
     if phase == "discovery":
         result = run_discovery(args, state, catalog, runtime)

@@ -199,6 +199,32 @@ def test_an_earlier_one_day_authority_row_moves_to_taiwans_day_in_the_master_and
     assert is_twitch_qualified(published)
 
 
+def test_the_daily_refresh_moves_earlier_one_day_rows_in_the_saved_master():
+    """The daily refresh stops before the Followers phase that saved the
+    filtered master, so loading the master moves these rows in any phase."""
+    from radar_backend.application import candidates as application
+    from radar_backend.jobs.candidates import build_parser
+    from tests.test_candidate_layers import MemoryState, prepared_state, runtime
+
+    legacy = legacy_one_day_authority()
+    other = dict(legacy_one_day_authority(), appid=456)
+    other.pop("twitch_admission")  # Not an authority row: left exactly as it is.
+    store = MemoryState({"state.json": prepared_state("complete"), "catalog.json": {"games": []},
+                         "master.json": {"games": [legacy, other], "updated_at": "2026-10-01T00:00:00Z"}})
+    args = build_parser().parse_args(["--state", "state.json", "--catalog", "catalog.json",
+                                      "--master", "master.json"])
+    application.execute_pipeline(args, runtime(store))
+    master = store.values["master.json"]
+    assert master["games"] == [taipei_release_day(legacy), other]
+    assert master["games"][0]["release_start"] == "2026-09-04"
+    assert master["games"][0]["release_store_date"] == "2026-09-03"
+    assert master["updated_at"] == "2026-10-01T00:00:00Z"
+    # Nothing left to move: the master is not written again.
+    store.saved.clear()
+    application.execute_pipeline(args, runtime(store))
+    assert "master.json" not in store.saved
+
+
 def test_moving_to_taiwans_day_is_not_announced_as_a_new_release_date():
     legacy, moved = legacy_one_day_authority(), taipei_release_day(legacy_one_day_authority())
     stamp = "2026-10-02T09:00:00Z"

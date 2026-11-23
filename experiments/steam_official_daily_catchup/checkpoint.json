@@ -3,7 +3,7 @@
   "cohort": "steam_official_daily_catchup_dynamic_v1",
   "community_daily_requests": {
     "date": "2026-11-23",
-    "requests": 84
+    "requests": 88
   },
   "community_identity": {
     "active": "zh-TW",
@@ -59812,19 +59812,19 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "45135184456",
+    "run_id": "45143181197",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 6,
-    "started_at": "2026-11-23T16:03:02.289530+08:00",
-    "last_updated_at": "2026-11-23T16:05:33.355886+08:00",
-    "requests_this_run": 6,
-    "official_new_this_run": 6,
+    "started_at": "2026-11-23T17:03:04.105255+08:00",
+    "last_updated_at": "2026-11-23T17:04:35.081702+08:00",
+    "requests_this_run": 4,
+    "official_new_this_run": 4,
     "http_429_this_run": 0,
-    "last_appid": 3458140,
-    "last_name": "NimerWorld: Shadows of a Promise",
-    "finished_at": "2026-11-23T16:05:33.355886+08:00",
+    "last_appid": 5511530,
+    "last_name": "Nightclub Life",
+    "finished_at": "2026-11-23T17:04:35.081702+08:00",
     "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
@@ -144836,13 +144836,65 @@
       "official_ge5000": false,
       "official_checked_at_taipei": "2026-11-23T16:05:33.207846+08:00",
       "official_source": "Steam Community XML memberCount"
+    },
+    "5455710": {
+      "appid": 5455710,
+      "name": "Plants Need Some Space",
+      "release_date": "2027-04-16",
+      "group_id64": "103582791476253853",
+      "steam_url": "https://store.steampowered.com/app/5455710/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-22T17:06:58.718814+00:00",
+      "official_followers": 12,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-23T17:03:05.010340+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5531650": {
+      "appid": 5531650,
+      "name": "Hollow Winter",
+      "release_date": "2027-04-16",
+      "group_id64": "103582791476230040",
+      "steam_url": "https://store.steampowered.com/app/5531650/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-22T17:06:58.718814+00:00",
+      "official_followers": 2,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-23T17:03:35.017642+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "4756280": {
+      "appid": 4756280,
+      "name": "Signarchy",
+      "release_date": "2027-04-20",
+      "group_id64": "103582791476089050",
+      "steam_url": "https://store.steampowered.com/app/4756280/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-22T17:06:58.718814+00:00",
+      "official_followers": 6,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-23T17:04:04.960457+08:00",
+      "official_source": "Steam Community XML memberCount"
+    },
+    "5511530": {
+      "appid": 5511530,
+      "name": "Nightclub Life",
+      "release_date": "2027-10-27",
+      "group_id64": "103582791476254592",
+      "steam_url": "https://store.steampowered.com/app/5511530/",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "daily_source_updated_at": "2026-11-22T17:06:58.718814+00:00",
+      "official_followers": 4,
+      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-23T17:04:34.948863+08:00",
+      "official_source": "Steam Community XML memberCount"
     }
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
   "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-11-23T16:05:33.207846+08:00",
+  "community_last_success_at": "2026-11-23T17:04:34.948863+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -166197,6 +166249,46 @@
       "status": "ok",
       "github_run_id": "45135184456",
       "official_followers": 2
+    },
+    {
+      "appid": 5455710,
+      "when_taipei": "2026-11-23T17:03:04.836487+08:00",
+      "release_date": "2027-04-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "45143181197",
+      "official_followers": 12
+    },
+    {
+      "appid": 5531650,
+      "when_taipei": "2026-11-23T17:03:34.836625+08:00",
+      "release_date": "2027-04-16",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "45143181197",
+      "official_followers": 2
+    },
+    {
+      "appid": 4756280,
+      "when_taipei": "2026-11-23T17:04:04.836748+08:00",
+      "release_date": "2027-04-20",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "45143181197",
+      "official_followers": 6
+    },
+    {
+      "appid": 5511530,
+      "when_taipei": "2026-11-23T17:04:34.836861+08:00",
+      "release_date": "2027-10-27",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "45143181197",
+      "official_followers": 4
     }
   ]
 }

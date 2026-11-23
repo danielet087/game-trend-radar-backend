@@ -19585,14 +19585,40 @@
       "release_date": "2027-10-27",
       "status": "ok",
       "when_taipei": "2026-11-23T17:04:34.836861+08:00"
+    },
+    {
+      "appid": 2295170,
+      "content_dispatch": "dispatched",
+      "github_run_id": "45244301463",
+      "http": 200,
+      "official_followers": 51487,
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-01-08",
+      "status": "ok",
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "when_taipei": "2026-11-24T03:03:25.458799+08:00"
+    },
+    {
+      "appid": 3438920,
+      "content_dispatch": "dispatched",
+      "github_run_id": "45244301463",
+      "http": 200,
+      "official_followers": 12909,
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-01-20",
+      "status": "ok",
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "when_taipei": "2026-11-24T03:04:11.695176+08:00"
     }
   ],
   "checkpoint_migration_note": "Clear transient XML-error cooldown only for confirmed AppID 4435490 without group ID; preserve HTTP 429 history and official results.",
   "cohort": "steam_official_daily_catchup_dynamic_v1",
   "community_cooldown": null,
   "community_daily_requests": {
-    "date": "2026-11-23",
-    "requests": 88
+    "date": "2026-11-24",
+    "requests": 3
   },
   "community_identity": {
     "active": "zh-TW",
@@ -19604,12 +19630,19 @@
     "standby_retry_at": "2026-11-20T19:03:04.465427+08:00",
     "switched_at": "2026-11-20T03:03:08.016271+08:00"
   },
-  "community_last_success_at": "2026-11-24T01:48:20.682701+08:00",
+  "community_last_success_at": "2026-11-24T03:05:21.579205+08:00",
   "content_dispatches": {
     "1154960": {
       "dispatched_at_taipei": "2026-11-10T17:28:13.789837+08:00",
       "event_type": "steam_game_qualified",
       "signature": "1154960:10582:2027-01-25:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend"
+    },
+    "1173980": {
+      "dispatched_at_taipei": "2026-11-24T03:05:21.690103+08:00",
+      "event_type": "steam_game_qualified",
+      "signature": "1173980:26052:2027-03-10:store-v2",
       "status": "dispatched",
       "target_repository": "danielet087/game-trend-radar-content-backend"
     },
@@ -19708,6 +19741,13 @@
       "dispatched_at_taipei": "2026-11-10T15:26:44.912435+08:00",
       "event_type": "steam_game_qualified",
       "signature": "2262630:5033:2026-12-10:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend"
+    },
+    "2295170": {
+      "dispatched_at_taipei": "2026-11-24T03:03:25.737547+08:00",
+      "event_type": "steam_game_qualified",
+      "signature": "2295170:51487:2027-01-08:store-v2",
       "status": "dispatched",
       "target_repository": "danielet087/game-trend-radar-content-backend"
     },
@@ -19855,6 +19895,13 @@
       "dispatched_at_taipei": "2026-10-16T16:19:37.879710+08:00",
       "event_type": "steam_game_qualified",
       "signature": "3370490:5778:2026-10-27:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend"
+    },
+    "3438920": {
+      "dispatched_at_taipei": "2026-11-24T03:04:11.944107+08:00",
+      "event_type": "steam_game_qualified",
+      "signature": "3438920:12909:2027-01-20:store-v2",
       "status": "dispatched",
       "target_repository": "danielet087/game-trend-radar-content-backend"
     },
@@ -22305,6 +22352,32 @@
       "store_date_exact": true,
       "store_date_status": "date_full"
     },
+    "1173980": {
+      "appid": 1173980,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-16T17:28:26Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791465515992",
+      "name": "Shadow of the Road",
+      "official_checked_at_taipei": "2026-11-24T03:05:21.579205+08:00",
+      "official_followers": 26052,
+      "official_ge5000": true,
+      "official_source": "Steam Community XML memberCount",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-03-10",
+      "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_timezone": "Asia/Taipei",
+      "release_display_precision": "date_full",
+      "release_display_provider": "Steam IStoreBrowseService/GetItems",
+      "release_time_utc": "2027-03-10T13:00:00Z",
+      "release_timestamp_taipei_date": "2027-03-10",
+      "steam_url": "https://store.steampowered.com/app/1173980/",
+      "store_date_checked_at_taipei": "2026-11-24T03:05:21.678430+08:00",
+      "store_date_exact": true,
+      "store_date_status": "date_full"
+    },
     "1203620": {
       "appid": 1203620,
       "group_id64": "103582791473574969",
@@ -23644,6 +23717,32 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-15",
       "steam_url": "https://store.steampowered.com/app/2278570/"
+    },
+    "2295170": {
+      "appid": 2295170,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-16T17:27:56Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791474230814",
+      "name": "Emberville",
+      "official_checked_at_taipei": "2026-11-24T03:03:25.577905+08:00",
+      "official_followers": 51487,
+      "official_ge5000": true,
+      "official_source": "Steam Community XML memberCount",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-01-08",
+      "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_timezone": "Asia/Taipei",
+      "release_display_precision": "date_full",
+      "release_display_provider": "Steam IStoreBrowseService/GetItems",
+      "release_time_utc": "2027-01-07T17:00:00Z",
+      "release_timestamp_taipei_date": "2027-01-08",
+      "steam_url": "https://store.steampowered.com/app/2295170/",
+      "store_date_checked_at_taipei": "2026-11-24T03:03:25.726262+08:00",
+      "store_date_exact": true,
+      "store_date_status": "date_full"
     },
     "2309180": {
       "appid": 2309180,
@@ -26132,7 +26231,7 @@
       "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
       "release_date": "2027-04-01",
       "steam_url": "https://store.steampowered.com/app/3266110/",
-      "store_date_checked_at_taipei": "2026-11-23T03:03:01.458450+08:00",
+      "store_date_checked_at_taipei": "2026-11-24T03:03:25.189216+08:00",
       "store_date_exact": false,
       "store_date_status": "text_comingsoon"
     },
@@ -26726,6 +26825,32 @@
       "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
       "release_date": "2026-11-09",
       "steam_url": "https://store.steampowered.com/app/3433110/"
+    },
+    "3438920": {
+      "appid": 3438920,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-09-20T01:54:12Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791474974489",
+      "name": "VOID DIVER: Escape from the Abyss",
+      "official_checked_at_taipei": "2026-11-24T03:04:11.796558+08:00",
+      "official_followers": 12909,
+      "official_ge5000": true,
+      "official_source": "Steam Community XML memberCount",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-01-20",
+      "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_timezone": "Asia/Taipei",
+      "release_display_precision": "date_full",
+      "release_display_provider": "Steam IStoreBrowseService/GetItems",
+      "release_time_utc": "2027-01-20T08:00:00Z",
+      "release_timestamp_taipei_date": "2027-01-20",
+      "steam_url": "https://store.steampowered.com/app/3438920/",
+      "store_date_checked_at_taipei": "2026-11-24T03:04:11.932860+08:00",
+      "store_date_exact": true,
+      "store_date_status": "date_full"
     },
     "3451250": {
       "appid": 3451250,
@@ -105956,6 +106081,18 @@
       "release_date": "2027-01-25",
       "steam_url": "https://store.steampowered.com/app/1154960/"
     },
+    "1173980": {
+      "appid": 1173980,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-16T17:28:26Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791465515992",
+      "name": "Shadow of the Road",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-03-10",
+      "steam_url": "https://store.steampowered.com/app/1173980/"
+    },
     "1207360": {
       "appid": 1207360,
       "daily_source_updated_at": "2026-11-19T17:06:07.179661+00:00",
@@ -106546,6 +106683,18 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-15",
       "steam_url": "https://store.steampowered.com/app/2278570/"
+    },
+    "2295170": {
+      "appid": 2295170,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-16T17:27:56Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791474230814",
+      "name": "Emberville",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-01-08",
+      "steam_url": "https://store.steampowered.com/app/2295170/"
     },
     "2309180": {
       "appid": 2309180,
@@ -107887,6 +108036,18 @@
       "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
       "release_date": "2026-11-09",
       "steam_url": "https://store.steampowered.com/app/3433110/"
+    },
+    "3438920": {
+      "appid": 3438920,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-09-20T01:54:12Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791474974489",
+      "name": "VOID DIVER: Escape from the Abyss",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2027-01-20",
+      "steam_url": "https://store.steampowered.com/app/3438920/"
     },
     "3451250": {
       "appid": 3451250,
@@ -109959,6 +110120,15 @@
       "release_date": "2027-05-19",
       "steam_url": "https://store.steampowered.com/app/4325520/"
     },
+    "4325760": {
+      "appid": 4325760,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476228474",
+      "name": "Night on Bald Mountain",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-30",
+      "steam_url": "https://store.steampowered.com/app/4325760/"
+    },
     "4329970": {
       "appid": 4329970,
       "daily_source_updated_at": "2026-10-08T11:01:56.890908+00:00",
@@ -110634,6 +110804,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-01",
       "steam_url": "https://store.steampowered.com/app/4488460/"
+    },
+    "4489630": {
+      "appid": 4489630,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475787050",
+      "name": "This is Not a Snake Game",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-12",
+      "steam_url": "https://store.steampowered.com/app/4489630/"
     },
     "4498140": {
       "appid": 4498140,
@@ -116401,6 +116580,15 @@
       "release_date": "2026-09-28",
       "steam_url": "https://store.steampowered.com/app/4958470/"
     },
+    "4958650": {
+      "appid": 4958650,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476070459",
+      "name": "Wheel of Death",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-26",
+      "steam_url": "https://store.steampowered.com/app/4958650/"
+    },
     "4958670": {
       "appid": 4958670,
       "group_id64": "103582791475818028",
@@ -116669,6 +116857,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-30",
       "steam_url": "https://store.steampowered.com/app/4966280/"
+    },
+    "4966440": {
+      "appid": 4966440,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475753414",
+      "name": "Rogue Link Loop",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-01",
+      "steam_url": "https://store.steampowered.com/app/4966440/"
     },
     "4966560": {
       "appid": 4966560,
@@ -117803,6 +118000,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-08",
       "steam_url": "https://store.steampowered.com/app/4989730/"
+    },
+    "4989850": {
+      "appid": 4989850,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475754167",
+      "name": "不一样的合成：生生不息 Genesis: From Water to Stars",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-18",
+      "steam_url": "https://store.steampowered.com/app/4989850/"
     },
     "4989900": {
       "appid": 4989900,
@@ -121921,6 +122127,15 @@
       "release_date": "2026-10-30",
       "steam_url": "https://store.steampowered.com/app/5050080/"
     },
+    "5050200": {
+      "appid": 5050200,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475787008",
+      "name": "Gold Seller",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-24",
+      "steam_url": "https://store.steampowered.com/app/5050200/"
+    },
     "5050460": {
       "appid": 5050460,
       "daily_source_updated_at": "2026-11-21T23:05:16.171692+00:00",
@@ -122879,6 +123094,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-03",
       "steam_url": "https://store.steampowered.com/app/5062020/"
+    },
+    "5062120": {
+      "appid": 5062120,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476179576",
+      "name": "Formula First Manager",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-04",
+      "steam_url": "https://store.steampowered.com/app/5062120/"
     },
     "5062150": {
       "appid": 5062150,
@@ -124994,6 +125218,15 @@
       "release_date": "2026-10-01",
       "steam_url": "https://store.steampowered.com/app/5090060/"
     },
+    "5090120": {
+      "appid": 5090120,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475790065",
+      "name": "NICO DRAW",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-09",
+      "steam_url": "https://store.steampowered.com/app/5090120/"
+    },
     "5090130": {
       "appid": 5090130,
       "daily_source_updated_at": "2026-11-08T17:05:56.077866+00:00",
@@ -125539,6 +125772,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-31",
       "steam_url": "https://store.steampowered.com/app/5097100/"
+    },
+    "5097110": {
+      "appid": 5097110,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475788753",
+      "name": "SLICKWAVE",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-02",
+      "steam_url": "https://store.steampowered.com/app/5097110/"
     },
     "5097190": {
       "appid": 5097190,
@@ -127676,6 +127918,15 @@
       "release_date": "2026-10-29",
       "steam_url": "https://store.steampowered.com/app/5123900/"
     },
+    "5123930": {
+      "appid": 5123930,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476127315",
+      "name": "TCG Town",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-25",
+      "steam_url": "https://store.steampowered.com/app/5123930/"
+    },
     "5123950": {
       "appid": 5123950,
       "group_id64": "103582791475830915",
@@ -128682,6 +128933,15 @@
       "queue_source": "frozen_20260922_original_third_party_missing",
       "release_date": "2026-10-28",
       "steam_url": "https://store.steampowered.com/app/5134070/"
+    },
+    "5134180": {
+      "appid": 5134180,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475807545",
+      "name": "Ass Slapper Co",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-02",
+      "steam_url": "https://store.steampowered.com/app/5134180/"
     },
     "5134240": {
       "appid": 5134240,
@@ -129773,6 +130033,15 @@
       "queue_source": "frozen_20260922_original_third_party_missing",
       "release_date": "2026-11-02",
       "steam_url": "https://store.steampowered.com/app/5150470/"
+    },
+    "5150590": {
+      "appid": 5150590,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475827140",
+      "name": "Dog Escape: Extraction Shooter",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-14",
+      "steam_url": "https://store.steampowered.com/app/5150590/"
     },
     "5151180": {
       "appid": 5151180,
@@ -130920,6 +131189,15 @@
       "queue_source": "frozen_20260922_original_third_party_missing",
       "release_date": "2026-09-28",
       "steam_url": "https://store.steampowered.com/app/5166980/"
+    },
+    "5167210": {
+      "appid": 5167210,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475802131",
+      "name": "Reversed",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-01",
+      "steam_url": "https://store.steampowered.com/app/5167210/"
     },
     "5167220": {
       "appid": 5167220,
@@ -135205,6 +135483,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-07",
       "steam_url": "https://store.steampowered.com/app/5213380/"
+    },
+    "5213430": {
+      "appid": 5213430,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475831194",
+      "name": "LOVE COMPANY: A Romance Escape",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-21",
+      "steam_url": "https://store.steampowered.com/app/5213430/"
     },
     "5213530": {
       "appid": 5213530,
@@ -139929,6 +140216,15 @@
       "release_date": "2027-01-01",
       "steam_url": "https://store.steampowered.com/app/5274850/"
     },
+    "5275040": {
+      "appid": 5275040,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791475836497",
+      "name": "Orbit Foundry",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-04-01",
+      "steam_url": "https://store.steampowered.com/app/5275040/"
+    },
     "5275380": {
       "appid": 5275380,
       "daily_source_updated_at": "2026-11-09T23:07:40.090992+00:00",
@@ -142274,6 +142570,15 @@
       "release_date": "2026-10-23",
       "steam_url": "https://store.steampowered.com/app/5303370/"
     },
+    "5303380": {
+      "appid": 5303380,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476000013",
+      "name": "Fih🥀🥀",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-14",
+      "steam_url": "https://store.steampowered.com/app/5303380/"
+    },
     "5303410": {
       "appid": 5303410,
       "daily_source_updated_at": "2026-11-16T17:03:49.144685+00:00",
@@ -143615,6 +143920,15 @@
       "release_date": "2026-10-27",
       "steam_url": "https://store.steampowered.com/app/5319020/"
     },
+    "5319080": {
+      "appid": 5319080,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476018169",
+      "name": "Iron Trails",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-21",
+      "steam_url": "https://store.steampowered.com/app/5319080/"
+    },
     "5319290": {
       "appid": 5319290,
       "daily_source_updated_at": "2026-09-30T21:31:14.887947+00:00",
@@ -143992,6 +144306,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-30",
       "steam_url": "https://store.steampowered.com/app/5323970/"
+    },
+    "5324080": {
+      "appid": 5324080,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476235710",
+      "name": "Dungeon: The Lantern Bearer",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-10",
+      "steam_url": "https://store.steampowered.com/app/5324080/"
     },
     "5324450": {
       "appid": 5324450,
@@ -146453,6 +146776,15 @@
       "release_date": "2026-11-06",
       "steam_url": "https://store.steampowered.com/app/5349900/"
     },
+    "5349990": {
+      "appid": 5349990,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476105088",
+      "name": "Llama 97 OS",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-28",
+      "steam_url": "https://store.steampowered.com/app/5349990/"
+    },
     "5350040": {
       "appid": 5350040,
       "daily_source_updated_at": "2026-10-03T17:02:31.825708+00:00",
@@ -147244,6 +147576,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-13",
       "steam_url": "https://store.steampowered.com/app/5360480/"
+    },
+    "5360490": {
+      "appid": 5360490,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476093016",
+      "name": "RUNEBLADE",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-29",
+      "steam_url": "https://store.steampowered.com/app/5360490/"
     },
     "5360610": {
       "appid": 5360610,
@@ -148225,6 +148566,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-01",
       "steam_url": "https://store.steampowered.com/app/5370760/"
+    },
+    "5370790": {
+      "appid": 5370790,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476131420",
+      "name": "Liar's Poker",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-10",
+      "steam_url": "https://store.steampowered.com/app/5370790/"
     },
     "5371030": {
       "appid": 5371030,
@@ -151634,6 +151984,24 @@
       "release_date": "2027-03-06",
       "steam_url": "https://store.steampowered.com/app/5409550/"
     },
+    "5409770": {
+      "appid": 5409770,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476162291",
+      "name": "Salem 1692",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-26",
+      "steam_url": "https://store.steampowered.com/app/5409770/"
+    },
+    "5409780": {
+      "appid": 5409780,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476156301",
+      "name": "4th Supplementary",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-27",
+      "steam_url": "https://store.steampowered.com/app/5409780/"
+    },
     "5410080": {
       "appid": 5410080,
       "daily_source_updated_at": "2026-11-03T17:14:31.456682+00:00",
@@ -152951,6 +153319,15 @@
       "release_date": "2026-12-22",
       "steam_url": "https://store.steampowered.com/app/5427160/"
     },
+    "5427280": {
+      "appid": 5427280,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476140188",
+      "name": "Robo Race",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-01",
+      "steam_url": "https://store.steampowered.com/app/5427280/"
+    },
     "5427290": {
       "appid": 5427290,
       "daily_source_updated_at": "2026-10-17T17:10:36.588178+00:00",
@@ -153097,6 +153474,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-08",
       "steam_url": "https://store.steampowered.com/app/5429260/"
+    },
+    "5429440": {
+      "appid": 5429440,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476126083",
+      "name": "Feed the Front",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-03-10",
+      "steam_url": "https://store.steampowered.com/app/5429440/"
     },
     "5429460": {
       "appid": 5429460,
@@ -154123,6 +154509,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-10-31",
       "steam_url": "https://store.steampowered.com/app/5442270/"
+    },
+    "5442290": {
+      "appid": 5442290,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476130806",
+      "name": "Gears & Glory",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-02",
+      "steam_url": "https://store.steampowered.com/app/5442290/"
     },
     "5442520": {
       "appid": 5442520,
@@ -158255,6 +158650,15 @@
       "release_date": "2026-12-11",
       "steam_url": "https://store.steampowered.com/app/5495460/"
     },
+    "5495650": {
+      "appid": 5495650,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476273727",
+      "name": "MazeParty",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-11",
+      "steam_url": "https://store.steampowered.com/app/5495650/"
+    },
     "5495700": {
       "appid": 5495700,
       "daily_source_updated_at": "2026-10-29T23:15:48.850736+00:00",
@@ -158597,6 +159001,15 @@
       "release_date": "2026-11-26",
       "steam_url": "https://store.steampowered.com/app/5499670/"
     },
+    "5499690": {
+      "appid": 5499690,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476177687",
+      "name": "Nightbound Ledger",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-03-29",
+      "steam_url": "https://store.steampowered.com/app/5499690/"
+    },
     "5500000": {
       "appid": 5500000,
       "daily_source_updated_at": "2026-10-29T23:15:48.850736+00:00",
@@ -158911,6 +159324,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-12",
       "steam_url": "https://store.steampowered.com/app/5503690/"
+    },
+    "5503800": {
+      "appid": 5503800,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476275872",
+      "name": "Stay Live: Ghost Viewers",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-18",
+      "steam_url": "https://store.steampowered.com/app/5503800/"
     },
     "5503820": {
       "appid": 5503820,
@@ -159686,6 +160108,15 @@
       "release_date": "2026-12-08",
       "steam_url": "https://store.steampowered.com/app/5515920/"
     },
+    "5515940": {
+      "appid": 5515940,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476276616",
+      "name": "Mahjong Kart",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-07",
+      "steam_url": "https://store.steampowered.com/app/5515940/"
+    },
     "5516160": {
       "appid": 5516160,
       "daily_source_updated_at": "2026-11-20T17:06:00.825114+00:00",
@@ -160252,6 +160683,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-15",
       "steam_url": "https://store.steampowered.com/app/5524570/"
+    },
+    "5524610": {
+      "appid": 5524610,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476197006",
+      "name": "Goblin Must Clean",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-07",
+      "steam_url": "https://store.steampowered.com/app/5524610/"
     },
     "5524730": {
       "appid": 5524730,
@@ -160864,6 +161304,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-01",
       "steam_url": "https://store.steampowered.com/app/5533280/"
+    },
+    "5533350": {
+      "appid": 5533350,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476246812",
+      "name": "Ascension Trail: Idle Crusade",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-03",
+      "steam_url": "https://store.steampowered.com/app/5533350/"
     },
     "5533510": {
       "appid": 5533510,
@@ -161684,6 +162133,15 @@
       "release_date": "2026-11-27",
       "steam_url": "https://store.steampowered.com/app/5546110/"
     },
+    "5546220": {
+      "appid": 5546220,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476213640",
+      "name": "Dungelo",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-03-05",
+      "steam_url": "https://store.steampowered.com/app/5546220/"
+    },
     "5546230": {
       "appid": 5546230,
       "daily_source_updated_at": "2026-11-06T05:09:52.117281+00:00",
@@ -161728,6 +162186,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-17",
       "steam_url": "https://store.steampowered.com/app/5546670/"
+    },
+    "5546750": {
+      "appid": 5546750,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476246861",
+      "name": "CHASA : Twilight Reaper",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-25",
+      "steam_url": "https://store.steampowered.com/app/5546750/"
     },
     "5547250": {
       "appid": 5547250,
@@ -161782,6 +162249,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-03-29",
       "steam_url": "https://store.steampowered.com/app/5547550/"
+    },
+    "5547610": {
+      "appid": 5547610,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476243108",
+      "name": "Survivor Town",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-27",
+      "steam_url": "https://store.steampowered.com/app/5547610/"
     },
     "5547910": {
       "appid": 5547910,
@@ -161944,6 +162420,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-11",
       "steam_url": "https://store.steampowered.com/app/5550220/"
+    },
+    "5550300": {
+      "appid": 5550300,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476213656",
+      "name": "Shear Debt",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-01",
+      "steam_url": "https://store.steampowered.com/app/5550300/"
     },
     "5550610": {
       "appid": 5550610,
@@ -162251,6 +162736,24 @@
       "release_date": "2026-11-17",
       "steam_url": "https://store.steampowered.com/app/5555440/"
     },
+    "5555520": {
+      "appid": 5555520,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476224397",
+      "name": "DETONUMBER!",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-08",
+      "steam_url": "https://store.steampowered.com/app/5555520/"
+    },
+    "5555790": {
+      "appid": 5555790,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476229061",
+      "name": "D.U.B.B.I.O",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-11-29",
+      "steam_url": "https://store.steampowered.com/app/5555790/"
+    },
     "5556030": {
       "appid": 5556030,
       "daily_source_updated_at": "2026-11-09T23:07:40.090992+00:00",
@@ -162457,6 +162960,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-25",
       "steam_url": "https://store.steampowered.com/app/5559650/"
+    },
+    "5559730": {
+      "appid": 5559730,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476224931",
+      "name": "Tongyou Town",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-03-03",
+      "steam_url": "https://store.steampowered.com/app/5559730/"
     },
     "5561120": {
       "appid": 5561120,
@@ -162826,6 +163338,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-04",
       "steam_url": "https://store.steampowered.com/app/5568040/"
+    },
+    "5568180": {
+      "appid": 5568180,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476230286",
+      "name": "Kingdom of Embers",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-14",
+      "steam_url": "https://store.steampowered.com/app/5568180/"
     },
     "5568300": {
       "appid": 5568300,
@@ -163205,6 +163726,15 @@
       "release_date": "2026-12-22",
       "steam_url": "https://store.steampowered.com/app/5577780/"
     },
+    "5577970": {
+      "appid": 5577970,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476274344",
+      "name": "CORN!",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-11",
+      "steam_url": "https://store.steampowered.com/app/5577970/"
+    },
     "5578150": {
       "appid": 5578150,
       "daily_source_updated_at": "2026-11-22T17:06:58.718814+00:00",
@@ -163393,6 +163923,15 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2027-01-02",
       "steam_url": "https://store.steampowered.com/app/5580140/"
+    },
+    "5580450": {
+      "appid": 5580450,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476276359",
+      "name": "牛马的涌现",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-07",
+      "steam_url": "https://store.steampowered.com/app/5580450/"
     },
     "5580500": {
       "appid": 5580500,
@@ -164456,6 +164995,24 @@
       "release_date": "2026-11-26",
       "steam_url": "https://store.steampowered.com/app/5608170/"
     },
+    "5608340": {
+      "appid": 5608340,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476259282",
+      "name": "Little Kingdom Xiangqi",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-07",
+      "steam_url": "https://store.steampowered.com/app/5608340/"
+    },
+    "5608870": {
+      "appid": 5608870,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476256820",
+      "name": "Smash Arena",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-21",
+      "steam_url": "https://store.steampowered.com/app/5608870/"
+    },
     "5609050": {
       "appid": 5609050,
       "daily_source_updated_at": "2026-11-20T17:06:00.825114+00:00",
@@ -164690,6 +165247,15 @@
       "release_date": "2027-01-06",
       "steam_url": "https://store.steampowered.com/app/5619350/"
     },
+    "5619950": {
+      "appid": 5619950,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476275987",
+      "name": "Dudo",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2027-01-21",
+      "steam_url": "https://store.steampowered.com/app/5619950/"
+    },
     "5620430": {
       "appid": 5620430,
       "daily_source_updated_at": "2026-11-22T17:06:58.718814+00:00",
@@ -164762,6 +165328,15 @@
       "release_date": "2026-12-15",
       "steam_url": "https://store.steampowered.com/app/5623320/"
     },
+    "5623410": {
+      "appid": 5623410,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476275321",
+      "name": "BetterAtGambling",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-07",
+      "steam_url": "https://store.steampowered.com/app/5623410/"
+    },
     "5623500": {
       "appid": 5623500,
       "daily_source_updated_at": "2026-11-21T23:05:16.171692+00:00",
@@ -164789,6 +165364,15 @@
       "release_date": "2026-12-09",
       "steam_url": "https://store.steampowered.com/app/5624570/"
     },
+    "5625200": {
+      "appid": 5625200,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476275796",
+      "name": "Billard Masters Legacy",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-15",
+      "steam_url": "https://store.steampowered.com/app/5625200/"
+    },
     "5625470": {
       "appid": 5625470,
       "daily_source_updated_at": "2026-11-21T23:05:16.171692+00:00",
@@ -164806,6 +165390,24 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-12-08",
       "steam_url": "https://store.steampowered.com/app/5625830/"
+    },
+    "5625860": {
+      "appid": 5625860,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476275781",
+      "name": "MistTower",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-10",
+      "steam_url": "https://store.steampowered.com/app/5625860/"
+    },
+    "5625880": {
+      "appid": 5625880,
+      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
+      "group_id64": "103582791476276964",
+      "name": "Penguin Trails Together",
+      "queue_source": "fresh_daily_prefilter_unresolved",
+      "release_date": "2026-12-10",
+      "steam_url": "https://store.steampowered.com/app/5625880/"
     },
     "689540": {
       "appid": 689540,
@@ -164880,499 +165482,22 @@
       "queue_source": "fresh_daily_prefilter_unresolved",
       "release_date": "2026-11-05",
       "steam_url": "https://store.steampowered.com/app/910550/"
-    },
-    "5123930": {
-      "appid": 5123930,
-      "name": "TCG Town",
-      "release_date": "2026-11-25",
-      "group_id64": "103582791476127315",
-      "steam_url": "https://store.steampowered.com/app/5123930/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5546750": {
-      "appid": 5546750,
-      "name": "CHASA : Twilight Reaper",
-      "release_date": "2026-11-25",
-      "group_id64": "103582791476246861",
-      "steam_url": "https://store.steampowered.com/app/5546750/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5409770": {
-      "appid": 5409770,
-      "name": "Salem 1692",
-      "release_date": "2026-11-26",
-      "group_id64": "103582791476162291",
-      "steam_url": "https://store.steampowered.com/app/5409770/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5409780": {
-      "appid": 5409780,
-      "name": "4th Supplementary",
-      "release_date": "2026-11-27",
-      "group_id64": "103582791476156301",
-      "steam_url": "https://store.steampowered.com/app/5409780/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5547610": {
-      "appid": 5547610,
-      "name": "Survivor Town",
-      "release_date": "2026-11-27",
-      "group_id64": "103582791476243108",
-      "steam_url": "https://store.steampowered.com/app/5547610/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5349990": {
-      "appid": 5349990,
-      "name": "Llama 97 OS",
-      "release_date": "2026-11-28",
-      "group_id64": "103582791476105088",
-      "steam_url": "https://store.steampowered.com/app/5349990/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5555790": {
-      "appid": 5555790,
-      "name": "D.U.B.B.I.O",
-      "release_date": "2026-11-29",
-      "group_id64": "103582791476229061",
-      "steam_url": "https://store.steampowered.com/app/5555790/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "4325760": {
-      "appid": 4325760,
-      "name": "Night on Bald Mountain",
-      "release_date": "2026-11-30",
-      "group_id64": "103582791476228474",
-      "steam_url": "https://store.steampowered.com/app/4325760/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5167210": {
-      "appid": 5167210,
-      "name": "Reversed",
-      "release_date": "2026-12-01",
-      "group_id64": "103582791475802131",
-      "steam_url": "https://store.steampowered.com/app/5167210/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5427280": {
-      "appid": 5427280,
-      "name": "Robo Race",
-      "release_date": "2026-12-01",
-      "group_id64": "103582791476140188",
-      "steam_url": "https://store.steampowered.com/app/5427280/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5550300": {
-      "appid": 5550300,
-      "name": "Shear Debt",
-      "release_date": "2026-12-01",
-      "group_id64": "103582791476213656",
-      "steam_url": "https://store.steampowered.com/app/5550300/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5097110": {
-      "appid": 5097110,
-      "name": "SLICKWAVE",
-      "release_date": "2026-12-02",
-      "group_id64": "103582791475788753",
-      "steam_url": "https://store.steampowered.com/app/5097110/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5442290": {
-      "appid": 5442290,
-      "name": "Gears & Glory",
-      "release_date": "2026-12-02",
-      "group_id64": "103582791476130806",
-      "steam_url": "https://store.steampowered.com/app/5442290/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5533350": {
-      "appid": 5533350,
-      "name": "Ascension Trail: Idle Crusade",
-      "release_date": "2026-12-03",
-      "group_id64": "103582791476246812",
-      "steam_url": "https://store.steampowered.com/app/5533350/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5062120": {
-      "appid": 5062120,
-      "name": "Formula First Manager",
-      "release_date": "2026-12-04",
-      "group_id64": "103582791476179576",
-      "steam_url": "https://store.steampowered.com/app/5062120/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5524610": {
-      "appid": 5524610,
-      "name": "Goblin Must Clean",
-      "release_date": "2026-12-07",
-      "group_id64": "103582791476197006",
-      "steam_url": "https://store.steampowered.com/app/5524610/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5580450": {
-      "appid": 5580450,
-      "name": "牛马的涌现",
-      "release_date": "2026-12-07",
-      "group_id64": "103582791476276359",
-      "steam_url": "https://store.steampowered.com/app/5580450/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5608340": {
-      "appid": 5608340,
-      "name": "Little Kingdom Xiangqi",
-      "release_date": "2026-12-07",
-      "group_id64": "103582791476259282",
-      "steam_url": "https://store.steampowered.com/app/5608340/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5623410": {
-      "appid": 5623410,
-      "name": "BetterAtGambling",
-      "release_date": "2026-12-07",
-      "group_id64": "103582791476275321",
-      "steam_url": "https://store.steampowered.com/app/5623410/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5555520": {
-      "appid": 5555520,
-      "name": "DETONUMBER!",
-      "release_date": "2026-12-08",
-      "group_id64": "103582791476224397",
-      "steam_url": "https://store.steampowered.com/app/5555520/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5090120": {
-      "appid": 5090120,
-      "name": "NICO DRAW",
-      "release_date": "2026-12-09",
-      "group_id64": "103582791475790065",
-      "steam_url": "https://store.steampowered.com/app/5090120/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5324080": {
-      "appid": 5324080,
-      "name": "Dungeon: The Lantern Bearer",
-      "release_date": "2026-12-10",
-      "group_id64": "103582791476235710",
-      "steam_url": "https://store.steampowered.com/app/5324080/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5370790": {
-      "appid": 5370790,
-      "name": "Liar's Poker",
-      "release_date": "2026-12-10",
-      "group_id64": "103582791476131420",
-      "steam_url": "https://store.steampowered.com/app/5370790/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5625860": {
-      "appid": 5625860,
-      "name": "MistTower",
-      "release_date": "2026-12-10",
-      "group_id64": "103582791476275781",
-      "steam_url": "https://store.steampowered.com/app/5625860/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5625880": {
-      "appid": 5625880,
-      "name": "Penguin Trails Together",
-      "release_date": "2026-12-10",
-      "group_id64": "103582791476276964",
-      "steam_url": "https://store.steampowered.com/app/5625880/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5495650": {
-      "appid": 5495650,
-      "name": "MazeParty",
-      "release_date": "2026-12-11",
-      "group_id64": "103582791476273727",
-      "steam_url": "https://store.steampowered.com/app/5495650/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5577970": {
-      "appid": 5577970,
-      "name": "CORN!",
-      "release_date": "2026-12-11",
-      "group_id64": "103582791476274344",
-      "steam_url": "https://store.steampowered.com/app/5577970/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5150590": {
-      "appid": 5150590,
-      "name": "Dog Escape: Extraction Shooter",
-      "release_date": "2026-12-14",
-      "group_id64": "103582791475827140",
-      "steam_url": "https://store.steampowered.com/app/5150590/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5303380": {
-      "appid": 5303380,
-      "name": "Fih🥀🥀",
-      "release_date": "2026-12-14",
-      "group_id64": "103582791476000013",
-      "steam_url": "https://store.steampowered.com/app/5303380/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5568180": {
-      "appid": 5568180,
-      "name": "Kingdom of Embers",
-      "release_date": "2026-12-14",
-      "group_id64": "103582791476230286",
-      "steam_url": "https://store.steampowered.com/app/5568180/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5625200": {
-      "appid": 5625200,
-      "name": "Billard Masters Legacy",
-      "release_date": "2026-12-15",
-      "group_id64": "103582791476275796",
-      "steam_url": "https://store.steampowered.com/app/5625200/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "4989850": {
-      "appid": 4989850,
-      "name": "不一样的合成：生生不息 Genesis: From Water to Stars",
-      "release_date": "2026-12-18",
-      "group_id64": "103582791475754167",
-      "steam_url": "https://store.steampowered.com/app/4989850/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5503800": {
-      "appid": 5503800,
-      "name": "Stay Live: Ghost Viewers",
-      "release_date": "2026-12-18",
-      "group_id64": "103582791476275872",
-      "steam_url": "https://store.steampowered.com/app/5503800/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5319080": {
-      "appid": 5319080,
-      "name": "Iron Trails",
-      "release_date": "2026-12-21",
-      "group_id64": "103582791476018169",
-      "steam_url": "https://store.steampowered.com/app/5319080/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5050200": {
-      "appid": 5050200,
-      "name": "Gold Seller",
-      "release_date": "2026-12-24",
-      "group_id64": "103582791475787008",
-      "steam_url": "https://store.steampowered.com/app/5050200/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "4966440": {
-      "appid": 4966440,
-      "name": "Rogue Link Loop",
-      "release_date": "2027-01-01",
-      "group_id64": "103582791475753414",
-      "steam_url": "https://store.steampowered.com/app/4966440/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5134180": {
-      "appid": 5134180,
-      "name": "Ass Slapper Co",
-      "release_date": "2027-01-02",
-      "group_id64": "103582791475807545",
-      "steam_url": "https://store.steampowered.com/app/5134180/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5515940": {
-      "appid": 5515940,
-      "name": "Mahjong Kart",
-      "release_date": "2027-01-07",
-      "group_id64": "103582791476276616",
-      "steam_url": "https://store.steampowered.com/app/5515940/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "2295170": {
-      "appid": 2295170,
-      "name": "Emberville",
-      "release_date": "2027-01-08",
-      "group_id64": "103582791474230814",
-      "steam_url": "https://store.steampowered.com/app/2295170/",
-      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
-      "follower_recheck": true,
-      "follower_recheck_after": "2026-11-16T17:27:56Z",
-      "follower_recheck_previous_at": null
-    },
-    "4489630": {
-      "appid": 4489630,
-      "name": "This is Not a Snake Game",
-      "release_date": "2027-01-12",
-      "group_id64": "103582791475787050",
-      "steam_url": "https://store.steampowered.com/app/4489630/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "3438920": {
-      "appid": 3438920,
-      "name": "VOID DIVER: Escape from the Abyss",
-      "release_date": "2027-01-20",
-      "group_id64": "103582791474974489",
-      "steam_url": "https://store.steampowered.com/app/3438920/",
-      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
-      "follower_recheck": true,
-      "follower_recheck_after": "2026-09-20T01:54:12Z",
-      "follower_recheck_previous_at": null
-    },
-    "5213430": {
-      "appid": 5213430,
-      "name": "LOVE COMPANY: A Romance Escape",
-      "release_date": "2027-01-21",
-      "group_id64": "103582791475831194",
-      "steam_url": "https://store.steampowered.com/app/5213430/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5608870": {
-      "appid": 5608870,
-      "name": "Smash Arena",
-      "release_date": "2027-01-21",
-      "group_id64": "103582791476256820",
-      "steam_url": "https://store.steampowered.com/app/5608870/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5619950": {
-      "appid": 5619950,
-      "name": "Dudo",
-      "release_date": "2027-01-21",
-      "group_id64": "103582791476275987",
-      "steam_url": "https://store.steampowered.com/app/5619950/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "4958650": {
-      "appid": 4958650,
-      "name": "Wheel of Death",
-      "release_date": "2027-01-26",
-      "group_id64": "103582791476070459",
-      "steam_url": "https://store.steampowered.com/app/4958650/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5360490": {
-      "appid": 5360490,
-      "name": "RUNEBLADE",
-      "release_date": "2027-01-29",
-      "group_id64": "103582791476093016",
-      "steam_url": "https://store.steampowered.com/app/5360490/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5559730": {
-      "appid": 5559730,
-      "name": "Tongyou Town",
-      "release_date": "2027-03-03",
-      "group_id64": "103582791476224931",
-      "steam_url": "https://store.steampowered.com/app/5559730/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5546220": {
-      "appid": 5546220,
-      "name": "Dungelo",
-      "release_date": "2027-03-05",
-      "group_id64": "103582791476213640",
-      "steam_url": "https://store.steampowered.com/app/5546220/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "1173980": {
-      "appid": 1173980,
-      "name": "Shadow of the Road",
-      "release_date": "2027-03-10",
-      "group_id64": "103582791465515992",
-      "steam_url": "https://store.steampowered.com/app/1173980/",
-      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00",
-      "follower_recheck": true,
-      "follower_recheck_after": "2026-11-16T17:28:26Z",
-      "follower_recheck_previous_at": null
-    },
-    "5429440": {
-      "appid": 5429440,
-      "name": "Feed the Front",
-      "release_date": "2027-03-10",
-      "group_id64": "103582791476126083",
-      "steam_url": "https://store.steampowered.com/app/5429440/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5499690": {
-      "appid": 5499690,
-      "name": "Nightbound Ledger",
-      "release_date": "2027-03-29",
-      "group_id64": "103582791476177687",
-      "steam_url": "https://store.steampowered.com/app/5499690/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
-    },
-    "5275040": {
-      "appid": 5275040,
-      "name": "Orbit Foundry",
-      "release_date": "2027-04-01",
-      "group_id64": "103582791475836497",
-      "steam_url": "https://store.steampowered.com/app/5275040/",
-      "queue_source": "fresh_daily_prefilter_unresolved",
-      "daily_source_updated_at": "2026-11-23T17:06:19.024757+00:00"
     }
   },
   "rate_limit_count": 0,
   "scheduler_batch": {
-    "active": false,
-    "finished_at": "2026-11-23T23:02:51.367977+08:00",
+    "active": true,
     "http_429_this_run": 0,
-    "last_updated_at": "2026-11-23T23:02:51.367977+08:00",
+    "last_appid": 3438920,
+    "last_name": "VOID DIVER: Escape from the Abyss",
+    "last_updated_at": "2026-11-24T03:05:21.268635+08:00",
     "manual_cooldown_override": false,
-    "official_new_this_run": 0,
+    "official_new_this_run": 2,
     "request_limit": 6,
-    "requests_this_run": 0,
-    "run_id": "45200303544",
-    "started_at": "2026-11-23T23:02:50.636102+08:00",
-    "status": "finished",
-    "stop_reason": "nothing_pending"
+    "requests_this_run": 2,
+    "run_id": "45244301463",
+    "started_at": "2026-11-24T03:03:24.433177+08:00",
+    "status": "querying"
   },
   "temporary_error_count": 0,
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
@@ -166110,6 +166235,78 @@
         "twitch_game_id": "1478650472"
       }
     },
+    "4437650": {
+      "appid": 4437650,
+      "name": "Stinker Golf",
+      "queue_source": "twitch_steam_discovery",
+      "release_date": "2027-01-11",
+      "steam_candidate": {
+        "appid": 4437650,
+        "community_url": "https://steamcommunity.com/app/4437650/",
+        "content_descriptorids": [],
+        "follower_checked_at": null,
+        "follower_source": null,
+        "followers": null,
+        "name": "Stinker Golf",
+        "name_en": "Stinker Golf",
+        "official_ge5000": false,
+        "post_followers_store_verified": true,
+        "post_followers_store_verified_at": "2026-11-23T19:02:05.639862Z",
+        "release_date_basis": "steam_store_browse_verified_full_date",
+        "release_date_conflict": false,
+        "release_date_normalization": "steam_store_date_matches_taipei",
+        "release_date_timezone": "Asia/Taipei",
+        "release_date_verified_at": "2026-11-23T19:02:05.639862Z",
+        "release_display_precision": "date_full",
+        "release_display_provider": "Steam IStoreBrowseService/GetItems",
+        "release_end": "2027-01-11",
+        "release_precision": "day",
+        "release_raw": "2027-01-11",
+        "release_start": "2027-01-11",
+        "release_store_date": "2027-01-11",
+        "release_time_source": "Steam IStoreBrowseService/GetItems",
+        "release_time_utc": "2027-01-11T14:30:00Z",
+        "release_timestamp_taipei_date": "2027-01-11",
+        "sexual_content_screened": true,
+        "steam_type": "game",
+        "store_url": "https://store.steampowered.com/app/4437650/",
+        "twitch_admission": {
+          "appid": 4437650,
+          "checked_at": "2026-11-23T18:19:43Z",
+          "igdb_id": "406107",
+          "method": "twitch_igdb_external_steam_v1",
+          "schema_version": 1,
+          "source_database_generation": 2405,
+          "source_database_namespace": "danielet087/game-trend-radar@main",
+          "source_database_revision": "6ba0ba0b90de9c6cdc1e32238e0b9663f5f4d827083a363a4a98dd40c4bc16b6",
+          "source_enrollment": {
+            "min_viewers": 7000,
+            "observed_at": "2026-10-09T17:13:36Z",
+            "source": "igdb_first_release_date",
+            "viewer_count": 11859
+          },
+          "twitch_game_id": "1419737853"
+        }
+      },
+      "steam_url": "https://store.steampowered.com/app/4437650/",
+      "twitch_admission": {
+        "appid": 4437650,
+        "checked_at": "2026-11-23T18:19:43Z",
+        "igdb_id": "406107",
+        "method": "twitch_igdb_external_steam_v1",
+        "schema_version": 1,
+        "source_database_generation": 2405,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_database_revision": "6ba0ba0b90de9c6cdc1e32238e0b9663f5f4d827083a363a4a98dd40c4bc16b6",
+        "source_enrollment": {
+          "min_viewers": 7000,
+          "observed_at": "2026-10-09T17:13:36Z",
+          "source": "igdb_first_release_date",
+          "viewer_count": 11859
+        },
+        "twitch_game_id": "1419737853"
+      }
+    },
     "4555040": {
       "appid": 4555040,
       "name": "Sushiamo",
@@ -166768,78 +166965,6 @@
           "viewer_count": 7037
         },
         "twitch_game_id": "45928433"
-      }
-    },
-    "4437650": {
-      "appid": 4437650,
-      "name": "Stinker Golf",
-      "release_date": "2027-01-11",
-      "steam_url": "https://store.steampowered.com/app/4437650/",
-      "queue_source": "twitch_steam_discovery",
-      "twitch_admission": {
-        "schema_version": 1,
-        "method": "twitch_igdb_external_steam_v1",
-        "appid": 4437650,
-        "twitch_game_id": "1419737853",
-        "igdb_id": "406107",
-        "checked_at": "2026-11-23T18:19:43Z",
-        "source_database_revision": "6ba0ba0b90de9c6cdc1e32238e0b9663f5f4d827083a363a4a98dd40c4bc16b6",
-        "source_database_generation": 2405,
-        "source_database_namespace": "danielet087/game-trend-radar@main",
-        "source_enrollment": {
-          "source": "igdb_first_release_date",
-          "observed_at": "2026-10-09T17:13:36Z",
-          "viewer_count": 11859,
-          "min_viewers": 7000
-        }
-      },
-      "steam_candidate": {
-        "appid": 4437650,
-        "name": "Stinker Golf",
-        "name_en": "Stinker Golf",
-        "release_raw": "2027-01-11",
-        "release_start": "2027-01-11",
-        "release_end": "2027-01-11",
-        "release_precision": "day",
-        "release_display_precision": "date_full",
-        "release_display_provider": "Steam IStoreBrowseService/GetItems",
-        "release_date_basis": "steam_store_browse_verified_full_date",
-        "release_date_timezone": "Asia/Taipei",
-        "release_time_utc": "2027-01-11T14:30:00Z",
-        "release_time_source": "Steam IStoreBrowseService/GetItems",
-        "release_timestamp_taipei_date": "2027-01-11",
-        "release_date_conflict": false,
-        "release_store_date": "2027-01-11",
-        "release_date_normalization": "steam_store_date_matches_taipei",
-        "release_date_verified_at": "2026-11-23T19:02:05.639862Z",
-        "post_followers_store_verified": true,
-        "post_followers_store_verified_at": "2026-11-23T19:02:05.639862Z",
-        "followers": null,
-        "follower_checked_at": null,
-        "follower_source": null,
-        "official_ge5000": false,
-        "sexual_content_screened": true,
-        "steam_type": "game",
-        "content_descriptorids": [],
-        "store_url": "https://store.steampowered.com/app/4437650/",
-        "community_url": "https://steamcommunity.com/app/4437650/",
-        "twitch_admission": {
-          "schema_version": 1,
-          "method": "twitch_igdb_external_steam_v1",
-          "appid": 4437650,
-          "twitch_game_id": "1419737853",
-          "igdb_id": "406107",
-          "checked_at": "2026-11-23T18:19:43Z",
-          "source_database_revision": "6ba0ba0b90de9c6cdc1e32238e0b9663f5f4d827083a363a4a98dd40c4bc16b6",
-          "source_database_generation": 2405,
-          "source_database_namespace": "danielet087/game-trend-radar@main",
-          "source_enrollment": {
-            "source": "igdb_first_release_date",
-            "observed_at": "2026-10-09T17:13:36Z",
-            "viewer_count": 11859,
-            "min_viewers": 7000
-          }
-        }
       }
     }
   },

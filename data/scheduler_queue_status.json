@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-23T07:02:28.619232Z",
+  "generated_at": "2026-11-23T07:05:19.711439Z",
   "today_taipei": "2026-11-23",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-23T06:05:19.727106Z",
+    "checkpoint_updated_at": "2026-11-23T07:05:19.392895Z",
     "group_resolution_updated_at": "2026-11-16T23:40:12.254489Z",
     "candidate_state_updated_at": "2026-11-22T17:06:58.731601Z",
     "prefilter_updated_at": "2026-11-22T17:06:58.718814Z",
     "eligible_screened_at": "2026-11-22T17:06:59.346558Z",
     "twitch_import_updated_at": "2026-11-23T06:06:08.980345Z",
-    "last_official_success_at": "2026-11-23T06:05:19.586814Z",
+    "last_official_success_at": "2026-11-23T07:05:19.217855Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,29 +23,29 @@
     "official_rechecks_pending": 0,
     "parked_group_xml_appids": [],
     "dropped_unlisted": 16,
-    "combined_pending_now": 16,
+    "combined_pending_now": 10,
     "likely_threshold_pending": 0,
     "completed_legacy": 408,
-    "completed_new": 5937,
+    "completed_new": 5943,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 16,
+    "normal_pending": 10,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 16,
-    "followers_ready_pending": 16,
+    "ready_pending": 10,
+    "followers_ready_pending": 10,
     "awaiting_group_pending": 0,
-    "total_pending": 16,
-    "today_attempts": 72,
-    "today_successes": 72,
+    "total_pending": 10,
+    "today_attempts": 78,
+    "today_successes": 78,
     "today_429": 0
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-23",
     "status": "completed",
-    "checked_at": "2026-11-23T07:02:28.619232+00:00",
+    "checked_at": "2026-11-23T15:05:19.711439+08:00",
     "needed": true,
     "planned_count": 6,
     "completed_count": 6,
@@ -69,107 +69,23 @@
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-11-23T14:02:48.614803+08:00",
-    "last_updated_at": "2026-11-23T14:05:19.727106+08:00",
-    "finished_at": "2026-11-23T14:05:19.727106+08:00",
+    "started_at": "2026-11-23T15:02:48.348403+08:00",
+    "last_updated_at": "2026-11-23T15:05:19.392895+08:00",
+    "finished_at": "2026-11-23T15:05:19.392895+08:00",
     "stop_reason": "batch_request_limit",
-    "last_appid": 5571280,
-    "last_name": "MORTGATE",
+    "last_appid": 5501000,
+    "last_name": "Incremon",
     "requests_this_run": 6,
     "official_new_this_run": 6,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 6,
-    "run_id": "45121252693",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45121252693"
+    "run_id": "45127984488",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45127984488"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 5574490,
-      "name": "Set Adventures",
-      "steam_url": "https://store.steampowered.com/app/5574490/",
-      "release_date": "2027-03-08",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476234376",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5169740,
-      "name": "Ragdoll Fighting Simulator",
-      "steam_url": "https://store.steampowered.com/app/5169740/",
-      "release_date": "2027-03-09",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476268437",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5413840,
-      "name": "MONOMANIA",
-      "steam_url": "https://store.steampowered.com/app/5413840/",
-      "release_date": "2027-03-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476247587",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5418340,
-      "name": "Dead Copies",
-      "steam_url": "https://store.steampowered.com/app/5418340/",
-      "release_date": "2027-03-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476255624",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5594030,
-      "name": "SQUISH N POPS",
-      "steam_url": "https://store.steampowered.com/app/5594030/",
-      "release_date": "2027-03-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476271292",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5501000,
-      "name": "Incremon",
-      "steam_url": "https://store.steampowered.com/app/5501000/",
-      "release_date": "2027-03-12",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476258944",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
       "appid": 5605730,
       "name": "Modan's Book of Myths: The Nameless Knight",
       "steam_url": "https://store.steampowered.com/app/5605730/",
@@ -183,7 +99,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 8,
+      "position": 2,
       "appid": 5425900,
       "name": "Marked Deck",
       "steam_url": "https://store.steampowered.com/app/5425900/",
@@ -197,7 +113,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 9,
+      "position": 3,
       "appid": 5199150,
       "name": "9 Box",
       "steam_url": "https://store.steampowered.com/app/5199150/",
@@ -211,7 +127,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 10,
+      "position": 4,
       "appid": 5564330,
       "name": "Path Of Fear: Allia's Nightmares",
       "steam_url": "https://store.steampowered.com/app/5564330/",
@@ -225,7 +141,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 11,
+      "position": 5,
       "appid": 5225200,
       "name": "Sleepwalkers",
       "steam_url": "https://store.steampowered.com/app/5225200/",
@@ -239,7 +155,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 6,
       "appid": 3458140,
       "name": "NimerWorld: Shadows of a Promise",
       "steam_url": "https://store.steampowered.com/app/3458140/",
@@ -253,7 +169,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 7,
       "appid": 5455710,
       "name": "Plants Need Some Space",
       "steam_url": "https://store.steampowered.com/app/5455710/",
@@ -267,7 +183,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 8,
       "appid": 5531650,
       "name": "Hollow Winter",
       "steam_url": "https://store.steampowered.com/app/5531650/",
@@ -281,7 +197,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 9,
       "appid": 4756280,
       "name": "Signarchy",
       "steam_url": "https://store.steampowered.com/app/4756280/",
@@ -295,7 +211,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 10,
       "appid": 5511530,
       "name": "Nightclub Life",
       "steam_url": "https://store.steampowered.com/app/5511530/",
@@ -311,84 +227,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-22T10:03:32.779767Z",
-      "kind": "official_attempt",
-      "appid": 5584340,
-      "name": "Drive Beyond Horizons City",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "45010252793",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45010252793"
-    },
-    {
-      "at": "2026-11-22T10:04:02.779900Z",
-      "kind": "official_attempt",
-      "appid": 5348660,
-      "name": "Calm Bricks",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 111,
-      "retry_at": null,
-      "run_id": "45010252793",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45010252793"
-    },
-    {
-      "at": "2026-11-22T10:04:32.780057Z",
-      "kind": "official_attempt",
-      "appid": 5619350,
-      "name": "Midgard Arena",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "45010252793",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45010252793"
-    },
-    {
-      "at": "2026-11-22T10:05:02.780194Z",
-      "kind": "official_attempt",
-      "appid": 4809940,
-      "name": "LEXICON: The Nameless Tongue",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "45010252793",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45010252793"
-    },
-    {
-      "at": "2026-11-22T11:02:56.175644Z",
-      "kind": "official_attempt",
-      "appid": 5443930,
-      "name": "Idle Dojo",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "45015135497",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45015135497"
-    },
-    {
-      "at": "2026-11-22T11:03:26.175782Z",
-      "kind": "official_attempt",
-      "appid": 5576540,
-      "name": "Ant Tidy Up",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 5,
-      "retry_at": null,
-      "run_id": "45015135497",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45015135497"
-    },
     {
       "at": "2026-11-22T11:03:56.175908Z",
       "kind": "official_attempt",
@@ -1610,6 +1448,84 @@
       "retry_at": null,
       "run_id": "45121252693",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45121252693"
+    },
+    {
+      "at": "2026-11-23T07:02:49.169352Z",
+      "kind": "official_attempt",
+      "appid": 5574490,
+      "name": "Set Adventures",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45127984488",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45127984488"
+    },
+    {
+      "at": "2026-11-23T07:03:19.169507Z",
+      "kind": "official_attempt",
+      "appid": 5169740,
+      "name": "Ragdoll Fighting Simulator",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "45127984488",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45127984488"
+    },
+    {
+      "at": "2026-11-23T07:03:49.169615Z",
+      "kind": "official_attempt",
+      "appid": 5413840,
+      "name": "MONOMANIA",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45127984488",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45127984488"
+    },
+    {
+      "at": "2026-11-23T07:04:19.169745Z",
+      "kind": "official_attempt",
+      "appid": 5418340,
+      "name": "Dead Copies",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 2,
+      "retry_at": null,
+      "run_id": "45127984488",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45127984488"
+    },
+    {
+      "at": "2026-11-23T07:04:49.169876Z",
+      "kind": "official_attempt",
+      "appid": 5594030,
+      "name": "SQUISH N POPS",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45127984488",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45127984488"
+    },
+    {
+      "at": "2026-11-23T07:05:19.169990Z",
+      "kind": "official_attempt",
+      "appid": 5501000,
+      "name": "Incremon",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "45127984488",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45127984488"
     }
   ],
   "events_limit": 100

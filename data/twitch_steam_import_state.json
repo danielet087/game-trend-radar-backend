@@ -6665,8 +6665,36 @@
         "event_type": "steam_game_twitch_discovered",
         "http": 204
       }
+    },
+    "4272560": {
+      "status": "pending",
+      "updated_at": "2026-11-23T21:01:42.916557Z",
+      "twitch_admission": {
+        "schema_version": 1,
+        "method": "twitch_igdb_external_steam_v1",
+        "appid": 4272560,
+        "twitch_game_id": "250350212",
+        "igdb_id": "413175",
+        "checked_at": "2026-11-23T20:23:56Z",
+        "source_database_revision": "eadf7f75414d8aeab6bee1b67074f650b1a58aca139096301814eae5ada28363",
+        "source_database_generation": 2415,
+        "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_enrollment": {
+          "source": "igdb_first_release_date",
+          "observed_at": "2026-11-23T20:23:56Z",
+          "viewer_count": 11932,
+          "min_viewers": 7000
+        }
+      },
+      "validation_version": 4,
+      "follower_candidate": null,
+      "reason": "uncertain_taiwan_store_date",
+      "retry_at": "2026-11-24T21:01:44.693166Z",
+      "rate_limit_stage": null,
+      "rate_limit_attempts": 0,
+      "retry_after": null
     }
   },
-  "updated_at": "2026-11-23T20:06:32.772313Z",
+  "updated_at": "2026-11-23T21:01:42.916557Z",
   "api_cooldowns": {}
 }

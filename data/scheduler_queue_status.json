@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T00:02:25.065892Z",
+  "generated_at": "2026-11-24T00:05:19.098045Z",
   "today_taipei": "2026-11-24",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-23T23:05:05.593467Z",
+    "checkpoint_updated_at": "2026-11-24T00:05:18.754733Z",
     "group_resolution_updated_at": "2026-11-16T23:40:12.254489Z",
     "candidate_state_updated_at": "2026-11-23T17:06:19.040711Z",
     "prefilter_updated_at": "2026-11-23T17:06:19.024757Z",
     "eligible_screened_at": "2026-11-23T17:06:19.837452Z",
     "twitch_import_updated_at": "2026-11-24T00:01:58.068374Z",
-    "last_official_success_at": "2026-11-23T23:05:05.482787Z",
+    "last_official_success_at": "2026-11-24T00:05:18.602507Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,29 +23,29 @@
     "official_rechecks_pending": 0,
     "parked_group_xml_appids": [],
     "dropped_unlisted": 16,
-    "combined_pending_now": 28,
+    "combined_pending_now": 22,
     "likely_threshold_pending": 0,
     "completed_legacy": 408,
-    "completed_new": 5977,
+    "completed_new": 5983,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 28,
+    "normal_pending": 22,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 28,
-    "followers_ready_pending": 28,
+    "ready_pending": 22,
+    "followers_ready_pending": 22,
     "awaiting_group_pending": 0,
-    "total_pending": 28,
-    "today_attempts": 24,
-    "today_successes": 24,
+    "total_pending": 22,
+    "today_attempts": 30,
+    "today_successes": 30,
     "today_429": 0
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-24",
     "status": "completed",
-    "checked_at": "2026-11-24T00:02:25.065892+00:00",
+    "checked_at": "2026-11-24T08:05:19.098045+08:00",
     "needed": true,
     "planned_count": 4,
     "completed_count": 3,
@@ -69,107 +69,23 @@
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-11-24T07:02:34.767430+08:00",
-    "last_updated_at": "2026-11-24T07:05:05.593467+08:00",
-    "finished_at": "2026-11-24T07:05:05.593467+08:00",
+    "started_at": "2026-11-24T08:02:47.638018+08:00",
+    "last_updated_at": "2026-11-24T08:05:18.754733+08:00",
+    "finished_at": "2026-11-24T08:05:18.754733+08:00",
     "stop_reason": "batch_request_limit",
-    "last_appid": 5090120,
-    "last_name": "NICO DRAW",
+    "last_appid": 5577970,
+    "last_name": "CORN!",
     "requests_this_run": 6,
     "official_new_this_run": 6,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 6,
-    "run_id": "45284907580",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45284907580"
+    "run_id": "45293538426",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45293538426"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 5324080,
-      "name": "Dungeon: The Lantern Bearer",
-      "steam_url": "https://store.steampowered.com/app/5324080/",
-      "release_date": "2026-12-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476235710",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5370790,
-      "name": "Liar's Poker",
-      "steam_url": "https://store.steampowered.com/app/5370790/",
-      "release_date": "2026-12-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476131420",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5625860,
-      "name": "MistTower",
-      "steam_url": "https://store.steampowered.com/app/5625860/",
-      "release_date": "2026-12-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476275781",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5625880,
-      "name": "Penguin Trails Together",
-      "steam_url": "https://store.steampowered.com/app/5625880/",
-      "release_date": "2026-12-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476276964",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5495650,
-      "name": "MazeParty",
-      "steam_url": "https://store.steampowered.com/app/5495650/",
-      "release_date": "2026-12-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476273727",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5577970,
-      "name": "CORN!",
-      "steam_url": "https://store.steampowered.com/app/5577970/",
-      "release_date": "2026-12-11",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476274344",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
       "appid": 5150590,
       "name": "Dog Escape: Extraction Shooter",
       "steam_url": "https://store.steampowered.com/app/5150590/",
@@ -183,7 +99,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 8,
+      "position": 2,
       "appid": 5303380,
       "name": "Fih🥀🥀",
       "steam_url": "https://store.steampowered.com/app/5303380/",
@@ -197,7 +113,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 9,
+      "position": 3,
       "appid": 5568180,
       "name": "Kingdom of Embers",
       "steam_url": "https://store.steampowered.com/app/5568180/",
@@ -211,7 +127,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 10,
+      "position": 4,
       "appid": 5625200,
       "name": "Billard Masters Legacy",
       "steam_url": "https://store.steampowered.com/app/5625200/",
@@ -225,7 +141,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 11,
+      "position": 5,
       "appid": 4989850,
       "name": "不一样的合成：生生不息 Genesis: From Water to Stars",
       "steam_url": "https://store.steampowered.com/app/4989850/",
@@ -239,7 +155,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 6,
       "appid": 5503800,
       "name": "Stay Live: Ghost Viewers",
       "steam_url": "https://store.steampowered.com/app/5503800/",
@@ -253,7 +169,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 7,
       "appid": 5319080,
       "name": "Iron Trails",
       "steam_url": "https://store.steampowered.com/app/5319080/",
@@ -267,7 +183,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 8,
       "appid": 5050200,
       "name": "Gold Seller",
       "steam_url": "https://store.steampowered.com/app/5050200/",
@@ -281,7 +197,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 9,
       "appid": 4966440,
       "name": "Rogue Link Loop",
       "steam_url": "https://store.steampowered.com/app/4966440/",
@@ -295,7 +211,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 16,
+      "position": 10,
       "appid": 5134180,
       "name": "Ass Slapper Co",
       "steam_url": "https://store.steampowered.com/app/5134180/",
@@ -309,7 +225,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 17,
+      "position": 11,
       "appid": 5515940,
       "name": "Mahjong Kart",
       "steam_url": "https://store.steampowered.com/app/5515940/",
@@ -323,7 +239,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 18,
+      "position": 12,
       "appid": 4489630,
       "name": "This is Not a Snake Game",
       "steam_url": "https://store.steampowered.com/app/4489630/",
@@ -337,7 +253,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 19,
+      "position": 13,
       "appid": 5213430,
       "name": "LOVE COMPANY: A Romance Escape",
       "steam_url": "https://store.steampowered.com/app/5213430/",
@@ -351,7 +267,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 20,
+      "position": 14,
       "appid": 5608870,
       "name": "Smash Arena",
       "steam_url": "https://store.steampowered.com/app/5608870/",
@@ -365,7 +281,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 21,
+      "position": 15,
       "appid": 5619950,
       "name": "Dudo",
       "steam_url": "https://store.steampowered.com/app/5619950/",
@@ -379,7 +295,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 22,
+      "position": 16,
       "appid": 4958650,
       "name": "Wheel of Death",
       "steam_url": "https://store.steampowered.com/app/4958650/",
@@ -393,7 +309,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 23,
+      "position": 17,
       "appid": 5360490,
       "name": "RUNEBLADE",
       "steam_url": "https://store.steampowered.com/app/5360490/",
@@ -407,7 +323,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 24,
+      "position": 18,
       "appid": 5559730,
       "name": "Tongyou Town",
       "steam_url": "https://store.steampowered.com/app/5559730/",
@@ -421,7 +337,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 25,
+      "position": 19,
       "appid": 5546220,
       "name": "Dungelo",
       "steam_url": "https://store.steampowered.com/app/5546220/",
@@ -435,7 +351,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 26,
+      "position": 20,
       "appid": 5429440,
       "name": "Feed the Front",
       "steam_url": "https://store.steampowered.com/app/5429440/",
@@ -449,7 +365,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 27,
+      "position": 21,
       "appid": 5499690,
       "name": "Nightbound Ledger",
       "steam_url": "https://store.steampowered.com/app/5499690/",
@@ -463,7 +379,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 28,
+      "position": 22,
       "appid": 5275040,
       "name": "Orbit Foundry",
       "steam_url": "https://store.steampowered.com/app/5275040/",
@@ -479,84 +395,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-22T21:02:46.538620Z",
-      "kind": "official_attempt",
-      "appid": 4851100,
-      "name": "Grid Gear TD",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "45069579089",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45069579089"
-    },
-    {
-      "at": "2026-11-22T21:03:16.538756Z",
-      "kind": "official_attempt",
-      "appid": 5186840,
-      "name": "Boat Trip",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "45069579089",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45069579089"
-    },
-    {
-      "at": "2026-11-22T21:03:46.538878Z",
-      "kind": "official_attempt",
-      "appid": 5603120,
-      "name": "Save the North Pole",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "45069579089",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45069579089"
-    },
-    {
-      "at": "2026-11-22T21:04:16.539001Z",
-      "kind": "official_attempt",
-      "appid": 3551290,
-      "name": "Tidy Garage",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 13,
-      "retry_at": null,
-      "run_id": "45069579089",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45069579089"
-    },
-    {
-      "at": "2026-11-22T21:04:46.539119Z",
-      "kind": "official_attempt",
-      "appid": 5059190,
-      "name": "Dungeon Town Life",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 7,
-      "retry_at": null,
-      "run_id": "45069579089",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45069579089"
-    },
-    {
-      "at": "2026-11-22T21:05:16.539232Z",
-      "kind": "official_attempt",
-      "appid": 5582410,
-      "name": "Verdant 森の射手",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "45069579089",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45069579089"
-    },
     {
       "at": "2026-11-22T22:02:43.718666Z",
       "kind": "official_attempt",
@@ -1778,6 +1616,84 @@
       "retry_at": null,
       "run_id": "45284907580",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45284907580"
+    },
+    {
+      "at": "2026-11-24T00:02:48.466732Z",
+      "kind": "official_attempt",
+      "appid": 5324080,
+      "name": "Dungeon: The Lantern Bearer",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 23,
+      "retry_at": null,
+      "run_id": "45293538426",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45293538426"
+    },
+    {
+      "at": "2026-11-24T00:03:18.466871Z",
+      "kind": "official_attempt",
+      "appid": 5370790,
+      "name": "Liar's Poker",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "45293538426",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45293538426"
+    },
+    {
+      "at": "2026-11-24T00:03:48.466999Z",
+      "kind": "official_attempt",
+      "appid": 5625860,
+      "name": "MistTower",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45293538426",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45293538426"
+    },
+    {
+      "at": "2026-11-24T00:04:18.467279Z",
+      "kind": "official_attempt",
+      "appid": 5625880,
+      "name": "Penguin Trails Together",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45293538426",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45293538426"
+    },
+    {
+      "at": "2026-11-24T00:04:48.467415Z",
+      "kind": "official_attempt",
+      "appid": 5495650,
+      "name": "MazeParty",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45293538426",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45293538426"
+    },
+    {
+      "at": "2026-11-24T00:05:18.467510Z",
+      "kind": "official_attempt",
+      "appid": 5577970,
+      "name": "CORN!",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45293538426",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45293538426"
     }
   ],
   "events_limit": 100

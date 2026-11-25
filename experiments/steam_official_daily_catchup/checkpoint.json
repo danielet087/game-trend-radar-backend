@@ -2,8 +2,8 @@
   "checkpoint_migration_note": "Clear transient XML-error cooldown only for confirmed AppID 4435490 without group ID; preserve HTTP 429 history and official results.",
   "cohort": "steam_official_daily_catchup_dynamic_v1",
   "community_daily_requests": {
-    "date": "2026-11-25",
-    "requests": 28
+    "date": "2026-11-26",
+    "requests": 6
   },
   "community_identity": {
     "active": "zh-TW",
@@ -38,11 +38,11 @@
       "target_repository": "danielet087/game-trend-radar-content-backend"
     },
     "1209970": {
-      "dispatched_at_taipei": "2026-10-17T10:08:09.487626+08:00",
-      "event_type": "steam_game_qualified",
-      "signature": "1209970:26759:2026-12-03:store-v2",
+      "signature": "1209970:28957:2026-12-03:store-v2",
       "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend"
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-11-26T07:11:28.502030+08:00"
     },
     "1426870": {
       "dispatched_at_taipei": "2026-11-17T09:03:03.497698+08:00",
@@ -59,11 +59,11 @@
       "target_repository": "danielet087/game-trend-radar-content-backend"
     },
     "1622130": {
-      "dispatched_at_taipei": "2026-11-10T11:26:07.610254+08:00",
-      "event_type": "steam_game_qualified",
-      "signature": "1622130:18013:2026-11-27:store-v2",
+      "signature": "1622130:18751:2026-11-27:store-v2",
       "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend"
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-11-26T07:04:11.189516+08:00"
     },
     "1747470": {
       "dispatched_at_taipei": "2026-11-10T17:31:35.865098+08:00",
@@ -283,11 +283,11 @@
       "target_repository": "danielet087/game-trend-radar-content-backend"
     },
     "3333850": {
-      "dispatched_at_taipei": "2026-11-04T16:10:32.778381+08:00",
-      "event_type": "steam_game_qualified",
-      "signature": "3333850:21555:2026-11-27:store-v2",
+      "signature": "3333850:23334:2026-11-27:store-v2",
       "status": "dispatched",
-      "target_repository": "danielet087/game-trend-radar-content-backend"
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-11-26T07:04:56.880183+08:00"
     },
     "3370490": {
       "dispatched_at_taipei": "2026-10-16T16:19:37.879710+08:00",
@@ -470,6 +470,27 @@
       "signature": "5246700:21551:2026-12-16:store-v2",
       "status": "dispatched",
       "target_repository": "danielet087/game-trend-radar-content-backend"
+    },
+    "4253570": {
+      "signature": "4253570:6091:2026-11-27:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-11-26T07:06:30.761573+08:00"
+    },
+    "3224600": {
+      "signature": "3224600:11471:2026-11-28:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-11-26T07:08:20.463865+08:00"
+    },
+    "3161310": {
+      "signature": "3161310:41623:2026-12-01:store-v2",
+      "status": "dispatched",
+      "target_repository": "danielet087/game-trend-radar-content-backend",
+      "event_type": "steam_game_qualified",
+      "dispatched_at_taipei": "2026-11-26T07:09:49.785685+08:00"
     }
   },
   "cooldown_migration_note": "2026-09-23 429 previously used hard-coded 48h; old response Retry-After was not recorded. Recalculated as first 15-minute cooldown from recorded 429 event.",
@@ -61723,18 +61744,20 @@
     }
   },
   "scheduler_batch": {
-    "run_id": "45709411961",
+    "run_id": "45717873967",
     "active": false,
     "status": "finished",
     "manual_cooldown_override": false,
     "request_limit": 6,
-    "started_at": "2026-11-26T06:02:46.114428+08:00",
-    "last_updated_at": "2026-11-26T06:02:46.840967+08:00",
-    "requests_this_run": 0,
-    "official_new_this_run": 0,
+    "started_at": "2026-11-26T07:02:54.063551+08:00",
+    "last_updated_at": "2026-11-26T07:12:53.975649+08:00",
+    "requests_this_run": 6,
+    "official_new_this_run": 6,
     "http_429_this_run": 0,
-    "finished_at": "2026-11-26T06:02:46.840967+08:00",
-    "stop_reason": "official_429_cooldown_no_request"
+    "last_appid": 1209970,
+    "last_name": "Blind Descent",
+    "finished_at": "2026-11-26T07:12:53.975649+08:00",
+    "stop_reason": "batch_request_limit"
   },
   "temporary_error_migration_note": "First 200 non-XML ParseError migrated from 12h to 15m; next run captures response diagnostic; do not claim official data for failed app.",
   "twitch_admitted_candidates": {
@@ -63542,11 +63565,14 @@
     },
     "1209970": {
       "appid": 1209970,
-      "daily_source_updated_at": "2026-10-16T17:09:01.652763+00:00",
+      "daily_source_updated_at": "2026-11-25T17:10:53.037460+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-23T17:43:50Z",
+      "follower_recheck_previous_at": "2026-10-17T10:08:09.312214+08:00",
       "group_id64": "103582791468222882",
       "name": "Blind Descent",
-      "official_checked_at_taipei": "2026-10-17T10:08:09.312214+08:00",
-      "official_followers": 26759,
+      "official_checked_at_taipei": "2026-11-26T07:11:28.282232+08:00",
+      "official_followers": 28957,
       "official_ge5000": true,
       "official_source": "Steam Community XML memberCount",
       "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
@@ -63559,7 +63585,7 @@
       "release_time_utc": "2026-12-02T16:00:00Z",
       "release_timestamp_taipei_date": "2026-12-03",
       "steam_url": "https://store.steampowered.com/app/1209970/",
-      "store_date_checked_at_taipei": "2026-10-17T10:08:09.483789+08:00",
+      "store_date_checked_at_taipei": "2026-11-26T07:11:28.493309+08:00",
       "store_date_exact": true,
       "store_date_status": "date_full"
     },
@@ -63910,14 +63936,14 @@
     },
     "1622130": {
       "appid": 1622130,
-      "daily_source_updated_at": "2026-11-09T23:07:40.090992+00:00",
+      "daily_source_updated_at": "2026-11-25T17:10:53.037460+00:00",
       "follower_recheck": true,
-      "follower_recheck_after": "2026-09-19T19:39:02Z",
-      "follower_recheck_previous_at": null,
+      "follower_recheck_after": "2026-11-23T17:46:20Z",
+      "follower_recheck_previous_at": "2026-11-10T11:26:07.383718+08:00",
       "group_id64": "103582791470231424",
       "name": "Our Life: Now & Forever",
-      "official_checked_at_taipei": "2026-11-10T11:26:07.383718+08:00",
-      "official_followers": 18013,
+      "official_checked_at_taipei": "2026-11-26T07:04:10.991235+08:00",
+      "official_followers": 18751,
       "official_ge5000": true,
       "official_source": "Steam Community XML memberCount",
       "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
@@ -63930,7 +63956,7 @@
       "release_time_utc": "2026-11-27T13:00:00Z",
       "release_timestamp_taipei_date": "2026-11-27",
       "steam_url": "https://store.steampowered.com/app/1622130/",
-      "store_date_checked_at_taipei": "2026-11-10T11:26:07.600385+08:00",
+      "store_date_checked_at_taipei": "2026-11-26T07:04:11.181350+08:00",
       "store_date_exact": true,
       "store_date_status": "date_full"
     },
@@ -66820,6 +66846,32 @@
       "release_date": "2026-12-04",
       "steam_url": "https://store.steampowered.com/app/3161250/"
     },
+    "3161310": {
+      "appid": 3161310,
+      "daily_source_updated_at": "2026-11-25T17:10:53.037460+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-23T17:41:50Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791474680173",
+      "name": "Hela: of Mice & Magic",
+      "official_checked_at_taipei": "2026-11-26T07:09:49.592688+08:00",
+      "official_followers": 41623,
+      "official_ge5000": true,
+      "official_source": "Steam Community XML memberCount",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2026-12-01",
+      "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_timezone": "Asia/Taipei",
+      "release_display_precision": "date_full",
+      "release_display_provider": "Steam IStoreBrowseService/GetItems",
+      "release_time_utc": "2026-12-01T10:00:00Z",
+      "release_timestamp_taipei_date": "2026-12-01",
+      "steam_url": "https://store.steampowered.com/app/3161310/",
+      "store_date_checked_at_taipei": "2026-11-26T07:09:49.776856+08:00",
+      "store_date_exact": true,
+      "store_date_status": "date_full"
+    },
     "3166230": {
       "appid": 3166230,
       "daily_source_updated_at": "2026-10-08T11:01:56.890908+00:00",
@@ -67293,6 +67345,32 @@
       "release_date": "2026-11-25",
       "steam_url": "https://store.steampowered.com/app/3220460/"
     },
+    "3224600": {
+      "appid": 3224600,
+      "daily_source_updated_at": "2026-11-25T17:10:53.037460+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-23T17:42:20Z",
+      "follower_recheck_previous_at": null,
+      "group_id64": "103582791474737994",
+      "name": "Am I Nima",
+      "official_checked_at_taipei": "2026-11-26T07:08:20.306726+08:00",
+      "official_followers": 11471,
+      "official_ge5000": true,
+      "official_source": "Steam Community XML memberCount",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2026-11-28",
+      "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_timezone": "Asia/Taipei",
+      "release_display_precision": "date_full",
+      "release_display_provider": "Steam IStoreBrowseService/GetItems",
+      "release_time_utc": "2026-11-27T17:00:00Z",
+      "release_timestamp_taipei_date": "2026-11-28",
+      "steam_url": "https://store.steampowered.com/app/3224600/",
+      "store_date_checked_at_taipei": "2026-11-26T07:08:20.454972+08:00",
+      "store_date_exact": true,
+      "store_date_status": "date_full"
+    },
     "3230780": {
       "appid": 3230780,
       "daily_source_updated_at": "2026-10-17T17:10:36.588178+00:00",
@@ -67563,11 +67641,14 @@
     },
     "3333850": {
       "appid": 3333850,
-      "daily_source_updated_at": "2026-11-03T17:14:31.456682+00:00",
+      "daily_source_updated_at": "2026-11-25T17:10:53.037460+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-23T17:45:20Z",
+      "follower_recheck_previous_at": "2026-11-04T16:10:32.453101+08:00",
       "group_id64": "103582791475304631",
       "name": "Arkheron",
-      "official_checked_at_taipei": "2026-11-04T16:10:32.453101+08:00",
-      "official_followers": 21555,
+      "official_checked_at_taipei": "2026-11-26T07:04:56.754084+08:00",
+      "official_followers": 23334,
       "official_ge5000": true,
       "official_source": "Steam Community XML memberCount",
       "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
@@ -67577,10 +67658,10 @@
       "release_date_timezone": "Asia/Taipei",
       "release_display_precision": "date_full",
       "release_display_provider": "Steam IStoreBrowseService/GetItems",
-      "release_time_utc": "2026-11-27T08:00:00Z",
+      "release_time_utc": "2026-11-27T15:00:00Z",
       "release_timestamp_taipei_date": "2026-11-27",
       "steam_url": "https://store.steampowered.com/app/3333850/",
-      "store_date_checked_at_taipei": "2026-11-04T16:10:32.770935+08:00",
+      "store_date_checked_at_taipei": "2026-11-26T07:04:56.871933+08:00",
       "store_date_exact": true,
       "store_date_status": "date_full"
     },
@@ -71779,85 +71860,29 @@
     },
     "4253570": {
       "appid": 4253570,
+      "daily_source_updated_at": "2026-11-25T17:10:53.037460+00:00",
+      "follower_recheck": true,
+      "follower_recheck_after": "2026-11-23T17:44:50Z",
+      "follower_recheck_previous_at": "2026-10-22T08:15:37.029003+08:00",
       "group_id64": "103582791475614885",
-      "group_resolution": {
-        "api_result": 1,
-        "attempted": true,
-        "checked_at": "2026-10-20T23:02:30.515827Z",
-        "http": 200,
-        "source": "Steam ISteamUser/ResolveVanityURL",
-        "status": "resolved"
-      },
       "name": "Reshine",
-      "official_checked_at_taipei": "2026-10-22T08:15:37.029003+08:00",
-      "official_followers": 3786,
-      "official_ge5000": false,
+      "official_checked_at_taipei": "2026-11-26T07:06:30.511305+08:00",
+      "official_followers": 6091,
+      "official_ge5000": true,
       "official_source": "Steam Community XML memberCount",
-      "priority": 100,
-      "queue_source": "twitch_steam_discovery",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
       "release_date": "2026-11-27",
-      "steam_candidate": {
-        "appid": 4253570,
-        "community_url": "https://steamcommunity.com/app/4253570/",
-        "content_descriptorids": [],
-        "name": "Reshine",
-        "name_en": "Reshine",
-        "post_followers_store_verified": true,
-        "post_followers_store_verified_at": "2026-10-22T00:02:04.044527Z",
-        "release_date_basis": "steam_store_browse_verified_full_date",
-        "release_date_conflict": false,
-        "release_date_normalization": "steam_utc_date_normalized_to_taipei",
-        "release_date_timezone": "Asia/Taipei",
-        "release_date_verified_at": "2026-10-22T00:02:04.044527Z",
-        "release_display_precision": "date_full",
-        "release_display_provider": "Steam IStoreBrowseService/GetItems",
-        "release_end": "2026-11-27",
-        "release_precision": "day",
-        "release_raw": "2026-11-27",
-        "release_start": "2026-11-27",
-        "release_store_date": "2026-11-26",
-        "release_time_source": "Steam IStoreBrowseService/GetItems",
-        "release_time_utc": "2026-11-26T16:39:00Z",
-        "release_timestamp_taipei_date": "2026-11-27",
-        "sexual_content_screened": true,
-        "steam_type": "game",
-        "store_url": "https://store.steampowered.com/app/4253570/",
-        "twitch_admission": {
-          "appid": 4253570,
-          "checked_at": "2026-10-21T21:19:25Z",
-          "igdb_id": "399078",
-          "method": "twitch_igdb_external_steam_v1",
-          "schema_version": 1,
-          "source_database_generation": 379,
-          "source_database_namespace": "danielet087/game-trend-radar@main",
-          "source_database_revision": "9fd29d0d63a241586db14c5db2a826488aaebf292d0a689beb99dc8131653360",
-          "source_enrollment": {
-            "min_viewers": 7000,
-            "observed_at": "2026-10-20T21:16:58Z",
-            "source": "igdb_first_release_date",
-            "viewer_count": 11552
-          },
-          "twitch_game_id": "758912766"
-        }
-      },
+      "release_date_basis": "steam_store_browse_verified_full_date",
+      "release_date_conflict": false,
+      "release_date_timezone": "Asia/Taipei",
+      "release_display_precision": "date_full",
+      "release_display_provider": "Steam IStoreBrowseService/GetItems",
+      "release_time_utc": "2026-11-26T16:39:00Z",
+      "release_timestamp_taipei_date": "2026-11-27",
       "steam_url": "https://store.steampowered.com/app/4253570/",
-      "twitch_admission": {
-        "appid": 4253570,
-        "checked_at": "2026-10-21T21:19:25Z",
-        "igdb_id": "399078",
-        "method": "twitch_igdb_external_steam_v1",
-        "schema_version": 1,
-        "source_database_generation": 379,
-        "source_database_namespace": "danielet087/game-trend-radar@main",
-        "source_database_revision": "9fd29d0d63a241586db14c5db2a826488aaebf292d0a689beb99dc8131653360",
-        "source_enrollment": {
-          "min_viewers": 7000,
-          "observed_at": "2026-10-20T21:16:58Z",
-          "source": "igdb_first_release_date",
-          "viewer_count": 11552
-        },
-        "twitch_game_id": "758912766"
-      }
+      "store_date_checked_at_taipei": "2026-11-26T07:06:30.753237+08:00",
+      "store_date_exact": true,
+      "store_date_status": "date_full"
     },
     "4258970": {
       "appid": 4258970,
@@ -148116,9 +148141,9 @@
   },
   "rate_limit_count": 0,
   "temporary_error_count": 0,
-  "next_request_after_taipei": "2026-11-26T07:04:09.808009+08:00",
+  "next_request_after_taipei": null,
   "community_cooldown": null,
-  "community_last_success_at": "2026-11-25T07:03:39.619055+08:00",
+  "community_last_success_at": "2026-11-26T07:11:28.282232+08:00",
   "official_growth_observations": {
     "1154960": {
       "appid": 1154960,
@@ -165311,6 +165336,84 @@
       "release_date": "2026-12-08",
       "status": "access_or_server_error",
       "when_taipei": "2026-11-25T07:04:09.488820+08:00"
+    },
+    {
+      "appid": 1622130,
+      "content_dispatch": "dispatched",
+      "github_run_id": "45717873967",
+      "http": 200,
+      "official_followers": 18751,
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2026-11-27",
+      "status": "ok",
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "when_taipei": "2026-11-26T07:04:10.808299+08:00"
+    },
+    {
+      "appid": 3333850,
+      "content_dispatch": "dispatched",
+      "github_run_id": "45717873967",
+      "http": 200,
+      "official_followers": 23334,
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2026-11-27",
+      "status": "ok",
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "when_taipei": "2026-11-26T07:04:56.644791+08:00"
+    },
+    {
+      "appid": 4253570,
+      "content_dispatch": "dispatched",
+      "github_run_id": "45717873967",
+      "http": 200,
+      "official_followers": 6091,
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2026-11-27",
+      "status": "ok",
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "when_taipei": "2026-11-26T07:06:30.365758+08:00"
+    },
+    {
+      "appid": 3224600,
+      "content_dispatch": "dispatched",
+      "github_run_id": "45717873967",
+      "http": 200,
+      "official_followers": 11471,
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2026-11-28",
+      "status": "ok",
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "when_taipei": "2026-11-26T07:08:20.193690+08:00"
+    },
+    {
+      "appid": 3161310,
+      "content_dispatch": "dispatched",
+      "github_run_id": "45717873967",
+      "http": 200,
+      "official_followers": 41623,
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "release_date": "2026-12-01",
+      "status": "ok",
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "when_taipei": "2026-11-26T07:09:49.396204+08:00"
+    },
+    {
+      "appid": 1209970,
+      "when_taipei": "2026-11-26T07:11:28.116031+08:00",
+      "release_date": "2026-12-03",
+      "queue_source": "fresh_daily_prefilter_ge4000_pending_official",
+      "http": 200,
+      "status": "ok",
+      "github_run_id": "45717873967",
+      "official_followers": 28957,
+      "store_date_exact": true,
+      "store_date_status": "date_full",
+      "content_dispatch": "dispatched"
     }
   ]
 }

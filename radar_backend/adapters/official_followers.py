@@ -71,7 +71,9 @@ class OfficialFollowerClient:
                 return FollowerOutcome("rate_limited", observed, http=429, retry_after=(getattr(response, "headers", None) or {}).get("Retry-After"))
             if response.status_code in (401, 403) or response.status_code >= 500:
                 if cooldown:
-                    cooldown.temporary_failure(observed, access_error=True)
+                    # A refusal waits a day; a server error (Steam's weekly
+                    # maintenance answers 503) backs off like a broken connection.
+                    cooldown.temporary_failure(observed, access_error=response.status_code in (401, 403))
                 return FollowerOutcome("access_or_server_error", observed, http=response.status_code)
             if response.status_code != 200:
                 return FollowerOutcome("unexpected_http", observed, http=response.status_code)

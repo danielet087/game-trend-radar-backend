@@ -24,7 +24,7 @@ Twitch 正式收錄的新作是獨立入口：Twitch ID → Helix 的 IGDB ID �
 
 主清單及 `data/twitch_steam_import_state.json` 持久化後，送 `steam_game_twitch_discovered` 內容事件；未知 Followers 隨事件保留未知，內容後端重新核對不可變 Twitch 證據與 Steam metadata 後發布。事件失敗保留重試。來源證據 `twitch_admission` 隨清單、內容、索引與成長紀錄保存，正常更新不能移除已接受的來源；後來取得的真實官方數值不能被未知值覆蓋。沿用既有 `CONTENT_BACKEND_TOKEN`，不新增 Secrets。
 
-既有官方 worker 的 Community 429 以 15 分鐘開始逐次退避，最長 24 小時，並遵守更長的 `Retry-After` 秒數或 HTTP 日期；唯一的 Community 冷卻保存在官方 worker checkpoint。Twitch importer 只查商店 metadata、讀官方快取及建立候選，不能自行查 Community，也不另存 Community 冷卻副本。商店 metadata 按 5／10／20／30 分鐘退避；一般 metadata 網路或解析失敗按 5 分鐘開始、最長 1 小時逐次退避。期限只決定何時可再查，實際執行仍依原排程與共用鎖。Community 冷卻期間仍可用真實官方 Followers 快取完成核對。日期衝突與資格排除仍每日核對；來源失效或不再合格的未收錄候選撤回 Twitch 優先資格，原一般候選恢復，不重設已查進度與官方結果。
+既有官方 worker 的 Community 429 以 15 分鐘開始逐次退避，最長 24 小時，並遵守更長的 `Retry-After` 秒數或 HTTP 日期；5xx 與連線、XML 錯誤另計次數，同樣 15 分鐘開始、每次加倍、最長 24 小時（2026-11-26 起；之前 5xx 一律 24 小時，Steam 週三例行維護的一次 503 就停了一整天）；401／403 冷卻 24 小時；成功一次才重設。唯一的 Community 冷卻保存在官方 worker checkpoint。Twitch importer 只查商店 metadata、讀官方快取及建立候選，不能自行查 Community，也不另存 Community 冷卻副本。商店 metadata 按 5／10／20／30 分鐘退避；一般 metadata 網路或解析失敗按 5 分鐘開始、最長 1 小時逐次退避。期限只決定何時可再查，實際執行仍依原排程與共用鎖。Community 冷卻期間仍可用真實官方 Followers 快取完成核對。日期衝突與資格排除仍每日核對；來源失效或不再合格的未收錄候選撤回 Twitch 優先資格，原一般候選恢復，不重設已查進度與官方結果。
 
 手動測試可在 Actions → `Steam official Followers - hourly bounded queue` → Run workflow，選 `main`、`trigger_source=manual`、`target_slot` 留空，勾選 `skip_cooldown`。此選項預設關閉，只略過這次 Followers 的冷卻檢查，依目前輪替順序測試最多 1 款；群組 API 與商店 metadata 的重試不受影響。CLI 同時要求 `GITHUB_EVENT_NAME=workflow_dispatch` 與 `SCHEDULE_TRIGGER_SOURCE=manual`，Cloudflare／其他事件不能啟用。測試前不清除持久化冷卻；有效且群組吻合的 XML 成功才依原規則清除現行冷卻。若再次 429 或查詢失敗，立即停止，保存結果與退避，且不縮短原現行／舊佇列尚未到期的期限。這個選項只對本輪有效，不改自動排程或後續政策。
 

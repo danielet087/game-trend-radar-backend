@@ -204,6 +204,9 @@ class CooldownStore:
         return until
 
     def temporary_failure(self, now, *, access_error=False):
+        """After a failed request: 24 hours for a refusal (401/403); for a
+        server error or a broken connection 15 minutes, doubling with each one
+        in a row, at most 24 hours. Only a success resets the count."""
         if access_error:
             until = now + timedelta(hours=24)
         else:

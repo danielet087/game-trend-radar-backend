@@ -90,6 +90,27 @@ def test_only_actual_success_clears_checkpoint_cooldown_not_legacy_or_queue():
     assert legacy['next_request_after_taipei'] == (NOW + timedelta(hours=3)).isoformat()
 
 
+@pytest.mark.parametrize('status,prior,minutes', [
+    (503, 0, 15), (500, 1, 30), (502, 2, 60), (503, 7, 1440), (503, 30, 1440), (401, 0, 1440), (403, 3, 1440)])
+def test_a_server_error_backs_off_like_a_broken_connection_and_a_refusal_waits_a_day(status, prior, minutes):
+    # 2026-11-25 07:04 Taipei: one 503 in Steam's weekly maintenance stopped a whole day of runs.
+    state = {'temporary_error_count': prior}
+    session = SimpleNamespace(get=Mock(return_value=response(status=status)))
+    outcome = OfficialFollowerClient(session=session, clock=lambda: NOW, cooldown=CooldownStore(state)).fetch(GID)
+    assert (outcome.status, outcome.http, outcome.followers) == ('access_or_server_error', status, None)
+    assert CooldownStore(state).deadline() == NOW + timedelta(minutes=minutes)
+    assert state['temporary_error_count'] == (prior if status in (401, 403) else min(8, prior + 1))
+    assert state.get('rate_limit_count', 0) == 0
+
+
+def test_a_server_error_keeps_a_longer_deadline():
+    state = {'next_request_after_taipei': (NOW + timedelta(hours=2)).isoformat()}
+    session = SimpleNamespace(get=Mock(return_value=response(status=503)))
+    client = OfficialFollowerClient(session=session, clock=lambda: NOW, cooldown=CooldownStore(state))
+    assert client.fetch(GID, manual_override=True).status == 'access_or_server_error'
+    assert CooldownStore(state).deadline() == NOW + timedelta(hours=2)
+
+
 def test_transport_failure_saves_retry_without_a_fabricated_measurement():
     state = {}
     client = OfficialFollowerClient(session=SimpleNamespace(get=Mock(side_effect=requests.Timeout())),

@@ -199,30 +199,57 @@ def test_an_earlier_one_day_authority_row_moves_to_taiwans_day_in_the_master_and
     assert is_twitch_qualified(published)
 
 
-def test_the_daily_refresh_moves_earlier_one_day_rows_in_the_saved_master():
+def test_the_daily_refresh_saves_earlier_one_day_rows_with_its_batch_output():
     """The daily refresh stops before the Followers phase that saved the
-    filtered master, so loading the master moves these rows in any phase."""
+    filtered master, so loading the master moves these rows in any phase; the
+    move is saved with the batch output, so a run that fails or makes none
+    leaves the master file alone and can still save its progress."""
     from radar_backend.application import candidates as application
     from radar_backend.jobs.candidates import build_parser
-    from tests.test_candidate_layers import MemoryState, prepared_state, runtime
+    from tests.test_candidate_layers import MemoryState, eligible_catalog, prepared_state, runtime
 
     legacy = legacy_one_day_authority()
     other = dict(legacy_one_day_authority(), appid=456)
     other.pop("twitch_admission")  # Not an authority row: left exactly as it is.
+    master = {"games": [legacy, other], "updated_at": "2026-10-01T00:00:00Z"}
+    args = build_parser().parse_args([
+        "--state", "state.json", "--catalog", "catalog.json", "--master", "master.json",
+        "--prefilter-state", "pre.json", "--prefilter-batch-size", "1",
+        "--prefilter-request-interval", "0", "--output", "public.json",
+    ])
+    # No batch output: the master file stays as it is.
     store = MemoryState({"state.json": prepared_state("complete"), "catalog.json": {"games": []},
-                         "master.json": {"games": [legacy, other], "updated_at": "2026-10-01T00:00:00Z"}})
-    args = build_parser().parse_args(["--state", "state.json", "--catalog", "catalog.json",
-                                      "--master", "master.json"])
+                         "master.json": master})
     application.execute_pipeline(args, runtime(store))
-    master = store.values["master.json"]
-    assert master["games"] == [taipei_release_day(legacy), other]
-    assert master["games"][0]["release_start"] == "2026-09-04"
-    assert master["games"][0]["release_store_date"] == "2026-09-03"
-    assert master["updated_at"] == "2026-10-01T00:00:00Z"
-    # Nothing left to move: the master is not written again.
-    store.saved.clear()
-    application.execute_pipeline(args, runtime(store))
-    assert "master.json" not in store.saved
+    assert "master.json" not in store.saved and store.values["master.json"] == master
+
+    pre = {"version": 1, "next_index": 0, "complete": False, "games": {}}
+    store = MemoryState({"state.json": prepared_state(), "catalog.json": eligible_catalog(),
+                         "pre.json": pre, "master.json": master})
+
+    def failed_scan(rows, pre, **kwargs):
+        raise RuntimeError("Third-party response incomplete")
+
+    with pytest.raises(RuntimeError, match="incomplete"):
+        application.execute_pipeline(args, runtime(store, scan_batch=failed_scan))
+    assert store.saved == [] and store.values["master.json"] == master
+
+    def successful_scan(rows, pre, **kwargs):
+        pre["next_index"] = 1
+        pre["games"]["101"] = {"third_party_followers": 4500}
+        return {"start_index": 0, "next_index": 1, "screened": 1, "priority": 1, "missing": 0}
+
+    application.execute_pipeline(args, runtime(
+        store, scan_batch=successful_scan, filter_confirmed_master_games=lambda games, rows, **kw: games,
+        is_twitch_qualified=lambda row: False))
+    saved = store.values["master.json"]
+    assert "master.json" in store.saved and "public.json" in store.outputs
+    assert saved["games"] == [taipei_release_day(legacy), other]
+    assert saved["games"][0]["release_start"] == "2026-09-04"
+    assert saved["games"][0]["release_store_date"] == "2026-09-03"
+    assert saved["updated_at"] == "2026-10-01T00:00:00Z"
+    # Nothing left to move: loading the saved master changes no row again.
+    assert all(taipei_release_day(row) is row for row in saved["games"])
 
 
 def test_moving_to_taiwans_day_is_not_announced_as_a_new_release_date():

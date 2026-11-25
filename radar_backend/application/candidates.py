@@ -373,14 +373,15 @@ def execute_pipeline(args: argparse.Namespace, runtime: CandidateRuntime) -> dic
     # day (#70). Only the Followers phase saved the filtered master, and the
     # daily refresh now stops before it (Followers run hourly elsewhere); the
     # catalog publication and the content reconcile read this file, so the rows
-    # move here in every phase. Nothing else in a row changes.
+    # move here in every phase. Nothing else in a row changes. They are saved
+    # with the batch output below: a run that fails, or makes no batch output,
+    # leaves the master file alone, so its progress can still be saved.
     games = master.get("games", [])
     moved = [taipei_release_day(row) if isinstance(row, dict) else row for row in games]
-    if moved != games:
+    moved_count = sum(new is not old for new, old in zip(moved, games))
+    if moved_count:
         master["games"] = moved
-        runtime.state.save(master_file, master)
-        LOG.info("MASTER_TAIWAN_RELEASE_DAY moved=%d",
-                 sum(new is not old for new, old in zip(moved, games)))
+        LOG.info("MASTER_TAIWAN_RELEASE_DAY moved=%d", moved_count)
     phase = state.get("phase")
     if phase == "discovery":
         result = run_discovery(args, state, catalog, runtime)
@@ -406,7 +407,7 @@ def execute_pipeline(args: argparse.Namespace, runtime: CandidateRuntime) -> dic
     runtime.state.save(catalog_file, catalog)
     runtime.state.save(state_file, state)
     if phase in {"followers", "prefilter"}:
-        if phase == "followers":
+        if phase == "followers" or moved_count:
             runtime.state.save(master_file, master)
         original_games = runtime.sources.filter_confirmed_master_games(
             master.get("games", []), active_candidate_rows(catalog, state, runtime),

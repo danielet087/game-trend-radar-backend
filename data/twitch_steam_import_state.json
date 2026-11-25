@@ -3438,7 +3438,7 @@
     },
     "4253570": {
       "status": "accepted",
-      "updated_at": "2026-11-25T23:18:21.219278Z",
+      "updated_at": "2026-11-25T23:19:03.935283Z",
       "twitch_admission": {
         "appid": 4253570,
         "checked_at": "2026-10-21T21:19:25Z",
@@ -3467,7 +3467,15 @@
       "retry_after": null,
       "content_signature": "dd02d7560644c224f7ef5f8be6d21d69564b203941721649fdbaa686ff2e5e25",
       "followers": 3786,
-      "follower_checked_at": "2026-10-22T08:15:37.029003+08:00"
+      "follower_checked_at": "2026-10-22T08:15:37.029003+08:00",
+      "content_dispatch": {
+        "status": "dispatched",
+        "signature": "dd02d7560644c224f7ef5f8be6d21d69564b203941721649fdbaa686ff2e5e25",
+        "attempted_at": "2026-11-25T23:19:03.935283Z",
+        "target_repository": "danielet087/game-trend-radar-content-backend",
+        "event_type": "steam_game_twitch_discovered",
+        "http": 204
+      }
     },
     "1853440": {
       "status": "accepted",
@@ -6851,6 +6859,6 @@
       }
     }
   },
-  "updated_at": "2026-11-25T23:18:21.219278Z",
+  "updated_at": "2026-11-25T23:19:03.935283Z",
   "api_cooldowns": {}
 }

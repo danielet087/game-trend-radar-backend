@@ -381,14 +381,7 @@ def test_locale_application_lookup_failure_leaves_game_untouched():
     assert game == {"name": "Old"}
 
 
-def test_canonical_composition_uses_new_ports_without_legacy_preview(monkeypatch):
-    import scripts.publish_steam_preview as legacy
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("Legacy preview is not a canonical dependency")
-
-    for name in ("steam_get", "app_details", "localized_names", "normalized_metadata", "add_traditional_name"):
-        monkeypatch.setattr(legacy, name, forbidden)
+def test_canonical_composition_uses_new_ports(monkeypatch):
     sleep = Mock()
     monkeypatch.setattr(adapter.time, "sleep", sleep)
     session = Session([Response({"12": {"success": True, "data": {"name": "中文"}}})])

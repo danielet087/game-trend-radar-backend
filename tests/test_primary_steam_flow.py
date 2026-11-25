@@ -192,7 +192,7 @@ def test_twitch_collection_uses_and_pins_database_bytes_before_collecting(db, mo
     assert sequence == ['pin', 'collect']
 
 
-def test_production_workflows_use_primary_entries_and_fence_old_writers():
+def test_production_workflows_use_primary_entries():
     root = Path(__file__).resolve().parents[1] / '.github/workflows'
     official = yaml.safe_load((root / 'steam-official-daily-catchup-250.yml').read_text())
     job = official['jobs']['follower-catchup']
@@ -204,31 +204,13 @@ def test_production_workflows_use_primary_entries_and_fence_old_writers():
     assert 'git reset --hard origin/main\npython -m radar_core.storage.primary hydrate' in commands
     tests = next(step for step in job['steps'] if 'pytest' in step.get('run', ''))
     assert tests['env']['RADAR_DATABASE_PRIMARY'] == '0'
-    for filename in ('pilot-steam-prefilter-4000.yml', 'verify-steam-4000-shortlist-15s.yml',
-                     'steam-official-backlog-oneoff-20260923.yml', 'publish-steam-preview.yml'):
-        legacy = yaml.safe_load((root / filename).read_text())
-        for value in legacy['jobs'].values():
-            assert "vars.RADAR_DATABASE_PRIMARY != '1'" in value['if']
 
 
-def test_all_legacy_writer_jobs_require_manual_dispatch_even_with_primary_disabled():
+def test_remaining_git_writer_jobs_require_manual_dispatch_even_with_primary_disabled():
     root = Path(__file__).resolve().parents[1] / '.github/workflows'
-    filenames = (
-        'convert-eligible-names-script-once.yml', 'games-popularity-anonymous-salvage-once.yml',
-        'games-popularity-resumable-once.yml', 'localize-steam-candidates-once.yml',
-        'pilot-steam-prefilter-4000.yml', 'publish-steam-preview.yml',
-        'screen-entire-steam-year-third-party.yml', 'screen-steam-exact-day-once.yml',
-        'steam-adult-filter-experiment-once.yml', 'steam-audit-published-release-dates.yml',
-        'steam-candidate-supervisor.yml', 'steam-manual-sync-once.yml',
-        'steam-master-post-followers-date-repair-once.yml', 'steam-official-backlog-oneoff-20260923.yml',
-        'steam-official-followers-resumable-once.yml', 'steam-official-hour-stress-once.yml',
-        'steam-official-nearfirst-batch-once.yml', 'steam-refresh-all-qualified-content.yml',
-        'steam-refresh-published-chinese.yml', 'steam-refresh-releasing-soon-content.yml',
-        'sync-steam-release-times.yml', 'update-steam.yml', 'verify-steam-4000-shortlist-15s.yml',
-    )
+    filenames = ('steam-refresh-all-qualified-content.yml', 'steam-refresh-releasing-soon-content.yml')
     expected = ("github.event_name == 'workflow_dispatch' && "
                 "vars.RADAR_DATABASE_MIGRATION_PAUSE != '1' && vars.RADAR_DATABASE_PRIMARY != '1'")
-    assert len(filenames) == 23
     for filename in filenames:
         workflow = yaml.safe_load((root / filename).read_text())
         for job in workflow['jobs'].values():

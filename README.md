@@ -16,7 +16,7 @@
 
 Twitch 正式收錄的新作是獨立入口：Twitch ID → Helix 的 IGDB ID → IGDB 官方 Steam 外部 ID，並驗證原始收錄觀眾至少 7,000 人。Steam 身分、正式遊戲類型、台灣完整上市日與成人內容規則仍須通過。可用的真實官方 Followers 直接沿用；缺少 GroupID 或官方 Followers 不再阻擋收錄，`followers`、`follower_checked_at`、`follower_source` 保存為 `null`，前端顯示「未取得／收錄依據 Twitch」。不以 0 代替未知，也不修改一般 Steam 來源的 5,000 Followers 門檻。IGDB 沒有 Steam 連結仍保留待確認，每日重查。
 
-每輪既有 hourly 工作先以不可變 Git／資料庫快照驗證 Twitch 身分鏈，再查 Steam 商店 metadata。收錄後同步保存主清單、匯入狀態與 checkpoint 的 `twitch_admitted_candidates` 回條，移除待查群組及其一般來源副本。重建 frozen／每日佇列會讀取這份獨立收錄證據，避免同一款因缺少 GroupID 被重新加入；官方數值、請求歷史與 Community 冷卻均保留。舊版因 metadata 暫時失敗而未完成收錄的候選仍可續跑。`reconcile-twitch-admissions.yml` 提供人工補跑入口，不增加定時排程。
+每輪既有 hourly 工作先以不可變 Git／資料庫快照驗證 Twitch 身分鏈，再查 Steam 商店 metadata。收錄後同步保存主清單、匯入狀態與 checkpoint 的 `twitch_admitted_candidates` 回條，移除待查群組及其一般來源副本。重建 frozen／每日佇列會讀取這份獨立收錄證據，避免同一款因缺少 GroupID 被重新加入；官方數值、請求歷史與 Community 冷卻均保留。舊版因 metadata 暫時失敗而未完成收錄的候選仍可續跑。
 
 若 Steam 台灣商店的完整上市日與 Store Browse 時間戳日期不同，已驗證 Twitch 身分的遊戲可採用同 AppID 的 `appdetails cc=TW l=tchinese` 完整日期進月曆。保存日期來源、查證時間與 `steam_taiwan_store_date_authoritative` 政策，同時保留真實 UTC、換算後台灣日期及衝突診斷，不改寫原始時間戳。
 

@@ -52,6 +52,7 @@ def runtime(store, **operations):
         excluded_appids=lambda: set(),
         is_disallowed=lambda row, blocked: int(row["appid"]) in blocked,
         session_factory=lambda: SimpleNamespace(headers={}),
+        store_facts=lambda: None,
     )
     sources.update(operations)
     return application.CandidateRuntime(

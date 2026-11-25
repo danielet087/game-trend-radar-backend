@@ -189,6 +189,25 @@ def api_key_from_environment() -> str:
     return os.environ.get("STEAM_WEB_API_KEY", "").strip()
 
 
+STORE_FACTS_SOURCE = "danielet087/game-trend-radar"
+STORE_FACTS_PATH = "data/store_facts.json"
+
+
+def read_store_facts():
+    """The content backend's Store Browse facts (data/store_facts.json) from the
+    primary database, or None: the master then keeps its dates. A missing or
+    unreadable file never stops the daily refresh."""
+    from radar_core.storage import primary
+    from radar_core.storage.sql import StorageError
+    if not primary.enabled():
+        return None
+    try:
+        return primary.read_json(STORE_FACTS_SOURCE, STORE_FACTS_PATH)
+    except (StorageError, ValueError, TypeError, OSError) as error:
+        LOG.warning("STORE_FACTS_UNAVAILABLE %s", type(error).__name__)
+        return None
+
+
 @dataclass(frozen=True)
 class CandidateSources:
     """Explicit replaceable operations; defaults are the production adapters."""
@@ -209,3 +228,4 @@ class CandidateSources:
     excluded_appids: Callable = excluded_appids
     is_disallowed: Callable = is_disallowed
     is_twitch_qualified: Callable = is_twitch_qualified
+    store_facts: Callable = read_store_facts

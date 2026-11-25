@@ -20,6 +20,8 @@ Twitch 正式收錄的新作是獨立入口：Twitch ID → Helix 的 IGDB ID �
 
 若 Steam 台灣商店的完整上市日與 Store Browse 時間戳日期不同，已驗證 Twitch 身分的遊戲可採用同 AppID 的 `appdetails cc=TW l=tchinese` 完整日期進月曆。保存日期來源、查證時間與 `steam_taiwan_store_date_authoritative` 政策，同時保留真實 UTC、換算後台灣日期及衝突診斷，不改寫原始時間戳。
 
+主清單的日期只在遊戲重新排到 Followers 查證時才會更新，Steam 之後延期或提前上市的遊戲會留在舊日期。每日流程整理主清單時讀內容後端發布的 `data/store_facts.json`（Store Browse 台灣商店，一天 4 次），主清單時間和 Steam 目前的上市時間差超過 12 小時就改用 Steam 的：已上市或商店顯示完整日期的算已查證、照常進月曆；改成只標月份、季、年或文字的先移出月曆，等每日查證重新確認完整日期。以台灣商店日期為準的遊戲、新舊時間都在 60 天前的歷史資料、超過一天沒更新的商店資料都不動，讀不到商店資料時主清單照舊。改動記在 `MASTER_STORE_FACT_RELEASE` 日誌。
+
 主清單及 `data/twitch_steam_import_state.json` 持久化後，送 `steam_game_twitch_discovered` 內容事件；未知 Followers 隨事件保留未知，內容後端重新核對不可變 Twitch 證據與 Steam metadata 後發布。事件失敗保留重試。來源證據 `twitch_admission` 隨清單、內容、索引與成長紀錄保存，正常更新不能移除已接受的來源；後來取得的真實官方數值不能被未知值覆蓋。沿用既有 `CONTENT_BACKEND_TOKEN`，不新增 Secrets。
 
 既有官方 worker 的 Community 429 以 15 分鐘開始逐次退避，最長 24 小時，並遵守更長的 `Retry-After` 秒數或 HTTP 日期；唯一的 Community 冷卻保存在官方 worker checkpoint。Twitch importer 只查商店 metadata、讀官方快取及建立候選，不能自行查 Community，也不另存 Community 冷卻副本。商店 metadata 按 5／10／20／30 分鐘退避；一般 metadata 網路或解析失敗按 5 分鐘開始、最長 1 小時逐次退避。期限只決定何時可再查，實際執行仍依原排程與共用鎖。Community 冷卻期間仍可用真實官方 Followers 快取完成核對。日期衝突與資格排除仍每日核對；來源失效或不再合格的未收錄候選撤回 Twitch 優先資格，原一般候選恢復，不重設已查進度與官方結果。

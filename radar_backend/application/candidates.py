@@ -7,6 +7,7 @@ remote publication remain outside the application layer.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
@@ -21,6 +22,7 @@ from radar_backend.domain.candidates import (
     official_request_budget, prefilter_complete, prescreen_window_complete,
     priority_rows, public_candidate_rows,
 )
+from radar_backend.domain.store_fact_releases import apply_store_fact_releases
 
 LOG = logging.getLogger(__name__)
 
@@ -43,6 +45,7 @@ class CandidateSourcePort(Protocol):
     excluded_appids: Callable
     is_disallowed: Callable
     is_twitch_qualified: Callable
+    store_facts: Callable
 
 
 class CandidateStatePort(Protocol):
@@ -382,6 +385,15 @@ def execute_pipeline(args: argparse.Namespace, runtime: CandidateRuntime) -> dic
     if moved_count:
         master["games"] = moved
         LOG.info("MASTER_TAIWAN_RELEASE_DAY moved=%d", moved_count)
+    # Games Steam moved after their date was last confirmed take Steam's current
+    # release time from the content backend's store facts, saved the same way.
+    corrected, release_changes = apply_store_fact_releases(
+        master.get("games", []), runtime.sources.store_facts(), runtime.utcnow(),
+    )
+    if release_changes:
+        master["games"] = corrected
+        LOG.info("MASTER_STORE_FACT_RELEASE changed=%d %s", len(release_changes),
+                 json.dumps(release_changes, ensure_ascii=False, sort_keys=True))
     phase = state.get("phase")
     if phase == "discovery":
         result = run_discovery(args, state, catalog, runtime)
@@ -407,7 +419,7 @@ def execute_pipeline(args: argparse.Namespace, runtime: CandidateRuntime) -> dic
     runtime.state.save(catalog_file, catalog)
     runtime.state.save(state_file, state)
     if phase in {"followers", "prefilter"}:
-        if phase == "followers" or moved_count:
+        if phase == "followers" or moved_count or release_changes:
             runtime.state.save(master_file, master)
         original_games = runtime.sources.filter_confirmed_master_games(
             master.get("games", []), active_candidate_rows(catalog, state, runtime),

@@ -3438,23 +3438,23 @@
     },
     "4253570": {
       "status": "accepted",
-      "updated_at": "2026-10-22T00:19:41.321730Z",
+      "updated_at": "2026-11-25T23:18:21.219278Z",
       "twitch_admission": {
-        "schema_version": 1,
-        "method": "twitch_igdb_external_steam_v1",
         "appid": 4253570,
-        "twitch_game_id": "758912766",
-        "igdb_id": "399078",
         "checked_at": "2026-10-21T21:19:25Z",
-        "source_database_revision": "2a84ee1559066452f55653072a195f2c04e894dce7886549a38b757b68032ee6",
+        "igdb_id": "399078",
+        "method": "twitch_igdb_external_steam_v1",
+        "schema_version": 1,
         "source_database_generation": 380,
         "source_database_namespace": "danielet087/game-trend-radar@main",
+        "source_database_revision": "2a84ee1559066452f55653072a195f2c04e894dce7886549a38b757b68032ee6",
         "source_enrollment": {
-          "source": "igdb_first_release_date",
+          "min_viewers": 7000,
           "observed_at": "2026-10-20T21:16:58Z",
-          "viewer_count": 11552,
-          "min_viewers": 7000
-        }
+          "source": "igdb_first_release_date",
+          "viewer_count": 11552
+        },
+        "twitch_game_id": "758912766"
       },
       "validation_version": 4,
       "follower_candidate": null,
@@ -3465,17 +3465,9 @@
       "rate_limit_stage": null,
       "rate_limit_attempts": 0,
       "retry_after": null,
-      "content_signature": "1a6e271db8c368b7e3f0caebb74ea3b08d65f53773c61898468a39b7f78dcee2",
+      "content_signature": "dd02d7560644c224f7ef5f8be6d21d69564b203941721649fdbaa686ff2e5e25",
       "followers": 3786,
-      "follower_checked_at": "2026-10-22T08:15:37.029003+08:00",
-      "content_dispatch": {
-        "status": "dispatched",
-        "signature": "1a6e271db8c368b7e3f0caebb74ea3b08d65f53773c61898468a39b7f78dcee2",
-        "attempted_at": "2026-10-22T00:19:41.321730Z",
-        "target_repository": "danielet087/game-trend-radar-content-backend",
-        "event_type": "steam_game_twitch_discovered",
-        "http": 204
-      }
+      "follower_checked_at": "2026-10-22T08:15:37.029003+08:00"
     },
     "1853440": {
       "status": "accepted",
@@ -6859,6 +6851,6 @@
       }
     }
   },
-  "updated_at": "2026-11-25T23:01:52.612194Z",
+  "updated_at": "2026-11-25T23:18:21.219278Z",
   "api_cooldowns": {}
 }

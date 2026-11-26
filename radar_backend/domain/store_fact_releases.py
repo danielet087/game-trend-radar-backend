@@ -9,12 +9,17 @@ it to 2027 Q1, and Nomad Drive on 2026-10-20 though it launched on 2026-10-28.
 
 A row whose release time is more than 12 hours from Steam's current one takes
 Steam's time. A full coming-soon date, or a release that has happened, is an
-exact date again. A coming-soon date Steam now shows only as a month,
-quarter, year or text loses its full-date status, so it leaves the published
-calendar until discovery confirms an exact date and the Followers phase takes
-it back. Small differences (a launch a few minutes or hours early) are left
-alone, and so are rows whose Taiwan Store date is the authority, history more
-than 60 days old on both sides, and facts not confirmed in the last day.
+exact date again. A release has happened once its time has passed and Steam
+does not call it coming soon: Store Browse leaves the coming-soon flag out for
+released games (on 2026-11-25 every released game had it null, so six launched
+games were wrongly taken off the calendar). A coming-soon date Steam now shows
+only as a month, quarter, year or text loses its full-date status, so it
+leaves the published calendar until discovery confirms an exact date and the
+Followers phase takes it back; a row this module took off the calendar comes
+back as soon as Steam's date is exact again, even at the same time. Small
+differences (a launch a few minutes or hours early) are left alone, and so
+are rows whose Taiwan Store date is the authority, history more than 60 days
+old on both sides, and facts not confirmed in the last day.
 """
 from __future__ import annotations
 
@@ -80,12 +85,15 @@ def corrected_row(row: object, fact: dict[str, Any] | None, now: datetime) -> di
         return None
     before = _master_time(row)
     at = fact["at"]
-    if before is None or abs(at - before) <= TOLERANCE or max(at, before) < now - HISTORY:
-        return None
-    # Steam's time is the launch itself once it has passed; before that only a
-    # full date shown on the Store is an exact date.
-    exact = (fact["coming_soon"] is False and at <= now) or (
+    # Steam's time is the launch itself once it has passed and Steam does not
+    # call the game coming soon; before that only a full date shown on the
+    # Store is an exact date.
+    exact = (fact["coming_soon"] is not True and at <= now) or (
         fact["coming_soon"] is not False and fact["display"] == "date_full")
+    restored = exact and row.get("release_date_basis") == NOT_FULL_BASIS
+    if (before is None or (abs(at - before) <= TOLERANCE and not restored)
+            or max(at, before) < now - HISTORY):
+        return None
     day = at.astimezone(TAIPEI).date().isoformat()
     result = {key: value for key, value in row.items() if key not in STALE_FIELDS}
     result.update({

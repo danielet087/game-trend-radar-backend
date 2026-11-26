@@ -100,8 +100,43 @@ def test_a_coming_soon_date_steam_no_longer_calls_full_is_not_exact_even_when_it
     passed = facts(**{"2988120": release("2026-11-20T09:00:00Z", coming_soon=True, display="date_month")})
     games, changes = apply_store_fact_releases([row()], passed, NOW)
     assert changes[0]["exact"] is False and games[0]["release_display_precision"] is None
-    unknown = facts(**{"2988120": release("2026-11-20T09:00:00Z", coming_soon=None, display=None)})
-    assert apply_store_fact_releases([row()], unknown, NOW)[1][0]["exact"] is False
+    # Without the flag a future time is not exact either.
+    future = facts(**{"2988120": release("2027-03-31T07:00:00Z", coming_soon=None, display=None)})
+    assert apply_store_fact_releases([row()], future, NOW)[1][0]["exact"] is False
+
+
+def test_a_launch_store_browse_reports_without_a_coming_soon_flag_is_exact():
+    # Store Browse leaves the flag out for released games. On 2026-11-25 this
+    # took Online: 404, Motocross The Game and Burning Sword off the calendar.
+    online = row(4094350, "2026-10-17", "2026-10-16T17:00:00Z")
+    games, changes = apply_store_fact_releases(
+        [online], facts(**{"4094350": release("2026-10-21T20:16:02Z", coming_soon=None, display=None)}), NOW)
+    assert changes == [{"appid": 4094350, "from": "2026-10-17", "from_time": "2026-10-16T17:00:00Z",
+                        "to": "2026-10-22", "to_time": "2026-10-21T20:16:02Z", "exact": True}]
+    moved = games[0]
+    assert (moved["release_start"], moved["release_timestamp_taipei_date"], moved["release_display_precision"]) == (
+        "2026-10-22", "2026-10-22", "date_full")
+    assert moved["release_date_basis"] == EXACT_BASIS and moved["post_followers_store_verified"] is True
+    assert moved["release_date_verified_at"] == CHECKED
+
+
+def test_a_row_taken_off_the_calendar_comes_back_once_steam_s_date_is_exact():
+    # The 2026-11-26 00:00 run left these rows on Steam's time but not exact.
+    gone = corrected_row(row(4094350, "2026-10-17", "2026-10-16T17:00:00Z"), fact_release(
+        facts(**{"4094350": release("2026-10-21T20:16:02Z", coming_soon=None, display=None)})["games"]["4094350"],
+        NOW - timedelta(hours=1)), NOW)
+    gone.update(release_display_precision=None, release_date_basis=NOT_FULL_BASIS, post_followers_store_verified=False)
+    games, changes = apply_store_fact_releases(
+        [gone], facts(**{"4094350": release("2026-10-21T20:16:02Z", coming_soon=None, display=None)}), NOW)
+    assert changes == [{"appid": 4094350, "from": "2026-10-22", "from_time": "2026-10-21T20:16:02Z",
+                        "to": "2026-10-22", "to_time": "2026-10-21T20:16:02Z", "exact": True}]
+    assert games[0]["release_display_precision"] == "date_full" and games[0]["release_date_basis"] == EXACT_BASIS
+    assert games[0]["post_followers_store_verified"] is True
+    # Never Be Alone stays off while Steam shows only a quarter, and an exact row is left alone.
+    quarter = facts(**{"2988120": release("2027-03-31T07:00:00Z", display="date_quarter")})
+    off = apply_store_fact_releases([row()], quarter, NOW)[0]
+    assert apply_store_fact_releases(off, quarter, NOW)[1] == []
+    assert apply_store_fact_releases(games, facts(**{"4094350": release("2026-10-21T20:16:02Z", None, None)}), NOW)[1] == []
 
 
 def test_the_daily_refresh_saves_moved_rows_with_its_batch_output_and_drops_them_from_the_calendar():

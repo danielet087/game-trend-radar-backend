@@ -20,6 +20,18 @@ class GrowthTests(unittest.TestCase):
         self.assertFalse(eligible({**row, "followers": 3000}, date(2026, 9, 28)))
         self.assertEqual(parse_count('<memberList><memberCount>6,521</memberCount></memberList>'), 6521)
 
+    def test_a_day_steam_has_moved_away_from_is_not_tracked(self):
+        # Never Be Alone, 11-26: the list still said 12-08, Steam's time was 2027-03-31.
+        row = {"appid": 2988120, "followers": 11165, "release_start": "2026-12-08", "release_end": "2026-12-08",
+               "release_time_utc": "2027-03-31T07:00:00Z", "release_timestamp_taipei_date": "2027-03-31"}
+        self.assertFalse(eligible(row, date(2026, 11, 26)))
+        self.assertFalse(eligible({**row, "release_timestamp_taipei_date": None}, date(2026, 11, 26)))
+        self.assertFalse(eligible({**row, "release_time_utc": None, "release_date_conflict": True}, date(2026, 11, 26)))
+        # Steam's time on the listed Taiwan day is the same day.
+        same = {**row, "release_time_utc": "2026-12-07T17:00:00Z", "release_timestamp_taipei_date": "2026-12-08"}
+        self.assertTrue(eligible(same, date(2026, 11, 26)))
+        self.assertFalse(eligible({**same, "release_end": "2026-12-09"}, date(2026, 11, 26)))
+
     def test_stop_on_429_without_retrying_or_inventing_zero(self):
         class Session:
             headers = {}

@@ -4,9 +4,10 @@ The complete source-document ingestion, D1 replication, and daily portable SQL
 backup workflow is implemented in `source-storage-sync.yml`. See
 [database-storage.md](database-storage.md) for current coverage, recovery and
 operating instructions. Direct collector-primary support is implemented behind
-the explicit `RADAR_DATABASE_PRIMARY` flag. Deployment starts in `prepare` mode;
-only a successful reviewed cutover report establishes that production writers
-have switched. See the cutover procedure in that document.
+the explicit `RADAR_DATABASE_PRIMARY` flag. Deployment started in `prepare` mode,
+and the reviewed cutover completed on 2026-10-16. Its control workflow,
+`config/database-rollout.json` and `scripts/database_primary_control.py` were
+removed on 2026-11-27; see that document.
 
 ## Stage 1: connection validation
 

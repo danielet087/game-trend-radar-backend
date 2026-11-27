@@ -27,6 +27,18 @@ def timestamp(value):
 POST_RELEASE_DAYS = 0
 
 
+def consistent_day(row, released):
+    """The site's own rule (the frontend's insights `accepted`): a day the row's
+    other fields contradict, such as Steam's time on a later day after a delay,
+    is off the site's list, so it is not tracked either."""
+    end, stamp_day, clock = row.get("release_end"), row.get("release_timestamp_taipei_date"), row.get("release_time_utc")
+    instant = timestamp(clock) if clock is not None else None
+    return (row.get("release_date_conflict") is not True
+            and (not end or end == row["release_start"])
+            and (not stamp_day or stamp_day == row["release_start"])
+            and (clock is None or (instant is not None and instant.astimezone(TAIPEI).date() == released)))
+
+
 def eligible(row, today):
     try:
         released = date.fromisoformat(row["release_start"])
@@ -34,7 +46,8 @@ def eligible(row, today):
         return (isinstance(aid, int) and not isinstance(aid, bool) and aid > 0
                 and (is_twitch_qualified(row) or (
                     type(count) is int and (count >= 5000 or count > 3000
-                    and row.get("recent_source") in {"tracked_release", "direct_release"})))
+                    and row.get("recent_source") in {"tracked_release", "direct_release"})
+                    and consistent_day(row, released)))
                 and row.get("release_precision", "day") == "day"
                 and today - timedelta(days=POST_RELEASE_DAYS) <= released <= today + timedelta(days=365))
     except (KeyError, TypeError, ValueError):

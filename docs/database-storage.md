@@ -3,8 +3,7 @@
 ## 目前整合邊界
 
 主庫模式的資料流是 **收集器 → Turso 讀寫 → Git 公開投影與 D1 非同步備援**。
-切換由 `Coordinate database primary cutover` 控制；部署程式不等於已切換。
-以成功的 cutover 報告、七個來源的 primary policy 與各 runtime 的
+2026-10-16 已切換完成（見「正式切換」）；是否為主庫模式，以七個來源的 primary policy 與各 runtime 的
 `RADAR_DATABASE_PRIMARY=1` 為準。尚未切換的來源仍按原本 Git 匯入流程運作。
 瀏覽器只讀靜態 JSON，資料庫 Token 僅注入 Actions 後端工作。
 D1 不會自動升為另一個寫入來源；主庫故障時保留最後成功的公開資料。
@@ -104,9 +103,9 @@ D1 API 有回傳用量時，`replica_usage` 顯示該輪讀寫列數與最近回
 | `export` | 匯出現在的 Turso 快照，額外提供保留 1 天的下載 artifact |
 
 五個 repository Actions Secrets 沿用 `docs/turso-d1-rollout.md`。
-Turso 兩個 secrets 亦需配置到 frontend Actions、Twitch、Content 與 YouTube runtime；
-IGDB 由 Twitch workflow 執行。`prepare` 只使用既有具權限的 Token，將固定兩個 Secrets
-以各目的 repo 的 public key 加密後寫入；不輸出明文。缺少權限時停止並回報，不繞過權限。
+Turso 兩個 secrets 也配置在 frontend Actions、Twitch、Content 與 YouTube runtime；
+IGDB 由 Twitch workflow 執行。切換時由控制工作的 `prepare` 以各目的 repo 的 public key 加密寫入；
+這個工具 2026-11-27 已移除，之後要更換這兩個 Secrets，就在各 repo 的 Actions Secrets 手動更新。
 GitHub Releases 使用 Actions 自帶的 `GITHUB_TOKEN`，不用再建立另一個 Token。
 
 ## 每日可攜式備份與還原
@@ -164,24 +163,22 @@ chunk payload 達 300 MiB 時，workflow 會在報告和 Actions 標註容量警
 - 手動執行預設只產生報告；勾選 `apply` 才刪除，且不受 200 筆上限限制。
 - 2026-11-16 首次清理釋放 10/16～11/13 的 501 筆，預估回收約 195 MB 編碼後 chunk。
 
-## 正式切換與重試
+## 正式切換（2026-10-16 完成）
 
-1. 先部署所有 repo，primary 開關保留 0；外部 repo 固定同一個 immutable core SHA。
-2. `prepare` 配置 runtime secrets，既有開關不重設。
-3. 在 `config/database-rollout.json` 填入已審 core SHA、所有 writer workflow SHA-256 與 `phase: cutover`。
-4. 控制工作驗證部署、暫停 writer、等待在途工作完成、最後匯入與保留舊收錄證據，再啟用七個來源。
-5. 全部 runtime 開關確認為 1 後才恢復排程；啟用後 Git 反向匯入會被資料庫拒絕。
+切換由 `Coordinate database primary cutover`（`database-primary-control.yml`，改設定檔時由 push 觸發）
+在 2026-10-15～16 完成：先部署所有 repo、primary 開關保留 0、外部 repo 固定同一個 core；`prepare`
+配置 runtime secrets；`config/database-rollout.json` 填入已審 core SHA、所有 writer workflow 的
+SHA-256 與 `phase: cutover` 後，控制工作驗證部署、暫停 writer、等在途工作完成、最後匯入並保留舊收錄證據，
+再啟用七個來源，全部 runtime 開關確認為 1 才恢復排程。啟用後 Git 反向匯入會被資料庫拒絕。
 
-切換途中失敗會保留暫停，不讓部分新舊 writer 同時運作。修正錯誤後重跑 cutover；
-`resume` 只接受全部來源均未啟用或均已啟用，部分啟用時必須先完成 cutover。
+這支控制工作、`config/database-rollout.json`、`scripts/database_primary_control.py` 與它的測試只在切換時用
+（2026-10-16 之後沒有再執行），2026-11-27 移除；要看當時的做法，查 Git 歷史。
+
 不要手動將已啟用的 runtime 改回 0；還原為 Git 權威來源需要獨立的資料遷移。
 人工設定檔仍可由 Git 維護；舊版人工資料 writer 在主庫模式下停用。
 
-若現有 publication Token 無法管理 Secrets／Variables（例如 HTTP 403），在 backend 新增
-`DATABASE_ROLLOUT_TOKEN`。使用使用者自己的 fine-grained PAT，選取本系統六個 repositories，
-Repository permissions 為 Contents: Read、Actions: Read、Secrets: Read and write、Variables: Read and write。
-用途僅為部署檢查、加密分發兩個 Turso Secrets、暫停與切換開關；不必授予 account-management 權限。
-切換及驗證完成後可以撤銷此臨時 Token；日常收集不依賴它。不要將 Token 貼到對話或公開檔案。
+切換時為了分發 Secrets 與切換開關建立的 backend Secret `DATABASE_ROLLOUT_TOKEN` 已沒有工作使用，
+可以撤銷；日常收集不依賴它。不要將 Token 貼到對話或公開檔案。
 
 ## 官方參考
 

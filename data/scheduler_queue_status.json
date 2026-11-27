@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-27T12:02:42.413979Z",
+  "generated_at": "2026-11-27T12:05:43.716209Z",
   "today_taipei": "2026-11-27",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
     "checkpoint_path": "experiments/steam_official_daily_catchup/checkpoint.json",
-    "checkpoint_updated_at": "2026-11-27T11:05:01.156848Z",
+    "checkpoint_updated_at": "2026-11-27T12:05:43.331688Z",
     "group_resolution_updated_at": "2026-11-16T23:40:12.254489Z",
     "candidate_state_updated_at": "2026-11-26T17:07:44.709287Z",
     "prefilter_updated_at": "2026-11-26T17:07:44.692024Z",
     "eligible_screened_at": "2026-11-26T17:07:45.525438Z",
     "twitch_import_updated_at": "2026-11-27T12:02:08.150670Z",
-    "last_official_success_at": "2026-11-27T11:05:01.041409Z",
+    "last_official_success_at": "2026-11-27T12:05:43.167232Z",
     "queue_projection": "official_collector_make_queue"
   },
   "source_status": {
@@ -23,29 +23,29 @@
     "official_rechecks_pending": 0,
     "parked_group_xml_appids": [],
     "dropped_unlisted": 16,
-    "combined_pending_now": 15,
+    "combined_pending_now": 9,
     "likely_threshold_pending": 0,
     "completed_legacy": 408,
-    "completed_new": 6220,
+    "completed_new": 6226,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 15,
+    "normal_pending": 9,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 15,
-    "followers_ready_pending": 15,
+    "ready_pending": 9,
+    "followers_ready_pending": 9,
     "awaiting_group_pending": 0,
-    "total_pending": 15,
-    "today_attempts": 102,
-    "today_successes": 102,
+    "total_pending": 9,
+    "today_attempts": 108,
+    "today_successes": 108,
     "today_429": 0
   },
   "follower_recheck_plan": {
     "schema_version": 1,
     "date_taipei": "2026-11-27",
     "status": "completed",
-    "checked_at": "2026-11-27T12:02:42.413979+00:00",
+    "checked_at": "2026-11-27T20:05:43.716209+08:00",
     "needed": true,
     "planned_count": 1,
     "completed_count": 1,
@@ -69,107 +69,23 @@
   "batch": {
     "active": false,
     "status": "finished",
-    "started_at": "2026-11-27T19:02:30.334469+08:00",
-    "last_updated_at": "2026-11-27T19:05:01.156848+08:00",
-    "finished_at": "2026-11-27T19:05:01.156848+08:00",
+    "started_at": "2026-11-27T20:03:12.128016+08:00",
+    "last_updated_at": "2026-11-27T20:05:43.331688+08:00",
+    "finished_at": "2026-11-27T20:05:43.331688+08:00",
     "stop_reason": "batch_request_limit",
-    "last_appid": 5612780,
-    "last_name": "Orb Immortal",
+    "last_appid": 5513710,
+    "last_name": "Pastime: Ultimate Baseball Simulator",
     "requests_this_run": 6,
     "official_new_this_run": 6,
     "http_429_this_run": 0,
     "manual_cooldown_override": false,
     "request_limit": 6,
-    "run_id": "45986800444",
-    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45986800444"
+    "run_id": "45995015574",
+    "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45995015574"
   },
   "queue": [
     {
       "position": 1,
-      "appid": 5545200,
-      "name": "Lone Sands",
-      "steam_url": "https://store.steampowered.com/app/5545200/",
-      "release_date": "2027-03-09",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476204699",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 2,
-      "appid": 5553200,
-      "name": "SIGNOS: IMPETUS",
-      "steam_url": "https://store.steampowered.com/app/5553200/",
-      "release_date": "2027-03-09",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476281446",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 3,
-      "appid": 5101300,
-      "name": "Sideways Motorways",
-      "steam_url": "https://store.steampowered.com/app/5101300/",
-      "release_date": "2027-03-10",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475804718",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 4,
-      "appid": 5193040,
-      "name": "Seagrid Nightfall",
-      "steam_url": "https://store.steampowered.com/app/5193040/",
-      "release_date": "2027-03-12",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791475831826",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 5,
-      "appid": 5279710,
-      "name": "Glitch Front",
-      "steam_url": "https://store.steampowered.com/app/5279710/",
-      "release_date": "2027-03-15",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476136346",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 6,
-      "appid": 5513710,
-      "name": "Pastime: Ultimate Baseball Simulator",
-      "steam_url": "https://store.steampowered.com/app/5513710/",
-      "release_date": "2027-03-22",
-      "source": "fresh_daily_prefilter_unresolved",
-      "priority": false,
-      "state": "waiting",
-      "group_id64": "103582791476284817",
-      "group_resolution": null,
-      "last_attempt_at": null,
-      "last_attempt_status": null
-    },
-    {
-      "position": 7,
       "appid": 5519820,
       "name": "BUBBA PEG SURVIVORS",
       "steam_url": "https://store.steampowered.com/app/5519820/",
@@ -183,7 +99,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 8,
+      "position": 2,
       "appid": 5262990,
       "name": "Mailed It!",
       "steam_url": "https://store.steampowered.com/app/5262990/",
@@ -197,7 +113,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 9,
+      "position": 3,
       "appid": 4773920,
       "name": "Saloon Shuffle",
       "steam_url": "https://store.steampowered.com/app/4773920/",
@@ -211,7 +127,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 10,
+      "position": 4,
       "appid": 5042610,
       "name": "GYRE Grazeline",
       "steam_url": "https://store.steampowered.com/app/5042610/",
@@ -225,7 +141,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 11,
+      "position": 5,
       "appid": 5567100,
       "name": "Mytheria",
       "steam_url": "https://store.steampowered.com/app/5567100/",
@@ -239,7 +155,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 12,
+      "position": 6,
       "appid": 5337710,
       "name": "Tower Reborn",
       "steam_url": "https://store.steampowered.com/app/5337710/",
@@ -253,7 +169,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 13,
+      "position": 7,
       "appid": 5458310,
       "name": "Copper Champions",
       "steam_url": "https://store.steampowered.com/app/5458310/",
@@ -267,7 +183,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 14,
+      "position": 8,
       "appid": 5635550,
       "name": "The Snake Catcher",
       "steam_url": "https://store.steampowered.com/app/5635550/",
@@ -281,7 +197,7 @@
       "last_attempt_status": null
     },
     {
-      "position": 15,
+      "position": 9,
       "appid": 5026980,
       "name": "My Snake Likes Apples",
       "steam_url": "https://store.steampowered.com/app/5026980/",
@@ -297,84 +213,6 @@
   ],
   "parked": [],
   "events": [
-    {
-      "at": "2026-11-26T19:04:04.641509Z",
-      "kind": "official_attempt",
-      "appid": 5417190,
-      "name": "Oops! All Mimics",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 3,
-      "retry_at": null,
-      "run_id": "45880294353",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45880294353"
-    },
-    {
-      "at": "2026-11-26T19:04:34.641650Z",
-      "kind": "official_attempt",
-      "appid": 5517540,
-      "name": "Pop-Up Apocalypse",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "45880294353",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45880294353"
-    },
-    {
-      "at": "2026-11-26T19:05:04.641813Z",
-      "kind": "official_attempt",
-      "appid": 5568830,
-      "name": "Awake or Sleep: Anomaly",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 4,
-      "retry_at": null,
-      "run_id": "45880294353",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45880294353"
-    },
-    {
-      "at": "2026-11-26T19:05:34.641922Z",
-      "kind": "official_attempt",
-      "appid": 5606120,
-      "name": "Rock Racer GOLD",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 1,
-      "retry_at": null,
-      "run_id": "45880294353",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45880294353"
-    },
-    {
-      "at": "2026-11-26T20:03:18.407270Z",
-      "kind": "official_attempt",
-      "appid": 3242050,
-      "name": "Sort It Together",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 93,
-      "retry_at": null,
-      "run_id": "45887790705",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45887790705"
-    },
-    {
-      "at": "2026-11-26T20:03:48.407458Z",
-      "kind": "official_attempt",
-      "appid": 5588810,
-      "name": "IDEAL DEATH GAMBLING",
-      "status": "ok",
-      "http": 200,
-      "source": "fresh_daily_prefilter_unresolved",
-      "official_followers": 2,
-      "retry_at": null,
-      "run_id": "45887790705",
-      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45887790705"
-    },
     {
       "at": "2026-11-26T20:04:18.407580Z",
       "kind": "official_attempt",
@@ -1596,6 +1434,84 @@
       "retry_at": null,
       "run_id": "45986800444",
       "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45986800444"
+    },
+    {
+      "at": "2026-11-27T12:03:13.047878Z",
+      "kind": "official_attempt",
+      "appid": 5545200,
+      "name": "Lone Sands",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 4,
+      "retry_at": null,
+      "run_id": "45995015574",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45995015574"
+    },
+    {
+      "at": "2026-11-27T12:03:43.048005Z",
+      "kind": "official_attempt",
+      "appid": 5553200,
+      "name": "SIGNOS: IMPETUS",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "45995015574",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45995015574"
+    },
+    {
+      "at": "2026-11-27T12:04:13.048140Z",
+      "kind": "official_attempt",
+      "appid": 5101300,
+      "name": "Sideways Motorways",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 9,
+      "retry_at": null,
+      "run_id": "45995015574",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45995015574"
+    },
+    {
+      "at": "2026-11-27T12:04:43.048289Z",
+      "kind": "official_attempt",
+      "appid": 5193040,
+      "name": "Seagrid Nightfall",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 12,
+      "retry_at": null,
+      "run_id": "45995015574",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45995015574"
+    },
+    {
+      "at": "2026-11-27T12:05:13.048434Z",
+      "kind": "official_attempt",
+      "appid": 5279710,
+      "name": "Glitch Front",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 1,
+      "retry_at": null,
+      "run_id": "45995015574",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45995015574"
+    },
+    {
+      "at": "2026-11-27T12:05:43.048574Z",
+      "kind": "official_attempt",
+      "appid": 5513710,
+      "name": "Pastime: Ultimate Baseball Simulator",
+      "status": "ok",
+      "http": 200,
+      "source": "fresh_daily_prefilter_unresolved",
+      "official_followers": 3,
+      "retry_at": null,
+      "run_id": "45995015574",
+      "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/45995015574"
     }
   ],
   "events_limit": 100

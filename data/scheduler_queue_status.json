@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-28T04:02:46.340390Z",
+  "generated_at": "2026-11-28T04:03:28.373198Z",
   "today_taipei": "2026-11-28",
   "source": {
     "repository": "danielet087/game-trend-radar-backend",
@@ -20,23 +20,23 @@
     "eligible_screened_at": "2026-11-27T17:06:10.262207+00:00",
     "added_from_daily": 0,
     "eligible_count": 3567,
-    "official_rechecks_pending": 0,
+    "official_rechecks_pending": 1,
     "parked_group_xml_appids": [],
     "dropped_unlisted": 16,
-    "combined_pending_now": 0,
-    "likely_threshold_pending": 0,
+    "combined_pending_now": 1,
+    "likely_threshold_pending": 1,
     "completed_legacy": 408,
     "completed_new": 6283,
     "twitch_priority_pending": 0
   },
   "summary": {
-    "normal_pending": 0,
+    "normal_pending": 1,
     "twitch_priority_pending": 0,
     "parked": 0,
-    "ready_pending": 0,
-    "followers_ready_pending": 0,
+    "ready_pending": 1,
+    "followers_ready_pending": 1,
     "awaiting_group_pending": 0,
-    "total_pending": 0,
+    "total_pending": 1,
     "today_attempts": 48,
     "today_successes": 48,
     "today_429": 0
@@ -45,12 +45,12 @@
     "schema_version": 1,
     "date_taipei": "2026-11-28",
     "status": "completed",
-    "checked_at": "2026-11-28T12:02:46.340390+08:00",
+    "checked_at": "2026-11-28T04:03:28.373198+00:00",
     "needed": true,
     "planned_count": 2,
     "completed_count": 1,
     "remaining_count": 1,
-    "due_now_count": 0
+    "due_now_count": 1
   },
   "group_resolution_api_cooldown": {
     "attempts": 0,
@@ -63,7 +63,7 @@
     "active": false,
     "until": null,
     "reason": null,
-    "next_eligible_slot": null,
+    "next_eligible_slot": "2026-11-28T05:00:00Z",
     "schedule_taipei": "03:00–23:00 hourly"
   },
   "batch": {
@@ -81,7 +81,22 @@
     "run_id": "46105470898",
     "run_url": "https://github.com/danielet087/game-trend-radar-backend/actions/runs/46105470898"
   },
-  "queue": [],
+  "queue": [
+    {
+      "position": 1,
+      "appid": 1830110,
+      "name": "THE SIGNAL: Stranded on Sirenis",
+      "steam_url": "https://store.steampowered.com/app/1830110/",
+      "release_date": "2027-02-05",
+      "source": "fresh_daily_prefilter_ge4000_pending_official",
+      "priority": false,
+      "state": "waiting",
+      "group_id64": "103582791474035185",
+      "group_resolution": null,
+      "last_attempt_at": "2026-11-26T04:02:55.910855Z",
+      "last_attempt_status": "ok"
+    }
+  ],
   "parked": [],
   "events": [
     {
